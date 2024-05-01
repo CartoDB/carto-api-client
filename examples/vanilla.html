@@ -2,51 +2,25 @@
 <html lang="en-GB">
   <head>
     <meta charset="utf-8" />
-    <style>
-      html,
-      body {
-        background: #fafafa;
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      #app {
-        display: flex;
-        flex-direction: row;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-      }
-      #view {
-        position: relative;
-        width: 100%;
-        height: 100%;
-      }
-      #rail {
-        position: relative;
-        width: 200px;
-        background-color: peachpuff;
-        padding: 1em;
-      }
-      #footer {
-        position: absolute;
-        font-size: 0.8em;
-        bottom: 1em;
-        left: 1em;
-      }
-    </style>
+    <link rel="stylesheet" href="./style.css">
   </head>
   <body>
     <main id="app">
-      <section id="view"></section>
+      <section id="view">
+        <div id="map"></div>
+        <canvas id="deck-canvas"></canvas>
+      </section>
       <section id="rail">
         <foo-widget id="widget" header="my widget"> lorem ipsum... </foo-widget>
+        <figure>figure 1</figure>
+        <figure>figure 2</figure>
+        <figure>figure 3</figure>
       </section>
       <footer id="footer"></footer>
     </main>
 
     <script type="module">
+      import maplibregl from 'maplibre-gl';
       import { Deck } from '@deck.gl/core';
       import { VectorTileLayer, vectorTableSource } from '@deck.gl/carto';
       // import '../dist/src/foo-widget.js';
@@ -77,9 +51,9 @@
       });
 
       const deck = new Deck({
-        parent: document.querySelector('#view'),
-        mapStyle:
-          'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json',
+        canvas: 'deck-canvas',
+        // mapStyle: deck.carto.BASEMAP.POSITRON,
+          // 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json',
         initialViewState: { latitude: 0, longitude: 0, zoom: 0 },
         onViewStateChange: ({ viewState }) => {
           widgetEl.viewState = viewState;
@@ -87,6 +61,16 @@
         },
         controller: true,
         layers: [layer],
+      });
+
+      const style = 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json'
+      const map = new maplibregl.Map({container: 'map', style, interactive: false});
+
+      deck.setProps({
+        onViewStateChange: ({viewState}) => {
+          const {longitude, latitude, ...rest} = viewState;
+          map.jumpTo({center: [longitude, latitude], ...rest});
+        }
       });
 
       widgetEl.viewState = deck.viewState;

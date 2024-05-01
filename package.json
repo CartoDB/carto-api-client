@@ -50,6 +50,7 @@
     "concurrently": "^8.2.2",
     "eslint": "^8.15.0",
     "lit-analyzer": "^1.2.1",
+    "maplibre-gl": "^4.1.3",
     "prettier": "^2.6.2",
     "rimraf": "^3.0.2",
     "rollup": "^2.73.0",
