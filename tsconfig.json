@@ -9,14 +9,16 @@
     "inlineSources": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "strict": true,
+    "allowJs": true, // TODO
+    "skipLibCheck": true,
+    "strict": false, // TODO
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false, // TODO
     "noImplicitThis": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,

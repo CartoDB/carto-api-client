@@ -11,78 +11,12 @@
         <canvas id="deck-canvas"></canvas>
       </section>
       <section id="rail">
-        <foo-widget id="widget" header="my widget"> lorem ipsum... </foo-widget>
         <figure>figure 1</figure>
         <figure>figure 2</figure>
         <figure>figure 3</figure>
       </section>
       <footer id="footer"></footer>
     </main>
-
-    <script type="module">
-      import maplibregl from 'maplibre-gl';
-      import { Deck } from '@deck.gl/core';
-      import { VectorTileLayer, vectorTableSource } from '@deck.gl/carto';
-      // import '../dist/src/foo-widget.js';
-
-      const widgetEl = document.querySelector('#widget');
-
-      /**************************************************************************
-       * DATA SOURCE
-       */
-
-      const cartoData = vectorTableSource({
-        accessToken: import.meta.env.VITE_CARTO_ACCESS_TOKEN,
-        connectionName: 'carto_dw',
-        tableName: 'carto-demo-data.demo_tables.world_airports',
-      });
-
-      widgetEl.data = cartoData;
-
-      /**************************************************************************
-       * DECK.GL
-       */
-
-      const layer = new VectorTileLayer({
-        id: 'world_airports',
-        data: cartoData,
-        pointRadiusMinPixels: 4,
-        getFillColor: [200, 0, 80],
-      });
-
-      const deck = new Deck({
-        canvas: 'deck-canvas',
-        // mapStyle: deck.carto.BASEMAP.POSITRON,
-          // 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json',
-        initialViewState: { latitude: 0, longitude: 0, zoom: 0 },
-        onViewStateChange: ({ viewState }) => {
-          widgetEl.viewState = viewState;
-          return viewState;
-        },
-        controller: true,
-        layers: [layer],
-      });
-
-      const style = 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json'
-      const map = new maplibregl.Map({container: 'map', style, interactive: false});
-
-      deck.setProps({
-        onViewStateChange: ({viewState}) => {
-          const {longitude, latitude, ...rest} = viewState;
-          map.jumpTo({center: [longitude, latitude], ...rest});
-        }
-      });
-
-      widgetEl.viewState = deck.viewState;
-
-      /**************************************************************************
-       * FOOTER
-       */
-
-      cartoData.then(({ attribution }) => {
-        const footerEl = document.querySelector('#footer');
-        footerEl.innerHTML = attribution;
-      });
-    </script>
+    <script type="module" src="./vanilla.ts"></script>
   </body>
 </html>
