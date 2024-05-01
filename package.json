@@ -1,0 +1,49 @@
+{
+  "private": true,
+  "version": "0.0.0",
+  "description": "TODO",
+  "author": "Don McCurdy <donmccurdy@carto.com>",
+  "license": "UNLICENSED",
+  "keywords": [
+    "web-components",
+    "lit-element",
+    "typescript",
+    "lit"
+  ],
+  "type": "module",
+  "types": "./dist/my-element.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/my-element.d.ts",
+      "default": "./dist/my-element.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "clean": "rimraf my-element.{d.ts,d.ts.map,js,js.map} test/my-element.{d.ts,d.ts.map,js,js.map} test/my-element_test.{d.ts,d.ts.map,js,js.map}",
+    "lint": "npm run lint:lit-analyzer && npm run lint:eslint",
+    "lint:eslint": "eslint 'src/**/*.ts'",
+    "lint:lit-analyzer": "lit-analyzer",
+    "format": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --write"
+  },
+  "dependencies": {
+    "lit": "^3.0.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-replace": "^5.0.2",
+    "@typescript-eslint/eslint-plugin": "^5.25.0",
+    "@typescript-eslint/parser": "^5.25.0",
+    "@webcomponents/webcomponentsjs": "^2.8.0",
+    "eslint": "^8.15.0",
+    "lit-analyzer": "^1.2.1",
+    "prettier": "^2.6.2",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.73.0",
+    "rollup-plugin-summary": "^1.4.3",
+    "rollup-plugin-terser": "^7.0.2",
+    "typescript": "~5.3.3"
+  },
+  "customElements": "custom-elements.json"
+}
