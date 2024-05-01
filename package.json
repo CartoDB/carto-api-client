@@ -21,6 +21,7 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
+    "dev": "concurrently \"yarn build:watch\" \"vite .\"",
     "clean": "rimraf my-element.{d.ts,d.ts.map,js,js.map} test/my-element.{d.ts,d.ts.map,js,js.map} test/my-element_test.{d.ts,d.ts.map,js,js.map}",
     "lint": "npm run lint:lit-analyzer && npm run lint:eslint",
     "lint:eslint": "eslint 'src/**/*.ts'",
@@ -36,6 +37,7 @@
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "@typescript-eslint/parser": "^5.25.0",
     "@webcomponents/webcomponentsjs": "^2.8.0",
+    "concurrently": "^8.2.2",
     "eslint": "^8.15.0",
     "lit-analyzer": "^1.2.1",
     "prettier": "^2.6.2",
@@ -43,7 +45,8 @@
     "rollup": "^2.73.0",
     "rollup-plugin-summary": "^1.4.3",
     "rollup-plugin-terser": "^7.0.2",
-    "typescript": "~5.3.3"
+    "typescript": "~5.3.3",
+    "vite": "^5.2.10"
   },
   "customElements": "custom-elements.json"
 }
