@@ -38,7 +38,7 @@
     },
     {
       "files": [
-        "**/custom_typings/*.ts",
+        "**/custom_typings/*.ts"
       ],
       "rules": {
         "@typescript-eslint/no-explicit-any": "off"
