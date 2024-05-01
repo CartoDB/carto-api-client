@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      html,
+      body {
+        background: #fafafa;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #app {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      #view {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+      #rail {
+        position: relative;
+        width: 200px;
+        background-color: peachpuff;
+        padding: 1em;
+      }
+      #footer {
+        position: absolute;
+        font-size: 0.8em;
+        bottom: 1em;
+        left: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="app">
+      <section id="view"></section>
+      <section id="rail">
+        <foo-widget id="widget" header="my widget"> lorem ipsum... </foo-widget>
+      </section>
+      <footer id="footer"></footer>
+    </main>
+
+    <script type="module">
+      import { Deck } from '@deck.gl/core';
+      import { VectorTileLayer, vectorTableSource } from '@deck.gl/carto';
+      // import '../dist/src/foo-widget.js';
+
+      const widgetEl = document.querySelector('#widget');
+
+      /**************************************************************************
+       * DATA SOURCE
+       */
+
+      const cartoData = vectorTableSource({
+        accessToken: import.meta.env.VITE_CARTO_ACCESS_TOKEN,
+        connectionName: 'carto_dw',
+        tableName: 'carto-demo-data.demo_tables.world_airports',
+      });
+
+      widgetEl.data = cartoData;
+
+      /**************************************************************************
+       * DECK.GL
+       */
+
+      const layer = new VectorTileLayer({
+        id: 'world_airports',
+        data: cartoData,
+        pointRadiusMinPixels: 4,
+        getFillColor: [200, 0, 80],
+      });
+
+      const deck = new Deck({
+        parent: document.querySelector('#view'),
+        mapStyle:
+          'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json',
+        initialViewState: { latitude: 0, longitude: 0, zoom: 0 },
+        onViewStateChange: ({ viewState }) => {
+          widgetEl.viewState = viewState;
+          return viewState;
+        },
+        controller: true,
+        layers: [layer],
+      });
+
+      widgetEl.viewState = deck.viewState;
+
+      /**************************************************************************
+       * FOOTER
+       */
+
+      cartoData.then(({ attribution }) => {
+        const footerEl = document.querySelector('#footer');
+        footerEl.innerHTML = attribution;
+      });
+    </script>
+  </body>
+</html>

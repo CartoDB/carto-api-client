@@ -32,6 +32,16 @@
     "lit": "^3.0.0"
   },
   "devDependencies": {
+    "@deck.gl/aggregation-layers": "^9.0.12",
+    "@deck.gl/carto": "^9.0.12",
+    "@deck.gl/core": "^9.0.12",
+    "@deck.gl/extensions": "^9.0.12",
+    "@deck.gl/geo-layers": "^9.0.12",
+    "@deck.gl/layers": "^9.0.12",
+    "@deck.gl/mesh-layers": "^9.0.12",
+    "@loaders.gl/core": "^4.2.1",
+    "@luma.gl/core": "^9.0.12",
+    "@luma.gl/engine": "^9.0.12",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-replace": "^5.0.2",
     "@typescript-eslint/eslint-plugin": "^5.25.0",
