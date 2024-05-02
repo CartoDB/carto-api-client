@@ -29,7 +29,7 @@ const layer = new VectorTileLayer({
  * DECK.GL
  */
 
-let viewState = {latitude: 0, longitude: 0, zoom: 0};
+let viewState = {latitude: 0, longitude: 0, zoom: 5};
 
 const deck = new Deck({
   canvas: 'deck-canvas',

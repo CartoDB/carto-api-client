@@ -33,7 +33,7 @@ export class FormulaWidget extends LitElement {
   header = 'Untitled';
 
   @property({type: String})
-  caption = '';
+  caption = 'Formula widget';
 
   @property({type: CartoDataView, attribute: false}) // TODO: DataView
   dataView = null;

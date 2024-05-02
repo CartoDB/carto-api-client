@@ -36,7 +36,7 @@ export class CategoryWidget extends LitElement {
   header = 'Untitled';
 
   @property()
-  caption = '';
+  caption = 'Category widget';
 
   @property({type: CartoDataView}) // TODO: DataView
   dataView = null;
