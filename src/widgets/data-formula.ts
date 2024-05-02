@@ -2,6 +2,8 @@ import {LitElement, html, css} from 'lit';
 import {Task} from '@lit/task';
 import {customElement, property} from 'lit/decorators.js';
 import {CartoDataView} from '../data-view';
+import {DEBOUNCE_TIME_MS} from '../constants';
+import {sleep} from '../utils';
 
 @customElement('data-formula')
 export class DataFormula extends LitElement {
@@ -12,7 +14,9 @@ export class DataFormula extends LitElement {
       padding: 16px;
       max-width: 800px;
     }
-    h3, p, figure {
+    h3,
+    p,
+    figure {
       margin: 0;
       padding: 0;
     }
@@ -39,10 +43,9 @@ export class DataFormula extends LitElement {
 
   private _formulaTask = new Task(this, {
     task: async ([dataView, config], {signal}) => {
-      const response = await dataView.getFormula({
-        ...config,
-        abortController: signal, // TODO
-      });
+      await sleep(DEBOUNCE_TIME_MS);
+      signal.throwIfAborted();
+      const response = await dataView.getFormula({...config}); // TODO: signal
       return response.value as number;
     },
     args: () => [this.dataView, this.config],
@@ -52,7 +55,10 @@ export class DataFormula extends LitElement {
     return this._formulaTask.render({
       pending: () =>
         html`<h3>${this.header}</h3>
-          <p>Loading product...</p>`,
+          <figure>
+            <div class="scorecard">&hellip;</div>
+            <figcaption>${this.caption}</figcaption>
+          </figure>`,
       complete: (formulaResult) => html`
         <h3>${this.header}</h3>
         <figure>

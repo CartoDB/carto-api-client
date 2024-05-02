@@ -1,11 +1,15 @@
 import {
   VectorTableSourceOptions,
   VectorQuerySourceOptions,
+  SourceOptions,
 } from '@deck.gl/carto';
+import { MapViewState } from '@deck.gl/core';
 
 export type $TODO = any;
 
-export type CartoDataViewProps = {};
+export type CartoDataViewProps = SourceOptions & {
+  viewState: MapViewState;
+};
 
 export type TableDataViewProps = CartoDataViewProps &
   VectorTableSourceOptions & {

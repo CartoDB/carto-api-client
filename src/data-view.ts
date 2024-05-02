@@ -5,6 +5,7 @@ import {
 } from './vendor/carto-react-widgets.js';
 import {
   $TODO,
+  CartoDataViewProps,
   DataView,
   QueryDataViewProps,
   TableDataViewProps,
@@ -15,7 +16,7 @@ import {
   DEFAULT_CLIENT,
   MAP_TYPES,
 } from './vendor/carto-constants.js';
-import {SourceOptions} from '@deck.gl/carto';
+import {WebMercatorViewport, MapViewState} from '@deck.gl/core';
 
 // TODO: legacy
 interface WidgetSource {
@@ -34,10 +35,18 @@ interface WidgetSource {
   filters: Record<string, unknown>;
 }
 
-export class CartoDataView<Props extends SourceOptions> implements DataView {
+export class CartoDataView<Props extends CartoDataViewProps>
+  implements DataView
+{
   readonly props: Props;
-  readonly credentials: {apiBaseUrl: string, apiVersion: API_VERSIONS, accessToken: string, clientId: string};
+  readonly credentials: {
+    apiBaseUrl: string;
+    apiVersion: API_VERSIONS;
+    accessToken: string;
+    clientId: string;
+  };
   readonly connectionName: string;
+  readonly viewState: MapViewState;
   constructor(props: Props) {
     this.props = props;
     this.credentials = {
@@ -47,6 +56,7 @@ export class CartoDataView<Props extends SourceOptions> implements DataView {
       accessToken: props.accessToken,
     };
     this.connectionName = props.connectionName;
+    this.viewState = props.viewState;
   }
   protected getSource(props: $TODO): WidgetSource {
     return {
@@ -55,13 +65,30 @@ export class CartoDataView<Props extends SourceOptions> implements DataView {
       connection: this.connectionName,
     };
   }
+  protected getSpatialFilter(props: $TODO): $TODO {
+    if (props.global) return null;
+
+    const viewport = new WebMercatorViewport(this.viewState);
+    return {
+      type: 'Polygon',
+      coordinates: [
+        [
+          viewport.unproject([0, 0]),
+          viewport.unproject([viewport.width, 0]),
+          viewport.unproject([viewport.width, viewport.height]),
+          viewport.unproject([0, viewport.height]),
+          viewport.unproject([0, 0]),
+        ],
+      ],
+    };
+  }
   getFormula(props: $TODO): $TODO {
     const {spatialFilter, abortController, operationExp, ...params} = props;
     const {column, operation} = params;
     return executeModel({
       model: 'formula',
       source: this.getSource(props),
-      spatialFilter,
+      spatialFilter: this.getSpatialFilter(props),
       params: {column: column ?? '*', operation, operationExp},
       opts: {abortController},
     }).then((res: $TODO) => normalizeObjectKeys(res.rows[0]));
