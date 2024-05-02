@@ -2,7 +2,7 @@
 <html lang="en-GB">
   <head>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <main id="app">
@@ -10,7 +10,18 @@
         <div id="map"></div>
         <canvas id="deck-canvas"></canvas>
       </section>
-      <section id="rail"></section>
+      <section id="rail">
+        <formula-widget
+          id="formula"
+          header="Total"
+          caption="Formula widget"
+        ></formula-widget>
+        <category-widget
+          id="category"
+          header="Categories"
+          caption="Category widget"
+        ></category-widget>
+      </section>
       <footer id="footer"></footer>
     </main>
     <script type="module" src="./pure-js.ts"></script>

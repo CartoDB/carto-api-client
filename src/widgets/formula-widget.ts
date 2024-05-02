@@ -29,16 +29,16 @@ export class FormulaWidget extends LitElement {
     }
   `;
 
-  @property()
+  @property({type: String})
   header = 'Untitled';
 
-  @property()
+  @property({type: String})
   caption = '';
 
-  @property({type: CartoDataView}) // TODO: DataView
+  @property({type: CartoDataView, attribute: false}) // TODO: DataView
   dataView = null;
 
-  @property({type: Object}) // TODO: types
+  @property({type: Object, attribute: false}) // TODO: types
   config = null;
 
   private _formulaTask = new Task(this, {

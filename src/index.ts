@@ -5,5 +5,6 @@ export {MAP_TYPES, API_VERSIONS, AggregationTypes} from './vendor/carto-constant
 export {TableDataView, QueryDataView} from './data-view';
 export {TableDataViewProps, QueryDataViewProps} from './types';
 
-// widets
+// widgets
+export {CategoryWidget} from './widgets/category-widget';
 export {FormulaWidget} from './widgets/formula-widget';

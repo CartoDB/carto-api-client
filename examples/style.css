@@ -30,6 +30,7 @@ body {
 #rail {
   display: flex;
   flex-direction: column;
+  gap: 1em;
   position: relative;
   width: 400px;
   background-color: #fefefe;

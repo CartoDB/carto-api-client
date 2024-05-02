@@ -1,7 +1,12 @@
 import maplibregl from 'maplibre-gl';
 import {Deck} from '@deck.gl/core';
 import {VectorTileLayer, vectorTableSource} from '@deck.gl/carto';
-import {TableDataView, AggregationTypes} from '../';
+import {
+  TableDataView,
+  AggregationTypes,
+  FormulaWidget,
+  CategoryWidget,
+} from '../';
 
 /**************************************************************************
  * LAYERS
@@ -35,8 +40,9 @@ const deck = new Deck({
 
 const map = new maplibregl.Map({
   container: 'map',
-  style: 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json',
-  interactive: false
+  style:
+    'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json',
+  interactive: false,
 });
 
 deck.setProps({
@@ -53,10 +59,8 @@ deck.setProps({
  */
 
 const railEl = document.querySelector('#rail')!;
-const widgetEl = document.createElement('formula-widget');
-widgetEl.header = 'Count'
-widgetEl.caption = 'Formula widget';
-railEl.appendChild(widgetEl);
+const formulaWidget = railEl.querySelector('#formula') as FormulaWidget;
+const categoryWidget = railEl.querySelector('#category') as CategoryWidget;
 
 function updateWidgets() {
   const dataView = new TableDataView({
@@ -66,8 +70,8 @@ function updateWidgets() {
     viewState,
   });
 
-  widgetEl.dataView = dataView;
-  widgetEl.config = {
+  formulaWidget.dataView = dataView;
+  formulaWidget.config = {
     // TODO(cleanup)
     source: {
       id: '85f6ea18-f3f3-4392-b52a-ca3c13c1a4f5',
@@ -81,7 +85,12 @@ function updateWidgets() {
     },
     operation: AggregationTypes.COUNT,
     column: '',
-    global: false
+    global: false,
+  };
+
+  categoryWidget.dataView = dataView;
+  categoryWidget.config = {
+    // TODO
   };
 }
 
