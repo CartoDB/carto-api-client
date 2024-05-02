@@ -1,7 +1,7 @@
 import maplibregl from 'maplibre-gl';
 import {Deck} from '@deck.gl/core';
 import {VectorTileLayer, vectorTableSource} from '@deck.gl/carto';
-import {TableDataView, AggregationTypes} from '../';
+import {TableDataView, AggregationTypes, DataFormula} from '../';
 
 /**************************************************************************
  * DATA SOURCE
@@ -56,15 +56,22 @@ cartoData.then(({attribution}) => {
 });
 
 /**************************************************************************
- * WIDGET
+ * RAIL
  */
+
+const railEl = document.querySelector('#rail')!;
 
 const dataView = new TableDataView({
   accessToken: import.meta.env.VITE_CARTO_ACCESS_TOKEN,
   connectionName: 'carto_dw',
   tableName: 'carto-demo-data.demo_tables.world_airports',
 });
-const formulaResult = await dataView.getFormula({
+
+const widgetEl = document.createElement('data-formula') as DataFormula;
+widgetEl.header = 'Count'
+widgetEl.caption = 'Formula widget';
+widgetEl.dataView = dataView;
+widgetEl.config = {
   // TODO(cleanup)
   source: {
     id: '85f6ea18-f3f3-4392-b52a-ca3c13c1a4f5',
@@ -91,5 +98,5 @@ const formulaResult = await dataView.getFormula({
       ],
     ],
   },
-});
-console.log({formulaResult});
+};
+railEl.appendChild(widgetEl);

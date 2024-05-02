@@ -28,6 +28,7 @@
     "format": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --write"
   },
   "dependencies": {
+    "@lit/task": "^1.0.0",
     "lit": "^3.0.0"
   },
   "devDependencies": {

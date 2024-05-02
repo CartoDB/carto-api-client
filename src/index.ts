@@ -7,3 +7,4 @@ export {TableDataViewProps, QueryDataViewProps} from './types';
 
 // elements
 export {MyElement} from './my-element';
+export {DataFormula} from './widgets/data-formula';
