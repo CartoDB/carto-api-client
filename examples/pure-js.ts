@@ -1,7 +1,7 @@
 import maplibregl from 'maplibre-gl';
-import {Deck, WebMercatorViewport} from '@deck.gl/core';
+import {Deck} from '@deck.gl/core';
 import {VectorTileLayer, vectorTableSource} from '@deck.gl/carto';
-import {TableDataView, AggregationTypes, DataFormula} from '../';
+import {TableDataView, AggregationTypes, FormulaWidget} from '../';
 
 /**************************************************************************
  * LAYERS
@@ -60,7 +60,7 @@ cartoData.then(({attribution}) => {
  */
 
 const railEl = document.querySelector('#rail')!;
-const widgetEl = document.createElement('data-formula') as DataFormula;
+const widgetEl = document.createElement('formula-widget');
 widgetEl.header = 'Count'
 widgetEl.caption = 'Formula widget';
 railEl.appendChild(widgetEl);

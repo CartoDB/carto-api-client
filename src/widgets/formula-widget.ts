@@ -5,8 +5,8 @@ import {CartoDataView} from '../data-view';
 import {DEBOUNCE_TIME_MS} from '../constants';
 import {sleep} from '../utils';
 
-@customElement('data-formula')
-export class DataFormula extends LitElement {
+@customElement('formula-widget')
+export class FormulaWidget extends LitElement {
   static override styles = css`
     :host {
       display: block;
@@ -75,6 +75,6 @@ export class DataFormula extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'data-formula': DataFormula;
+    'formula-widget': FormulaWidget;
   }
 }
