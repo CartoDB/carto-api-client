@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@lit/task": "^1.0.0",
+    "echarts": "^5.5.0",
     "lit": "^3.0.0"
   },
   "devDependencies": {

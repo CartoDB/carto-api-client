@@ -1,9 +1,11 @@
 import {LitElement, html, css} from 'lit';
 import {Task} from '@lit/task';
 import {customElement, property} from 'lit/decorators.js';
+import {Ref, createRef, ref} from 'lit/directives/ref.js';
 import {CartoDataView} from '../data-view';
 import {DEBOUNCE_TIME_MS} from '../constants';
 import {sleep} from '../utils';
+import * as echarts from 'echarts';
 
 @customElement('category-widget')
 export class CategoryWidget extends LitElement {
@@ -27,7 +29,6 @@ export class CategoryWidget extends LitElement {
     .chart {
       width: 100%;
       height: 200px;
-      background: peachpuff;
     }
   `;
 
@@ -42,6 +43,8 @@ export class CategoryWidget extends LitElement {
 
   @property({type: Object}) // TODO: types
   config = null;
+
+  private chartRef: Ref<HTMLElement> = createRef();
 
   // @ts-ignore
   private _formulaTask = new Task(this, {
@@ -59,10 +62,36 @@ export class CategoryWidget extends LitElement {
     return html`
       <h3>${this.header}</h3>
       <figure>
-        <div class="chart">&hellip;</div>
+        <div class="chart" ${ref(this.chartRef)}></div>
         <figcaption>${this.caption}</figcaption>
       </figure>
-    `
+    `;
+  }
+
+  override firstUpdated() {
+    const chart = echarts.init(this.chartRef.value!, null, {height: 200});
+    chart.setOption({
+      xAxis: {
+        data: ['Shirts', 'Cardigans', 'Chiffons', 'Pants'],
+      },
+      yAxis: {},
+      series: [
+        {
+          name: 'sales',
+          type: 'bar',
+          data: [5, 20, 36, 10],
+        },
+      ],
+      tooltip: {},
+      grid: {
+        left: 0,
+        right: '4px',
+        top: '8px',
+        bottom: '24px',
+        width: 'auto',
+        height: 'auto',
+      },
+    });
   }
 }
 
