@@ -88,7 +88,7 @@ export class CartoDataView<Props extends CartoDataViewProps>
     return executeModel({
       model: 'formula',
       source: this.getSource(props),
-      spatialFilter: this.getSpatialFilter(props),
+      spatialFilter: spatialFilter || this.getSpatialFilter(props),
       params: {column: column ?? '*', operation, operationExp},
       opts: {abortController},
     }).then((res: $TODO) => normalizeObjectKeys(res.rows[0]));
@@ -100,7 +100,7 @@ export class CartoDataView<Props extends CartoDataViewProps>
     return executeModel({
       model: 'category',
       source: this.getSource(props),
-      spatialFilter,
+      spatialFilter: spatialFilter || this.getSpatialFilter(props),
       params: {
         column,
         operation,

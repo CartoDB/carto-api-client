@@ -6,6 +6,16 @@ import {CartoDataView} from '../data-view';
 import {DEBOUNCE_TIME_MS} from '../constants';
 import {sleep} from '../utils';
 import * as echarts from 'echarts';
+import { TaskStatus } from '@lit/task';
+
+const DEFAULT_CATEGORY_GRID = {
+  left: 0,
+  right: '4px',
+  top: '8px',
+  bottom: '24px',
+  width: 'auto',
+  height: 'auto',
+};
 
 @customElement('category-widget')
 export class CategoryWidget extends LitElement {
@@ -44,53 +54,66 @@ export class CategoryWidget extends LitElement {
   @property({type: Object}) // TODO: types
   config = null;
 
+  private chart: echarts.ECharts | null = null;
   private chartRef: Ref<HTMLElement> = createRef();
 
-  // @ts-ignore
-  private _formulaTask = new Task(this, {
-    // @ts-ignore
+  private _categoryTask = new Task(this, {
     task: async ([dataView, config], {signal}) => {
       await sleep(DEBOUNCE_TIME_MS);
       signal.throwIfAborted();
-      // const response = await dataView.getFormula({...config}); // TODO: signal
-      return '';
+      const response = await dataView.getCategories({...config}); // TODO: signal
+      return {
+        labels: response.map(({name}) => name) as string[],
+        data: response.map(({value}) => value) as number[],
+      };
     },
     args: () => [this.dataView, this.config],
   });
 
   override render() {
-    return html`
-      <h3>${this.header}</h3>
-      <figure>
-        <div class="chart" ${ref(this.chartRef)}></div>
-        <figcaption>${this.caption}</figcaption>
-      </figure>
-    `;
+    return this._categoryTask.render({
+      pending: () =>
+        html`<h3>${this.header}</h3>
+          <figure>
+            <div class="chart" ${ref(this.chartRef)}></div>
+            <figcaption>${this.caption}</figcaption>
+          </figure>`,
+      complete: () => html`
+        <h3>${this.header}</h3>
+        <figure>
+          <div class="chart" ${ref(this.chartRef)}></div>
+          <figcaption>${this.caption}</figcaption>
+        </figure>
+      `,
+      error: (e) =>
+        html`<h3>${this.header}</h3>
+          <p>Error: ${e}</p>`,
+    });
   }
 
-  override firstUpdated() {
-    const chart = echarts.init(this.chartRef.value!, null, {height: 200});
-    chart.setOption({
-      xAxis: {
-        data: ['Shirts', 'Cardigans', 'Chiffons', 'Pants'],
-      },
+  override updated() {
+    if (!this.chart || this.chart.getDom() !== this.chartRef.value) {
+      // TODO: improve caching of HTML elements.
+      this.chart = echarts.init(this.chartRef.value!, null, {height: 200});
+    }
+    this._updateChart()
+  }
+
+  private async _updateChart() {
+    if (this._categoryTask.status === TaskStatus.ERROR) {
+      return;
+    }
+
+    // TODO: real error handling
+    const {labels, data} = await this._categoryTask.taskComplete;
+    this.chart.setOption({
+      xAxis: {data: labels},
       yAxis: {},
       series: [
-        {
-          name: 'sales',
-          type: 'bar',
-          data: [5, 20, 36, 10],
-        },
+        {type: 'bar', name: this.header, data},
       ],
       tooltip: {},
-      grid: {
-        left: 0,
-        right: '4px',
-        top: '8px',
-        bottom: '24px',
-        width: 'auto',
-        height: 'auto',
-      },
+      grid: DEFAULT_CATEGORY_GRID,
     });
   }
 }

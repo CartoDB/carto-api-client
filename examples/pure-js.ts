@@ -15,11 +15,11 @@ import {
 const cartoData = vectorTableSource({
   accessToken: import.meta.env.VITE_CARTO_ACCESS_TOKEN,
   connectionName: 'carto_dw',
-  tableName: 'carto-demo-data.demo_tables.world_airports',
+  tableName: 'carto-demo-data.demo_tables.retail_stores',
 });
 
 const layer = new VectorTileLayer({
-  id: 'world_airports',
+  id: 'retail_stores',
   data: cartoData,
   pointRadiusMinPixels: 4,
   getFillColor: [200, 0, 80],
@@ -29,7 +29,7 @@ const layer = new VectorTileLayer({
  * DECK.GL
  */
 
-let viewState = {latitude: 0, longitude: 0, zoom: 5};
+let viewState = {latitude: 40.7128, longitude: -74.0060, zoom: 12};
 
 const deck = new Deck({
   canvas: 'deck-canvas',
@@ -66,7 +66,7 @@ function updateWidgets() {
   const dataView = new TableDataView({
     accessToken: import.meta.env.VITE_CARTO_ACCESS_TOKEN,
     connectionName: 'carto_dw',
-    tableName: 'carto-demo-data.demo_tables.world_airports',
+    tableName: 'carto-demo-data.demo_tables.retail_stores',
     viewState,
   });
 
@@ -74,8 +74,8 @@ function updateWidgets() {
   formulaWidget.config = {
     // TODO(cleanup)
     source: {
-      id: '85f6ea18-f3f3-4392-b52a-ca3c13c1a4f5',
-      data: 'carto-demo-data.demo_tables.world_airports',
+      id: '0717773c-f5d9-444c-a47d-0a4689667850',
+      data: 'carto-demo-data.demo_tables.retail_stores',
       type: 'table',
       filtersLogicalOperator: 'and',
       queryParameters: [],
@@ -90,7 +90,20 @@ function updateWidgets() {
 
   categoryWidget.dataView = dataView;
   categoryWidget.config = {
-    // TODO
+    // TODO(cleanup)
+    source: {
+      id: '0717773c-f5d9-444c-a47d-0a4689667850',
+      data: 'carto-demo-data.demo_tables.retail_stores',
+      type: 'table',
+      filtersLogicalOperator: 'and',
+      queryParameters: [],
+      geoColumn: 'geom',
+      provider: 'bigquery',
+      filters: {},
+    },
+    operation: AggregationTypes.COUNT,
+    column: 'storetype',
+    global: false,
   };
 }
 
