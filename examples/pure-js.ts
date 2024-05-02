@@ -1,7 +1,7 @@
 import maplibregl from 'maplibre-gl';
 import {Deck} from '@deck.gl/core';
 import {VectorTileLayer, vectorTableSource} from '@deck.gl/carto';
-import {TableDataView, AggregationTypes, FormulaWidget} from '../';
+import {TableDataView, AggregationTypes} from '../';
 
 /**************************************************************************
  * LAYERS
@@ -33,26 +33,19 @@ const deck = new Deck({
   layers: [layer],
 });
 
-const style =
-  'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json';
-const map = new maplibregl.Map({container: 'map', style, interactive: false});
+const map = new maplibregl.Map({
+  container: 'map',
+  style: 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json',
+  interactive: false
+});
 
 deck.setProps({
   onViewStateChange: (params) => {
-    const {longitude, latitude, ...rest} = params.viewState;
-    map.jumpTo({center: [longitude, latitude], ...rest});
     viewState = params.viewState;
+    const {longitude, latitude, ...rest} = viewState;
+    map.jumpTo({center: [longitude, latitude], ...rest});
     updateWidgets();
   },
-});
-
-/**************************************************************************
- * FOOTER
- */
-
-cartoData.then(({attribution}) => {
-  const footerEl = document.querySelector('#footer')!;
-  footerEl.innerHTML = attribution;
 });
 
 /**************************************************************************
@@ -91,3 +84,12 @@ function updateWidgets() {
     global: false
   };
 }
+
+/**************************************************************************
+ * ATTRIBUTION
+ */
+
+const footerEl = document.querySelector('#footer')!;
+cartoData.then(({attribution}) => {
+  footerEl.innerHTML = attribution;
+});
