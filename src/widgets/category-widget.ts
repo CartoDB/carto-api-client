@@ -6,7 +6,7 @@ import {CartoDataView} from '../data-view';
 import {DEBOUNCE_TIME_MS} from '../constants';
 import {sleep} from '../utils';
 import * as echarts from 'echarts';
-import { TaskStatus } from '@lit/task';
+import {TaskStatus} from '@lit/task';
 
 const DEFAULT_CATEGORY_GRID = {
   left: 0,
@@ -16,6 +16,8 @@ const DEFAULT_CATEGORY_GRID = {
   width: 'auto',
   height: 'auto',
 };
+
+const DEFAULT_TEXT_STYLE = {fontFamily: 'Courier New, monospace'};
 
 @customElement('category-widget')
 export class CategoryWidget extends LitElement {
@@ -96,7 +98,7 @@ export class CategoryWidget extends LitElement {
       // TODO: improve caching of HTML elements.
       this.chart = echarts.init(this.chartRef.value!, null, {height: 200});
     }
-    this._updateChart()
+    this._updateChart();
   }
 
   private async _updateChart() {
@@ -109,11 +111,10 @@ export class CategoryWidget extends LitElement {
     this.chart.setOption({
       xAxis: {data: labels},
       yAxis: {},
-      series: [
-        {type: 'bar', name: this.header, data},
-      ],
+      series: [{type: 'bar', name: this.header, data}],
       tooltip: {},
       grid: DEFAULT_CATEGORY_GRID,
+      textStyle: DEFAULT_TEXT_STYLE,
     });
   }
 }
