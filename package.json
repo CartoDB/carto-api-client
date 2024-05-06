@@ -1,5 +1,5 @@
 {
-  "private": true,
+  "name": "@carto/widgets",
   "version": "0.0.0",
   "description": "TODO",
   "author": "Don McCurdy <donmccurdy@carto.com>",
@@ -21,7 +21,7 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "dev": "concurrently \"yarn build:watch\" \"vite .\"",
+    "dev": "concurrently \"yarn build:watch\" \"vite -c examples/vite.config.js\"",
     "clean": "rimraf my-element.{d.ts,d.ts.map,js,js.map} test/my-element.{d.ts,d.ts.map,js,js.map} test/my-element_test.{d.ts,d.ts.map,js,js.map}",
     "lint": "npm run lint:lit-analyzer",
     "lint:lit-analyzer": "lit-analyzer",
