@@ -1,41 +1,36 @@
 import maplibregl from 'maplibre-gl';
-import {Deck} from '@deck.gl/core';
+import {Deck, Layer} from '@deck.gl/core';
 import {VectorTileLayer, vectorTableSource} from '@deck.gl/carto';
 import {
   TableDataView,
   AggregationTypes,
   FormulaWidget,
   CategoryWidget,
+  FilterEvent,
+  Filter,
 } from '../';
 
 /**************************************************************************
- * LAYERS
+ * REACTIVE STATE
  */
 
-const cartoData = vectorTableSource({
-  accessToken: import.meta.env.VITE_CARTO_ACCESS_TOKEN,
-  connectionName: 'carto_dw',
-  tableName: 'carto-demo-data.demo_tables.retail_stores',
-});
+const railEl = document.querySelector('#rail')!;
+const formulaWidget = railEl.querySelector('#formula') as FormulaWidget;
+const categoryWidget = railEl.querySelector('#category') as CategoryWidget;
+const footerEl = document.querySelector('#footer')!;
 
-const layer = new VectorTileLayer({
-  id: 'retail_stores',
-  data: cartoData,
-  pointRadiusMinPixels: 4,
-  getFillColor: [200, 0, 80],
-});
+let viewState = {latitude: 40.7128, longitude: -74.0060, zoom: 12};
+let filters: Record<string, Filter> = {};
 
 /**************************************************************************
  * DECK.GL
  */
 
-let viewState = {latitude: 40.7128, longitude: -74.0060, zoom: 12};
-
 const deck = new Deck({
   canvas: 'deck-canvas',
   initialViewState: viewState,
   controller: true,
-  layers: [layer],
+  layers: [],
 });
 
 const map = new maplibregl.Map({
@@ -54,13 +49,35 @@ deck.setProps({
   },
 });
 
+updateLayers();
+updateWidgets();
+
+/**************************************************************************
+ * LAYERS
+ */
+
+function updateLayers() {
+  const cartoData = vectorTableSource({
+    accessToken: import.meta.env.VITE_CARTO_ACCESS_TOKEN,
+    connectionName: 'carto_dw',
+    tableName: 'carto-demo-data.demo_tables.retail_stores',
+    filters,
+  });
+
+  const layer = new VectorTileLayer({
+    id: 'retail_stores',
+    data: cartoData,
+    pointRadiusMinPixels: 4,
+    getFillColor: [200, 0, 80],
+  });
+
+  deck.setProps({layers: [layer]});
+  cartoData.then(({attribution}) => (footerEl.innerHTML = attribution));
+}
+
 /**************************************************************************
  * WIDGETS
  */
-
-const railEl = document.querySelector('#rail')!;
-const formulaWidget = railEl.querySelector('#formula') as FormulaWidget;
-const categoryWidget = railEl.querySelector('#category') as CategoryWidget;
 
 function updateWidgets() {
   const dataView = new TableDataView({
@@ -74,14 +91,13 @@ function updateWidgets() {
   formulaWidget.config = {
     // TODO(cleanup)
     source: {
-      id: '0717773c-f5d9-444c-a47d-0a4689667850',
       data: 'carto-demo-data.demo_tables.retail_stores',
       type: 'table',
       filtersLogicalOperator: 'and',
       queryParameters: [],
       geoColumn: 'geom',
       provider: 'bigquery',
-      filters: {},
+      filters: filters,
     },
     operation: AggregationTypes.COUNT,
     column: '',
@@ -92,26 +108,28 @@ function updateWidgets() {
   categoryWidget.config = {
     // TODO(cleanup)
     source: {
-      id: '0717773c-f5d9-444c-a47d-0a4689667850',
       data: 'carto-demo-data.demo_tables.retail_stores',
       type: 'table',
       filtersLogicalOperator: 'and',
       queryParameters: [],
       geoColumn: 'geom',
       provider: 'bigquery',
-      filters: {},
+      filters: filters,
     },
     operation: AggregationTypes.COUNT,
     column: 'storetype',
     global: false,
   };
+  // TODO: Type definitions for events.
+  (categoryWidget as any).addEventListener('filter', onFilterChange);
 }
 
 /**************************************************************************
- * ATTRIBUTION
+ * EVENT LISTENERS
  */
 
-const footerEl = document.querySelector('#footer')!;
-cartoData.then(({attribution}) => {
-  footerEl.innerHTML = attribution;
-});
+function onFilterChange(event: FilterEvent) {
+  filters = event.detail.filters;
+  updateLayers();
+  updateWidgets();
+}

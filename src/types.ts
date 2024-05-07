@@ -24,3 +24,7 @@ export type QueryDataViewProps = CartoDataViewProps &
   };
 
 export interface DataView {}
+
+export interface FilterEvent extends CustomEvent {
+  detail: {filters: any}
+}
