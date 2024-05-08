@@ -1,5 +1,5 @@
 import maplibregl from 'maplibre-gl';
-import {Deck, Layer} from '@deck.gl/core';
+import {Deck} from '@deck.gl/core';
 import {VectorTileLayer, vectorTableSource} from '@deck.gl/carto';
 import {
   TableDataView,
@@ -8,6 +8,7 @@ import {
   CategoryWidget,
   FilterEvent,
   Filter,
+  PieWidget,
 } from '../';
 
 /**************************************************************************
@@ -17,6 +18,7 @@ import {
 const railEl = document.querySelector('#rail')!;
 const formulaWidget = railEl.querySelector('#formula') as FormulaWidget;
 const categoryWidget = railEl.querySelector('#category') as CategoryWidget;
+const pieWidget = railEl.querySelector('#pie') as PieWidget;
 const footerEl = document.querySelector('#footer')!;
 
 let viewState = {latitude: 40.7128, longitude: -74.0060, zoom: 12};
@@ -104,8 +106,8 @@ function updateWidgets() {
     global: false,
   };
 
-  categoryWidget.dataView = dataView;
-  categoryWidget.config = {
+  categoryWidget.dataView = pieWidget.dataView = dataView;
+  categoryWidget.config = pieWidget.config = {
     // TODO(cleanup)
     source: {
       data: 'carto-demo-data.demo_tables.retail_stores',
@@ -122,6 +124,7 @@ function updateWidgets() {
   };
   // TODO: Type definitions for events.
   (categoryWidget as any).addEventListener('filter', onFilterChange);
+  (pieWidget as any).addEventListener('filter', onFilterChange);
 }
 
 /**************************************************************************

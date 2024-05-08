@@ -9,3 +9,4 @@ export {TableDataViewProps, QueryDataViewProps, FilterEvent} from './types';
 // widgets
 export {CategoryWidget} from './widgets/category-widget';
 export {FormulaWidget} from './widgets/formula-widget';
+export {PieWidget} from './widgets/pie-widget';

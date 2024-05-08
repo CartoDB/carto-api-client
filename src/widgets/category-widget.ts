@@ -1,4 +1,4 @@
-import {LitElement, html, css, nothing} from 'lit';
+import {LitElement, html, nothing} from 'lit';
 import {Task} from '@lit/task';
 import {customElement, property, state} from 'lit/decorators.js';
 import {Ref, createRef, ref} from 'lit/directives/ref.js';
@@ -7,52 +7,19 @@ import {DEBOUNCE_TIME_MS} from '../constants';
 import {getWidgetFilters, sleep} from '../utils';
 import * as echarts from 'echarts';
 import {TaskStatus} from '@lit/task';
-
-const DEFAULT_CATEGORY_GRID = {
-  left: 0,
-  right: '4px',
-  top: '8px',
-  bottom: '24px',
-  width: 'auto',
-  height: 'auto',
-};
-
-const DEFAULT_TEXT_STYLE = {fontFamily: 'Courier New, monospace'};
+import {
+  DEFAULT_CATEGORY_GRID,
+  DEFAULT_PALETTE,
+  DEFAULT_TEXT_STYLE,
+  WIDGET_BASE_CSS,
+} from './styles';
+import {cache} from 'lit/directives/cache.js';
 
 type Category = {name: string; value: number};
 
 @customElement('category-widget')
 export class CategoryWidget extends LitElement {
-  static override styles = css`
-    :host {
-      --padding: 16px;
-
-      position: relative;
-      display: block;
-      border: solid 1px gray;
-      padding: var(--padding);
-      max-width: 800px;
-    }
-    h3,
-    p,
-    figure {
-      margin: 0;
-      padding: 0;
-    }
-    figcaption {
-      font-size: 0.8em;
-      opacity: 0.8;
-    }
-    .chart {
-      width: 100%;
-      height: 200px;
-    }
-    .clear-btn {
-      position: absolute;
-      top: var(--padding);
-      right: var(--padding);
-    }
-  `;
+  static override styles = WIDGET_BASE_CSS;
 
   @property()
   header = 'Untitled';
@@ -66,24 +33,18 @@ export class CategoryWidget extends LitElement {
   @property({type: Object}) // TODO: types
   config = null;
 
-  private readonly widgetId = crypto.randomUUID();
-  private chart: echarts.ECharts | null = null;
-  private chartRef: Ref<HTMLElement> = createRef();
+  protected readonly widgetId = crypto.randomUUID();
+  protected chart: echarts.ECharts | null = null;
+  protected chartRef: Ref<HTMLElement> = createRef();
 
   @state()
-  private filterValues: string[] = [];
+  protected filterValues: string[] = [];
 
-  private _categoryTask = new Task(this, {
+  protected _categoryTask = new Task(this, {
     task: async ([dataView, config], {signal}) => {
       await sleep(DEBOUNCE_TIME_MS);
       signal.throwIfAborted();
 
-      // TODO: If filtering logic mostly lives in the widget, not the DataView,
-      // should we provide any utilities to make that easier for users who are
-      // building custom widgets?
-
-      // TODO: Cache requests, or at least avoid making requests when _this_
-      // widget is filtered. Results will be the same.
       const filters = getWidgetFilters(this.widgetId, config.source.filters);
       const source = {...config.source, filters};
       return (await dataView.getCategories({...config, source})) as Category[]; // TODO: signal
@@ -94,25 +55,26 @@ export class CategoryWidget extends LitElement {
   override render() {
     return this._categoryTask.render({
       pending: () =>
-        html`<h3>${this.header}</h3>
+        cache(html`<h3>${this.header}</h3>
+          <figure>
+            <div class="chart chart-skeleton"></div>
+            <figcaption>${this.caption}</figcaption>
+          </figure>`),
+      complete: () =>
+        cache(html`
+          <h3>${this.header}</h3>
           <figure>
             <div class="chart" ${ref(this.chartRef)}></div>
             <figcaption>${this.caption}</figcaption>
-          </figure>`,
-      complete: () => html`
-        <h3>${this.header}</h3>
-        <figure>
-          <div class="chart" ${ref(this.chartRef)}></div>
-          <figcaption>${this.caption}</figcaption>
-        </figure>
-        <button
-          class="clear-btn"
-          @click=${this._clearFilter}
-          disabled=${this.filterValues.length > 0 ? nothing : true}
-        >
-          Clear
-        </button>
-      `,
+          </figure>
+          <button
+            class="clear-btn"
+            @click=${this._clearFilter}
+            disabled=${this.filterValues.length > 0 ? nothing : true}
+          >
+            Clear
+          </button>
+        `),
       error: (e) =>
         html`<h3>${this.header}</h3>
           <p>Error: ${e}</p>`,
@@ -120,11 +82,13 @@ export class CategoryWidget extends LitElement {
   }
 
   override updated() {
+    if (this._categoryTask.status !== TaskStatus.COMPLETE) return;
+
     if (!this.chart || this.chart.getDom() !== this.chartRef.value) {
-      // TODO: improve caching of HTML elements.
       this.chart = echarts.init(this.chartRef.value!, null, {height: 200});
       this.chart.on('click', ({name}) => this._toggleFilter(name));
     }
+
     this._updateChart();
   }
 
@@ -158,7 +122,7 @@ export class CategoryWidget extends LitElement {
     this.dispatchEvent(new CustomEvent('filter', {detail: {filters}}));
   }
 
-  private async _updateChart() {
+  protected async _updateChart() {
     if (this._categoryTask.status === TaskStatus.ERROR) {
       return;
     }
@@ -166,20 +130,17 @@ export class CategoryWidget extends LitElement {
     const categories = await this._categoryTask.taskComplete;
     categories.sort((a, b) => (a.value > b.value ? -1 : 1));
 
-    const accentColor = '#5470c6';
-    const baseColor = this.filterValues.length > 0 ? '#cccccc' : accentColor;
-
-    const labels = categories.map(({name}) => name) as string[];
-    const data = categories.map(({name, value}) => {
-      if (this.filterValues.includes(name)) {
-        return {value, itemStyle: {color: accentColor}};
+    const data = categories.map(({name, value}, index) => {
+      let color = DEFAULT_PALETTE[index]; // TODO: >8 categories allowed?
+      if (this.filterValues.length > 0) {
+        color = this.filterValues.includes(name) ? color : '#cccccc';
       }
-      return {value, itemStyle: {color: baseColor}};
+      return {value, name, itemStyle: {color}};
     });
 
     this.chart.setOption({
-      xAxis: {data: labels},
-      yAxis: {},
+      xAxis: {data: data.map(({name}) => name)},
+      yAxis: {type: 'value'},
       series: [{type: 'bar', name: this.header, data}],
       tooltip: {},
       grid: DEFAULT_CATEGORY_GRID,
