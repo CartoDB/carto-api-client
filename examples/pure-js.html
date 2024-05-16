@@ -11,9 +11,25 @@
         <canvas id="deck-canvas"></canvas>
       </section>
       <section id="rail">
-        <formula-widget id="formula" header="Total"></formula-widget>
-        <category-widget id="category" header="Store type"></category-widget>
-        <pie-widget id="pie" header="Store type"></pie-widget>
+        <formula-widget
+          id="formula"
+          header="Total"
+          aggregation="count"
+        ></formula-widget>
+
+        <category-widget
+          id="category"
+          header="Store type"
+          aggregation="count"
+          column="storetype"
+        ></category-widget>
+
+        <pie-widget
+          id="pie"
+          header="Store type"
+          aggregation="count"
+          column="storetype"
+        ></pie-widget>
       </section>
       <footer id="footer"></footer>
     </main>

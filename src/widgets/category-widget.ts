@@ -13,6 +13,7 @@ import {
   WIDGET_BASE_CSS,
 } from './styles';
 import {cache} from 'lit/directives/cache.js';
+import { AggregationTypes } from '../vendor/carto-constants';
 
 type Category = {name: string; value: number};
 
@@ -29,8 +30,11 @@ export class CategoryWidget extends LitElement {
   @property({type: Object, attribute: false}) // TODO: types
   data = null;
 
-  @property({type: Object, attribute: false}) // TODO: types
-  config = null;
+  @property({type: AggregationTypes})
+  operation = AggregationTypes.COUNT;
+
+  @property({type: String})
+  column = '';
 
   @property({type: Object, attribute: false}) // TODO: types
   viewState = null;
@@ -43,19 +47,17 @@ export class CategoryWidget extends LitElement {
   protected filterValues: string[] = [];
 
   protected _categoryTask = new Task(this, {
-    task: async ([data, config, viewState], {signal}) => {
+    task: async ([data, operation, column, viewState], {signal}) => {
       if (!data) return [];
 
       await sleep(DEBOUNCE_TIME_MS);
       signal.throwIfAborted();
 
       const {dataView} = await data;
-      const filters = getWidgetFilters(this.widgetId, config.source.filters);
-      const source = {...config.source, filters};
       const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
-      return (await dataView.getCategories({...config, source, spatialFilter})) as Category[]; // TODO: signal
+      return (await dataView.getCategories({operation, column, spatialFilter})) as Category[]; // TODO: signal
     },
-    args: () => [this.data, this.config, this.viewState],
+    args: () => [this.data, this.operation, this.column, this.viewState],
   });
 
   override render() {

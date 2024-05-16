@@ -11,6 +11,7 @@ import {
   MAP_TYPES,
 } from './vendor/carto-constants.js';
 import {
+  MapType,
   SourceOptions,
   VectorQuerySourceOptions,
   VectorTableSourceOptions,
@@ -33,6 +34,12 @@ interface WidgetSource {
   filters: Record<string, unknown>;
 }
 
+// TODO: types
+const DEFAULT_PROPS: any = {
+  filters: {},
+  filtersLogicalOperator: 'and',
+};
+
 export class CartoDataView<Props extends SourceOptions> implements DataView {
   readonly props: Props;
   readonly credentials: {
@@ -42,8 +49,9 @@ export class CartoDataView<Props extends SourceOptions> implements DataView {
     clientId: string;
   };
   readonly connectionName: string;
+
   constructor(props: Props) {
-    this.props = props;
+    this.props = {...DEFAULT_PROPS, ...props};
     this.credentials = {
       apiVersion: API_VERSIONS.V3,
       apiBaseUrl: DEFAULT_API_BASE_URL || props.apiBaseUrl,
@@ -52,9 +60,9 @@ export class CartoDataView<Props extends SourceOptions> implements DataView {
     };
     this.connectionName = props.connectionName;
   }
-  protected getSource(props: $TODO): WidgetSource {
+  protected getSource(): WidgetSource {
     return {
-      ...props.source,
+      ...this.props as any,
       credentials: this.credentials,
       connection: this.connectionName,
     };
@@ -64,7 +72,7 @@ export class CartoDataView<Props extends SourceOptions> implements DataView {
     const {column, operation} = params;
     return executeModel({
       model: 'formula',
-      source: this.getSource(props),
+      source: this.getSource(),
       spatialFilter: spatialFilter,
       params: {column: column ?? '*', operation, operationExp},
       opts: {abortController},
@@ -76,7 +84,7 @@ export class CartoDataView<Props extends SourceOptions> implements DataView {
 
     return executeModel({
       model: 'category',
-      source: this.getSource(props),
+      source: this.getSource(),
       spatialFilter: spatialFilter,
       params: {
         column,
@@ -92,7 +100,7 @@ export class CartoDataView<Props extends SourceOptions> implements DataView {
 
     return executeModel({
       model: 'range',
-      source: this.getSource(props),
+      source: this.getSource(),
       spatialFilter: spatialFilter,
       params: {column},
       opts: {abortController},
@@ -104,7 +112,7 @@ export class CartoDataView<Props extends SourceOptions> implements DataView {
 
     return executeModel({
       model: 'table',
-      source: this.getSource(props),
+      source: this.getSource(),
       spatialFilter: spatialFilter,
       params: {
         column: columns,
@@ -133,13 +141,21 @@ export class CartoDataView<Props extends SourceOptions> implements DataView {
 }
 
 export class TableDataView extends CartoDataView<VectorTableSourceOptions> {
-  constructor(props: VectorTableSourceOptions) {
-    super(props);
+  protected override getSource(): WidgetSource {
+    return {
+      ...super.getSource(),
+      type: MAP_TYPES.TABLE,
+      data: this.props.tableName
+    };
   }
 }
 
 export class QueryDataView extends CartoDataView<VectorQuerySourceOptions> {
-  constructor(props: VectorQuerySourceOptions) {
-    super(props);
+  protected override getSource(): WidgetSource {
+    return {
+      ...super.getSource(),
+      type: MAP_TYPES.QUERY,
+      data: this.props.sqlQuery
+    };
   }
 }

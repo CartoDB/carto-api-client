@@ -3,6 +3,7 @@ import {Task} from '@lit/task';
 import {customElement, property} from 'lit/decorators.js';
 import {DEBOUNCE_TIME_MS} from '../constants';
 import {getSpatialFilter, sleep} from '../utils';
+import { AggregationTypes } from '../vendor/carto-constants';
 
 @customElement('formula-widget')
 export class FormulaWidget extends LitElement {
@@ -37,14 +38,17 @@ export class FormulaWidget extends LitElement {
   @property({type: Object, attribute: false}) // TODO: types
   data = null;
 
-  @property({type: Object, attribute: false}) // TODO: types
-  config = null;
+  @property({type: AggregationTypes})
+  operation = AggregationTypes.COUNT;
+
+  @property({type: String})
+  column = '';
 
   @property({type: Object, attribute: false}) // TODO: types
   viewState = null;
 
   private _formulaTask = new Task(this, {
-    task: async ([data, config, viewState], {signal}) => {
+    task: async ([data, operation, column, viewState], {signal}) => {
       if (!data) return -1;
 
       await sleep(DEBOUNCE_TIME_MS);
@@ -52,10 +56,10 @@ export class FormulaWidget extends LitElement {
 
       const {dataView} = await data;
       const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
-      const response = await dataView.getFormula({...config, spatialFilter}); // TODO: signal
+      const response = await dataView.getFormula({operation, column, spatialFilter}); // TODO: signal
       return response.value as number;
     },
-    args: () => [this.data, this.config, this.viewState],
+    args: () => [this.data, this.operation, this.column, this.viewState],
   });
 
   override render() {

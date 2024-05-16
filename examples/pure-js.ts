@@ -2,14 +2,11 @@ import maplibregl from 'maplibre-gl';
 import {Deck} from '@deck.gl/core';
 import {VectorTileLayer} from '@deck.gl/carto';
 import {
-  AggregationTypes,
-  FormulaWidget,
-  CategoryWidget,
   FilterEvent,
   Filter,
-  PieWidget,
   vectorTableSource,
   VectorTableSourceResponse,
+  Widget,
 } from '../';
 
 /**************************************************************************
@@ -47,49 +44,10 @@ deck.setProps({
   },
 });
 
-const widgets = [
-  bindWidget('formula', {
-    source: {
-      data: 'carto-demo-data.demo_tables.retail_stores', // REDUNDANT
-      type: 'table', // REDUNDANT
-      filtersLogicalOperator: 'and',
-      queryParameters: [],
-      geoColumn: 'geom',
-      provider: 'bigquery',
-      filters: filters, // REDUNDANT
-    },
-    operation: AggregationTypes.COUNT,
-    column: '',
-    global: false,
-  }),
-  bindWidget('category', {
-    source: {
-      data: 'carto-demo-data.demo_tables.retail_stores', // REDUNDANT
-      type: 'table', // REDUNDANT
-      filtersLogicalOperator: 'and',
-      queryParameters: [],
-      geoColumn: 'geom', // REDUNDANT
-      provider: 'bigquery',
-      filters: filters, // REDUNDANT
-    },
-    operation: AggregationTypes.COUNT,
-    column: 'storetype',
-    global: false,
-  }),
-  bindWidget('pie', {
-    source: {
-      data: 'carto-demo-data.demo_tables.retail_stores',
-      type: 'table',
-      filtersLogicalOperator: 'and',
-      queryParameters: [],
-      geoColumn: 'geom', // REDUNDANT
-      provider: 'bigquery',
-      filters: filters, // REDUNDANT
-    },
-    operation: AggregationTypes.COUNT,
-    column: 'storetype',
-    global: false,
-  }),
+const widgets: Widget[] = [
+  bindWidget('#formula'),
+  bindWidget('#category'),
+  bindWidget('#pie'),
 ];
 
 updateSources();
@@ -136,11 +94,10 @@ function updateWidgets() {
  */
 
 // TODO: Improve type definitions.
-function bindWidget(id: string, config: unknown): CategoryWidget | PieWidget | FormulaWidget {
-  const widget = document.querySelector(`#${id}`) as any;
-  widget.config = config;
+function bindWidget(selector: string): Widget {
+  const widget = document.querySelector<Widget>(selector)!;
 
-  widget.addEventListener('filter', (event: FilterEvent) => {
+  (widget as any).addEventListener('filter', (event: FilterEvent) => {
     filters = event.detail.filters;
     updateSources();
   });

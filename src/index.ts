@@ -8,6 +8,8 @@ export {TableDataView, QueryDataView} from './data-view.js';
 export {FilterEvent} from './types.js';
 
 // widgets
-export {CategoryWidget} from './widgets/category-widget.js';
-export {FormulaWidget} from './widgets/formula-widget.js';
-export {PieWidget} from './widgets/pie-widget.js';
+import {CategoryWidget} from './widgets/category-widget.js';
+import {FormulaWidget} from './widgets/formula-widget.js';
+import {PieWidget} from './widgets/pie-widget.js';
+export type Widget = CategoryWidget | PieWidget | FormulaWidget;
+export {CategoryWidget, FormulaWidget, PieWidget};
