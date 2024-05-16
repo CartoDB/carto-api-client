@@ -2,9 +2,8 @@ import {LitElement, html, nothing} from 'lit';
 import {Task} from '@lit/task';
 import {customElement, property, state} from 'lit/decorators.js';
 import {Ref, createRef, ref} from 'lit/directives/ref.js';
-import {CartoDataView} from '../data-view';
 import {DEBOUNCE_TIME_MS} from '../constants';
-import {getWidgetFilters, sleep} from '../utils';
+import {getSpatialFilter, getWidgetFilters, sleep} from '../utils';
 import * as echarts from 'echarts';
 import {TaskStatus} from '@lit/task';
 import {
@@ -27,11 +26,14 @@ export class CategoryWidget extends LitElement {
   @property()
   caption = 'Category widget';
 
-  @property({type: CartoDataView}) // TODO: DataView
-  dataView = null;
+  @property({type: Object, attribute: false}) // TODO: types
+  data = null;
 
-  @property({type: Object}) // TODO: types
+  @property({type: Object, attribute: false}) // TODO: types
   config = null;
+
+  @property({type: Object, attribute: false}) // TODO: types
+  viewState = null;
 
   protected readonly widgetId = crypto.randomUUID();
   protected chart: echarts.ECharts | null = null;
@@ -41,15 +43,19 @@ export class CategoryWidget extends LitElement {
   protected filterValues: string[] = [];
 
   protected _categoryTask = new Task(this, {
-    task: async ([dataView, config], {signal}) => {
+    task: async ([data, config, viewState], {signal}) => {
+      if (!data) return [];
+
       await sleep(DEBOUNCE_TIME_MS);
       signal.throwIfAborted();
 
+      const {dataView} = await data;
       const filters = getWidgetFilters(this.widgetId, config.source.filters);
       const source = {...config.source, filters};
-      return (await dataView.getCategories({...config, source})) as Category[]; // TODO: signal
+      const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
+      return (await dataView.getCategories({...config, source, spatialFilter})) as Category[]; // TODO: signal
     },
-    args: () => [this.dataView, this.config],
+    args: () => [this.data, this.config, this.viewState],
   });
 
   override render() {

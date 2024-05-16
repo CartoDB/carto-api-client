@@ -3,20 +3,18 @@ import {
   formatResult,
   normalizeObjectKeys,
 } from './vendor/carto-react-widgets.js';
-import {
-  $TODO,
-  CartoDataViewProps,
-  DataView,
-  QueryDataViewProps,
-  TableDataViewProps,
-} from './types.js';
+import {$TODO, DataView} from './types.js';
 import {
   API_VERSIONS,
   DEFAULT_API_BASE_URL,
   DEFAULT_CLIENT,
   MAP_TYPES,
 } from './vendor/carto-constants.js';
-import {WebMercatorViewport, MapViewState} from '@deck.gl/core';
+import {
+  SourceOptions,
+  VectorQuerySourceOptions,
+  VectorTableSourceOptions,
+} from '@deck.gl/carto';
 
 // TODO: legacy
 interface WidgetSource {
@@ -35,9 +33,7 @@ interface WidgetSource {
   filters: Record<string, unknown>;
 }
 
-export class CartoDataView<Props extends CartoDataViewProps>
-  implements DataView
-{
+export class CartoDataView<Props extends SourceOptions> implements DataView {
   readonly props: Props;
   readonly credentials: {
     apiBaseUrl: string;
@@ -46,7 +42,6 @@ export class CartoDataView<Props extends CartoDataViewProps>
     clientId: string;
   };
   readonly connectionName: string;
-  readonly viewState: MapViewState;
   constructor(props: Props) {
     this.props = props;
     this.credentials = {
@@ -56,7 +51,6 @@ export class CartoDataView<Props extends CartoDataViewProps>
       accessToken: props.accessToken,
     };
     this.connectionName = props.connectionName;
-    this.viewState = props.viewState;
   }
   protected getSource(props: $TODO): WidgetSource {
     return {
@@ -65,30 +59,13 @@ export class CartoDataView<Props extends CartoDataViewProps>
       connection: this.connectionName,
     };
   }
-  protected getSpatialFilter(props: $TODO): $TODO {
-    if (props.global) return null;
-
-    const viewport = new WebMercatorViewport(this.viewState);
-    return {
-      type: 'Polygon',
-      coordinates: [
-        [
-          viewport.unproject([0, 0]),
-          viewport.unproject([viewport.width, 0]),
-          viewport.unproject([viewport.width, viewport.height]),
-          viewport.unproject([0, viewport.height]),
-          viewport.unproject([0, 0]),
-        ],
-      ],
-    };
-  }
   getFormula(props: $TODO): $TODO {
     const {spatialFilter, abortController, operationExp, ...params} = props;
     const {column, operation} = params;
     return executeModel({
       model: 'formula',
       source: this.getSource(props),
-      spatialFilter: spatialFilter || this.getSpatialFilter(props),
+      spatialFilter: spatialFilter,
       params: {column: column ?? '*', operation, operationExp},
       opts: {abortController},
     }).then((res: $TODO) => normalizeObjectKeys(res.rows[0]));
@@ -100,7 +77,7 @@ export class CartoDataView<Props extends CartoDataViewProps>
     return executeModel({
       model: 'category',
       source: this.getSource(props),
-      spatialFilter: spatialFilter || this.getSpatialFilter(props),
+      spatialFilter: spatialFilter,
       params: {
         column,
         operation,
@@ -110,12 +87,13 @@ export class CartoDataView<Props extends CartoDataViewProps>
     }).then((res: $TODO) => normalizeObjectKeys(res.rows));
   }
   getRange(props: $TODO): $TODO {
-    const {abortController, ...params} = props;
+    const {spatialFilter, abortController, ...params} = props;
     const {column} = params;
 
     return executeModel({
       model: 'range',
       source: this.getSource(props),
+      spatialFilter: spatialFilter,
       params: {column},
       opts: {abortController},
     }).then((res: $TODO) => normalizeObjectKeys(res.rows[0]));
@@ -127,7 +105,7 @@ export class CartoDataView<Props extends CartoDataViewProps>
     return executeModel({
       model: 'table',
       source: this.getSource(props),
-      spatialFilter,
+      spatialFilter: spatialFilter,
       params: {
         column: columns,
         sortBy,
@@ -154,14 +132,14 @@ export class CartoDataView<Props extends CartoDataViewProps>
   }
 }
 
-export class TableDataView extends CartoDataView<TableDataViewProps> {
-  constructor(props: TableDataViewProps) {
+export class TableDataView extends CartoDataView<VectorTableSourceOptions> {
+  constructor(props: VectorTableSourceOptions) {
     super(props);
   }
 }
 
-export class QueryDataView extends CartoDataView<QueryDataViewProps> {
-  constructor(props: QueryDataViewProps) {
+export class QueryDataView extends CartoDataView<VectorQuerySourceOptions> {
+  constructor(props: VectorQuerySourceOptions) {
     super(props);
   }
 }

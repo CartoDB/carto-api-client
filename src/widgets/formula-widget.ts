@@ -1,9 +1,8 @@
 import {LitElement, html, css} from 'lit';
 import {Task} from '@lit/task';
 import {customElement, property} from 'lit/decorators.js';
-import {CartoDataView} from '../data-view';
 import {DEBOUNCE_TIME_MS} from '../constants';
-import {sleep} from '../utils';
+import {getSpatialFilter, sleep} from '../utils';
 
 @customElement('formula-widget')
 export class FormulaWidget extends LitElement {
@@ -35,20 +34,28 @@ export class FormulaWidget extends LitElement {
   @property({type: String})
   caption = 'Formula widget';
 
-  @property({type: CartoDataView, attribute: false}) // TODO: DataView
-  dataView = null;
+  @property({type: Object, attribute: false}) // TODO: types
+  data = null;
 
   @property({type: Object, attribute: false}) // TODO: types
   config = null;
 
+  @property({type: Object, attribute: false}) // TODO: types
+  viewState = null;
+
   private _formulaTask = new Task(this, {
-    task: async ([dataView, config], {signal}) => {
+    task: async ([data, config, viewState], {signal}) => {
+      if (!data) return -1;
+
       await sleep(DEBOUNCE_TIME_MS);
       signal.throwIfAborted();
-      const response = await dataView.getFormula({...config}); // TODO: signal
+
+      const {dataView} = await data;
+      const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
+      const response = await dataView.getFormula({...config, spatialFilter}); // TODO: signal
       return response.value as number;
     },
-    args: () => [this.dataView, this.config],
+    args: () => [this.data, this.config, this.viewState],
   });
 
   override render() {
