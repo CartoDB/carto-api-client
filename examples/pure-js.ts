@@ -58,6 +58,7 @@ updateSources();
 
 function updateSources() {
   data = vectorTableSource({
+    // @ts-expect-error
     accessToken: import.meta.env.VITE_CARTO_ACCESS_TOKEN,
     connectionName: 'carto_dw',
     tableName: 'carto-demo-data.demo_tables.retail_stores',

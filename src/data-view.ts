@@ -11,7 +11,6 @@ import {
   MAP_TYPES,
 } from './vendor/carto-constants.js';
 import {
-  MapType,
   SourceOptions,
   VectorQuerySourceOptions,
   VectorTableSourceOptions,
@@ -62,7 +61,7 @@ export class CartoDataView<Props extends SourceOptions> implements DataView {
   }
   protected getSource(): WidgetSource {
     return {
-      ...this.props as any,
+      ...(this.props as any),
       credentials: this.credentials,
       connection: this.connectionName,
     };
@@ -145,7 +144,7 @@ export class TableDataView extends CartoDataView<VectorTableSourceOptions> {
     return {
       ...super.getSource(),
       type: MAP_TYPES.TABLE,
-      data: this.props.tableName
+      data: this.props.tableName,
     };
   }
 }
@@ -155,7 +154,7 @@ export class QueryDataView extends CartoDataView<VectorQuerySourceOptions> {
     return {
       ...super.getSource(),
       type: MAP_TYPES.QUERY,
-      data: this.props.sqlQuery
+      data: this.props.sqlQuery,
     };
   }
 }
