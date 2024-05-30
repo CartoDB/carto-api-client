@@ -1,27 +1,20 @@
 import maplibregl from 'maplibre-gl';
 import {Deck} from '@deck.gl/core';
-import {VectorTileLayer, vectorTableSource} from '@deck.gl/carto';
+import {VectorTileLayer} from '@deck.gl/carto';
 import {
-  TableDataView,
-  AggregationTypes,
-  FormulaWidget,
-  CategoryWidget,
   FilterEvent,
   Filter,
-  PieWidget,
+  vectorTableSource,
+  VectorTableSourceResponse,
+  Widget,
 } from '../';
 
 /**************************************************************************
  * REACTIVE STATE
  */
 
-const railEl = document.querySelector('#rail')!;
-const formulaWidget = railEl.querySelector('#formula') as FormulaWidget;
-const categoryWidget = railEl.querySelector('#category') as CategoryWidget;
-const pieWidget = railEl.querySelector('#pie') as PieWidget;
-const footerEl = document.querySelector('#footer')!;
-
-let viewState = {latitude: 40.7128, longitude: -74.0060, zoom: 12};
+let data: Promise<VectorTableSourceResponse>;
+let viewState = {latitude: 40.7128, longitude: -74.006, zoom: 12};
 let filters: Record<string, Filter> = {};
 
 /**************************************************************************
@@ -51,88 +44,64 @@ deck.setProps({
   },
 });
 
-updateLayers();
-updateWidgets();
+const widgets: Widget[] = [
+  bindWidget('#formula'),
+  bindWidget('#category'),
+  bindWidget('#pie'),
+];
+
+updateSources();
 
 /**************************************************************************
- * LAYERS
+ * UPDATES
  */
 
-function updateLayers() {
-  const cartoData = vectorTableSource({
+function updateSources() {
+  data = vectorTableSource({
+    // @ts-expect-error
     accessToken: import.meta.env.VITE_CARTO_ACCESS_TOKEN,
     connectionName: 'carto_dw',
     tableName: 'carto-demo-data.demo_tables.retail_stores',
     filters,
   });
 
+  updateLayers();
+  updateWidgets();
+}
+
+function updateLayers() {
   const layer = new VectorTileLayer({
     id: 'retail_stores',
-    data: cartoData,
+    data,
     pointRadiusMinPixels: 4,
     getFillColor: [200, 0, 80],
   });
 
   deck.setProps({layers: [layer]});
-  cartoData.then(({attribution}) => (footerEl.innerHTML = attribution));
+  data.then(({attribution}) => {
+    document.querySelector('#footer')!.innerHTML = attribution;
+  });
 }
-
-/**************************************************************************
- * WIDGETS
- */
 
 function updateWidgets() {
-  const dataView = new TableDataView({
-    accessToken: import.meta.env.VITE_CARTO_ACCESS_TOKEN,
-    connectionName: 'carto_dw',
-    tableName: 'carto-demo-data.demo_tables.retail_stores',
-    viewState,
-  });
-
-  formulaWidget.dataView = dataView;
-  formulaWidget.config = {
-    // TODO(cleanup)
-    source: {
-      data: 'carto-demo-data.demo_tables.retail_stores',
-      type: 'table',
-      filtersLogicalOperator: 'and',
-      queryParameters: [],
-      geoColumn: 'geom',
-      provider: 'bigquery',
-      filters: filters,
-    },
-    operation: AggregationTypes.COUNT,
-    column: '',
-    global: false,
-  };
-
-  categoryWidget.dataView = pieWidget.dataView = dataView;
-  categoryWidget.config = pieWidget.config = {
-    // TODO(cleanup)
-    source: {
-      data: 'carto-demo-data.demo_tables.retail_stores',
-      type: 'table',
-      filtersLogicalOperator: 'and',
-      queryParameters: [],
-      geoColumn: 'geom',
-      provider: 'bigquery',
-      filters: filters,
-    },
-    operation: AggregationTypes.COUNT,
-    column: 'storetype',
-    global: false,
-  };
-  // TODO: Type definitions for events.
-  (categoryWidget as any).addEventListener('filter', onFilterChange);
-  (pieWidget as any).addEventListener('filter', onFilterChange);
+  for (const widget of widgets) {
+    widget.data = data;
+    widget.viewState = viewState;
+  }
 }
 
 /**************************************************************************
- * EVENT LISTENERS
+ * INITIALIZATION
  */
 
-function onFilterChange(event: FilterEvent) {
-  filters = event.detail.filters;
-  updateLayers();
-  updateWidgets();
+// TODO: Improve type definitions.
+function bindWidget(selector: string): Widget {
+  const widget = document.querySelector<Widget>(selector)!;
+
+  (widget as any).addEventListener('filter', (event: FilterEvent) => {
+    filters = event.detail.filters;
+    updateSources();
+  });
+
+  return widget;
 }

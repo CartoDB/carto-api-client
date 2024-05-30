@@ -3,41 +3,27 @@ import {
   formatResult,
   normalizeObjectKeys,
 } from './vendor/carto-react-widgets.js';
-import {
-  $TODO,
-  CartoDataViewProps,
-  DataView,
-  QueryDataViewProps,
-  TableDataViewProps,
-} from './types.js';
+import {$TODO, DataView} from './types.js';
 import {
   API_VERSIONS,
   DEFAULT_API_BASE_URL,
   DEFAULT_CLIENT,
   MAP_TYPES,
 } from './vendor/carto-constants.js';
-import {WebMercatorViewport, MapViewState} from '@deck.gl/core';
+import {
+  SourceOptions,
+  VectorQuerySourceOptions,
+  VectorTableSourceOptions,
+} from '@deck.gl/carto';
+import {getWidgetFilters} from './utils.js';
 
-// TODO: legacy
-interface WidgetSource {
-  id: string;
-  data: string;
-  type: MAP_TYPES;
-  credentials: {
-    apiVersion: API_VERSIONS;
-    accessToken: string;
-  };
-  connection: string;
-  filtersLogicalOperator: string;
-  queryParameters: unknown[];
-  geoColumn: string;
-  provider: string;
-  filters: Record<string, unknown>;
-}
+// TODO: types
+const DEFAULT_PROPS: any = {
+  filters: {},
+  filtersLogicalOperator: 'and',
+};
 
-export class CartoDataView<Props extends CartoDataViewProps>
-  implements DataView
-{
+export class CartoDataView<Props extends SourceOptions> implements DataView {
   readonly props: Props;
   readonly credentials: {
     apiBaseUrl: string;
@@ -46,9 +32,9 @@ export class CartoDataView<Props extends CartoDataViewProps>
     clientId: string;
   };
   readonly connectionName: string;
-  readonly viewState: MapViewState;
+
   constructor(props: Props) {
-    this.props = props;
+    this.props = {...DEFAULT_PROPS, ...props};
     this.credentials = {
       apiVersion: API_VERSIONS.V3,
       apiBaseUrl: DEFAULT_API_BASE_URL || props.apiBaseUrl,
@@ -56,51 +42,35 @@ export class CartoDataView<Props extends CartoDataViewProps>
       accessToken: props.accessToken,
     };
     this.connectionName = props.connectionName;
-    this.viewState = props.viewState;
   }
-  protected getSource(props: $TODO): WidgetSource {
+  protected getSource(owner: string): $TODO {
     return {
-      ...props.source,
+      ...(this.props as any),
+      filters: getWidgetFilters(owner, (this.props as any).filters),
       credentials: this.credentials,
       connection: this.connectionName,
     };
   }
-  protected getSpatialFilter(props: $TODO): $TODO {
-    if (props.global) return null;
-
-    const viewport = new WebMercatorViewport(this.viewState);
-    return {
-      type: 'Polygon',
-      coordinates: [
-        [
-          viewport.unproject([0, 0]),
-          viewport.unproject([viewport.width, 0]),
-          viewport.unproject([viewport.width, viewport.height]),
-          viewport.unproject([0, viewport.height]),
-          viewport.unproject([0, 0]),
-        ],
-      ],
-    };
-  }
   getFormula(props: $TODO): $TODO {
-    const {spatialFilter, abortController, operationExp, ...params} = props;
+    const {owner, spatialFilter, abortController, operationExp, ...params} =
+      props;
     const {column, operation} = params;
     return executeModel({
       model: 'formula',
-      source: this.getSource(props),
-      spatialFilter: spatialFilter || this.getSpatialFilter(props),
+      source: this.getSource(owner),
+      spatialFilter: spatialFilter,
       params: {column: column ?? '*', operation, operationExp},
       opts: {abortController},
     }).then((res: $TODO) => normalizeObjectKeys(res.rows[0]));
   }
   getCategories(props: $TODO): $TODO {
-    const {spatialFilter, abortController, ...params} = props;
+    const {owner, spatialFilter, abortController, ...params} = props;
     const {column, operation, operationColumn} = params;
 
     return executeModel({
       model: 'category',
-      source: this.getSource(props),
-      spatialFilter: spatialFilter || this.getSpatialFilter(props),
+      source: this.getSource(owner),
+      spatialFilter: spatialFilter,
       params: {
         column,
         operation,
@@ -110,24 +80,25 @@ export class CartoDataView<Props extends CartoDataViewProps>
     }).then((res: $TODO) => normalizeObjectKeys(res.rows));
   }
   getRange(props: $TODO): $TODO {
-    const {abortController, ...params} = props;
+    const {owner, spatialFilter, abortController, ...params} = props;
     const {column} = params;
 
     return executeModel({
       model: 'range',
-      source: this.getSource(props),
+      source: this.getSource(owner),
+      spatialFilter: spatialFilter,
       params: {column},
       opts: {abortController},
     }).then((res: $TODO) => normalizeObjectKeys(res.rows[0]));
   }
   getTable(props: $TODO): $TODO {
-    const {spatialFilter, abortController, ...params} = props;
+    const {owner, spatialFilter, abortController, ...params} = props;
     const {columns, sortBy, sortDirection, page, rowsPerPage} = params;
 
     return executeModel({
       model: 'table',
-      source: this.getSource(props),
-      spatialFilter,
+      source: this.getSource(owner),
+      spatialFilter: spatialFilter,
       params: {
         column: columns,
         sortBy,
@@ -154,14 +125,22 @@ export class CartoDataView<Props extends CartoDataViewProps>
   }
 }
 
-export class TableDataView extends CartoDataView<TableDataViewProps> {
-  constructor(props: TableDataViewProps) {
-    super(props);
+export class TableDataView extends CartoDataView<VectorTableSourceOptions> {
+  protected override getSource(owner: string): $TODO {
+    return {
+      ...super.getSource(owner),
+      type: MAP_TYPES.TABLE,
+      data: this.props.tableName,
+    };
   }
 }
 
-export class QueryDataView extends CartoDataView<QueryDataViewProps> {
-  constructor(props: QueryDataViewProps) {
-    super(props);
+export class QueryDataView extends CartoDataView<VectorQuerySourceOptions> {
+  protected override getSource(owner: string): $TODO {
+    return {
+      ...super.getSource(owner),
+      type: MAP_TYPES.QUERY,
+      data: this.props.sqlQuery,
+    };
   }
 }

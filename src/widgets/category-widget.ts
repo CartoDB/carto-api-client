@@ -2,9 +2,8 @@ import {LitElement, html, nothing} from 'lit';
 import {Task} from '@lit/task';
 import {customElement, property, state} from 'lit/decorators.js';
 import {Ref, createRef, ref} from 'lit/directives/ref.js';
-import {CartoDataView} from '../data-view';
 import {DEBOUNCE_TIME_MS} from '../constants';
-import {getWidgetFilters, sleep} from '../utils';
+import {getSpatialFilter, sleep} from '../utils';
 import * as echarts from 'echarts';
 import {TaskStatus} from '@lit/task';
 import {
@@ -14,6 +13,7 @@ import {
   WIDGET_BASE_CSS,
 } from './styles';
 import {cache} from 'lit/directives/cache.js';
+import {AggregationTypes} from '../vendor/carto-constants';
 
 type Category = {name: string; value: number};
 
@@ -27,11 +27,17 @@ export class CategoryWidget extends LitElement {
   @property()
   caption = 'Category widget';
 
-  @property({type: CartoDataView}) // TODO: DataView
-  dataView = null;
+  @property({type: Object, attribute: false}) // TODO: types
+  data = null;
 
-  @property({type: Object}) // TODO: types
-  config = null;
+  @property({type: AggregationTypes})
+  operation = AggregationTypes.COUNT;
+
+  @property({type: String})
+  column = '';
+
+  @property({type: Object, attribute: false}) // TODO: types
+  viewState = null;
 
   protected readonly widgetId = crypto.randomUUID();
   protected chart: echarts.ECharts | null = null;
@@ -41,15 +47,23 @@ export class CategoryWidget extends LitElement {
   protected filterValues: string[] = [];
 
   protected _categoryTask = new Task(this, {
-    task: async ([dataView, config], {signal}) => {
+    task: async ([data, operation, column, viewState], {signal}) => {
+      if (!data) return [];
+
       await sleep(DEBOUNCE_TIME_MS);
       signal.throwIfAborted();
 
-      const filters = getWidgetFilters(this.widgetId, config.source.filters);
-      const source = {...config.source, filters};
-      return (await dataView.getCategories({...config, source})) as Category[]; // TODO: signal
+      const {dataView} = await data;
+      const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
+
+      return (await dataView.getCategories({
+        owner: this.widgetId,
+        operation,
+        column,
+        spatialFilter,
+      })) as Category[]; // TODO: signal
     },
-    args: () => [this.dataView, this.config],
+    args: () => [this.data, this.operation, this.column, this.viewState],
   });
 
   override render() {
@@ -89,6 +103,8 @@ export class CategoryWidget extends LitElement {
       this.chart.on('click', ({name}) => this._toggleFilter(name));
     }
 
+    // TODO: If another widget overrides this widget's filters, what happens?
+
     this._updateChart();
   }
 
@@ -106,10 +122,12 @@ export class CategoryWidget extends LitElement {
     this._dispatchFilter();
   }
 
-  private _dispatchFilter(): void {
-    const filters = {...this.config.filters} as Record<string, unknown>;
-    const column = this.config.column as string;
+  private async _dispatchFilter(): Promise<void> {
+    const {dataView} = await this.data;
+    const filters = {...dataView.props.filters} as Record<string, unknown>;
+    const column = this.column as string;
 
+    // TODO: Append filters from multiple widgets on the same columns.
     if (this.filterValues.length > 0) {
       filters[column] = {
         in: {
@@ -117,6 +135,8 @@ export class CategoryWidget extends LitElement {
           values: Array.from(this.filterValues),
         },
       };
+    } else {
+      delete filters[column];
     }
 
     this.dispatchEvent(new CustomEvent('filter', {detail: {filters}}));

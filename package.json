@@ -21,7 +21,7 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "dev": "concurrently \"yarn build:watch\" \"vite -c examples/vite.config.js\"",
+    "dev": "concurrently \"yarn build:watch\" \"vite --config examples/vite.config.js --open\"",
     "clean": "rimraf my-element.{d.ts,d.ts.map,js,js.map} test/my-element.{d.ts,d.ts.map,js,js.map} test/my-element_test.{d.ts,d.ts.map,js,js.map}",
     "lint": "npm run lint:lit-analyzer",
     "lint:lit-analyzer": "lit-analyzer",
