@@ -103,6 +103,8 @@ export class CategoryWidget extends LitElement {
       this.chart.on('click', ({name}) => this._toggleFilter(name));
     }
 
+    // TODO: If another widget overrides this widget's filters, what happens?
+
     this._updateChart();
   }
 
