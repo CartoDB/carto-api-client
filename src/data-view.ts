@@ -15,23 +15,7 @@ import {
   VectorQuerySourceOptions,
   VectorTableSourceOptions,
 } from '@deck.gl/carto';
-
-// TODO: legacy
-interface WidgetSource {
-  id: string;
-  data: string;
-  type: MAP_TYPES;
-  credentials: {
-    apiVersion: API_VERSIONS;
-    accessToken: string;
-  };
-  connection: string;
-  filtersLogicalOperator: string;
-  queryParameters: unknown[];
-  geoColumn: string;
-  provider: string;
-  filters: Record<string, unknown>;
-}
+import {getWidgetFilters} from './utils.js';
 
 // TODO: types
 const DEFAULT_PROPS: any = {
@@ -59,31 +43,33 @@ export class CartoDataView<Props extends SourceOptions> implements DataView {
     };
     this.connectionName = props.connectionName;
   }
-  protected getSource(): WidgetSource {
+  protected getSource(owner: string): $TODO {
     return {
       ...(this.props as any),
+      filters: getWidgetFilters(owner, (this.props as any).filters),
       credentials: this.credentials,
       connection: this.connectionName,
     };
   }
   getFormula(props: $TODO): $TODO {
-    const {spatialFilter, abortController, operationExp, ...params} = props;
+    const {owner, spatialFilter, abortController, operationExp, ...params} =
+      props;
     const {column, operation} = params;
     return executeModel({
       model: 'formula',
-      source: this.getSource(),
+      source: this.getSource(owner),
       spatialFilter: spatialFilter,
       params: {column: column ?? '*', operation, operationExp},
       opts: {abortController},
     }).then((res: $TODO) => normalizeObjectKeys(res.rows[0]));
   }
   getCategories(props: $TODO): $TODO {
-    const {spatialFilter, abortController, ...params} = props;
+    const {owner, spatialFilter, abortController, ...params} = props;
     const {column, operation, operationColumn} = params;
 
     return executeModel({
       model: 'category',
-      source: this.getSource(),
+      source: this.getSource(owner),
       spatialFilter: spatialFilter,
       params: {
         column,
@@ -94,24 +80,24 @@ export class CartoDataView<Props extends SourceOptions> implements DataView {
     }).then((res: $TODO) => normalizeObjectKeys(res.rows));
   }
   getRange(props: $TODO): $TODO {
-    const {spatialFilter, abortController, ...params} = props;
+    const {owner, spatialFilter, abortController, ...params} = props;
     const {column} = params;
 
     return executeModel({
       model: 'range',
-      source: this.getSource(),
+      source: this.getSource(owner),
       spatialFilter: spatialFilter,
       params: {column},
       opts: {abortController},
     }).then((res: $TODO) => normalizeObjectKeys(res.rows[0]));
   }
   getTable(props: $TODO): $TODO {
-    const {spatialFilter, abortController, ...params} = props;
+    const {owner, spatialFilter, abortController, ...params} = props;
     const {columns, sortBy, sortDirection, page, rowsPerPage} = params;
 
     return executeModel({
       model: 'table',
-      source: this.getSource(),
+      source: this.getSource(owner),
       spatialFilter: spatialFilter,
       params: {
         column: columns,
@@ -140,9 +126,9 @@ export class CartoDataView<Props extends SourceOptions> implements DataView {
 }
 
 export class TableDataView extends CartoDataView<VectorTableSourceOptions> {
-  protected override getSource(): WidgetSource {
+  protected override getSource(owner: string): $TODO {
     return {
-      ...super.getSource(),
+      ...super.getSource(owner),
       type: MAP_TYPES.TABLE,
       data: this.props.tableName,
     };
@@ -150,9 +136,9 @@ export class TableDataView extends CartoDataView<VectorTableSourceOptions> {
 }
 
 export class QueryDataView extends CartoDataView<VectorQuerySourceOptions> {
-  protected override getSource(): WidgetSource {
+  protected override getSource(owner: string): $TODO {
     return {
-      ...super.getSource(),
+      ...super.getSource(owner),
       type: MAP_TYPES.QUERY,
       data: this.props.sqlQuery,
     };

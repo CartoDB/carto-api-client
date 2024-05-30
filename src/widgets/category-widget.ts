@@ -14,7 +14,6 @@ import {
 } from './styles';
 import {cache} from 'lit/directives/cache.js';
 import {AggregationTypes} from '../vendor/carto-constants';
-import {CartoDataView} from '../data-view';
 
 type Category = {name: string; value: number};
 
@@ -57,8 +56,8 @@ export class CategoryWidget extends LitElement {
       const {dataView} = await data;
       const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
 
-      // TODO: Pass widget ID for filter exclusions?
       return (await dataView.getCategories({
+        owner: this.widgetId,
         operation,
         column,
         spatialFilter,

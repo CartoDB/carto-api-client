@@ -1,16 +1,25 @@
-import { MapViewState, WebMercatorViewport } from "@deck.gl/core";
-import { Filter, FilterTypes } from "./vendor/deck-carto.js";
+import {MapViewState, WebMercatorViewport} from '@deck.gl/core';
+import {Filter, FilterTypes} from './vendor/deck-carto.js';
 
-export function sleep (ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+const FILTER_TYPES = new Set(Object.values(FilterTypes));
+
+export function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export function getWidgetFilters(owner: string, allFilters?: Record<string, Filter>): Record<string, Filter> {
+export function getWidgetFilters(
+  owner: string,
+  allFilters?: Record<string, Filter>
+): Record<string, Filter> {
   if (!allFilters) return {};
+  if (!owner) return allFilters;
 
   const widgetFilters: Record<string, Filter> = {};
+
   for (const column in allFilters) {
-    for (const type in FilterTypes) {
+    for (const type in allFilters[column]) {
+      if (!FILTER_TYPES.has(type as FilterTypes)) continue;
+
       const filter = allFilters[column][type];
       if (filter && filter.owner !== owner) {
         widgetFilters[column] = allFilters[column];
