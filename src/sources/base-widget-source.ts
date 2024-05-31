@@ -18,13 +18,7 @@ import {Filter} from '../vendor/deck-carto.js';
  *
  */
 export interface BaseWidgetSourceProps extends SourceOptions {
-  id?: string;
   type?: MAP_TYPES;
-  credentials: {
-    apiVersion: API_VERSIONS;
-    accessToken: string;
-  };
-  connection: string;
   filtersLogicalOperator?: 'and' | 'or';
   queryParameters?: unknown[];
   geoColumn?: string;

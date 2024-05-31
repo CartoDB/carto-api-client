@@ -1,3 +1,5 @@
+import {Filter} from './vendor/deck-carto';
+
 /******************************************************************************
  * COMMON
  */
@@ -9,7 +11,7 @@ export type $TODO = any;
  */
 
 export interface FilterEvent extends CustomEvent {
-  detail: {filters: any};
+  detail: {filters: Record<string, Filter>};
 }
 
 /******************************************************************************

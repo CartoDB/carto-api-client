@@ -1,8 +1,6 @@
 import {MapViewState, WebMercatorViewport} from '@deck.gl/core';
 import {Filter, FilterTypes} from './vendor/deck-carto.js';
 
-const FILTER_TYPES = new Set(Object.values(FilterTypes));
-
 export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
