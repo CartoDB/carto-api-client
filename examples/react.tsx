@@ -71,6 +71,7 @@ function App(): JSX.Element {
         </DeckGL>
       </section>
       <section id="rail">
+        {/* @ts-expect-error */}
         <FormulaWidget
           ref={formulaRef}
           id="formula"
@@ -78,6 +79,7 @@ function App(): JSX.Element {
           aggregation="count"
         ></FormulaWidget>
 
+        {/* @ts-expect-error */}
         <CategoryWidget
           ref={categoryRef}
           id="category"
@@ -87,6 +89,7 @@ function App(): JSX.Element {
           onFilter={({detail}) => setFilters(detail.filters)}
         ></CategoryWidget>
 
+        {/* @ts-expect-error */}
         <PieWidget
           ref={pieRef}
           id="pie"
