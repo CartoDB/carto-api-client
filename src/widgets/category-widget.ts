@@ -53,10 +53,10 @@ export class CategoryWidget extends LitElement {
       await sleep(DEBOUNCE_TIME_MS);
       signal.throwIfAborted();
 
-      const {dataView} = await data;
+      const {widgetSource} = await data;
       const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
 
-      return (await dataView.getCategories({
+      return (await widgetSource.getCategories({
         owner: this.widgetId,
         operation,
         column,
@@ -123,8 +123,8 @@ export class CategoryWidget extends LitElement {
   }
 
   private async _dispatchFilter(): Promise<void> {
-    const {dataView} = await this.data;
-    const filters = {...dataView.props.filters} as Record<string, unknown>;
+    const {widgetSource} = await this.data;
+    const filters = {...widgetSource.props.filters} as Record<string, unknown>;
     const column = this.column as string;
 
     // TODO: Append filters from multiple widgets on the same columns.

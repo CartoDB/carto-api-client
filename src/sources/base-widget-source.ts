@@ -1,29 +1,38 @@
-import {executeModel} from './vendor/carto-react-api.js';
+import {executeModel} from '../vendor/carto-react-api.js';
 import {
   formatResult,
   normalizeObjectKeys,
-} from './vendor/carto-react-widgets.js';
-import {$TODO, DataView} from './types.js';
+} from '../vendor/carto-react-widgets.js';
+import {$TODO} from '../types.js';
 import {
   API_VERSIONS,
   DEFAULT_API_BASE_URL,
   DEFAULT_CLIENT,
   MAP_TYPES,
-} from './vendor/carto-constants.js';
-import {
-  SourceOptions,
-  VectorQuerySourceOptions,
-  VectorTableSourceOptions,
-} from '@deck.gl/carto';
-import {getWidgetFilters} from './utils.js';
+} from '../vendor/carto-constants.js';
+import {SourceOptions} from '@deck.gl/carto';
+import {getWidgetFilters} from '../utils.js';
+import {Filter} from '../vendor/deck-carto.js';
 
-// TODO: types
-const DEFAULT_PROPS: any = {
-  filters: {},
-  filtersLogicalOperator: 'and',
-};
+/**
+ *
+ */
+export interface BaseWidgetSourceProps extends SourceOptions {
+  id?: string;
+  type?: MAP_TYPES;
+  credentials: {
+    apiVersion: API_VERSIONS;
+    accessToken: string;
+  };
+  connection: string;
+  filtersLogicalOperator?: 'and' | 'or';
+  queryParameters?: unknown[];
+  geoColumn?: string;
+  provider?: string;
+  filters: Record<string, Filter>;
+}
 
-export class CartoDataView<Props extends SourceOptions> implements DataView {
+export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
   readonly props: Props;
   readonly credentials: {
     apiBaseUrl: string;
@@ -33,8 +42,13 @@ export class CartoDataView<Props extends SourceOptions> implements DataView {
   };
   readonly connectionName: string;
 
+  static defaultProps: Partial<BaseWidgetSourceProps> = {
+    filters: {},
+    filtersLogicalOperator: 'and',
+  };
+
   constructor(props: Props) {
-    this.props = {...DEFAULT_PROPS, ...props};
+    this.props = {...BaseWidgetSource.defaultProps, ...props};
     this.credentials = {
       apiVersion: API_VERSIONS.V3,
       apiBaseUrl: DEFAULT_API_BASE_URL || props.apiBaseUrl,
@@ -122,25 +136,5 @@ export class CartoDataView<Props extends SourceOptions> implements DataView {
   }
   getHistogram() {
     throw new Error('TODO: implement');
-  }
-}
-
-export class TableDataView extends CartoDataView<VectorTableSourceOptions> {
-  protected override getSource(owner: string): $TODO {
-    return {
-      ...super.getSource(owner),
-      type: MAP_TYPES.TABLE,
-      data: this.props.tableName,
-    };
-  }
-}
-
-export class QueryDataView extends CartoDataView<VectorQuerySourceOptions> {
-  protected override getSource(owner: string): $TODO {
-    return {
-      ...super.getSource(owner),
-      type: MAP_TYPES.QUERY,
-      data: this.props.sqlQuery,
-    };
   }
 }
