@@ -3,7 +3,7 @@ import {
   formatResult,
   normalizeObjectKeys,
 } from '../vendor/carto-react-widgets.js';
-import {$TODO} from '../types.js';
+import {$TODO, CategoryResponse, FormulaResponse} from '../types.js';
 import {
   API_VERSIONS,
   DEFAULT_API_BASE_URL,
@@ -31,6 +31,8 @@ export interface BaseWidgetSourceProps extends SourceOptions {
   provider?: string;
   filters: Record<string, Filter>;
 }
+
+export type WidgetSource = BaseWidgetSource<BaseWidgetSourceProps>;
 
 export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
   readonly props: Props;
@@ -65,7 +67,7 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
       connection: this.connectionName,
     };
   }
-  getFormula(props: $TODO): $TODO {
+  async getFormula(props: $TODO): Promise<FormulaResponse> {
     const {owner, spatialFilter, abortController, operationExp, ...params} =
       props;
     const {column, operation} = params;
@@ -77,7 +79,7 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
       opts: {abortController},
     }).then((res: $TODO) => normalizeObjectKeys(res.rows[0]));
   }
-  getCategories(props: $TODO): $TODO {
+  async getCategories(props: $TODO): Promise<CategoryResponse> {
     const {owner, spatialFilter, abortController, ...params} = props;
     const {column, operation, operationColumn} = params;
 
@@ -128,13 +130,13 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
       }))
       .then(formatResult);
   }
-  getScatter() {
+  getScatter(_props: $TODO): $TODO {
     throw new Error('TODO: implement');
   }
-  getTimeSeries() {
+  getTimeSeries(_props: $TODO): $TODO {
     throw new Error('TODO: implement');
   }
-  getHistogram() {
+  getHistogram(_props: $TODO): $TODO {
     throw new Error('TODO: implement');
   }
 }

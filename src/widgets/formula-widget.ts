@@ -4,6 +4,7 @@ import {customElement, property} from 'lit/decorators.js';
 import {DEBOUNCE_TIME_MS} from '../constants';
 import {getSpatialFilter, sleep} from '../utils';
 import {AggregationTypes} from '../vendor/carto-constants';
+import {WidgetSource} from '../sources/index.js';
 
 @customElement('formula-widget')
 export class FormulaWidget extends LitElement {
@@ -54,14 +55,14 @@ export class FormulaWidget extends LitElement {
       await sleep(DEBOUNCE_TIME_MS);
       signal.throwIfAborted();
 
-      const {widgetSource} = await data;
+      const {widgetSource} = (await data) as {widgetSource: WidgetSource};
       const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
       const response = await widgetSource.getFormula({
         operation,
         column,
         spatialFilter,
       }); // TODO: signal
-      return response.value as number;
+      return response.value;
     },
     args: () => [this.data, this.operation, this.column, this.viewState],
   });

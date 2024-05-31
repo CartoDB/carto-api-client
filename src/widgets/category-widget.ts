@@ -14,8 +14,7 @@ import {
 } from './styles';
 import {cache} from 'lit/directives/cache.js';
 import {AggregationTypes} from '../vendor/carto-constants';
-
-type Category = {name: string; value: number};
+import {WidgetSource} from '../sources/index.js';
 
 @customElement('category-widget')
 export class CategoryWidget extends LitElement {
@@ -53,15 +52,15 @@ export class CategoryWidget extends LitElement {
       await sleep(DEBOUNCE_TIME_MS);
       signal.throwIfAborted();
 
-      const {widgetSource} = await data;
+      const {widgetSource} = (await data) as {widgetSource: WidgetSource};
       const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
 
-      return (await widgetSource.getCategories({
+      return await widgetSource.getCategories({
         owner: this.widgetId,
         operation,
         column,
         spatialFilter,
-      })) as Category[]; // TODO: signal
+      }); // TODO: signal
     },
     args: () => [this.data, this.operation, this.column, this.viewState],
   });

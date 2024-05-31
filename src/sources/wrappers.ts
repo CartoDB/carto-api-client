@@ -14,7 +14,7 @@ import {
 } from '@deck.gl/carto';
 import {QueryWidgetSource} from './query-widget-source';
 import {TableWidgetSource} from './table-widget-source';
-import {WidgetSourceProps} from './types';
+import {BaseWidgetSourceProps} from './base-widget-source';
 
 /******************************************************************************
  * RESPONSE OBJECTS
@@ -44,7 +44,7 @@ export type QuadbinQuerySourceResponse = QueryWidgetSourceResponse &
 
 /** Wrapper adding widget support to {@link _vectorTableSource}. */
 export async function vectorTableSource(
-  props: VectorTableSourceOptions & WidgetSourceProps
+  props: VectorTableSourceOptions & BaseWidgetSourceProps
 ): Promise<VectorTableSourceResponse> {
   const response = await _vectorTableSource(props);
   return {...response, widgetSource: new TableWidgetSource(props)};
@@ -52,7 +52,7 @@ export async function vectorTableSource(
 
 /** Wrapper adding widget support to {@link _vectorQuerySource}. */
 export async function vectorQuerySource(
-  props: VectorQuerySourceOptions & WidgetSourceProps
+  props: VectorQuerySourceOptions & BaseWidgetSourceProps
 ): Promise<VectorQuerySourceResponse> {
   const response = await _vectorQuerySource(props);
   return {...response, widgetSource: new QueryWidgetSource(props)};
@@ -69,7 +69,7 @@ export async function vectorTilesetSource() {
 
 /** Wrapper adding widget support to {@link _h3TableSource}. */
 export async function h3TableSource(
-  props: H3TableSourceOptions & WidgetSourceProps
+  props: H3TableSourceOptions & BaseWidgetSourceProps
 ): Promise<H3TableSourceResponse> {
   const response = await _h3TableSource(props);
   return {...response, widgetSource: new TableWidgetSource(props)};
@@ -77,7 +77,7 @@ export async function h3TableSource(
 
 /** Wrapper adding widget support to {@link _h3QuerySource}. */
 export async function h3QuerySource(
-  props: H3QuerySourceOptions & WidgetSourceProps
+  props: H3QuerySourceOptions & BaseWidgetSourceProps
 ): Promise<H3QuerySourceResponse> {
   const response = await _h3QuerySource(props);
   return {...response, widgetSource: new QueryWidgetSource(props)};
@@ -94,7 +94,7 @@ export async function h3TilesetSource() {
 
 /** Wrapper adding widget support to {@link _quadbinTableSource}. */
 export async function quadbinTableSource(
-  props: QuadbinTableSourceOptions & WidgetSourceProps
+  props: QuadbinTableSourceOptions & BaseWidgetSourceProps
 ): Promise<QuadbinTableSourceResponse> {
   const response = await _quadbinTableSource(props);
   return {...response, widgetSource: new TableWidgetSource(props)};
@@ -102,7 +102,7 @@ export async function quadbinTableSource(
 
 /** Wrapper adding widget support to {@link _quadbinQuerySource}. */
 export async function quadbinQuerySource(
-  props: QuadbinQuerySourceOptions & WidgetSourceProps
+  props: QuadbinQuerySourceOptions & BaseWidgetSourceProps
 ): Promise<QuadbinQuerySourceResponse> {
   const response = await _quadbinQuerySource(props);
   return {...response, widgetSource: new QueryWidgetSource(props)};
