@@ -3,7 +3,22 @@ import {
   formatResult,
   normalizeObjectKeys,
 } from '../vendor/carto-react-widgets.js';
-import {$TODO, CategoryResponse, FormulaResponse} from '../types.js';
+import {
+  CategoryRequestOptions,
+  CategoryResponse,
+  FormulaRequestOptions,
+  FormulaResponse,
+  HistogramRequestOptions,
+  HistogramResponse,
+  RangeRequestOptions,
+  RangeResponse,
+  ScatterRequestOptions,
+  ScatterResponse,
+  TableRequestOptions,
+  TableResponse,
+  TimeSeriesRequestOptions,
+  TimeSeriesResponse,
+} from '../types.js';
 import {
   API_VERSIONS,
   DEFAULT_API_BASE_URL,
@@ -13,6 +28,7 @@ import {
 import {SourceOptions} from '@deck.gl/carto';
 import {getWidgetFilters} from '../utils.js';
 import {Filter} from '../vendor/deck-carto.js';
+import {$TODO} from '../types-internal.js';
 
 /**
  *
@@ -53,6 +69,7 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
     };
     this.connectionName = props.connectionName;
   }
+
   protected getSource(owner: string): $TODO {
     return {
       ...(this.props as any),
@@ -61,25 +78,34 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
       connection: this.connectionName,
     };
   }
-  async getFormula(props: $TODO): Promise<FormulaResponse> {
-    const {owner, spatialFilter, abortController, operationExp, ...params} =
-      props;
+
+  async getFormula(props: FormulaRequestOptions): Promise<FormulaResponse> {
+    const {
+      filterOwner,
+      spatialFilter,
+      abortController,
+      operationExp,
+      ...params
+    } = props;
     const {column, operation} = params;
     return executeModel({
       model: 'formula',
-      source: this.getSource(owner),
+      source: this.getSource(filterOwner),
       spatialFilter: spatialFilter,
       params: {column: column ?? '*', operation, operationExp},
       opts: {abortController},
     }).then((res: $TODO) => normalizeObjectKeys(res.rows[0]));
   }
-  async getCategories(props: $TODO): Promise<CategoryResponse> {
-    const {owner, spatialFilter, abortController, ...params} = props;
+
+  async getCategories(
+    props: CategoryRequestOptions
+  ): Promise<CategoryResponse> {
+    const {filterOwner, spatialFilter, abortController, ...params} = props;
     const {column, operation, operationColumn} = params;
 
     return executeModel({
       model: 'category',
-      source: this.getSource(owner),
+      source: this.getSource(filterOwner),
       spatialFilter: spatialFilter,
       params: {
         column,
@@ -89,25 +115,27 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
       opts: {abortController},
     }).then((res: $TODO) => normalizeObjectKeys(res.rows));
   }
-  getRange(props: $TODO): $TODO {
-    const {owner, spatialFilter, abortController, ...params} = props;
+
+  async getRange(props: RangeRequestOptions): Promise<RangeResponse> {
+    const {filterOwner, spatialFilter, abortController, ...params} = props;
     const {column} = params;
 
     return executeModel({
       model: 'range',
-      source: this.getSource(owner),
+      source: this.getSource(filterOwner),
       spatialFilter: spatialFilter,
       params: {column},
       opts: {abortController},
     }).then((res: $TODO) => normalizeObjectKeys(res.rows[0]));
   }
-  getTable(props: $TODO): $TODO {
-    const {owner, spatialFilter, abortController, ...params} = props;
+
+  async getTable(props: TableRequestOptions): Promise<TableResponse> {
+    const {filterOwner, spatialFilter, abortController, ...params} = props;
     const {columns, sortBy, sortDirection, page, rowsPerPage} = params;
 
     return executeModel({
       model: 'table',
-      source: this.getSource(owner),
+      source: this.getSource(filterOwner),
       spatialFilter: spatialFilter,
       params: {
         column: columns,
@@ -124,13 +152,20 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
       }))
       .then(formatResult);
   }
-  getScatter(_props: $TODO): $TODO {
+
+  async getScatter(_props: ScatterRequestOptions): Promise<ScatterResponse> {
     throw new Error('TODO: implement');
   }
-  getTimeSeries(_props: $TODO): $TODO {
+
+  async getTimeSeries(
+    _props: TimeSeriesRequestOptions
+  ): Promise<TimeSeriesResponse> {
     throw new Error('TODO: implement');
   }
-  getHistogram(_props: $TODO): $TODO {
+
+  async getHistogram(
+    _props: HistogramRequestOptions
+  ): Promise<HistogramResponse> {
     throw new Error('TODO: implement');
   }
 }

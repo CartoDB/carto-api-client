@@ -56,7 +56,7 @@ export class CategoryWidget extends LitElement {
       const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
 
       return await widgetSource.getCategories({
-        owner: this.widgetId,
+        filterOwner: this.widgetId,
         operation,
         column,
         spatialFilter,
