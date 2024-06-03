@@ -14,11 +14,11 @@ export class PieWidget extends CategoryWidget {
   override caption = 'Pie widget';
 
   protected override async _updateChart() {
-    if (this._categoryTask.status === TaskStatus.ERROR) {
+    if (this._task.status === TaskStatus.ERROR) {
       return;
     }
 
-    const categories = await this._categoryTask.taskComplete;
+    const categories = await this._task.taskComplete;
     categories.sort((a, b) => (a.value > b.value ? -1 : 1));
 
     const data = categories.map(({name, value}, index) => {

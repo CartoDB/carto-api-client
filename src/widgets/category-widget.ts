@@ -1,4 +1,4 @@
-import {LitElement, html, nothing} from 'lit';
+import {LitElement, css, html, nothing} from 'lit';
 import {Task} from '@lit/task';
 import {customElement, property, state} from 'lit/decorators.js';
 import {Ref, createRef, ref} from 'lit/directives/ref.js';
@@ -45,7 +45,7 @@ export class CategoryWidget extends LitElement {
   @state()
   protected filterValues: string[] = [];
 
-  protected _categoryTask = new Task(this, {
+  protected _task = new Task(this, {
     task: async ([data, operation, column, viewState], {signal}) => {
       if (!data) return [];
 
@@ -66,7 +66,7 @@ export class CategoryWidget extends LitElement {
   });
 
   override render() {
-    return this._categoryTask.render({
+    return this._task.render({
       pending: () =>
         cache(html`<h3>${this.header}</h3>
           <figure>
@@ -95,7 +95,7 @@ export class CategoryWidget extends LitElement {
   }
 
   override updated() {
-    if (this._categoryTask.status !== TaskStatus.COMPLETE) return;
+    if (this._task.status !== TaskStatus.COMPLETE) return;
 
     if (!this.chart || this.chart.getDom() !== this.chartRef.value) {
       this.chart = echarts.init(this.chartRef.value!, null, {height: 200});
@@ -142,11 +142,11 @@ export class CategoryWidget extends LitElement {
   }
 
   protected async _updateChart() {
-    if (this._categoryTask.status === TaskStatus.ERROR) {
+    if (this._task.status === TaskStatus.ERROR) {
       return;
     }
 
-    const categories = await this._categoryTask.taskComplete;
+    const categories = await this._task.taskComplete;
     categories.sort((a, b) => (a.value > b.value ? -1 : 1));
 
     const data = categories.map(({name, value}, index) => {

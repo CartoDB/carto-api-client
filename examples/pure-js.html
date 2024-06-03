@@ -14,21 +14,27 @@
         <formula-widget
           id="formula"
           header="Total"
-          aggregation="count"
+          operation="count"
         ></formula-widget>
 
         <category-widget
           id="category"
           header="Store type"
-          aggregation="count"
+          operation="count"
           column="storetype"
         ></category-widget>
 
         <pie-widget
           id="pie"
           header="Store type"
-          aggregation="count"
+          operation="count"
           column="storetype"
+        ></pie-widget>
+
+        <table-widget
+          id="table"
+          header="Store type"
+          columns="[&quot;storetype&quot;,&quot;revenue&quot;]"
         ></pie-widget>
       </section>
       <footer id="footer"></footer>

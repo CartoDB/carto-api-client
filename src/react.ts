@@ -1,6 +1,11 @@
 import React from 'react';
 import {createComponent} from '@lit/react';
-import {CategoryWidget, FormulaWidget, PieWidget} from './widgets/index.js';
+import {
+  CategoryWidget,
+  FormulaWidget,
+  PieWidget,
+  TableWidget,
+} from './widgets/index.js';
 
 // TODO: React <=18 requires these wrappers to support Web Components. Because
 // the wrappers depend on the `react` npm package, they belong in a separate
@@ -36,5 +41,15 @@ export const CategoryWidgetComponent = createComponent({
     onactivate: 'activate',
     onchange: 'change',
     onfilter: 'filter',
+  },
+});
+
+export const TableWidgetComponent = createComponent({
+  tagName: 'table-widget',
+  elementClass: TableWidget,
+  react: React,
+  events: {
+    onactivate: 'activate',
+    onchange: 'change',
   },
 });

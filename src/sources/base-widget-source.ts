@@ -116,6 +116,7 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
     }).then((res: $TODO) => normalizeObjectKeys(res.rows));
   }
 
+  // TODO(test)
   async getRange(props: RangeRequestOptions): Promise<RangeResponse> {
     const {filterOwner, spatialFilter, abortController, ...params} = props;
     const {column} = params;
@@ -131,7 +132,7 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
 
   async getTable(props: TableRequestOptions): Promise<TableResponse> {
     const {filterOwner, spatialFilter, abortController, ...params} = props;
-    const {columns, sortBy, sortDirection, page, rowsPerPage} = params;
+    const {columns, sortBy, sortDirection, page = 0, rowsPerPage = 10} = params;
 
     return executeModel({
       model: 'table',
@@ -153,16 +154,19 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
       .then(formatResult);
   }
 
+  // TODO(implement)
   async getScatter(_props: ScatterRequestOptions): Promise<ScatterResponse> {
     throw new Error('TODO: implement');
   }
 
+  // TODO(implement)
   async getTimeSeries(
     _props: TimeSeriesRequestOptions
   ): Promise<TimeSeriesResponse> {
     throw new Error('TODO: implement');
   }
 
+  // TODO(implement)
   async getHistogram(
     _props: HistogramRequestOptions
   ): Promise<HistogramResponse> {

@@ -48,7 +48,7 @@ export class FormulaWidget extends LitElement {
   @property({type: Object, attribute: false}) // TODO: types
   viewState = null;
 
-  private _formulaTask = new Task(this, {
+  private _task = new Task(this, {
     task: async ([data, operation, column, viewState], {signal}) => {
       if (!data) return -1;
 
@@ -68,17 +68,17 @@ export class FormulaWidget extends LitElement {
   });
 
   override render() {
-    return this._formulaTask.render({
+    return this._task.render({
       pending: () =>
         html`<h3>${this.header}</h3>
           <figure>
             <div class="scorecard">&hellip;</div>
             <figcaption>${this.caption}</figcaption>
           </figure>`,
-      complete: (formulaResult) => html`
+      complete: (taskResult) => html`
         <h3>${this.header}</h3>
         <figure>
-          <div class="scorecard">${formulaResult.toLocaleString()}</div>
+          <div class="scorecard">${taskResult.toLocaleString()}</div>
           <figcaption>${this.caption}</figcaption>
         </figure>
       `,
