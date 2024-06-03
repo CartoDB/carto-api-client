@@ -113,7 +113,6 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
     }).then((res: $TODO) => normalizeObjectKeys(res.rows));
   }
 
-  // TODO(test)
   async getRange(props: RangeRequestOptions): Promise<RangeResponse> {
     const {filterOwner, spatialFilter, abortController, ...params} = props;
     const {column} = params;
@@ -180,17 +179,64 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
       .then((res) => res.map(({x, y}) => [x, y]));
   }
 
-  // TODO(implement)
   async getTimeSeries(
-    _props: TimeSeriesRequestOptions
+    props: TimeSeriesRequestOptions
   ): Promise<TimeSeriesResponse> {
-    throw new Error('TODO: implement');
+    const {filterOwner, abortController, spatialFilter, ...params} = props;
+    const {
+      column,
+      operationColumn,
+      joinOperation,
+      operation,
+      stepSize,
+      stepMultiplier,
+      splitByCategory,
+      splitByCategoryLimit,
+      splitByCategoryValues,
+    } = params;
+
+    executeModel({
+      model: 'timeseries',
+      source: this.getSource(filterOwner),
+      spatialFilter,
+      params: {
+        column,
+        stepSize,
+        stepMultiplier,
+        operationColumn: operationColumn || column,
+        joinOperation,
+        operation,
+        splitByCategory,
+        splitByCategoryLimit,
+        splitByCategoryValues,
+      },
+      opts: {abortController},
+    }).then((res) => ({
+      rows: normalizeObjectKeys(res.rows),
+      categories: res.metadata?.categories,
+    }));
   }
 
-  // TODO(implement)
   async getHistogram(
-    _props: HistogramRequestOptions
+    props: HistogramRequestOptions
   ): Promise<HistogramResponse> {
-    throw new Error('TODO: implement');
+    const {filterOwner, spatialFilter, abortController, ...params} = props;
+    const {column, operation, ticks} = params;
+
+    const data = await executeModel({
+      model: 'histogram',
+      source: this.getSource(filterOwner),
+      spatialFilter,
+      params: {column, operation, ticks},
+      opts: {abortController},
+    }).then((res) => normalizeObjectKeys(res.rows));
+
+    if (data.length) {
+      const result = Array(ticks.length + 1).fill(0);
+      data.forEach(({tick, value}) => (result[tick] = value));
+      return result;
+    }
+
+    return [];
   }
 }

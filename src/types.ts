@@ -83,6 +83,6 @@ export type TableResponse = {
   totalCount: number;
   rows: Record<string, number | string>[];
 };
-export type ScatterResponse = $TODO;
+export type ScatterResponse = [number, number][];
 export type TimeSeriesResponse = $TODO;
 export type HistogramResponse = $TODO;
