@@ -1,3 +1,4 @@
+import {AggregationTypes} from './vendor/carto-constants.js';
 import {$TODO} from './types-internal';
 import {SpatialFilter} from './vendor/carto-react-api';
 import {Filter} from './vendor/deck-carto';
@@ -22,13 +23,13 @@ interface BaseRequestOptions {
 
 export interface FormulaRequestOptions extends BaseRequestOptions {
   column: string;
-  operation?: $TODO;
-  operationExp?: $TODO;
+  operation?: AggregationTypes;
+  operationExp?: string;
 }
 
 export interface CategoryRequestOptions extends BaseRequestOptions {
   column: string;
-  operation?: $TODO;
+  operation?: AggregationTypes;
   operationColumn?: string;
 }
 
@@ -47,18 +48,18 @@ export interface TableRequestOptions extends BaseRequestOptions {
 
 export interface ScatterRequestOptions extends BaseRequestOptions {
   xAxisColumn: string;
-  xAxisJoinOperation?: $TODO;
+  xAxisJoinOperation?: AggregationTypes;
   yAxisColumn: string;
-  yAxisJoinOperation?: $TODO;
+  yAxisJoinOperation?: AggregationTypes;
 }
 
 export interface TimeSeriesRequestOptions extends BaseRequestOptions {
   column: string;
   stepSize?: $TODO;
   stepMultiplier?: $TODO;
-  operation?: $TODO;
+  operation?: AggregationTypes;
   operationColumn?: string;
-  joinOperation?: $TODO;
+  joinOperation?: AggregationTypes;
   splitByCategory?: $TODO;
   splitByCategoryLimit?: $TODO;
   splitByCategoryValues?: $TODO;
@@ -66,7 +67,7 @@ export interface TimeSeriesRequestOptions extends BaseRequestOptions {
 
 export interface HistogramRequestOptions extends BaseRequestOptions {
   column: string;
-  operation?: $TODO;
+  operation?: AggregationTypes;
   ticks?: $TODO;
 }
 

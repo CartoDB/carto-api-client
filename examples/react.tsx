@@ -3,11 +3,12 @@ import {createRoot} from 'react-dom/client';
 import {Map} from 'react-map-gl/maplibre';
 import DeckGL from '@deck.gl/react';
 import {
-  CategoryWidget,
+  CategoryWidgetComponent,
+  FormulaWidgetComponent,
+  PieWidgetComponent,
   Filter,
-  FormulaWidget,
-  PieWidget,
   vectorTableSource,
+  AggregationTypes,
 } from '../';
 import {MapView} from '@deck.gl/core';
 import {VectorTileLayer} from '@deck.gl/carto';
@@ -71,33 +72,30 @@ function App(): JSX.Element {
         </DeckGL>
       </section>
       <section id="rail">
-        {/* @ts-expect-error */}
-        <FormulaWidget
+        <FormulaWidgetComponent
           ref={formulaRef}
           id="formula"
           header="Total"
-          aggregation="count"
-        ></FormulaWidget>
+          operation={AggregationTypes.COUNT}
+        ></FormulaWidgetComponent>
 
-        {/* @ts-expect-error */}
-        <CategoryWidget
+        <CategoryWidgetComponent
           ref={categoryRef}
           id="category"
           header="Store type"
-          aggregation="count"
+          operation={AggregationTypes.COUNT}
           column="storetype"
-          onFilter={({detail}) => setFilters(detail.filters)}
-        ></CategoryWidget>
+          onfilter={(e) => setFilters((e as any).detail.filters)}
+        ></CategoryWidgetComponent>
 
-        {/* @ts-expect-error */}
-        <PieWidget
+        <PieWidgetComponent
           ref={pieRef}
           id="pie"
           header="Store type"
-          aggregation="count"
+          operation={AggregationTypes.COUNT}
           column="storetype"
-          onFilter={({detail}) => setFilters(detail.filters)}
-        ></PieWidget>
+          onfilter={(e) => setFilters((e as any).detail.filters)}
+        ></PieWidgetComponent>
       </section>
       <footer id="footer"></footer>
     </>
