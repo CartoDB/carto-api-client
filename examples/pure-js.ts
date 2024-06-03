@@ -49,6 +49,7 @@ const widgets: Widget[] = [
   bindWidget('#category'),
   bindWidget('#pie'),
   bindWidget('#table'),
+  bindWidget('#scatter'),
 ];
 
 updateSources();

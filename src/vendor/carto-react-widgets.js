@@ -13,9 +13,3 @@ export function normalizeObjectKeys(el) {
     return acc;
   }, {});
 }
-
-export function formatResult(res) {
-  const { rows, totalCount } = res;
-  const hasData = totalCount > 0;
-  return { rows, totalCount, hasData };
-}

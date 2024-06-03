@@ -6,9 +6,11 @@ import {
   CategoryWidgetComponent,
   FormulaWidgetComponent,
   PieWidgetComponent,
+  AggregationTypes,
+  ScatterWidgetComponent,
+  TableWidgetComponent,
   Filter,
   vectorTableSource,
-  AggregationTypes,
 } from '../';
 import {MapView} from '@deck.gl/core';
 import {VectorTileLayer} from '@deck.gl/carto';
@@ -21,10 +23,6 @@ const INITIAL_VIEW_STATE = {latitude: 40.7128, longitude: -74.006, zoom: 12};
 function App(): JSX.Element {
   const [viewState, setViewState] = useState({...INITIAL_VIEW_STATE});
   const [filters, setFilters] = useState<Record<string, Filter>>({});
-
-  const formulaRef = useRef<FormulaWidget>();
-  const categoryRef = useRef<CategoryWidget>();
-  const pieRef = useRef<PieWidget>();
 
   // Update sources.
   const data = useMemo(() => {
@@ -48,16 +46,6 @@ function App(): JSX.Element {
     ];
   }, [data]);
 
-  // Update widgets.
-  useEffect(() => {
-    for (const widgetRef of [formulaRef, categoryRef, pieRef]) {
-      if (widgetRef.current) {
-        widgetRef.current.data = data;
-        widgetRef.current.viewState = viewState;
-      }
-    }
-  }, [data, viewState]);
-
   return (
     <>
       <section id="view">
@@ -73,29 +61,44 @@ function App(): JSX.Element {
       </section>
       <section id="rail">
         <FormulaWidgetComponent
-          ref={formulaRef}
-          id="formula"
+          data={data}
+          viewState={viewState}
           header="Total"
           operation={AggregationTypes.COUNT}
         ></FormulaWidgetComponent>
 
         <CategoryWidgetComponent
-          ref={categoryRef}
-          id="category"
+          data={data}
+          viewState={viewState}
           header="Store type"
           operation={AggregationTypes.COUNT}
           column="storetype"
-          onfilter={(e) => setFilters((e as any).detail.filters)}
+          onfilter={(e) => setFilters((e as any).detail.filters)} // TODO: types
         ></CategoryWidgetComponent>
 
         <PieWidgetComponent
-          ref={pieRef}
-          id="pie"
+          data={data}
+          viewState={viewState}
           header="Store type"
           operation={AggregationTypes.COUNT}
           column="storetype"
-          onfilter={(e) => setFilters((e as any).detail.filters)}
+          onfilter={(e) => setFilters((e as any).detail.filters)} // TODO: types
         ></PieWidgetComponent>
+
+        <TableWidgetComponent
+          data={data}
+          viewState={viewState}
+          header="Store type"
+          columns={['storetype', 'revenue']}
+        ></TableWidgetComponent>
+
+        <ScatterWidgetComponent
+          data={data}
+          viewState={viewState}
+          header="Size vs. Revenue"
+          xAxisColumn="size_m2"
+          yAxisColumn="revenue"
+        ></ScatterWidgetComponent>
       </section>
       <footer id="footer"></footer>
     </>

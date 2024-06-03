@@ -4,6 +4,7 @@ import {
   CategoryWidget,
   FormulaWidget,
   PieWidget,
+  ScatterWidget,
   TableWidget,
 } from './widgets/index.js';
 
@@ -11,6 +12,17 @@ import {
 // the wrappers depend on the `react` npm package, they belong in a separate
 // package from the base Web Components, out of scope for POC.
 // See: https://lit.dev/docs/frameworks/react/
+
+export const CategoryWidgetComponent = createComponent({
+  tagName: 'category-widget',
+  elementClass: CategoryWidget,
+  react: React,
+  events: {
+    onactivate: 'activate',
+    onchange: 'change',
+    onfilter: 'filter',
+  },
+});
 
 export const FormulaWidgetComponent = createComponent({
   tagName: 'formula-widget',
@@ -33,14 +45,13 @@ export const PieWidgetComponent = createComponent({
   },
 });
 
-export const CategoryWidgetComponent = createComponent({
-  tagName: 'category-widget',
-  elementClass: CategoryWidget,
+export const ScatterWidgetComponent = createComponent({
+  tagName: 'scatter-widget',
+  elementClass: ScatterWidget,
   react: React,
   events: {
     onactivate: 'activate',
     onchange: 'change',
-    onfilter: 'filter',
   },
 });
 

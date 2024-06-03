@@ -1,12 +1,17 @@
 import {customElement, property} from 'lit/decorators.js';
 import {TaskStatus} from '@lit/task';
-import {
-  DEFAULT_CATEGORY_GRID,
-  DEFAULT_PALETTE,
-  DEFAULT_TEXT_STYLE,
-} from './styles';
+import {DEFAULT_PALETTE, DEFAULT_TEXT_STYLE} from './styles';
 
 import {CategoryWidget} from '..';
+
+const DEFAULT_PIE_GRID = {
+  left: 0,
+  right: '4px',
+  top: '8px',
+  bottom: '24px',
+  width: 'auto',
+  height: 'auto',
+};
 
 @customElement('pie-widget')
 export class PieWidget extends CategoryWidget {
@@ -34,7 +39,7 @@ export class PieWidget extends CategoryWidget {
       yAxis: {type: 'value'},
       series: [{type: 'pie', radius: ['40%', '70%'], name: this.header, data}],
       tooltip: {},
-      grid: DEFAULT_CATEGORY_GRID,
+      grid: DEFAULT_PIE_GRID,
       textStyle: DEFAULT_TEXT_STYLE,
     });
   }

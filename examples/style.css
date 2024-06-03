@@ -32,9 +32,10 @@ body {
   flex-direction: column;
   gap: 1em;
   position: relative;
-  width: 400px;
+  width: 450px;
   background-color: #fefefe;
   padding: 1em;
+  overflow-y: auto;
 }
 #rail > figure {
   width: 100%;

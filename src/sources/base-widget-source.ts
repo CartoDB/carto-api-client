@@ -1,8 +1,5 @@
 import {executeModel} from '../vendor/carto-react-api.js';
-import {
-  formatResult,
-  normalizeObjectKeys,
-} from '../vendor/carto-react-widgets.js';
+import {normalizeObjectKeys} from '../vendor/carto-react-widgets.js';
 import {
   CategoryRequestOptions,
   CategoryResponse,
@@ -91,7 +88,7 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
     return executeModel({
       model: 'formula',
       source: this.getSource(filterOwner),
-      spatialFilter: spatialFilter,
+      spatialFilter,
       params: {column: column ?? '*', operation, operationExp},
       opts: {abortController},
     }).then((res: $TODO) => normalizeObjectKeys(res.rows[0]));
@@ -106,7 +103,7 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
     return executeModel({
       model: 'category',
       source: this.getSource(filterOwner),
-      spatialFilter: spatialFilter,
+      spatialFilter,
       params: {
         column,
         operation,
@@ -124,7 +121,7 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
     return executeModel({
       model: 'range',
       source: this.getSource(filterOwner),
-      spatialFilter: spatialFilter,
+      spatialFilter,
       params: {column},
       opts: {abortController},
     }).then((res: $TODO) => normalizeObjectKeys(res.rows[0]));
@@ -137,7 +134,7 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
     return executeModel({
       model: 'table',
       source: this.getSource(filterOwner),
-      spatialFilter: spatialFilter,
+      spatialFilter,
       params: {
         column: columns,
         sortBy,
@@ -151,12 +148,36 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
         rows: normalizeObjectKeys(res.rows),
         totalCount: res.metadata.total,
       }))
-      .then(formatResult);
+      .then((res) => {
+        const {rows, totalCount} = res;
+        const hasData = totalCount > 0;
+        return {rows, totalCount, hasData};
+      });
   }
 
-  // TODO(implement)
-  async getScatter(_props: ScatterRequestOptions): Promise<ScatterResponse> {
-    throw new Error('TODO: implement');
+  async getScatter(props: ScatterRequestOptions): Promise<ScatterResponse> {
+    const {filterOwner, spatialFilter, abortController, ...params} = props;
+    const {xAxisColumn, xAxisJoinOperation, yAxisColumn, yAxisJoinOperation} =
+      params;
+
+    // Make sure this is sync with the same constant in cloud-native/maps-api
+    const HARD_LIMIT = 500;
+
+    return executeModel({
+      model: 'scatterplot',
+      source: this.getSource(filterOwner),
+      spatialFilter,
+      params: {
+        xAxisColumn,
+        xAxisJoinOperation,
+        yAxisColumn,
+        yAxisJoinOperation,
+        limit: HARD_LIMIT,
+      },
+      opts: {abortController},
+    })
+      .then((res) => normalizeObjectKeys(res.rows))
+      .then((res) => res.map(({x, y}) => [x, y]));
   }
 
   // TODO(implement)

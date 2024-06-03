@@ -34,8 +34,15 @@
         <table-widget
           id="table"
           header="Store type"
-          columns="[&quot;storetype&quot;,&quot;revenue&quot;]"
-        ></pie-widget>
+          columns='["storetype","revenue"]'
+        ></table-widget>
+
+        <scatter-widget
+          id="scatter"
+          header="Size vs. Revenue"
+          xAxisColumn="size_m2"
+          yAxisColumn="revenue"
+        ></scatter-widget>
       </section>
       <footer id="footer"></footer>
     </main>
