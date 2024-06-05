@@ -7,6 +7,21 @@ body {
   padding: 0;
   font-family: 'Courier New', monospace;
 }
+header {
+    position: fixed;
+    top: 1em;
+    left: 1em;
+    z-index: 100;
+    padding: 1em;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #f0f0f0;
+}
+header h1 {
+    margin: 0;
+    font-weight: normal;
+    font-size: 1.2rem;
+}
 #app {
   display: flex;
   flex-direction: row;

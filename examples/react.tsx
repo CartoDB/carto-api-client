@@ -48,6 +48,7 @@ function App(): JSX.Element {
 
   return (
     <>
+      <header><h1>Example: React</h1></header>
       <section id="view">
         <DeckGL
           layers={layers}
