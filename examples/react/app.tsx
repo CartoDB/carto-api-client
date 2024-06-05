@@ -1,16 +1,14 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Map} from 'react-map-gl/maplibre';
 import DeckGL from '@deck.gl/react';
+import {AggregationTypes, Filter, vectorTableSource} from '../../';
 import {
-  CategoryWidgetComponent,
-  FormulaWidgetComponent,
-  PieWidgetComponent,
-  AggregationTypes,
-  ScatterWidgetComponent,
-  TableWidgetComponent,
-  Filter,
-  vectorTableSource,
-} from '../../';
+  CategoryWidget,
+  FormulaWidget,
+  PieWidget,
+  ScatterWidget,
+  TableWidget,
+} from '../../dist/react.js';
 import {MapView} from '@deck.gl/core';
 import {VectorTileLayer} from '@deck.gl/carto';
 
@@ -68,45 +66,45 @@ export function App(): JSX.Element {
         </DeckGL>
       </section>
       <section id="rail">
-        <FormulaWidgetComponent
+        <FormulaWidget
           data={data}
           viewState={viewState}
           header="Total"
           operation={AggregationTypes.COUNT}
-        ></FormulaWidgetComponent>
+        ></FormulaWidget>
 
-        <CategoryWidgetComponent
+        <CategoryWidget
           data={data}
           viewState={viewState}
           header="Store type"
           operation={AggregationTypes.COUNT}
           column="storetype"
           onfilter={(e) => setFilters((e as any).detail.filters)} // TODO: types
-        ></CategoryWidgetComponent>
+        ></CategoryWidget>
 
-        <PieWidgetComponent
+        <PieWidget
           data={data}
           viewState={viewState}
           header="Store type"
           operation={AggregationTypes.COUNT}
           column="storetype"
           onfilter={(e) => setFilters((e as any).detail.filters)} // TODO: types
-        ></PieWidgetComponent>
+        ></PieWidget>
 
-        <TableWidgetComponent
+        <TableWidget
           data={data}
           viewState={viewState}
           header="Store type"
           columns={['storetype', 'revenue']}
-        ></TableWidgetComponent>
+        ></TableWidget>
 
-        <ScatterWidgetComponent
+        <ScatterWidget
           data={data}
           viewState={viewState}
           header="Size vs. Revenue"
           xAxisColumn="size_m2"
           yAxisColumn="revenue"
-        ></ScatterWidgetComponent>
+        ></ScatterWidget>
       </section>
       <footer
         id="footer"

@@ -16,6 +16,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "react": {
+      "types": "./dist/react.d.ts",
+      "default": "./dist/react.js"
     }
   },
   "scripts": {

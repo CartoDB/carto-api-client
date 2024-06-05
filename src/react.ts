@@ -1,11 +1,11 @@
 import React from 'react';
 import {createComponent} from '@lit/react';
 import {
-  CategoryWidget,
-  FormulaWidget,
-  PieWidget,
-  ScatterWidget,
-  TableWidget,
+  CategoryWidget as _CategoryWidget,
+  FormulaWidget as _FormulaWidget,
+  PieWidget as _PieWidget,
+  ScatterWidget as _ScatterWidget,
+  TableWidget as _TableWidget,
 } from './widgets/index.js';
 
 // TODO: React <=18 requires these wrappers to support Web Components. Because
@@ -13,9 +13,9 @@ import {
 // package from the base Web Components, out of scope for POC.
 // See: https://lit.dev/docs/frameworks/react/
 
-export const CategoryWidgetComponent = createComponent({
+export const CategoryWidget = createComponent({
   tagName: 'category-widget',
-  elementClass: CategoryWidget,
+  elementClass: _CategoryWidget,
   react: React,
   events: {
     onactivate: 'activate',
@@ -24,9 +24,9 @@ export const CategoryWidgetComponent = createComponent({
   },
 });
 
-export const FormulaWidgetComponent = createComponent({
+export const FormulaWidget = createComponent({
   tagName: 'formula-widget',
-  elementClass: FormulaWidget,
+  elementClass: _FormulaWidget,
   react: React,
   events: {
     onactivate: 'activate',
@@ -34,9 +34,9 @@ export const FormulaWidgetComponent = createComponent({
   },
 });
 
-export const PieWidgetComponent = createComponent({
+export const PieWidget = createComponent({
   tagName: 'pie-widget',
-  elementClass: PieWidget,
+  elementClass: _PieWidget,
   react: React,
   events: {
     onactivate: 'activate',
@@ -45,9 +45,9 @@ export const PieWidgetComponent = createComponent({
   },
 });
 
-export const ScatterWidgetComponent = createComponent({
+export const ScatterWidget = createComponent({
   tagName: 'scatter-widget',
-  elementClass: ScatterWidget,
+  elementClass: _ScatterWidget,
   react: React,
   events: {
     onactivate: 'activate',
@@ -55,9 +55,9 @@ export const ScatterWidgetComponent = createComponent({
   },
 });
 
-export const TableWidgetComponent = createComponent({
+export const TableWidget = createComponent({
   tagName: 'table-widget',
-  elementClass: TableWidget,
+  elementClass: _TableWidget,
   react: React,
   events: {
     onactivate: 'activate',
