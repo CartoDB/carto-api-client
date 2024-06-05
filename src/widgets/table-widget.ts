@@ -8,6 +8,7 @@ import {WIDGET_BASE_CSS} from './styles';
 import {TableResponse} from '../types';
 import {cache} from 'lit/directives/cache.js';
 import {map} from 'lit/directives/map.js';
+import {MapViewState} from '@deck.gl/core';
 
 @customElement('table-widget')
 export class TableWidget extends LitElement {
@@ -39,14 +40,14 @@ export class TableWidget extends LitElement {
   @property({type: String})
   caption = 'Table widget';
 
-  @property({type: Object, attribute: false}) // TODO: types
-  data = null;
+  @property({type: Object, attribute: false})
+  data: Promise<{widgetSource: WidgetSource}> | null = null;
 
-  @property({type: Array}) // TODO: types
-  columns = [];
+  @property({type: Array})
+  columns: string[] = [];
 
   @property({type: Object, attribute: false}) // TODO: types
-  viewState = null;
+  viewState: MapViewState | null = null;
 
   private _task = new Task(this, {
     task: async ([data, columns, viewState], {signal}) => {
@@ -57,11 +58,11 @@ export class TableWidget extends LitElement {
       await sleep(DEBOUNCE_TIME_MS);
       signal.throwIfAborted();
 
-      const {widgetSource} = (await data) as {widgetSource: WidgetSource};
+      const {widgetSource} = await data;
       const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
       return widgetSource.getTable({columns, spatialFilter}); // TODO: signal
     },
-    args: () => [this.data, this.columns, this.viewState],
+    args: () => [this.data, this.columns, this.viewState] as const,
   });
 
   override render() {
@@ -115,10 +116,4 @@ function renderTableRow(row: unknown[]) {
   return html`<tr>
     ${map(row, (value) => html`<td>${value}</td>`)}
   </tr>`;
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'table-widget': TableWidget;
-  }
 }

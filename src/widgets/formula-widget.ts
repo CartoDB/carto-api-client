@@ -5,6 +5,7 @@ import {DEBOUNCE_TIME_MS} from '../constants';
 import {getSpatialFilter, sleep} from '../utils';
 import {AggregationTypes} from '../vendor/carto-constants';
 import {WidgetSource} from '../sources/index.js';
+import {MapViewState} from '@deck.gl/core';
 
 @customElement('formula-widget')
 export class FormulaWidget extends LitElement {
@@ -36,8 +37,8 @@ export class FormulaWidget extends LitElement {
   @property({type: String})
   caption = 'Formula widget';
 
-  @property({type: Object, attribute: false}) // TODO: types
-  data = null;
+  @property({type: Object, attribute: false})
+  data: Promise<{widgetSource: WidgetSource}> | null = null;
 
   @property({type: AggregationTypes})
   operation = AggregationTypes.COUNT;
@@ -45,8 +46,8 @@ export class FormulaWidget extends LitElement {
   @property({type: String})
   column = '';
 
-  @property({type: Object, attribute: false}) // TODO: types
-  viewState = null;
+  @property({type: Object, attribute: false})
+  viewState: MapViewState | null = null;
 
   private _task = new Task(this, {
     task: async ([data, operation, column, viewState], {signal}) => {
@@ -55,7 +56,7 @@ export class FormulaWidget extends LitElement {
       await sleep(DEBOUNCE_TIME_MS);
       signal.throwIfAborted();
 
-      const {widgetSource} = (await data) as {widgetSource: WidgetSource};
+      const {widgetSource} = await data;
       const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
       const response = await widgetSource.getFormula({
         operation,
@@ -64,7 +65,8 @@ export class FormulaWidget extends LitElement {
       }); // TODO: signal
       return response.value;
     },
-    args: () => [this.data, this.operation, this.column, this.viewState],
+    args: () =>
+      [this.data, this.operation, this.column, this.viewState] as const,
   });
 
   override render() {
@@ -86,11 +88,5 @@ export class FormulaWidget extends LitElement {
         html`<h3>${this.header}</h3>
           <p>Error: ${e}</p>`,
     });
-  }
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'formula-widget': FormulaWidget;
   }
 }

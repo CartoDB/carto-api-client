@@ -10,6 +10,7 @@ import {DEFAULT_PALETTE, DEFAULT_TEXT_STYLE, WIDGET_BASE_CSS} from './styles';
 import {cache} from 'lit/directives/cache.js';
 import {AggregationTypes} from '../vendor/carto-constants';
 import {WidgetSource} from '../sources/index.js';
+import {MapViewState} from '@deck.gl/core';
 
 const DEFAULT_CATEGORY_GRID = {
   left: 0,
@@ -30,8 +31,8 @@ export class CategoryWidget extends LitElement {
   @property()
   caption = 'Scatter widget';
 
-  @property({type: Object, attribute: false}) // TODO: types
-  data = null;
+  @property({type: Object, attribute: false})
+  data: Promise<{widgetSource: WidgetSource}> | null = null;
 
   @property({type: AggregationTypes})
   operation = AggregationTypes.COUNT;
@@ -39,8 +40,8 @@ export class CategoryWidget extends LitElement {
   @property({type: String})
   column = '';
 
-  @property({type: Object, attribute: false}) // TODO: types
-  viewState = null;
+  @property({type: Object, attribute: false})
+  viewState: MapViewState | null = null;
 
   protected readonly widgetId = crypto.randomUUID();
   protected chart: echarts.ECharts | null = null;
@@ -56,7 +57,7 @@ export class CategoryWidget extends LitElement {
       await sleep(DEBOUNCE_TIME_MS);
       signal.throwIfAborted();
 
-      const {widgetSource} = (await data) as {widgetSource: WidgetSource};
+      const {widgetSource} = await data;
       const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
 
       return await widgetSource.getCategories({
@@ -66,7 +67,8 @@ export class CategoryWidget extends LitElement {
         spatialFilter,
       }); // TODO: signal
     },
-    args: () => [this.data, this.operation, this.column, this.viewState],
+    args: () =>
+      [this.data, this.operation, this.column, this.viewState] as const,
   });
 
   override render() {
@@ -126,6 +128,8 @@ export class CategoryWidget extends LitElement {
   }
 
   private async _dispatchFilter(): Promise<void> {
+    if (!this.data) return;
+
     const {widgetSource} = await this.data;
     const filters = {...widgetSource.props.filters} as Record<string, unknown>;
     const column = this.column as string;
@@ -161,7 +165,7 @@ export class CategoryWidget extends LitElement {
       return {value, name, itemStyle: {color}};
     });
 
-    this.chart.setOption({
+    this.chart!.setOption({
       xAxis: {data: data.map(({name}) => name)},
       yAxis: {type: 'value'},
       series: [{type: 'bar', name: this.header, data}],
@@ -169,11 +173,5 @@ export class CategoryWidget extends LitElement {
       grid: DEFAULT_CATEGORY_GRID,
       textStyle: DEFAULT_TEXT_STYLE,
     });
-  }
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'category-widget': CategoryWidget;
   }
 }

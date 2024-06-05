@@ -10,6 +10,7 @@ import {DEFAULT_TEXT_STYLE, WIDGET_BASE_CSS} from './styles';
 import {cache} from 'lit/directives/cache.js';
 import {AggregationTypes} from '../vendor/carto-constants';
 import {WidgetSource} from '../sources/index.js';
+import {MapViewState} from '@deck.gl/core';
 
 const DEFAULT_SCATTER_GRID = {
   left: '90px',
@@ -30,23 +31,23 @@ export class ScatterWidget extends LitElement {
   @property()
   caption = 'Scatter widget';
 
-  @property({type: Object, attribute: false}) // TODO: types
-  data = null;
+  @property({type: Object, attribute: false})
+  data: Promise<{widgetSource: WidgetSource}> | null = null;
 
   @property({type: String})
-  xAxisColumn: string;
+  xAxisColumn: string = '';
 
   @property({type: AggregationTypes})
   xAxisJoinOperation = AggregationTypes.COUNT;
 
   @property({type: String})
-  yAxisColumn: string;
+  yAxisColumn: string = '';
 
   @property({type: AggregationTypes})
   yAxisJoinOperation = AggregationTypes.COUNT;
 
-  @property({type: Object, attribute: false}) // TODO: types
-  viewState = null;
+  @property({type: Object, attribute: false})
+  viewState: MapViewState | null = null;
 
   protected readonly widgetId = crypto.randomUUID();
   protected chart: echarts.ECharts | null = null;
@@ -72,7 +73,7 @@ export class ScatterWidget extends LitElement {
       await sleep(DEBOUNCE_TIME_MS);
       signal.throwIfAborted();
 
-      const {widgetSource} = (await data) as {widgetSource: WidgetSource};
+      const {widgetSource} = await data;
       const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
 
       return await widgetSource.getScatter({
@@ -84,14 +85,15 @@ export class ScatterWidget extends LitElement {
         yAxisJoinOperation,
       }); // TODO: signal
     },
-    args: () => [
-      this.data,
-      this.viewState,
-      this.xAxisColumn,
-      this.xAxisJoinOperation,
-      this.yAxisColumn,
-      this.yAxisJoinOperation,
-    ],
+    args: () =>
+      [
+        this.data,
+        this.viewState,
+        this.xAxisColumn,
+        this.xAxisJoinOperation,
+        this.yAxisColumn,
+        this.yAxisJoinOperation,
+      ] as const,
   });
 
   override render() {
@@ -133,7 +135,7 @@ export class ScatterWidget extends LitElement {
 
     const data = await this._task.taskComplete;
 
-    this.chart.setOption({
+    this.chart!.setOption({
       xAxis: {name: this.xAxisColumn, nameLocation: 'middle', nameGap: 20},
       yAxis: {name: this.yAxisColumn, nameLocation: 'middle', nameGap: 80},
       series: [{type: 'scatter', symbolSize: 8, data}],
@@ -141,11 +143,5 @@ export class ScatterWidget extends LitElement {
       grid: DEFAULT_SCATTER_GRID,
       textStyle: DEFAULT_TEXT_STYLE,
     });
-  }
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'scatter-widget': ScatterWidget;
   }
 }

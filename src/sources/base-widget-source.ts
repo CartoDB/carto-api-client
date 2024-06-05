@@ -67,7 +67,7 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
     this.connectionName = props.connectionName;
   }
 
-  protected getSource(owner: string): $TODO {
+  protected getSource(owner?: string): $TODO {
     return {
       ...(this.props as any),
       filters: getWidgetFilters(owner, (this.props as any).filters),
@@ -176,7 +176,7 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
       opts: {abortController},
     })
       .then((res) => normalizeObjectKeys(res.rows))
-      .then((res) => res.map(({x, y}) => [x, y]));
+      .then((res) => res.map(({x, y}: {x: number; y: number}) => [x, y]));
   }
 
   async getTimeSeries(
@@ -233,7 +233,9 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
 
     if (data.length) {
       const result = Array(ticks.length + 1).fill(0);
-      data.forEach(({tick, value}) => (result[tick] = value));
+      data.forEach(
+        ({tick, value}: {tick: number; value: number}) => (result[tick] = value)
+      );
       return result;
     }
 

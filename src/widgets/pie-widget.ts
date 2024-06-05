@@ -34,7 +34,7 @@ export class PieWidget extends CategoryWidget {
       return {value, name, itemStyle: {color}};
     });
 
-    this.chart.setOption({
+    this.chart!.setOption({
       xAxis: {data: data.map(({name}) => name)},
       yAxis: {type: 'value'},
       series: [{type: 'pie', radius: ['40%', '70%'], name: this.header, data}],
@@ -42,11 +42,5 @@ export class PieWidget extends CategoryWidget {
       grid: DEFAULT_PIE_GRID,
       textStyle: DEFAULT_TEXT_STYLE,
     });
-  }
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'pie-widget': PieWidget;
   }
 }
