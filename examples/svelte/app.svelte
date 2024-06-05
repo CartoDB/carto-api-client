@@ -17,8 +17,8 @@
     zoom: 12,
   };
 
-  let map: Map | null = null;
-  let deck: Deck | null = null;
+  let map: Map;
+  let deck: Deck;
 
   let mapEl: HTMLDivElement;
   let canvasEl: HTMLCanvasElement;
@@ -43,30 +43,6 @@
     getFillColor: [200, 0, 80],
   });
 
-  onMount(() => {
-    console.log('i am here');
-    map = new Map({
-      container: mapEl,
-      style: MAP_STYLE,
-      interactive: false,
-    });
-
-    deck = new Deck({
-      canvas: canvasEl,
-      initialViewState: INITIAL_MAP_STATE,
-      controller: true,
-      layers: [],
-      onViewStateChange: ({viewState: _viewState}) => {
-        viewState = _viewState;
-      },
-    });
-  });
-
-  onDestroy(() => {
-    deck?.finalize();
-    map?.remove();
-  });
-
   $: {
     const {longitude, latitude, ...rest} = viewState;
     map?.jumpTo({center: [longitude, latitude], ...rest});
@@ -78,6 +54,27 @@
   function onFilterChange(event: FilterEvent) {
     filters = event.detail.filters;
   }
+
+  onMount(() => {
+    map = new Map({
+      container: mapEl,
+      style: MAP_STYLE,
+      interactive: false,
+    });
+
+    deck = new Deck({
+      canvas: canvasEl,
+      initialViewState: INITIAL_MAP_STATE,
+      controller: true,
+      layers: [],
+      onViewStateChange: ({viewState: _viewState}) => (viewState = _viewState),
+    });
+  });
+
+  onDestroy(() => {
+    deck?.finalize();
+    map?.remove();
+  });
 </script>
 
 <header>

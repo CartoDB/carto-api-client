@@ -47,6 +47,23 @@ const layer = computed(
     })
 );
 
+watchEffect(() => {
+  const {longitude, latitude, ...rest} = viewState.value;
+  map.value?.jumpTo({center: [longitude, latitude], ...rest});
+});
+
+watchEffect(() => {
+  deck.value?.setProps({layers: layer.value ? [layer.value] : []});
+});
+
+watchEffect(() => {
+  data.value?.then(({attribution}) => (attributionHTML.value = attribution));
+});
+
+function onFilterChange(event: FilterEvent) {
+  filters.value = event.detail.filters;
+}
+
 onMounted(() => {
   map.value = new Map({
     container: 'map',
@@ -69,23 +86,6 @@ onUnmounted(() => {
   deck.value?.finalize();
   map.value?.remove();
 });
-
-watchEffect(() => {
-  const {longitude, latitude, ...rest} = viewState.value;
-  map.value?.jumpTo({center: [longitude, latitude], ...rest});
-});
-
-watchEffect(() => {
-  deck.value?.setProps({layers: layer.value ? [layer.value] : []});
-});
-
-watchEffect(() => {
-  data.value?.then(({attribution}) => (attributionHTML.value = attribution));
-});
-
-function onFilterChange(event: FilterEvent) {
-  filters.value = event.detail.filters;
-}
 </script>
 
 <template>
