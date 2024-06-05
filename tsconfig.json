@@ -1,12 +1,13 @@
 {
   "include": [
     "src/**/*.ts",
-    "examples/**/*.{ts,tsx}"
+    "examples/*.{ts,tsx,vue}"
   ],
   "compilerOptions": {
     "target": "es2021",
     "module": "es2020",
     "lib": ["es2021", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
     "jsx": "react",
     "declaration": true,
     "declarationMap": true,

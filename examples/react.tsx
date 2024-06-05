@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import {Map} from 'react-map-gl/maplibre';
 import DeckGL from '@deck.gl/react';
@@ -48,7 +48,9 @@ function App(): JSX.Element {
 
   return (
     <>
-      <header><h1>Example: React</h1></header>
+      <header>
+        <h1>Example: React</h1>
+      </header>
       <section id="view">
         <DeckGL
           layers={layers}
