@@ -1,5 +1,4 @@
-import React, {useMemo, useState} from 'react';
-import {createRoot} from 'react-dom/client';
+import React, {useEffect, useMemo, useState} from 'react';
 import {Map} from 'react-map-gl/maplibre';
 import DeckGL from '@deck.gl/react';
 import {
@@ -11,7 +10,7 @@ import {
   TableWidgetComponent,
   Filter,
   vectorTableSource,
-} from '../';
+} from '../../';
 import {MapView} from '@deck.gl/core';
 import {VectorTileLayer} from '@deck.gl/carto';
 
@@ -20,9 +19,10 @@ const MAP_STYLE =
   'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json';
 const INITIAL_VIEW_STATE = {latitude: 40.7128, longitude: -74.006, zoom: 12};
 
-function App(): JSX.Element {
+export function App(): JSX.Element {
   const [viewState, setViewState] = useState({...INITIAL_VIEW_STATE});
   const [filters, setFilters] = useState<Record<string, Filter>>({});
+  const [attributionHTML, setAttributionHTML] = useState('');
 
   // Update sources.
   const data = useMemo(() => {
@@ -46,10 +46,15 @@ function App(): JSX.Element {
     ];
   }, [data]);
 
+  useEffect(() => {
+    data?.then(({attribution}) => setAttributionHTML(attribution));
+  }, [data]);
+
   return (
     <>
       <header>
-        <h1>Example: React</h1>
+        <h1>React</h1>
+        <a href="../">← Back</a>
       </header>
       <section id="view">
         <DeckGL
@@ -103,10 +108,10 @@ function App(): JSX.Element {
           yAxisColumn="revenue"
         ></ScatterWidgetComponent>
       </section>
-      <footer id="footer"></footer>
+      <footer
+        id="footer"
+        dangerouslySetInnerHTML={{__html: attributionHTML}}
+      ></footer>
     </>
   );
 }
-
-const container = document.querySelector('#app')!;
-createRoot(container).render(<App />);

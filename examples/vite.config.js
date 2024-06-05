@@ -1,3 +1,4 @@
+import {svelte} from '@sveltejs/vite-plugin-svelte';
 import vue from '@vitejs/plugin-vue';
 
 export default {
@@ -9,5 +10,6 @@ export default {
         compilerOptions: {isCustomElement: (tag) => tag.includes('-')},
       },
     }),
+    svelte(),
   ],
 };

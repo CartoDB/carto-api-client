@@ -1,22 +1,35 @@
 <script setup lang="ts">
-import '../';
-import {Filter, FilterEvent, vectorTableSource} from '../';
+import '../../';
+import {Filter, FilterEvent, vectorTableSource} from '../../';
 import {Map} from 'maplibre-gl';
 import {Deck, MapViewState} from '@deck.gl/core';
 import {VectorTileLayer} from '@deck.gl/carto';
-import { computed, onMounted, ref, shallowRef, watchEffect } from 'vue';
+import {
+  computed,
+  onMounted,
+  onUnmounted,
+  ref,
+  shallowRef,
+  watchEffect,
+} from 'vue';
 
 const ACCESS_TOKEN = import.meta.env.VITE_CARTO_ACCESS_TOKEN;
 const MAP_STYLE =
   'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json';
-const INITIAL_MAP_STATE: MapViewState = {latitude: 40.7128, longitude: -74.006, zoom: 12};
+const INITIAL_MAP_STATE: MapViewState = {
+  latitude: 40.7128,
+  longitude: -74.006,
+  zoom: 12,
+};
 
-const map = shallowRef<Map|null>(null);
-const deck = shallowRef<Deck|null>(null);
-const viewState = ref<MapViewState>(INITIAL_MAP_STATE)
+const map = shallowRef<Map | null>(null);
+const deck = shallowRef<Deck | null>(null);
+const viewState = ref<MapViewState>(INITIAL_MAP_STATE);
 const filters = ref<Record<string, Filter>>({});
+const attributionHTML = ref<string>('');
 
-const data = computed(() => vectorTableSource({
+const data = computed(() =>
+  vectorTableSource({
     accessToken: ACCESS_TOKEN,
     connectionName: 'carto_dw',
     tableName: 'carto-demo-data.demo_tables.retail_stores',
@@ -24,12 +37,14 @@ const data = computed(() => vectorTableSource({
   })
 );
 
-const layer = computed(() => new VectorTileLayer({
-    id: 'retail_stores',
-    data: data.value,
-    pointRadiusMinPixels: 4,
-    getFillColor: [200, 0, 80],
-  })
+const layer = computed(
+  () =>
+    new VectorTileLayer({
+      id: 'retail_stores',
+      data: data.value,
+      pointRadiusMinPixels: 4,
+      getFillColor: [200, 0, 80],
+    })
 );
 
 onMounted(() => {
@@ -46,25 +61,26 @@ onMounted(() => {
     layers: [],
     onViewStateChange: ({viewState: _viewState}) => {
       viewState.value = _viewState;
-    }
+    },
   });
 });
 
+onUnmounted(() => {
+  deck.value?.finalize();
+  map.value?.remove();
+});
+
 watchEffect(() => {
-  if (!map.value) return;
   const {longitude, latitude, ...rest} = viewState.value;
-  map.value.jumpTo({center: [longitude, latitude], ...rest});
+  map.value?.jumpTo({center: [longitude, latitude], ...rest});
 });
 
 watchEffect(() => {
-  if (!deck.value) return;
-  deck.value.setProps({layers: [layer.value]});
+  deck.value?.setProps({layers: layer.value ? [layer.value] : []});
 });
 
 watchEffect(() => {
-  data.value.then(({attribution}) => {
-    document.querySelector('#footer')!.innerHTML = attribution;
-  });
+  data.value?.then(({attribution}) => (attributionHTML.value = attribution));
 });
 
 function onFilterChange(event: FilterEvent) {
@@ -73,58 +89,56 @@ function onFilterChange(event: FilterEvent) {
 </script>
 
 <template>
-  <header><h1>Example: Vue</h1></header>
+  <header>
+    <h1>Vue</h1>
+    <a href="../">← Back</a>
+  </header>
   <section id="view">
     <div id="map"></div>
     <canvas id="deck-canvas"></canvas>
   </section>
   <section id="rail">
     <formula-widget
-      id="formula"
       header="Total"
       operation="count"
-      :data=data
-      :viewState=viewState
+      :data="data"
+      :viewState="viewState"
     ></formula-widget>
 
     <category-widget
-      id="category"
       header="Store type"
       operation="count"
       column="storetype"
-      :data=data
-      :viewState=viewState
-      @filter=onFilterChange
+      :data="data"
+      :viewState="viewState"
+      @filter="onFilterChange"
     ></category-widget>
 
     <pie-widget
-      id="pie"
       header="Store type"
       operation="count"
       column="storetype"
-      :data=data
-      :viewState=viewState
-      @filter=onFilterChange
+      :data="data"
+      :viewState="viewState"
+      @filter="onFilterChange"
     ></pie-widget>
 
     <table-widget
-      id="table"
       header="Store type"
-      :columns='["storetype","revenue"]'
-      :data=data
-      :viewState=viewState
+      :columns="['storetype', 'revenue']"
+      :data="data"
+      :viewState="viewState"
     ></table-widget>
 
     <scatter-widget
-      id="scatter"
       header="Size vs. Revenue"
       xAxisColumn="size_m2"
       yAxisColumn="revenue"
-      :data=data
-      :viewState=viewState
+      :data="data"
+      :viewState="viewState"
     ></scatter-widget>
   </section>
-  <footer id="footer"></footer>
+  <footer id="footer" v-html="attributionHTML"></footer>
 </template>
 
 <style scoped></style>

@@ -7,7 +7,7 @@ import {
   vectorTableSource,
   VectorTableSourceResponse,
   Widget,
-} from '../';
+} from '../../';
 
 /**************************************************************************
  * REACTIVE STATE
