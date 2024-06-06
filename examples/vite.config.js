@@ -3,7 +3,12 @@ import vue from '@vitejs/plugin-vue';
 
 export default {
   root: 'examples',
-  resolve: {alias: {'@carto/widgets': '../'}},
+  resolve: {
+    alias: {
+      '@carto/core': '../packages/core/',
+      '@carto/ui': '../packages/ui/',
+    },
+  },
   plugins: [
     vue({
       template: {

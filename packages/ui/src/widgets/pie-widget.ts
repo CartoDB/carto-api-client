@@ -1,8 +1,8 @@
 import {customElement, property} from 'lit/decorators.js';
 import {TaskStatus} from '@lit/task';
-import {DEFAULT_PALETTE, DEFAULT_TEXT_STYLE} from './styles';
 
-import {CategoryWidget} from '..';
+import {DEFAULT_PALETTE, DEFAULT_TEXT_STYLE} from './styles.js';
+import {CategoryWidget} from './category-widget.js';
 
 const DEFAULT_PIE_GRID = {
   left: 0,

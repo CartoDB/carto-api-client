@@ -1,11 +1,10 @@
 import {LitElement, html, css} from 'lit';
 import {Task} from '@lit/task';
 import {customElement, property} from 'lit/decorators.js';
-import {DEBOUNCE_TIME_MS} from '../constants';
-import {getSpatialFilter, sleep} from '../utils';
-import {AggregationTypes} from '../vendor/carto-constants';
-import {WidgetSource} from '../sources/index.js';
+import {AggregationTypes, WidgetSource} from '@carto/core';
 import {MapViewState} from '@deck.gl/core';
+import {DEBOUNCE_TIME_MS} from '../constants.js';
+import {getSpatialFilter, sleep} from '../utils.js';
 
 @customElement('formula-widget')
 export class FormulaWidget extends LitElement {

@@ -1,16 +1,19 @@
 import {LitElement, html, nothing} from 'lit';
-import {Task} from '@lit/task';
+import {Task, TaskStatus} from '@lit/task';
 import {customElement, property, state} from 'lit/decorators.js';
 import {Ref, createRef, ref} from 'lit/directives/ref.js';
-import {DEBOUNCE_TIME_MS} from '../constants';
-import {getSpatialFilter, sleep} from '../utils';
-import * as echarts from 'echarts';
-import {TaskStatus} from '@lit/task';
-import {DEFAULT_PALETTE, DEFAULT_TEXT_STYLE, WIDGET_BASE_CSS} from './styles';
 import {cache} from 'lit/directives/cache.js';
-import {AggregationTypes} from '../vendor/carto-constants';
-import {WidgetSource} from '../sources/index.js';
+import * as echarts from 'echarts';
+import {AggregationTypes, WidgetSource} from '@carto/core';
 import {MapViewState} from '@deck.gl/core';
+
+import {
+  DEFAULT_PALETTE,
+  DEFAULT_TEXT_STYLE,
+  WIDGET_BASE_CSS,
+} from './styles.js';
+import {DEBOUNCE_TIME_MS} from '../constants.js';
+import {getSpatialFilter, sleep} from '../utils.js';
 
 const DEFAULT_CATEGORY_GRID = {
   left: 0,

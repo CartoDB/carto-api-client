@@ -1,14 +1,14 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Map} from 'react-map-gl/maplibre';
 import DeckGL from '@deck.gl/react';
-import {AggregationTypes, Filter, vectorTableSource} from '../../';
+import {AggregationTypes, Filter, vectorTableSource} from '@carto/core';
 import {
   CategoryWidget,
   FormulaWidget,
   PieWidget,
   ScatterWidget,
   TableWidget,
-} from '../../dist/react.js';
+} from '@carto/ui/react';
 import {MapView} from '@deck.gl/core';
 import {VectorTileLayer} from '@deck.gl/carto';
 

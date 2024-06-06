@@ -1,0 +1,14 @@
+{
+	"extends": "../../tsconfig.json",
+	"include": ["src/**/*", "../global.d.ts"],
+	"compilerOptions": {
+		"outDir": "dist",
+		"experimentalDecorators": true,
+    "plugins": [
+      {
+        "name": "ts-lit-plugin",
+        "strict": true
+      }
+    ]
+	}
+}

@@ -1,11 +1,10 @@
 import {LitElement, css, html} from 'lit';
 import {Task} from '@lit/task';
 import {customElement, property} from 'lit/decorators.js';
-import {DEBOUNCE_TIME_MS} from '../constants';
-import {getSpatialFilter, sleep} from '../utils';
-import {WidgetSource} from '../sources/index.js';
-import {WIDGET_BASE_CSS} from './styles';
-import {TableResponse} from '../types';
+import {DEBOUNCE_TIME_MS} from '../constants.js';
+import {getSpatialFilter, sleep} from '../utils.js';
+import {WidgetSource, TableResponse} from '@carto/core';
+import {WIDGET_BASE_CSS} from './styles.js';
 import {cache} from 'lit/directives/cache.js';
 import {map} from 'lit/directives/map.js';
 import {MapViewState} from '@deck.gl/core';

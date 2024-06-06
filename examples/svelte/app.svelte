@@ -1,7 +1,7 @@
 <script lang="ts">
-  import '../../';
-  import type {Filter, FilterEvent, VectorTableSourceResponse} from '../../';
-  import {vectorTableSource} from '../../';
+  import '@carto/ui';
+  import type {Filter, FilterEvent, VectorTableSourceResponse} from '@carto/core';
+  import {vectorTableSource} from '@carto/core';
   import {Map} from 'maplibre-gl';
   import type {MapViewState} from '@deck.gl/core';
   import {Deck} from '@deck.gl/core';

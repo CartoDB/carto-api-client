@@ -1,5 +1,9 @@
-import { assert, InvalidColumnError, getClient } from './carto-react-core';
-import { MAP_TYPES, API_VERSIONS, REQUEST_GET_MAX_URL_LENGTH } from './carto-constants';
+import {assert, InvalidColumnError, getClient} from './carto-react-core.js';
+import {
+  MAP_TYPES,
+  API_VERSIONS,
+  REQUEST_GET_MAX_URL_LENGTH,
+} from './carto-constants.js';
 
 /******************************************************************************
  * model.js
@@ -12,7 +16,7 @@ const AVAILABLE_MODELS = [
   'timeseries',
   'range',
   'scatterplot',
-  'table'
+  'table',
 ];
 
 const DEFAULT_GEO_COLUMN = 'geom';
@@ -40,7 +44,7 @@ export function executeModel(props) {
     )}`
   );
 
-  const { source, model, params, spatialFilter, opts } = props;
+  const {source, model, params, spatialFilter, opts} = props;
 
   checkCredentials(source.credentials);
 
@@ -48,11 +52,14 @@ export function executeModel(props) {
     source.credentials.apiVersion === API_VERSIONS.V3,
     'SQL Model API is a feature only available in CARTO 3.'
   );
-  assert(source.type !== MAP_TYPES.TILESET, 'executeModel: Tileset not supported');
+  assert(
+    source.type !== MAP_TYPES.TILESET,
+    'executeModel: Tileset not supported'
+  );
 
   let url = `${source.credentials.apiBaseUrl}/v3/sql/${source.connection}/model/${model}`;
 
-  const { filters, filtersLogicalOperator, data, type } = source;
+  const {filters, filtersLogicalOperator, data, type} = source;
   const queryParameters = source.queryParameters
     ? JSON.stringify(source.queryParameters)
     : '';
@@ -63,13 +70,14 @@ export function executeModel(props) {
     params: JSON.stringify(params),
     queryParameters,
     filters: JSON.stringify(filters),
-    filtersLogicalOperator
+    filtersLogicalOperator,
   };
 
   // API supports multiple filters, we apply it only to geoColumn
   const spatialFilters = spatialFilter
     ? {
-        [source.geoColumn ? source.geoColumn : DEFAULT_GEO_COLUMN]: spatialFilter
+        [source.geoColumn ? source.geoColumn : DEFAULT_GEO_COLUMN]:
+          spatialFilter,
       }
     : undefined;
 
@@ -77,7 +85,8 @@ export function executeModel(props) {
     queryParams.spatialFilters = JSON.stringify(spatialFilters);
   }
 
-  const urlWithSearchParams = url + '?' + new URLSearchParams(queryParams).toString();
+  const urlWithSearchParams =
+    url + '?' + new URLSearchParams(queryParams).toString();
   const isGet = urlWithSearchParams.length <= REQUEST_GET_MAX_URL_LENGTH;
   if (isGet) {
     url = urlWithSearchParams;
@@ -96,8 +105,8 @@ export function executeModel(props) {
     opts: {
       ...opts,
       method: isGet ? 'GET' : 'POST',
-      ...(!isGet && { body: JSON.stringify(queryParams) })
-    }
+      ...(!isGet && {body: JSON.stringify(queryParams)}),
+    },
   });
 }
 
@@ -105,69 +114,69 @@ export function executeModel(props) {
  * common.js
  */
 
- /**
-  * Return more descriptive error from API
-  */
- export function dealWithApiError({ response, data }) {
-   if (data.error === 'Column not found') {
-     throw new InvalidColumnError(`${data.error} ${data.column_name}`);
-   }
+/**
+ * Return more descriptive error from API
+ */
+export function dealWithApiError({response, data}) {
+  if (data.error === 'Column not found') {
+    throw new InvalidColumnError(`${data.error} ${data.column_name}`);
+  }
 
-   if (data.error?.includes('Missing columns')) {
-     throw new InvalidColumnError(data.error);
-   }
+  if (data.error?.includes('Missing columns')) {
+    throw new InvalidColumnError(data.error);
+  }
 
-   switch (response.status) {
-     case 401:
-       throw new Error('Unauthorized access. Invalid credentials');
-     case 403:
-       throw new Error('Forbidden access to the requested data');
-     default:
-       const msg =
-         data && data.error && typeof data.error === 'string'
-           ? data.error
-           : JSON.stringify(data?.hint || data.error?.[0]);
-       throw new Error(msg);
-   }
- }
+  switch (response.status) {
+    case 401:
+      throw new Error('Unauthorized access. Invalid credentials');
+    case 403:
+      throw new Error('Forbidden access to the requested data');
+    default:
+      const msg =
+        data && data.error && typeof data.error === 'string'
+          ? data.error
+          : JSON.stringify(data?.hint || data.error?.[0]);
+      throw new Error(msg);
+  }
+}
 
- export function checkCredentials(credentials) {
-   if (!credentials || !credentials.apiBaseUrl || !credentials.accessToken) {
-     throw new Error('Missing or bad credentials provided');
-   }
- }
+export function checkCredentials(credentials) {
+  if (!credentials || !credentials.apiBaseUrl || !credentials.accessToken) {
+    throw new Error('Missing or bad credentials provided');
+  }
+}
 
- export async function makeCall({ url, credentials, opts }) {
-   let response;
-   let data;
-   const isPost = opts?.method === 'POST';
-   try {
-     response = await fetch(url.toString(), {
-       headers: {
-         Authorization: `Bearer ${credentials.accessToken}`,
-         ...(isPost ? { 'Content-Type': 'application/json' } : {})
-       },
-       ...(isPost
-         ? {
-             method: opts?.method,
-             body: opts?.body
-           }
-         : {}),
-       signal: opts?.abortController?.signal,
-       ...opts?.otherOptions
-     });
-     data = await response.json();
-   } catch (error) {
-     if (error.name === 'AbortError') throw error;
+export async function makeCall({url, credentials, opts}) {
+  let response;
+  let data;
+  const isPost = opts?.method === 'POST';
+  try {
+    response = await fetch(url.toString(), {
+      headers: {
+        Authorization: `Bearer ${credentials.accessToken}`,
+        ...(isPost ? {'Content-Type': 'application/json'} : {}),
+      },
+      ...(isPost
+        ? {
+            method: opts?.method,
+            body: opts?.body,
+          }
+        : {}),
+      signal: opts?.abortController?.signal,
+      ...opts?.otherOptions,
+    });
+    data = await response.json();
+  } catch (error) {
+    if (error.name === 'AbortError') throw error;
 
-     throw new Error(`Failed request: ${error}`);
-   }
+    throw new Error(`Failed request: ${error}`);
+  }
 
-   if (!response.ok) {
-     dealWithApiError({ response, data });
-   }
+  if (!response.ok) {
+    dealWithApiError({response, data});
+  }
 
-   return data;
- }
+  return data;
+}
 
- export const CLIENT_ID = 'carto-for-react';
+export const CLIENT_ID = 'carto-for-react';
