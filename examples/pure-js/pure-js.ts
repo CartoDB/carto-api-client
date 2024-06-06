@@ -7,6 +7,7 @@ import {
   vectorTableSource,
   VectorTableSourceResponse,
 } from '@carto/core';
+import '@carto/ui';
 import type {Widget} from '@carto/ui';
 
 /**************************************************************************
