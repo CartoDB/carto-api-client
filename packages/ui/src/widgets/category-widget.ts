@@ -1,19 +1,14 @@
-import {LitElement, html, nothing} from 'lit';
+import {html, nothing} from 'lit';
 import {Task, TaskStatus} from '@lit/task';
-import {customElement, property, state} from 'lit/decorators.js';
 import {Ref, createRef, ref} from 'lit/directives/ref.js';
 import {cache} from 'lit/directives/cache.js';
 import * as echarts from 'echarts';
-import {AggregationTypes, WidgetSource} from '@carto/core';
-import {MapViewState} from '@deck.gl/core';
+import {AggregationTypes} from '@carto/core';
 
-import {
-  DEFAULT_PALETTE,
-  DEFAULT_TEXT_STYLE,
-  WIDGET_BASE_CSS,
-} from './styles.js';
+import {DEFAULT_PALETTE, DEFAULT_TEXT_STYLE} from './styles.js';
 import {DEBOUNCE_TIME_MS} from '../constants.js';
 import {getSpatialFilter, sleep} from '../utils.js';
+import {BaseWidget} from './base-widget.js';
 
 const DEFAULT_CATEGORY_GRID = {
   left: 0,
@@ -24,34 +19,29 @@ const DEFAULT_CATEGORY_GRID = {
   height: 'auto',
 };
 
-@customElement('category-widget')
-export class CategoryWidget extends LitElement {
-  static override styles = WIDGET_BASE_CSS;
+export class CategoryWidget extends BaseWidget {
+  static get properties() {
+    return {
+      ...super.properties,
+      operation: {type: AggregationTypes},
+      column: {type: String},
+      _filterValues: {state: true},
+    };
+  }
 
-  @property()
-  header = 'Untitled';
+  declare column: string;
+  declare operation: AggregationTypes;
 
-  @property()
-  caption = 'Scatter widget';
+  protected _chart: echarts.ECharts | null = null;
+  protected _chartRef: Ref<HTMLElement> = createRef();
+  protected declare _filterValues: string[];
 
-  @property({type: Object, attribute: false})
-  data: Promise<{widgetSource: WidgetSource}> | null = null;
-
-  @property({type: AggregationTypes})
-  operation = AggregationTypes.COUNT;
-
-  @property({type: String})
-  column = '';
-
-  @property({type: Object, attribute: false})
-  viewState: MapViewState | null = null;
-
-  protected readonly widgetId = crypto.randomUUID();
-  protected chart: echarts.ECharts | null = null;
-  protected chartRef: Ref<HTMLElement> = createRef();
-
-  @state()
-  protected filterValues: string[] = [];
+  constructor() {
+    super();
+    this.operation = AggregationTypes.COUNT;
+    this.column = '';
+    this._filterValues = [];
+  }
 
   protected _task = new Task(this, {
     task: async ([data, operation, column, viewState], {signal}) => {
@@ -64,7 +54,7 @@ export class CategoryWidget extends LitElement {
       const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
 
       return await widgetSource.getCategories({
-        filterOwner: this.widgetId,
+        filterOwner: this._widgetId,
         operation,
         column,
         spatialFilter,
@@ -86,13 +76,13 @@ export class CategoryWidget extends LitElement {
         cache(html`
           <h3>${this.header}</h3>
           <figure>
-            <div class="chart" ${ref(this.chartRef)}></div>
+            <div class="chart" ${ref(this._chartRef)}></div>
             <figcaption>${this.caption}</figcaption>
           </figure>
           <button
             class="clear-btn"
             @click=${this._clearFilter}
-            disabled=${this.filterValues.length > 0 ? nothing : true}
+            disabled=${this._filterValues.length > 0 ? nothing : true}
           >
             Clear
           </button>
@@ -106,9 +96,9 @@ export class CategoryWidget extends LitElement {
   override updated() {
     if (this._task.status !== TaskStatus.COMPLETE) return;
 
-    if (!this.chart || this.chart.getDom() !== this.chartRef.value) {
-      this.chart = echarts.init(this.chartRef.value!, null, {height: 200});
-      this.chart.on('click', ({name}) => this._toggleFilter(name));
+    if (!this._chart || this._chart.getDom() !== this._chartRef.value) {
+      this._chart = echarts.init(this._chartRef.value!, null, {height: 200});
+      this._chart.on('click', ({name}) => this._toggleFilter(name));
     }
 
     // TODO: If another widget overrides this widget's filters, what happens?
@@ -117,16 +107,16 @@ export class CategoryWidget extends LitElement {
   }
 
   private _toggleFilter(value: string): void {
-    if (this.filterValues.includes(value)) {
-      this.filterValues = this.filterValues.filter((v) => v !== value);
+    if (this._filterValues.includes(value)) {
+      this._filterValues = this._filterValues.filter((v) => v !== value);
     } else {
-      this.filterValues = [...this.filterValues, value];
+      this._filterValues = [...this._filterValues, value];
     }
     this._dispatchFilter();
   }
 
   private _clearFilter(): void {
-    this.filterValues = [];
+    this._filterValues = [];
     this._dispatchFilter();
   }
 
@@ -138,11 +128,11 @@ export class CategoryWidget extends LitElement {
     const column = this.column as string;
 
     // TODO: Append filters from multiple widgets on the same columns.
-    if (this.filterValues.length > 0) {
+    if (this._filterValues.length > 0) {
       filters[column] = {
         in: {
-          owner: this.widgetId,
-          values: Array.from(this.filterValues),
+          owner: this._widgetId,
+          values: Array.from(this._filterValues),
         },
       };
     } else {
@@ -162,13 +152,13 @@ export class CategoryWidget extends LitElement {
 
     const data = categories.map(({name, value}, index) => {
       let color = DEFAULT_PALETTE[index]; // TODO: >8 categories allowed?
-      if (this.filterValues.length > 0) {
-        color = this.filterValues.includes(name) ? color : '#cccccc';
+      if (this._filterValues.length > 0) {
+        color = this._filterValues.includes(name) ? color : '#cccccc';
       }
       return {value, name, itemStyle: {color}};
     });
 
-    this.chart!.setOption({
+    this._chart!.setOption({
       xAxis: {data: data.map(({name}) => name)},
       yAxis: {type: 'value'},
       series: [{type: 'bar', name: this.header, data}],

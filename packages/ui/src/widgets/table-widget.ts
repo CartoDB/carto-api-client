@@ -1,16 +1,14 @@
-import {LitElement, css, html} from 'lit';
+import {css, html} from 'lit';
 import {Task} from '@lit/task';
-import {customElement, property} from 'lit/decorators.js';
 import {DEBOUNCE_TIME_MS} from '../constants.js';
 import {getSpatialFilter, sleep} from '../utils.js';
-import {WidgetSource, TableResponse} from '@carto/core';
+import {TableResponse} from '@carto/core';
 import {WIDGET_BASE_CSS} from './styles.js';
 import {cache} from 'lit/directives/cache.js';
 import {map} from 'lit/directives/map.js';
-import {MapViewState} from '@deck.gl/core';
+import {BaseWidget} from './base-widget.js';
 
-@customElement('table-widget')
-export class TableWidget extends LitElement {
+export class TableWidget extends BaseWidget {
   static override styles = css`
     ${WIDGET_BASE_CSS}
 
@@ -33,20 +31,19 @@ export class TableWidget extends LitElement {
     }
   `;
 
-  @property({type: String})
-  header = 'Untitled';
+  static get properties() {
+    return {
+      ...super.properties,
+      columns: {type: Array},
+    };
+  }
 
-  @property({type: String})
-  caption = 'Table widget';
+  declare columns: string[];
 
-  @property({type: Object, attribute: false})
-  data: Promise<{widgetSource: WidgetSource}> | null = null;
-
-  @property({type: Array})
-  columns: string[] = [];
-
-  @property({type: Object, attribute: false}) // TODO: types
-  viewState: MapViewState | null = null;
+  constructor() {
+    super();
+    this.columns = [];
+  }
 
   private _task = new Task(this, {
     task: async ([data, columns, viewState], {signal}) => {

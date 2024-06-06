@@ -13,6 +13,12 @@ export type Widget =
 
 export {CategoryWidget, FormulaWidget, PieWidget, ScatterWidget, TableWidget};
 
+customElements.define('category-widget', CategoryWidget);
+customElements.define('formula-widget', FormulaWidget);
+customElements.define('pie-widget', PieWidget);
+customElements.define('scatter-widget', ScatterWidget);
+customElements.define('table-widget', TableWidget);
+
 declare global {
   interface HTMLElementTagNameMap {
     'category-widget': CategoryWidget;

@@ -1,16 +1,15 @@
-import {LitElement, html} from 'lit';
+import {html} from 'lit';
 import {Task} from '@lit/task';
-import {customElement, property, state} from 'lit/decorators.js';
 import {Ref, createRef, ref} from 'lit/directives/ref.js';
 import {cache} from 'lit/directives/cache.js';
 import * as echarts from 'echarts';
 import {TaskStatus} from '@lit/task';
-import {AggregationTypes, WidgetSource} from '@carto/core';
-import {MapViewState} from '@deck.gl/core';
+import {AggregationTypes} from '@carto/core';
 
 import {DEBOUNCE_TIME_MS} from '../constants.js';
 import {getSpatialFilter, sleep} from '../utils.js';
-import {DEFAULT_TEXT_STYLE, WIDGET_BASE_CSS} from './styles.js';
+import {DEFAULT_TEXT_STYLE} from './styles.js';
+import {BaseWidget} from './base-widget.js';
 
 const DEFAULT_SCATTER_GRID = {
   left: '90px',
@@ -21,40 +20,32 @@ const DEFAULT_SCATTER_GRID = {
   height: 'auto',
 };
 
-@customElement('scatter-widget')
-export class ScatterWidget extends LitElement {
-  static override styles = WIDGET_BASE_CSS;
+export class ScatterWidget extends BaseWidget {
+  static get properties() {
+    return {
+      ...super.properties,
+      xAxisColumn: {type: String},
+      yAxisColumn: {type: String},
+      xAxisJoinOperation: {type: AggregationTypes},
+      yAxisJoinOperation: {type: AggregationTypes},
+    };
+  }
 
-  @property()
-  header = 'Untitled';
+  declare xAxisColumn: string;
+  declare xAxisJoinOperation: AggregationTypes;
+  declare yAxisColumn: string;
+  declare yAxisJoinOperation: AggregationTypes;
 
-  @property()
-  caption = 'Scatter widget';
+  protected _chart: echarts.ECharts | null = null;
+  protected _chartRef: Ref<HTMLElement> = createRef();
 
-  @property({type: Object, attribute: false})
-  data: Promise<{widgetSource: WidgetSource}> | null = null;
-
-  @property({type: String})
-  xAxisColumn: string = '';
-
-  @property({type: AggregationTypes})
-  xAxisJoinOperation = AggregationTypes.COUNT;
-
-  @property({type: String})
-  yAxisColumn: string = '';
-
-  @property({type: AggregationTypes})
-  yAxisJoinOperation = AggregationTypes.COUNT;
-
-  @property({type: Object, attribute: false})
-  viewState: MapViewState | null = null;
-
-  protected readonly widgetId = crypto.randomUUID();
-  protected chart: echarts.ECharts | null = null;
-  protected chartRef: Ref<HTMLElement> = createRef();
-
-  @state()
-  protected filterValues: string[] = [];
+  constructor() {
+    super();
+    this.xAxisColumn = '';
+    this.xAxisJoinOperation = AggregationTypes.COUNT;
+    this.yAxisColumn = '';
+    this.yAxisJoinOperation = AggregationTypes.COUNT;
+  }
 
   protected _task = new Task(this, {
     task: async (
@@ -77,7 +68,7 @@ export class ScatterWidget extends LitElement {
       const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
 
       return await widgetSource.getScatter({
-        filterOwner: this.widgetId,
+        filterOwner: this._widgetId,
         spatialFilter,
         xAxisColumn,
         xAxisJoinOperation,
@@ -108,7 +99,7 @@ export class ScatterWidget extends LitElement {
         cache(html`
           <h3>${this.header}</h3>
           <figure>
-            <div class="chart" ${ref(this.chartRef)}></div>
+            <div class="chart" ${ref(this._chartRef)}></div>
             <figcaption>${this.caption}</figcaption>
           </figure>
         `),
@@ -121,8 +112,8 @@ export class ScatterWidget extends LitElement {
   override updated() {
     if (this._task.status !== TaskStatus.COMPLETE) return;
 
-    if (!this.chart || this.chart.getDom() !== this.chartRef.value) {
-      this.chart = echarts.init(this.chartRef.value!, null, {height: 200});
+    if (!this._chart || this._chart.getDom() !== this._chartRef.value) {
+      this._chart = echarts.init(this._chartRef.value!, null, {height: 200});
     }
 
     this._updateChart();
@@ -135,7 +126,7 @@ export class ScatterWidget extends LitElement {
 
     const data = await this._task.taskComplete;
 
-    this.chart!.setOption({
+    this._chart!.setOption({
       xAxis: {name: this.xAxisColumn, nameLocation: 'middle', nameGap: 20},
       yAxis: {name: this.yAxisColumn, nameLocation: 'middle', nameGap: 80},
       series: [{type: 'scatter', symbolSize: 8, data}],
