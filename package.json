@@ -69,5 +69,6 @@
     "vite": "^5.2.10",
     "vue": "^3.4.27"
   },
-  "customElements": "custom-elements.json"
+  "customElements": "custom-elements.json",
+  "packageManager": "yarn@4.2.2"
 }
