@@ -1,15 +1,15 @@
-import {LitElement, html, css} from 'lit';
+import {html, css} from 'lit';
 import {Task} from '@lit/task';
-import {customElement, property} from 'lit/decorators.js';
-import {DEBOUNCE_TIME_MS} from '../constants';
-import {getSpatialFilter, sleep} from '../utils';
-import {AggregationTypes} from '../vendor/carto-constants';
-import {WidgetSource} from '../sources/index.js';
-import {MapViewState} from '@deck.gl/core';
+import {AggregationTypes} from '@carto/core';
+import {DEBOUNCE_TIME_MS} from '../constants.js';
+import {getSpatialFilter, sleep} from '../utils.js';
+import {BaseWidget} from './base-widget.js';
+import {WIDGET_BASE_CSS} from './styles.js';
 
-@customElement('formula-widget')
-export class FormulaWidget extends LitElement {
+export class FormulaWidget extends BaseWidget {
   static override styles = css`
+    ${WIDGET_BASE_CSS}
+
     :host {
       display: block;
       border: solid 1px gray;
@@ -31,23 +31,22 @@ export class FormulaWidget extends LitElement {
     }
   `;
 
-  @property({type: String})
-  header = 'Untitled';
+  static get properties() {
+    return {
+      ...super.properties,
+      operation: {type: AggregationTypes},
+      column: {type: String},
+    };
+  }
 
-  @property({type: String})
-  caption = 'Formula widget';
+  declare operation: AggregationTypes;
+  declare column: string;
 
-  @property({type: Object, attribute: false})
-  data: Promise<{widgetSource: WidgetSource}> | null = null;
-
-  @property({type: AggregationTypes})
-  operation = AggregationTypes.COUNT;
-
-  @property({type: String})
-  column = '';
-
-  @property({type: Object, attribute: false})
-  viewState: MapViewState | null = null;
+  constructor() {
+    super();
+    this.operation = AggregationTypes.COUNT;
+    this.column = '';
+  }
 
   private _task = new Task(this, {
     task: async ([data, operation, column, viewState], {signal}) => {

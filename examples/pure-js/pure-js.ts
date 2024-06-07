@@ -6,8 +6,9 @@ import {
   Filter,
   vectorTableSource,
   VectorTableSourceResponse,
-  Widget,
-} from '../../';
+} from '@carto/core';
+import '@carto/ui';
+import type {Widget} from '@carto/ui';
 
 /**************************************************************************
  * REACTIVE STATE

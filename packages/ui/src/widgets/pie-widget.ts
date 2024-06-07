@@ -1,8 +1,7 @@
-import {customElement, property} from 'lit/decorators.js';
 import {TaskStatus} from '@lit/task';
-import {DEFAULT_PALETTE, DEFAULT_TEXT_STYLE} from './styles';
 
-import {CategoryWidget} from '..';
+import {DEFAULT_PALETTE, DEFAULT_TEXT_STYLE} from './styles.js';
+import {CategoryWidget} from './category-widget.js';
 
 const DEFAULT_PIE_GRID = {
   left: 0,
@@ -13,11 +12,7 @@ const DEFAULT_PIE_GRID = {
   height: 'auto',
 };
 
-@customElement('pie-widget')
 export class PieWidget extends CategoryWidget {
-  @property()
-  override caption = 'Pie widget';
-
   protected override async _updateChart() {
     if (this._task.status === TaskStatus.ERROR) {
       return;
@@ -28,13 +23,13 @@ export class PieWidget extends CategoryWidget {
 
     const data = categories.map(({name, value}, index) => {
       let color = DEFAULT_PALETTE[index]; // TODO: >8 categories allowed?
-      if (this.filterValues.length > 0) {
-        color = this.filterValues.includes(name) ? color : '#cccccc';
+      if (this._filterValues.length > 0) {
+        color = this._filterValues.includes(name) ? color : '#cccccc';
       }
       return {value, name, itemStyle: {color}};
     });
 
-    this.chart!.setOption({
+    this._chart!.setOption({
       xAxis: {data: data.map(({name}) => name)},
       yAxis: {type: 'value'},
       series: [{type: 'pie', radius: ['40%', '70%'], name: this.header, data}],

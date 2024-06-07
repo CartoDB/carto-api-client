@@ -1,5 +1,5 @@
 import {VectorTableSourceOptions} from '@deck.gl/carto';
-import {$TODO} from '../types-internal';
+import {$TODO} from '../types-internal.js';
 import {MAP_TYPES} from '../vendor/carto-constants.js';
 import {BaseWidgetSource, BaseWidgetSourceProps} from './base-widget-source.js';
 

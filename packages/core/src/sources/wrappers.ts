@@ -12,9 +12,9 @@ import {
   QuadbinQuerySourceOptions,
   QuadbinTableSourceOptions,
 } from '@deck.gl/carto';
-import {QueryWidgetSource} from './query-widget-source';
-import {TableWidgetSource} from './table-widget-source';
-import {BaseWidgetSourceProps} from './base-widget-source';
+import {QueryWidgetSource} from './query-widget-source.js';
+import {TableWidgetSource} from './table-widget-source.js';
+import {BaseWidgetSourceProps} from './base-widget-source.js';
 
 /******************************************************************************
  * RESPONSE OBJECTS
