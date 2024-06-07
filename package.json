@@ -22,6 +22,7 @@
     "@deck.gl/layers": "^9.0.12",
     "@deck.gl/mesh-layers": "^9.0.12",
     "@deck.gl/react": "^9.0.17",
+    "@lit/react": "^1.0.5",
     "@loaders.gl/core": "^4.2.1",
     "@luma.gl/core": "^9.0.12",
     "@luma.gl/engine": "^9.0.12",

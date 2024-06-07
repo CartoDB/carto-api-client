@@ -11,6 +11,7 @@ export default {
     alias: {
       '@carto/core': resolve(__dirname, '../packages/core/'),
       '@carto/ui': resolve(__dirname, '../packages/ui/'),
+      '@carto/ui/react': resolve(__dirname, '../packages/ui/'),
     },
   },
   plugins: [

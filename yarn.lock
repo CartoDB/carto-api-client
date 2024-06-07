@@ -91,26 +91,11 @@ __metadata:
   resolution: "@carto/ui@workspace:packages/ui"
   dependencies:
     "@carto/core": "workspace:^"
-    "@lit/react": "npm:^1.0.5"
     "@lit/task": "npm:^1.0.0"
-    "@types/react": "npm:>=18.0.0"
     echarts: "npm:^5.5.0"
     lit: "npm:^3.0.0"
-    react: "npm:>=18.0.0"
   peerDependencies:
     "@deck.gl/core": ">=9.0.0"
-    "@types/react": ">=18.0.0"
-    react: ">=18.0.0"
-  dependenciesMeta:
-    "@types/react":
-      optional: true
-    react:
-      optional: true
-  peerDependenciesMeta:
-    "@types/react":
-      optional: true
-    react:
-      optional: true
   languageName: unknown
   linkType: soft
 
@@ -2118,7 +2103,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*, @types/react@npm:>=18.0.0, @types/react@npm:^18.3.3":
+"@types/react@npm:*, @types/react@npm:^18.3.3":
   version: 18.3.3
   resolution: "@types/react@npm:18.3.3"
   dependencies:
@@ -7287,7 +7272,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:>=18.0.0, react@npm:^18.3.1":
+"react@npm:^18.3.1":
   version: 18.3.1
   resolution: "react@npm:18.3.1"
   dependencies:
@@ -7673,6 +7658,7 @@ __metadata:
     "@deck.gl/layers": "npm:^9.0.12"
     "@deck.gl/mesh-layers": "npm:^9.0.12"
     "@deck.gl/react": "npm:^9.0.17"
+    "@lit/react": "npm:^1.0.5"
     "@loaders.gl/core": "npm:^4.2.1"
     "@luma.gl/core": "npm:^9.0.12"
     "@luma.gl/engine": "npm:^9.0.12"

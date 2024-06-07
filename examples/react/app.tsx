@@ -8,7 +8,7 @@ import {
   PieWidget,
   ScatterWidget,
   TableWidget,
-} from '@carto/ui/react';
+} from './wrappers';
 import {MapView} from '@deck.gl/core';
 import {VectorTileLayer} from '@deck.gl/carto';
 

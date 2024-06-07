@@ -7,7 +7,8 @@
     "baseUrl": "./packages",
     "paths": {
       "@carto/core": ["./packages/core/"],
-      "@carto/ui": ["./packages/ui/"]
+      "@carto/ui": ["./packages/ui/"],
+      "@carto/ui/react": ["./packages/ui/"]
     },
     "target": "es2022",
     "module": "es2022",
