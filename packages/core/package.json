@@ -13,6 +13,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "test": "vitest",
     "lint": "echo 'lint not implemented' && exit 1"
   }
 }

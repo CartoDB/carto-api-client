@@ -9,6 +9,7 @@
   "type": "module",
   "scripts": {
     "build": "lerna run build",
+    "test": "lerna run test",
     "dev": "concurrently \"yarn build -- --watch\" \"vite --config examples/vite.config.js --open\"",
     "clean": "rimraf packages/*/dist/*",
     "format": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --write"
@@ -45,6 +46,7 @@
     "svelte": "^4.2.17",
     "typescript": "~5.3.3",
     "vite": "^5.2.10",
+    "vitest": "^1.6.0",
     "vue": "^3.4.27"
   }
 }

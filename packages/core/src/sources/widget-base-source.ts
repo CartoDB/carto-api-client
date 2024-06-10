@@ -36,7 +36,7 @@ export interface WidgetBaseSourceProps extends SourceOptions {
   queryParameters?: unknown[];
   geoColumn?: string;
   provider?: string;
-  filters: Record<string, Filter>;
+  filters?: Record<string, Filter>;
 }
 
 export type WidgetSource = WidgetBaseSource<WidgetBaseSourceProps>;
