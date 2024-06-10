@@ -12,30 +12,30 @@ import {
   QuadbinQuerySourceOptions,
   QuadbinTableSourceOptions,
 } from '@deck.gl/carto';
-import {QueryWidgetSource} from './query-widget-source.js';
-import {TableWidgetSource} from './table-widget-source.js';
-import {BaseWidgetSourceProps} from './base-widget-source.js';
+import {WidgetBaseSourceProps} from './widget-base-source.js';
+import {WidgetQuerySource} from './widget-query-source.js';
+import {WidgetTableSource} from './widget-table-source.js';
 
 /******************************************************************************
  * RESPONSE OBJECTS
  */
 
-type TableWidgetSourceResponse = {widgetSource: TableWidgetSource};
-type QueryWidgetSourceResponse = {widgetSource: QueryWidgetSource};
+type WidgetTableSourceResponse = {widgetSource: WidgetTableSource};
+type WidgetQuerySourceResponse = {widgetSource: WidgetQuerySource};
 
-export type VectorTableSourceResponse = TableWidgetSourceResponse &
+export type VectorTableSourceResponse = WidgetTableSourceResponse &
   Awaited<ReturnType<typeof _vectorTableSource>>;
-export type VectorQuerySourceResponse = QueryWidgetSourceResponse &
+export type VectorQuerySourceResponse = WidgetQuerySourceResponse &
   Awaited<ReturnType<typeof _vectorQuerySource>>;
 
-export type H3TableSourceResponse = TableWidgetSourceResponse &
+export type H3TableSourceResponse = WidgetTableSourceResponse &
   Awaited<ReturnType<typeof _h3TableSource>>;
-export type H3QuerySourceResponse = QueryWidgetSourceResponse &
+export type H3QuerySourceResponse = WidgetQuerySourceResponse &
   Awaited<ReturnType<typeof _h3QuerySource>>;
 
-export type QuadbinTableSourceResponse = TableWidgetSourceResponse &
+export type QuadbinTableSourceResponse = WidgetTableSourceResponse &
   Awaited<ReturnType<typeof _quadbinTableSource>>;
-export type QuadbinQuerySourceResponse = QueryWidgetSourceResponse &
+export type QuadbinQuerySourceResponse = WidgetQuerySourceResponse &
   Awaited<ReturnType<typeof _quadbinQuerySource>>;
 
 /******************************************************************************
@@ -44,18 +44,18 @@ export type QuadbinQuerySourceResponse = QueryWidgetSourceResponse &
 
 /** Wrapper adding widget support to {@link _vectorTableSource}. */
 export async function vectorTableSource(
-  props: VectorTableSourceOptions & BaseWidgetSourceProps
+  props: VectorTableSourceOptions & WidgetBaseSourceProps
 ): Promise<VectorTableSourceResponse> {
   const response = await _vectorTableSource(props);
-  return {...response, widgetSource: new TableWidgetSource(props)};
+  return {...response, widgetSource: new WidgetTableSource(props)};
 }
 
 /** Wrapper adding widget support to {@link _vectorQuerySource}. */
 export async function vectorQuerySource(
-  props: VectorQuerySourceOptions & BaseWidgetSourceProps
+  props: VectorQuerySourceOptions & WidgetBaseSourceProps
 ): Promise<VectorQuerySourceResponse> {
   const response = await _vectorQuerySource(props);
-  return {...response, widgetSource: new QueryWidgetSource(props)};
+  return {...response, widgetSource: new WidgetQuerySource(props)};
 }
 
 /** Wrapper adding widget support to {@link _vectorTilesetSource}. */
@@ -69,18 +69,18 @@ export async function vectorTilesetSource() {
 
 /** Wrapper adding widget support to {@link _h3TableSource}. */
 export async function h3TableSource(
-  props: H3TableSourceOptions & BaseWidgetSourceProps
+  props: H3TableSourceOptions & WidgetBaseSourceProps
 ): Promise<H3TableSourceResponse> {
   const response = await _h3TableSource(props);
-  return {...response, widgetSource: new TableWidgetSource(props)};
+  return {...response, widgetSource: new WidgetTableSource(props)};
 }
 
 /** Wrapper adding widget support to {@link _h3QuerySource}. */
 export async function h3QuerySource(
-  props: H3QuerySourceOptions & BaseWidgetSourceProps
+  props: H3QuerySourceOptions & WidgetBaseSourceProps
 ): Promise<H3QuerySourceResponse> {
   const response = await _h3QuerySource(props);
-  return {...response, widgetSource: new QueryWidgetSource(props)};
+  return {...response, widgetSource: new WidgetQuerySource(props)};
 }
 
 /** Wrapper adding widget support to {@link _h3TilesetSource}. */
@@ -94,18 +94,18 @@ export async function h3TilesetSource() {
 
 /** Wrapper adding widget support to {@link _quadbinTableSource}. */
 export async function quadbinTableSource(
-  props: QuadbinTableSourceOptions & BaseWidgetSourceProps
+  props: QuadbinTableSourceOptions & WidgetBaseSourceProps
 ): Promise<QuadbinTableSourceResponse> {
   const response = await _quadbinTableSource(props);
-  return {...response, widgetSource: new TableWidgetSource(props)};
+  return {...response, widgetSource: new WidgetTableSource(props)};
 }
 
 /** Wrapper adding widget support to {@link _quadbinQuerySource}. */
 export async function quadbinQuerySource(
-  props: QuadbinQuerySourceOptions & BaseWidgetSourceProps
+  props: QuadbinQuerySourceOptions & WidgetBaseSourceProps
 ): Promise<QuadbinQuerySourceResponse> {
   const response = await _quadbinQuerySource(props);
-  return {...response, widgetSource: new QueryWidgetSource(props)};
+  return {...response, widgetSource: new WidgetQuerySource(props)};
 }
 
 /** Wrapper adding widget support to {@link _quadbinTilesetSource}. */

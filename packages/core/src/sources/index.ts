@@ -1,4 +1,4 @@
-export {WidgetSource} from './base-widget-source.js';
-export * from './query-widget-source.js';
-export * from './table-widget-source.js';
+export {WidgetSource} from './widget-base-source.js';
+export * from './widget-query-source.js';
+export * from './widget-table-source.js';
 export * from './wrappers.js';

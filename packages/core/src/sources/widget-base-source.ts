@@ -30,7 +30,7 @@ import {$TODO} from '../types-internal.js';
 /**
  *
  */
-export interface BaseWidgetSourceProps extends SourceOptions {
+export interface WidgetBaseSourceProps extends SourceOptions {
   type?: MAP_TYPES;
   filtersLogicalOperator?: 'and' | 'or';
   queryParameters?: unknown[];
@@ -39,9 +39,9 @@ export interface BaseWidgetSourceProps extends SourceOptions {
   filters: Record<string, Filter>;
 }
 
-export type WidgetSource = BaseWidgetSource<BaseWidgetSourceProps>;
+export type WidgetSource = WidgetBaseSource<WidgetBaseSourceProps>;
 
-export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
+export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
   readonly props: Props;
   readonly credentials: {
     apiBaseUrl: string;
@@ -51,13 +51,13 @@ export class BaseWidgetSource<Props extends BaseWidgetSourceProps> {
   };
   readonly connectionName: string;
 
-  static defaultProps: Partial<BaseWidgetSourceProps> = {
+  static defaultProps: Partial<WidgetBaseSourceProps> = {
     filters: {},
     filtersLogicalOperator: 'and',
   };
 
   constructor(props: Props) {
-    this.props = {...BaseWidgetSource.defaultProps, ...props};
+    this.props = {...WidgetBaseSource.defaultProps, ...props};
     this.credentials = {
       apiVersion: API_VERSIONS.V3,
       apiBaseUrl: DEFAULT_API_BASE_URL || props.apiBaseUrl,
