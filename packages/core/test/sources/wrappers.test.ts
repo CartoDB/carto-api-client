@@ -40,7 +40,7 @@ test('vectorQuerySource', async () => {
   vi.stubGlobal('fetch', createMockFetchForTileJSON());
 
   const {widgetSource} = await vectorQuerySource({
-    accessToken: '•••',
+    accessToken: '<token>',
     connectionName: 'carto_dw',
     sqlQuery: 'SELECT *',
   });
@@ -52,7 +52,7 @@ test('vectorTableSource', async () => {
   vi.stubGlobal('fetch', createMockFetchForTileJSON());
 
   const {widgetSource} = await vectorTableSource({
-    accessToken: '•••',
+    accessToken: '<token>',
     connectionName: 'carto_dw',
     tableName: 'my-table',
   });
@@ -73,7 +73,7 @@ test('h3QuerySource', async () => {
   vi.stubGlobal('fetch', createMockFetchForTileJSON());
 
   const {widgetSource} = await h3QuerySource({
-    accessToken: '•••',
+    accessToken: '<token>',
     connectionName: 'carto_dw',
     sqlQuery: 'SELECT *',
     aggregationExp: 'COUNT (*)',
@@ -86,7 +86,7 @@ test('h3TableSource', async () => {
   vi.stubGlobal('fetch', createMockFetchForTileJSON());
 
   const {widgetSource} = await h3TableSource({
-    accessToken: '•••',
+    accessToken: '<token>',
     connectionName: 'carto_dw',
     tableName: 'my-table',
     aggregationExp: 'COUNT (*)',
@@ -108,7 +108,7 @@ test('quadbinQuerySource', async () => {
   vi.stubGlobal('fetch', createMockFetchForTileJSON());
 
   const {widgetSource} = await quadbinQuerySource({
-    accessToken: '•••',
+    accessToken: '<token>',
     connectionName: 'carto_dw',
     sqlQuery: 'SELECT *',
     aggregationExp: 'COUNT (*)',
@@ -121,7 +121,7 @@ test('quadbinTableSource', async () => {
   vi.stubGlobal('fetch', createMockFetchForTileJSON());
 
   const {widgetSource} = await quadbinTableSource({
-    accessToken: '•••',
+    accessToken: '<token>',
     connectionName: 'carto_dw',
     tableName: 'my-table',
     aggregationExp: 'COUNT (*)',
