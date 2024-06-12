@@ -80,22 +80,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@carto/core@workspace:^, @carto/core@workspace:packages/core":
+"@carto/core@workspace:packages/core":
   version: 0.0.0-use.local
   resolution: "@carto/core@workspace:packages/core"
-  languageName: unknown
-  linkType: soft
-
-"@carto/ui@workspace:packages/ui":
-  version: 0.0.0-use.local
-  resolution: "@carto/ui@workspace:packages/ui"
-  dependencies:
-    "@carto/core": "workspace:^"
-    "@lit/task": "npm:^1.0.0"
-    echarts: "npm:^5.5.0"
-    lit: "npm:^3.0.0"
   peerDependencies:
-    "@deck.gl/core": ">=9.0.0"
+    "@deck.gl/carto": ">=9.0.0"
   languageName: unknown
   linkType: soft
 
@@ -597,15 +586,6 @@ __metadata:
   dependencies:
     "@lit-labs/ssr-dom-shim": "npm:^1.2.0"
   checksum: 10c0/359cc19ea9ee8b65e1417eb9c12f40dddba8f0a5ab32f0e5facaecee6060629e44eb4ca27d9af945fe6eda8c033aa636abaa5f0c4e6a529b224d78674acf47ba
-  languageName: node
-  linkType: hard
-
-"@lit/task@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "@lit/task@npm:1.0.0"
-  dependencies:
-    "@lit/reactive-element": "npm:^1.0.0 || ^2.0.0"
-  checksum: 10c0/6d776e17620c4bb53a07a17c21f25237480f1d2bc461e54fa9eb387074900d4d04e77aa7ed8a519d2af4ae11c31b8f8edf991d372b5ea45c4934422967fb9f11
   languageName: node
   linkType: hard
 
@@ -5717,17 +5697,6 @@ __metadata:
   dependencies:
     "@types/trusted-types": "npm:^2.0.2"
   checksum: 10c0/0d0b6fd0db7151d38387fa7b07e4203f3598e3b89567997d6d37f84ba7cd76e0e6fd5a41c5eb13d70e10e632dbce6bfc69c5b24c6e8b54975eeb942bb5fa334c
-  languageName: node
-  linkType: hard
-
-"lit@npm:^3.0.0":
-  version: 3.1.3
-  resolution: "lit@npm:3.1.3"
-  dependencies:
-    "@lit/reactive-element": "npm:^2.0.4"
-    lit-element: "npm:^4.0.4"
-    lit-html: "npm:^3.1.2"
-  checksum: 10c0/bd29503bed86e07d94ff3445da4ac11b883bd94d50a2c8a089e990cbd3ce91c06f0e177cce38fbc75ddb35eb6e44f2ee5a1f7b8613478d522eff11438ebb858f
   languageName: node
   linkType: hard
 

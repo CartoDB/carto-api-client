@@ -15,5 +15,8 @@
     "build": "tsc",
     "test": "vitest",
     "lint": "echo 'lint not implemented' && exit 1"
+  },
+  "peerDependencies": {
+    "@deck.gl/carto": ">=9.0.0"
   }
 }

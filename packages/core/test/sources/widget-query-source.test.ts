@@ -1,6 +1,5 @@
 import {afterEach, describe, expect, test, vi} from 'vitest';
 import {AggregationTypes, WidgetQuerySource} from '@carto/core';
-import {AGGREGATION} from '@deck.gl/carto/dist/api/layer-map';
 
 const createMockResponse = (data: unknown) => ({
   ok: true,
