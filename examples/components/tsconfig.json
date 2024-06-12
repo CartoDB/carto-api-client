@@ -1,8 +1,7 @@
 {
 	"extends": "../../tsconfig.json",
-	"include": ["src/**/*", "../global.d.ts"],
+	"include": ["**/*.ts"],
 	"compilerOptions": {
-		"outDir": "dist",
     "plugins": [
       {
         "name": "ts-lit-plugin",

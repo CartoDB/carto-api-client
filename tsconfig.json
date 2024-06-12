@@ -6,9 +6,7 @@
   "compilerOptions": {
     "baseUrl": "./packages",
     "paths": {
-      "@carto/core": ["./packages/core/"],
-      "@carto/ui": ["./packages/ui/"],
-      "@carto/ui/react": ["./packages/ui/"]
+      "@carto/core": ["./packages/core/"]
     },
     "target": "es2022",
     "module": "es2022",

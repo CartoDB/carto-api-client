@@ -1,5 +1,5 @@
 <script lang="ts">
-  import '@carto/ui';
+  import '../components/index.js';
   import type {Filter, FilterEvent, VectorTableSourceResponse} from '@carto/core';
   import {vectorTableSource} from '@carto/core';
   import {Map} from 'maplibre-gl';

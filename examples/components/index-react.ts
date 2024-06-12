@@ -6,7 +6,7 @@ import {
   PieWidget as _PieWidget,
   ScatterWidget as _ScatterWidget,
   TableWidget as _TableWidget,
-} from '@carto/ui';
+} from './index.js';
 
 // TODO: React <=18 requires these wrappers to support Web Components. Because
 // the wrappers depend on the `react` npm package, they belong in a separate

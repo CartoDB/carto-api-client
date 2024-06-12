@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import '@carto/ui';
+import '../components/index.js';
 import {Filter, FilterEvent, vectorTableSource} from '@carto/core';
 import {Map} from 'maplibre-gl';
 import {Deck, MapViewState} from '@deck.gl/core';

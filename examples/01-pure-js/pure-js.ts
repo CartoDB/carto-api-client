@@ -7,8 +7,8 @@ import {
   vectorTableSource,
   VectorTableSourceResponse,
 } from '@carto/core';
-import '@carto/ui';
-import type {Widget} from '@carto/ui';
+import '../components/index.js';
+import type {Widget} from '../components/index.js';
 
 /**************************************************************************
  * REACTIVE STATE
