@@ -231,6 +231,8 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       opts: {abortController},
     }).then((res) => normalizeObjectKeys(res.rows));
 
+    // TODO(donmccurdy): Why allocate `ticks.length + 1`? I would have
+    // expected `ticks.length - 1`...
     if (data.length) {
       const result = Array(ticks.length + 1).fill(0);
       data.forEach(

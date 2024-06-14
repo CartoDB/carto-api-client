@@ -14,6 +14,8 @@ export enum API_VERSIONS {
  * Enum for the different types of aggregations available for widgets
  * @enum {string}
  * @readonly
+ * @internalRemarks TODO(donmccurdy): Consider making this into a type
+ *  union rather than an enum, see https://app.shortcut.com/cartoteam/story/417715/add-types-and-jsdoc-for-widget-api-module.
  */
 export enum AggregationTypes {
   /** Count */

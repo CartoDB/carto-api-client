@@ -65,7 +65,7 @@ describe('getCategories', () => {
       source: 'SELECT * FROM my-table',
       params: JSON.stringify({
         column: 'store_type',
-        operation: 'count',
+        operation: AggregationTypes.COUNT,
         operationColumn: 'store_type',
       }),
       queryParameters: '',
@@ -102,7 +102,10 @@ describe('getFormula', () => {
     expect(Object.fromEntries(params)).toMatchObject({
       type: 'query',
       source: 'SELECT * FROM my-table',
-      params: JSON.stringify({column: 'store_type', operation: 'count'}),
+      params: JSON.stringify({
+        column: 'store_type',
+        operation: AggregationTypes.COUNT,
+      }),
       queryParameters: '',
       filters: JSON.stringify({}),
       filtersLogicalOperator: 'and',
@@ -197,9 +200,9 @@ describe('getScatter', () => {
       source: 'SELECT * FROM my-table',
       params: JSON.stringify({
         xAxisColumn: 'a',
-        xAxisJoinOperation: 'count',
+        xAxisJoinOperation: AggregationTypes.COUNT,
         yAxisColumn: 'b',
-        yAxisJoinOperation: 'count',
+        yAxisJoinOperation: AggregationTypes.COUNT,
         limit: 500,
       }),
       queryParameters: '',
@@ -214,5 +217,50 @@ describe('getTimeSeries', () => {
 });
 
 describe('getHistogram', () => {
-  test.todo('default', async () => {});
+  // TODO(donmccurdy): Need a working widget implementation to check this.
+  test('default', async () => {
+    const widgetSource = new WidgetQuerySource({
+      accessToken: '<token>',
+      connectionName: 'carto_dw',
+      sqlQuery: 'SELECT * FROM my-table',
+    });
+
+    const ticks = [0, 50, 100, 200];
+    const expectedHistogram = [10, 5, 15, 12];
+
+    const mockFetch = vi.fn().mockResolvedValueOnce(
+      createMockResponse({
+        rows: expectedHistogram.map((value, index) => ({
+          tick: index + 1,
+          value,
+        })),
+      })
+    );
+    vi.stubGlobal('fetch', mockFetch);
+
+    const actualHistogram = await widgetSource.getHistogram({
+      column: 'a',
+      operation: AggregationTypes.COUNT,
+      ticks,
+    });
+
+    expect(mockFetch).toHaveBeenCalledOnce();
+
+    // TODO(donmccurdy): Why the leading zero?
+    expect(actualHistogram).toEqual([0, ...expectedHistogram]);
+
+    const params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
+    expect(Object.fromEntries(params)).toMatchObject({
+      type: 'query',
+      source: 'SELECT * FROM my-table',
+      params: JSON.stringify({
+        column: 'a',
+        operation: AggregationTypes.COUNT,
+        ticks,
+      }),
+      queryParameters: '',
+      filters: JSON.stringify({}),
+      filtersLogicalOperator: 'and',
+    });
+  });
 });

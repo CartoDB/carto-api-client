@@ -67,8 +67,8 @@ export interface TimeSeriesRequestOptions extends BaseRequestOptions {
 
 export interface HistogramRequestOptions extends BaseRequestOptions {
   column: string;
+  ticks: number[];
   operation?: AggregationTypes;
-  ticks?: $TODO;
 }
 
 /******************************************************************************
@@ -85,4 +85,4 @@ export type TableResponse = {
 };
 export type ScatterResponse = [number, number][];
 export type TimeSeriesResponse = $TODO;
-export type HistogramResponse = $TODO;
+export type HistogramResponse = number[];
