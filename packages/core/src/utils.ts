@@ -2,6 +2,17 @@ import {FILTER_TYPES} from './constants.js';
 import {$TODO} from './types-internal.js';
 import {Filter, FilterTypes} from './vendor/deck-carto.js';
 
+/**
+ * @privateRemarks In C4R, this logic occurs in `useWidgetSource` and is termed
+ * `getApplicableFilters`. Keep these terms in mind for public API?
+ *
+ * ```javascript
+ *   const applicableFilters = useMemo(
+ *      () => getApplicableFilters(rawSource?.filters, id),
+ *      [rawSource?.filters, id]
+ *   );
+ * ```
+ */
 export function getWidgetFilters(
   owner?: string,
   allFilters?: Record<string, Filter>
