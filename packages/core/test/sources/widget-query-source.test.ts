@@ -217,7 +217,6 @@ describe('getTimeSeries', () => {
 });
 
 describe('getHistogram', () => {
-  // TODO(donmccurdy): Need a working widget implementation to check this.
   test('default', async () => {
     const widgetSource = new WidgetQuerySource({
       accessToken: '<token>',
@@ -225,13 +224,15 @@ describe('getHistogram', () => {
       sqlQuery: 'SELECT * FROM my-table',
     });
 
-    const ticks = [0, 50, 100, 200];
+    // Given N ticks, API returns N+1 bins. One bin before,
+    // N-1 bins between ticks, and one bin after.
+    const ticks = [50, 100, 200];
     const expectedHistogram = [10, 5, 15, 12];
 
     const mockFetch = vi.fn().mockResolvedValueOnce(
       createMockResponse({
         rows: expectedHistogram.map((value, index) => ({
-          tick: index + 1,
+          tick: index,
           value,
         })),
       })
@@ -245,9 +246,7 @@ describe('getHistogram', () => {
     });
 
     expect(mockFetch).toHaveBeenCalledOnce();
-
-    // TODO(donmccurdy): Why the leading zero?
-    expect(actualHistogram).toEqual([0, ...expectedHistogram]);
+    expect(actualHistogram).toEqual([...expectedHistogram]);
 
     const params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
     expect(Object.fromEntries(params)).toMatchObject({
