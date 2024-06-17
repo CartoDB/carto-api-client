@@ -2,7 +2,7 @@ import {css, html} from 'lit';
 import {Task} from '@lit/task';
 import {DEBOUNCE_TIME_MS} from '../constants.js';
 import {getSpatialFilter, sleep} from '../utils.js';
-import {TableResponse} from '@carto/core';
+import {TableResponse} from '@carto/api-client';
 import {WIDGET_BASE_CSS} from './styles.js';
 import {cache} from 'lit/directives/cache.js';
 import {map} from 'lit/directives/map.js';

@@ -4,7 +4,7 @@ import {Ref, createRef, ref} from 'lit/directives/ref.js';
 import {cache} from 'lit/directives/cache.js';
 import * as echarts from 'echarts';
 import {TaskStatus} from '@lit/task';
-import {AggregationTypes} from '@carto/core';
+import {AggregationTypes} from '@carto/api-client';
 
 import {DEBOUNCE_TIME_MS} from '../constants.js';
 import {getSpatialFilter, sleep} from '../utils.js';

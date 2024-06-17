@@ -1,5 +1,5 @@
 import {afterEach, describe, expect, test, vi} from 'vitest';
-import {AggregationTypes, WidgetQuerySource} from '@carto/core';
+import {AggregationTypes, WidgetQuerySource} from '@carto/api-client';
 
 const createMockResponse = (data: unknown) => ({
   ok: true,

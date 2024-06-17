@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Map} from 'react-map-gl/maplibre';
 import DeckGL from '@deck.gl/react';
-import {AggregationTypes, Filter, vectorTableSource} from '@carto/core';
+import {AggregationTypes, Filter, vectorTableSource} from '@carto/api-client';
 import {
   CategoryWidget,
   FormulaWidget,

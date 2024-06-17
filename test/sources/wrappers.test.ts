@@ -11,7 +11,7 @@ import {
   quadbinTilesetSource,
   WidgetQuerySource,
   WidgetTableSource,
-} from '@carto/core';
+} from '@carto/api-client';
 
 const createMockFetchForTileJSON = () =>
   vi

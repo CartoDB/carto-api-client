@@ -1,5 +1,5 @@
 import {LitElement} from 'lit';
-import {WidgetSource} from '@carto/core';
+import {WidgetSource} from '@carto/api-client';
 import {MapViewState} from '@deck.gl/core';
 
 import {WIDGET_BASE_CSS} from './styles.js';

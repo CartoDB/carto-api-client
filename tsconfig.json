@@ -1,12 +1,13 @@
 {
   "include": [
-    "packages/*/src/**/*.ts",
+    "src/**/*.ts",
     "examples/**/*.{svelte,ts,tsx,vue}"
   ],
   "compilerOptions": {
     "baseUrl": "./packages",
+    "outDir": "dist",
     "paths": {
-      "@carto/core": ["./packages/core/"]
+      "@carto/api-client": ["./"]
     },
     "target": "es2022",
     "module": "es2022",
@@ -21,6 +22,7 @@
     "sourceMap": true,
     "inlineSources": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "allowJs": true // TODO
   }
 }

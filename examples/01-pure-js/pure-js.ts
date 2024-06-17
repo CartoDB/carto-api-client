@@ -6,7 +6,7 @@ import {
   Filter,
   vectorTableSource,
   VectorTableSourceResponse,
-} from '@carto/core';
+} from '@carto/api-client';
 import '../components/index.js';
 import type {Widget} from '../components/index.js';
 

@@ -9,7 +9,7 @@ export default {
   root: 'examples',
   resolve: {
     alias: {
-      '@carto/core': resolve(__dirname, '../packages/core/'),
+      '@carto/api-client': resolve(__dirname, '../'),
     },
   },
   plugins: [

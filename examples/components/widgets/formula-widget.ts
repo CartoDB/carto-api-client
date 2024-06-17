@@ -1,6 +1,6 @@
 import {html, css} from 'lit';
 import {Task} from '@lit/task';
-import {AggregationTypes} from '@carto/core';
+import {AggregationTypes} from '@carto/api-client';
 import {DEBOUNCE_TIME_MS} from '../constants.js';
 import {getSpatialFilter, sleep} from '../utils.js';
 import {BaseWidget} from './base-widget.js';

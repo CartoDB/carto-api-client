@@ -1,4 +1,4 @@
-# deck.gl data widgets
+# `@carto/api-client`
 
 ## References
 
@@ -15,7 +15,7 @@ yarn
 yarn build
 
 # build package and watch for changes
-yarn build:watch
+yarn build --watch
 
 # build package, watch for changes, and start a local server for examples
 yarn dev

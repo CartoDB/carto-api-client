@@ -3,7 +3,7 @@ import {Task, TaskStatus} from '@lit/task';
 import {Ref, createRef, ref} from 'lit/directives/ref.js';
 import {cache} from 'lit/directives/cache.js';
 import * as echarts from 'echarts';
-import {AggregationTypes} from '@carto/core';
+import {AggregationTypes} from '@carto/api-client';
 
 import {DEFAULT_PALETTE, DEFAULT_TEXT_STYLE} from './styles.js';
 import {DEBOUNCE_TIME_MS} from '../constants.js';
