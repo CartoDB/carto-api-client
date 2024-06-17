@@ -231,9 +231,9 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       opts: {abortController},
     }).then((res) => normalizeObjectKeys(res.rows));
 
-    // TODO(donmccurdy): Why allocate `ticks.length + 1`? I would have
-    // expected `ticks.length - 1`...
     if (data.length) {
+      // Given N ticks the API returns up to N+1 bins, omitting any empty bins. Bins
+      // include 1 bin below the lowest tick, N-1 between ticks, and 1 bin above the highest tick.
       const result = Array(ticks.length + 1).fill(0);
       data.forEach(
         ({tick, value}: {tick: number; value: number}) => (result[tick] = value)

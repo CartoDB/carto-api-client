@@ -33,7 +33,8 @@ export class PieWidget extends CategoryWidget {
       xAxis: {data: data.map(({name}) => name)},
       yAxis: {type: 'value'},
       series: [{type: 'pie', radius: ['40%', '70%'], name: this.header, data}],
-      tooltip: {},
+      // Confine tooltip to the chart bounds, so it doesn't clip at sidebar scroll rect.
+      tooltip: {confine: true},
       grid: DEFAULT_PIE_GRID,
       textStyle: DEFAULT_TEXT_STYLE,
     });

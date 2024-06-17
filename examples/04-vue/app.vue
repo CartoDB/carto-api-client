@@ -137,6 +137,14 @@ onUnmounted(() => {
       :data="data"
       :viewState="viewState"
     ></scatter-widget>
+
+    <histogram-widget
+      header="Revenue"
+      column="revenue"
+      :ticks="[1250000, 1500000, 1750000]"
+      :data="data"
+      :viewState="viewState"
+    ></histogram-widget>
   </section>
   <footer id="footer" v-html="attributionHTML"></footer>
 </template>

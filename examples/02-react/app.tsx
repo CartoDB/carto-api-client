@@ -5,6 +5,7 @@ import {AggregationTypes, Filter, vectorTableSource} from '@carto/core';
 import {
   CategoryWidget,
   FormulaWidget,
+  HistogramWidget,
   PieWidget,
   ScatterWidget,
   TableWidget,
@@ -105,6 +106,14 @@ export function App(): JSX.Element {
           xAxisColumn="size_m2"
           yAxisColumn="revenue"
         ></ScatterWidget>
+
+        <HistogramWidget
+          data={data}
+          viewState={viewState}
+          header="Revenue"
+          column="revenue"
+          ticks={[1250000, 1500000, 1750000]}
+        ></HistogramWidget>
       </section>
       <footer
         id="footer"

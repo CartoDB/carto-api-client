@@ -121,6 +121,14 @@
     {data}
     {viewState}
   ></scatter-widget>
+
+  <histogram-widget
+    data={data}
+    viewState={viewState}
+    header="Revenue"
+    column="revenue"
+    ticks={[1250000, 1500000, 1750000]}
+  ></histogram-widget>
 </section>
 <footer id="footer">{@html attributionHTML}</footer>
 

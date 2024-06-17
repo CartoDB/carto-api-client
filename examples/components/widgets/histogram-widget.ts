@@ -1,16 +1,17 @@
-import {html, nothing} from 'lit';
-import {Task, TaskStatus} from '@lit/task';
+import {html} from 'lit';
+import {Task} from '@lit/task';
 import {Ref, createRef, ref} from 'lit/directives/ref.js';
 import {cache} from 'lit/directives/cache.js';
 import * as echarts from 'echarts';
+import {TaskStatus} from '@lit/task';
 import {AggregationTypes} from '@carto/core';
 
-import {DEFAULT_PALETTE, DEFAULT_TEXT_STYLE} from './styles.js';
 import {DEBOUNCE_TIME_MS} from '../constants.js';
 import {getSpatialFilter, sleep} from '../utils.js';
+import {DEFAULT_TEXT_STYLE} from './styles.js';
 import {BaseWidget} from './base-widget.js';
 
-const DEFAULT_CATEGORY_GRID = {
+const DEFAULT_HISTOGRAM_GRID = {
   left: 0,
   right: '4px',
   top: '8px',
@@ -19,32 +20,32 @@ const DEFAULT_CATEGORY_GRID = {
   height: 'auto',
 };
 
-export class CategoryWidget extends BaseWidget {
+export class HistogramWidget extends BaseWidget {
   static get properties() {
     return {
       ...super.properties,
-      operation: {type: AggregationTypes},
       column: {type: String},
-      _filterValues: {state: true},
+      operation: {type: AggregationTypes},
+      ticks: {type: Array},
     };
   }
 
   declare column: string;
   declare operation: AggregationTypes;
+  declare ticks: number[];
 
   protected _chart: echarts.ECharts | null = null;
   protected _chartRef: Ref<HTMLElement> = createRef();
-  protected declare _filterValues: string[];
 
   constructor() {
     super();
-    this.operation = AggregationTypes.COUNT;
     this.column = '';
-    this._filterValues = [];
+    this.operation = AggregationTypes.COUNT;
+    this.ticks = [];
   }
 
   protected _task = new Task(this, {
-    task: async ([data, operation, column, viewState], {signal}) => {
+    task: async ([data, viewState, column, operation, ticks], {signal}) => {
       if (!data) return [];
 
       await sleep(DEBOUNCE_TIME_MS);
@@ -53,15 +54,22 @@ export class CategoryWidget extends BaseWidget {
       const {widgetSource} = await data;
       const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
 
-      return await widgetSource.getCategories({
+      return await widgetSource.getHistogram({
         filterOwner: this._widgetId,
-        operation,
-        column,
         spatialFilter,
+        column,
+        operation,
+        ticks,
       }); // TODO: signal
     },
     args: () =>
-      [this.data, this.operation, this.column, this.viewState] as const,
+      [
+        this.data,
+        this.viewState,
+        this.column,
+        this.operation,
+        this.ticks,
+      ] as const,
   });
 
   override render() {
@@ -79,13 +87,6 @@ export class CategoryWidget extends BaseWidget {
             <div class="chart" ${ref(this._chartRef)}></div>
             <figcaption>${this.caption}</figcaption>
           </figure>
-          <button
-            class="clear-btn"
-            @click=${this._clearFilter}
-            disabled=${this._filterValues.length > 0 ? nothing : true}
-          >
-            Clear
-          </button>
         `),
       error: (e) =>
         html`<h3>${this.header}</h3>
@@ -98,48 +99,9 @@ export class CategoryWidget extends BaseWidget {
 
     if (!this._chart || this._chart.getDom() !== this._chartRef.value) {
       this._chart = echarts.init(this._chartRef.value!, null, {height: 200});
-      this._chart.on('click', ({name}) => this._toggleFilter(name));
     }
-
-    // TODO: If another widget overrides this widget's filters, what happens?
 
     this._updateChart();
-  }
-
-  private _toggleFilter(value: string): void {
-    if (this._filterValues.includes(value)) {
-      this._filterValues = this._filterValues.filter((v) => v !== value);
-    } else {
-      this._filterValues = [...this._filterValues, value];
-    }
-    this._dispatchFilter();
-  }
-
-  private _clearFilter(): void {
-    this._filterValues = [];
-    this._dispatchFilter();
-  }
-
-  private async _dispatchFilter(): Promise<void> {
-    if (!this.data) return;
-
-    const {widgetSource} = await this.data;
-    const filters = {...widgetSource.props.filters} as Record<string, unknown>;
-    const column = this.column as string;
-
-    // TODO: Append filters from multiple widgets on the same columns.
-    if (this._filterValues.length > 0) {
-      filters[column] = {
-        in: {
-          owner: this._widgetId,
-          values: Array.from(this._filterValues),
-        },
-      };
-    } else {
-      delete filters[column];
-    }
-
-    this.dispatchEvent(new CustomEvent('filter', {detail: {filters}}));
   }
 
   protected async _updateChart() {
@@ -147,16 +109,11 @@ export class CategoryWidget extends BaseWidget {
       return;
     }
 
-    const categories = await this._task.taskComplete;
-    categories.sort((a, b) => (a.value > b.value ? -1 : 1));
-
-    const data = categories.map(({name, value}, index) => {
-      let color = DEFAULT_PALETTE[index]; // TODO: >8 categories allowed?
-      if (this._filterValues.length > 0) {
-        color = this._filterValues.includes(name) ? color : '#cccccc';
-      }
-      return {value, name, itemStyle: {color}};
-    });
+    const values = await this._task.taskComplete;
+    const data = values.map((value, binIndex) => ({
+      name: getTickLabel(binIndex, this.ticks),
+      value,
+    }));
 
     this._chart!.setOption({
       xAxis: {data: data.map(({name}) => name)},
@@ -164,8 +121,15 @@ export class CategoryWidget extends BaseWidget {
       series: [{type: 'bar', name: this.header, data}],
       // Confine tooltip to the chart bounds, so it doesn't clip at sidebar scroll rect.
       tooltip: {confine: true},
-      grid: DEFAULT_CATEGORY_GRID,
+      grid: DEFAULT_HISTOGRAM_GRID,
       textStyle: DEFAULT_TEXT_STYLE,
     });
   }
+}
+
+function getTickLabel(binIndex: number, ticks: number[]): string {
+  // TODO: Confirm whether labels should be < or <=
+  if (binIndex === 0) return `< ${ticks[binIndex]}`;
+  if (binIndex === ticks.length) return `> ${ticks[ticks.length - 1]}`;
+  return `${ticks[binIndex - 1]} to ${ticks[binIndex]}`;
 }

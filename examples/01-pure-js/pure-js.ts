@@ -46,11 +46,12 @@ deck.setProps({
 });
 
 const widgets: Widget[] = [
-  bindWidget('#formula'),
   bindWidget('#category'),
+  bindWidget('#formula'),
+  bindWidget('#histogram'),
   bindWidget('#pie'),
-  bindWidget('#table'),
   bindWidget('#scatter'),
+  bindWidget('#table'),
 ];
 
 updateSources();
