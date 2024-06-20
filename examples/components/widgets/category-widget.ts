@@ -7,7 +7,7 @@ import {AggregationTypes} from '@carto/api-client';
 
 import {DEFAULT_PALETTE, DEFAULT_TEXT_STYLE} from './styles.js';
 import {DEBOUNCE_TIME_MS} from '../constants.js';
-import {getSpatialFilter, sleep} from '../utils.js';
+import {sleep} from '../utils.js';
 import {BaseWidget} from './base-widget.js';
 
 const DEFAULT_CATEGORY_GRID = {
@@ -44,24 +44,29 @@ export class CategoryWidget extends BaseWidget {
   }
 
   protected _task = new Task(this, {
-    task: async ([data, operation, column, viewState], {signal}) => {
+    task: async ([data, operation, column], {signal}) => {
       if (!data) return [];
 
       await sleep(DEBOUNCE_TIME_MS);
       signal.throwIfAborted();
 
       const {widgetSource} = await data;
-      const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
 
       return await widgetSource.getCategories({
         filterOwner: this._widgetId,
+        spatialFilter: this.getSpatialFilterOrViewState(),
         operation,
         column,
-        spatialFilter,
       }); // TODO: signal
     },
     args: () =>
-      [this.data, this.operation, this.column, this.viewState] as const,
+      [
+        this.data,
+        this.operation,
+        this.column,
+        this.viewState,
+        this.spatialFilter,
+      ] as const,
   });
 
   override render() {

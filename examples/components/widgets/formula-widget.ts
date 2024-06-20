@@ -2,7 +2,7 @@ import {html, css} from 'lit';
 import {Task} from '@lit/task';
 import {AggregationTypes} from '@carto/api-client';
 import {DEBOUNCE_TIME_MS} from '../constants.js';
-import {getSpatialFilter, sleep} from '../utils.js';
+import {sleep} from '../utils.js';
 import {BaseWidget} from './base-widget.js';
 import {WIDGET_BASE_CSS} from './styles.js';
 
@@ -49,23 +49,28 @@ export class FormulaWidget extends BaseWidget {
   }
 
   private _task = new Task(this, {
-    task: async ([data, operation, column, viewState], {signal}) => {
+    task: async ([data, operation, column], {signal}) => {
       if (!data) return -1;
 
       await sleep(DEBOUNCE_TIME_MS);
       signal.throwIfAborted();
 
       const {widgetSource} = await data;
-      const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
       const response = await widgetSource.getFormula({
         operation,
         column,
-        spatialFilter,
+        spatialFilter: this.getSpatialFilterOrViewState(),
       }); // TODO: signal
       return response.value;
     },
     args: () =>
-      [this.data, this.operation, this.column, this.viewState] as const,
+      [
+        this.data,
+        this.operation,
+        this.column,
+        this.viewState,
+        this.spatialFilter,
+      ] as const,
   });
 
   override render() {

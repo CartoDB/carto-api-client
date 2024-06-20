@@ -1,6 +1,6 @@
 import {LitElement} from 'lit';
-import {WidgetSource} from '@carto/api-client';
-import {MapViewState} from '@deck.gl/core';
+import {SpatialFilter, WidgetSource} from '@carto/api-client';
+import {MapViewState, WebMercatorViewport} from '@deck.gl/core';
 
 import {WIDGET_BASE_CSS} from './styles.js';
 
@@ -23,6 +23,7 @@ export abstract class BaseWidget extends LitElement {
   declare caption: string;
   declare data: Promise<{widgetSource: WidgetSource}> | null;
   declare viewState: MapViewState | null;
+  declare spatialFilter: GeoJSON.Geometry | null;
 
   protected readonly _widgetId = crypto.randomUUID();
 
@@ -33,5 +34,30 @@ export abstract class BaseWidget extends LitElement {
     this.caption = '';
     this.data = null;
     this.viewState = null;
+    this.spatialFilter = null;
+  }
+
+  getSpatialFilterOrViewState(): SpatialFilter | undefined {
+    if (this.spatialFilter) {
+      return this.spatialFilter;
+    }
+
+    if (this.viewState) {
+      const viewport = new WebMercatorViewport(this.viewState);
+      return {
+        type: 'Polygon',
+        coordinates: [
+          [
+            viewport.unproject([0, 0]),
+            viewport.unproject([viewport.width, 0]),
+            viewport.unproject([viewport.width, viewport.height]),
+            viewport.unproject([0, viewport.height]),
+            viewport.unproject([0, 0]),
+          ],
+        ],
+      };
+    }
+
+    return undefined;
   }
 }

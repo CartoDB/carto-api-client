@@ -7,7 +7,7 @@ import {TaskStatus} from '@lit/task';
 import {AggregationTypes} from '@carto/api-client';
 
 import {DEBOUNCE_TIME_MS} from '../constants.js';
-import {getSpatialFilter, sleep} from '../utils.js';
+import {sleep} from '../utils.js';
 import {DEFAULT_TEXT_STYLE} from './styles.js';
 import {BaseWidget} from './base-widget.js';
 
@@ -49,14 +49,7 @@ export class ScatterWidget extends BaseWidget {
 
   protected _task = new Task(this, {
     task: async (
-      [
-        data,
-        viewState,
-        xAxisColumn,
-        xAxisJoinOperation,
-        yAxisColumn,
-        yAxisJoinOperation,
-      ],
+      [data, xAxisColumn, xAxisJoinOperation, yAxisColumn, yAxisJoinOperation],
       {signal}
     ) => {
       if (!data) return [];
@@ -65,11 +58,10 @@ export class ScatterWidget extends BaseWidget {
       signal.throwIfAborted();
 
       const {widgetSource} = await data;
-      const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
 
       return await widgetSource.getScatter({
         filterOwner: this._widgetId,
-        spatialFilter,
+        spatialFilter: this.getSpatialFilterOrViewState(),
         xAxisColumn,
         xAxisJoinOperation,
         yAxisColumn,
@@ -79,11 +71,12 @@ export class ScatterWidget extends BaseWidget {
     args: () =>
       [
         this.data,
-        this.viewState,
         this.xAxisColumn,
         this.xAxisJoinOperation,
         this.yAxisColumn,
         this.yAxisJoinOperation,
+        this.viewState,
+        this.spatialFilter,
       ] as const,
   });
 

@@ -1,4 +1,4 @@
-import {executeModel} from '../vendor/carto-react-api.js';
+import {executeModel, Filter} from '../vendor/carto-react-api.js';
 import {normalizeObjectKeys} from '../vendor/carto-react-widgets.js';
 import {
   CategoryRequestOptions,
@@ -24,7 +24,6 @@ import {
 } from '../vendor/carto-constants.js';
 import {SourceOptions} from '@deck.gl/carto';
 import {getWidgetFilters} from '../utils.js';
-import {Filter} from '../vendor/deck-carto.js';
 import {$TODO} from '../types-internal.js';
 
 /**

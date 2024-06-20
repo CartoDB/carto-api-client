@@ -21,18 +21,57 @@ const AVAILABLE_MODELS = [
 
 const DEFAULT_GEO_COLUMN = 'geom';
 
-/**
- * Execute a SQL model request.
- *
- * @typedef { import('geojson').Polygon | import('geojson').MultiPolygon } SpatialFilter
- * @param { object } props
- * @param { string } props.model - widget's model that we want to get the data for
- * @param { object } props.source - source that owns the column
- * @param { object } props.params - widget's props
- * @param { SpatialFilter= } props.spatialFilter - restrict widget calculation to an area
- * @param { object= } props.opts - Additional options for the HTTP request
- */
-export function executeModel(props) {
+export type SpatialFilter = GeoJSON.Polygon | GeoJSON.MultiPolygon;
+
+export type Credentials = {
+  apiVersion: API_VERSIONS;
+  apiBaseUrl: string;
+  geoColumn: string;
+  accessToken: string;
+};
+
+export type Source = {
+  type: MAP_TYPES;
+  connection: string;
+  credentials: Credentials;
+  data: string;
+  geoColumn?: string;
+  queryParameters?: unknown[];
+  filters?: Record<string, Filter>;
+  filtersLogicalOperator?: 'and' | 'or';
+};
+
+export enum FilterTypes {
+  In = 'in',
+  Between = 'between', // [a, b] both are included
+  ClosedOpen = 'closed_open', // [a, b) a is included, b is not
+  Time = 'time',
+  StringSearch = 'stringSearch',
+}
+
+export interface Filter {
+  [FilterTypes.In]: number[];
+  [FilterTypes.Between]: number[][];
+  [FilterTypes.ClosedOpen]: number[][];
+  [FilterTypes.Time]: number[][];
+  [FilterTypes.StringSearch]: string[];
+}
+
+export interface ModelRequestOptions {
+  method: 'GET' | 'POST';
+  abortController?: AbortController;
+  otherOptions?: Record<string, unknown>;
+  body?: string;
+}
+
+/** Execute a SQL model request. */
+export function executeModel(props: {
+  model: string;
+  source: Source;
+  params: Record<string, unknown>;
+  spatialFilter?: SpatialFilter;
+  opts?: Partial<ModelRequestOptions>;
+}) {
   assert(props.source, 'executeModel: missing source');
   assert(props.model, 'executeModel: missing model');
   assert(props.params, 'executeModel: missing params');
@@ -59,11 +98,12 @@ export function executeModel(props) {
 
   let url = `${source.credentials.apiBaseUrl}/v3/sql/${source.connection}/model/${model}`;
 
-  const {filters, filtersLogicalOperator, data, type} = source;
+  const {filters, filtersLogicalOperator = 'and', data, type} = source;
   const queryParameters = source.queryParameters
     ? JSON.stringify(source.queryParameters)
     : '';
-  let queryParams = {
+
+  const queryParams: Record<string, string> = {
     type,
     client: getClient(),
     source: data,
@@ -91,12 +131,12 @@ export function executeModel(props) {
   if (isGet) {
     url = urlWithSearchParams;
   } else {
-    // undo the JSON.stringify, @todo find a better pattern
-    queryParams.params = params;
-    queryParams.filters = filters;
-    queryParams.queryParameters = source.queryParameters;
+    // undo the JSON.stringify, @TODO find a better pattern
+    queryParams.params = params as any;
+    queryParams.filters = filters as any;
+    queryParams.queryParameters = source.queryParameters as any;
     if (spatialFilters) {
-      queryParams.spatialFilters = spatialFilters;
+      queryParams.spatialFilters = spatialFilters as any;
     }
   }
   return makeCall({
@@ -117,7 +157,13 @@ export function executeModel(props) {
 /**
  * Return more descriptive error from API
  */
-export function dealWithApiError({response, data}) {
+export function dealWithApiError({
+  response,
+  data,
+}: {
+  response: Response;
+  data: any;
+}) {
   if (data.error === 'Column not found') {
     throw new InvalidColumnError(`${data.error} ${data.column_name}`);
   }
@@ -140,13 +186,21 @@ export function dealWithApiError({response, data}) {
   }
 }
 
-export function checkCredentials(credentials) {
+export function checkCredentials(credentials: Credentials) {
   if (!credentials || !credentials.apiBaseUrl || !credentials.accessToken) {
     throw new Error('Missing or bad credentials provided');
   }
 }
 
-export async function makeCall({url, credentials, opts}) {
+export async function makeCall({
+  url,
+  credentials,
+  opts,
+}: {
+  url: string;
+  credentials: Credentials;
+  opts: ModelRequestOptions;
+}) {
   let response;
   let data;
   const isPost = opts?.method === 'POST';
@@ -167,7 +221,7 @@ export async function makeCall({url, credentials, opts}) {
     });
     data = await response.json();
   } catch (error) {
-    if (error.name === 'AbortError') throw error;
+    if ((error as Error).name === 'AbortError') throw error;
 
     throw new Error(`Failed request: ${error}`);
   }

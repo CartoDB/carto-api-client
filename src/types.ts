@@ -1,7 +1,6 @@
 import {AggregationTypes} from './vendor/carto-constants.js';
 import {$TODO} from './types-internal.js';
-import {SpatialFilter} from './vendor/carto-react-api.js';
-import {Filter} from './vendor/deck-carto.js';
+import {Filter, SpatialFilter} from './vendor/carto-react-api.js';
 
 /******************************************************************************
  * FILTERS

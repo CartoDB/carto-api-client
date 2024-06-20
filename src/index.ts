@@ -2,7 +2,11 @@ export * from './sources/index.js';
 export * from './types.js';
 
 // TODO: Clean up and consolidate shared constants and types.
-export type {Filter} from './vendor/deck-carto.js';
+export type {
+  Filter,
+  FilterTypes,
+  SpatialFilter,
+} from './vendor/carto-react-api.js';
 export {
   MAP_TYPES,
   API_VERSIONS,

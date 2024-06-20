@@ -1,7 +1,7 @@
 import {css, html} from 'lit';
 import {Task} from '@lit/task';
 import {DEBOUNCE_TIME_MS} from '../constants.js';
-import {getSpatialFilter, sleep} from '../utils.js';
+import {sleep} from '../utils.js';
 import {TableResponse} from '@carto/api-client';
 import {WIDGET_BASE_CSS} from './styles.js';
 import {cache} from 'lit/directives/cache.js';
@@ -46,7 +46,7 @@ export class TableWidget extends BaseWidget {
   }
 
   private _task = new Task(this, {
-    task: async ([data, columns, viewState], {signal}) => {
+    task: async ([data, columns], {signal}) => {
       if (!data) {
         return {hasData: false, rows: [], totalCount: -1};
       }
@@ -55,10 +55,13 @@ export class TableWidget extends BaseWidget {
       signal.throwIfAborted();
 
       const {widgetSource} = await data;
-      const spatialFilter = viewState ? getSpatialFilter(viewState) : undefined;
-      return widgetSource.getTable({columns, spatialFilter}); // TODO: signal
+      return widgetSource.getTable({
+        columns,
+        spatialFilter: this.getSpatialFilterOrViewState(),
+      }); // TODO: signal
     },
-    args: () => [this.data, this.columns, this.viewState] as const,
+    args: () =>
+      [this.data, this.columns, this.viewState, this.spatialFilter] as const,
   });
 
   override render() {
