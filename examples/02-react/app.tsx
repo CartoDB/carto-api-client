@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Map} from 'react-map-gl/maplibre';
 import DeckGL from '@deck.gl/react';
-import {AggregationTypes, Filter, vectorTableSource} from '@carto/api-client';
+import {Filter, vectorTableSource} from '@carto/api-client';
 import {
   CategoryWidget,
   FormulaWidget,
@@ -71,14 +71,14 @@ export function App(): JSX.Element {
           data={data}
           viewState={viewState}
           header="Total"
-          operation={AggregationTypes.COUNT}
+          operation="count"
         ></FormulaWidget>
 
         <CategoryWidget
           data={data}
           viewState={viewState}
           header="Store type"
-          operation={AggregationTypes.COUNT}
+          operation="count"
           column="storetype"
           onfilter={(e) => setFilters((e as any).detail.filters)} // TODO: types
         ></CategoryWidget>
@@ -87,7 +87,7 @@ export function App(): JSX.Element {
           data={data}
           viewState={viewState}
           header="Store type"
-          operation={AggregationTypes.COUNT}
+          operation="count"
           column="storetype"
           onfilter={(e) => setFilters((e as any).detail.filters)} // TODO: types
         ></PieWidget>

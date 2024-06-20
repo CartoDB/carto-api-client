@@ -1,87 +1,67 @@
-import {AggregationTypes} from './vendor/carto-constants.js';
-import {$TODO} from './types-internal.js';
-import {Filter, SpatialFilter} from './vendor/carto-react-api.js';
+import type {API_VERSIONS, MAP_TYPES} from './constants';
+
+/******************************************************************************
+ * AGGREGATION
+ */
+
+/**
+ * Enum for the different types of aggregations available for widgets
+ * @enum {string}
+ * @readonly
+ * @internalRemarks Source: @carto/constants
+ * @internalRemarks Converted from enum to type union, for improved declarative API.
+ */
+export type AggregationType =
+  | 'count'
+  | 'avg'
+  | 'min'
+  | 'max'
+  | 'sum'
+  | 'custom';
 
 /******************************************************************************
  * FILTERS
  */
 
-export interface FilterEvent extends CustomEvent {
-  detail: {filters: Record<string, Filter>};
-}
+/** @internalRemarks Source: @carto/react-api */
+export type SpatialFilter = GeoJSON.Polygon | GeoJSON.MultiPolygon;
 
-/******************************************************************************
- * WIDGET API REQUESTS
- */
-
-interface BaseRequestOptions {
-  spatialFilter?: SpatialFilter;
-  abortController?: AbortController;
-  filterOwner?: string;
-}
-
-export interface FormulaRequestOptions extends BaseRequestOptions {
-  column: string;
-  operation?: AggregationTypes;
-  operationExp?: string;
-}
-
-export interface CategoryRequestOptions extends BaseRequestOptions {
-  column: string;
-  operation?: AggregationTypes;
-  operationColumn?: string;
-}
-
-export interface RangeRequestOptions extends BaseRequestOptions {
-  column: string;
-}
-
-export interface TableRequestOptions extends BaseRequestOptions {
-  columns: string[];
-  sortBy?: $TODO;
-  sortDirection?: $TODO;
-  sortByColumnType?: $TODO;
-  page?: number;
-  rowsPerPage?: number;
-}
-
-export interface ScatterRequestOptions extends BaseRequestOptions {
-  xAxisColumn: string;
-  xAxisJoinOperation?: AggregationTypes;
-  yAxisColumn: string;
-  yAxisJoinOperation?: AggregationTypes;
-}
-
-export interface TimeSeriesRequestOptions extends BaseRequestOptions {
-  column: string;
-  stepSize?: $TODO;
-  stepMultiplier?: $TODO;
-  operation?: AggregationTypes;
-  operationColumn?: string;
-  joinOperation?: AggregationTypes;
-  splitByCategory?: $TODO;
-  splitByCategoryLimit?: $TODO;
-  splitByCategoryValues?: $TODO;
-}
-
-export interface HistogramRequestOptions extends BaseRequestOptions {
-  column: string;
-  ticks: number[];
-  operation?: AggregationTypes;
-}
-
-/******************************************************************************
- * WIDGET API RESPONSES
- */
-
-export type FormulaResponse = {value: number};
-export type CategoryResponse = {name: string; value: number}[];
-export type RangeResponse = $TODO;
-export type TableResponse = {
-  hasData: boolean;
-  totalCount: number;
-  rows: Record<string, number | string>[];
+/** @internalRemarks Source: @carto/react-api */
+export type Credentials = {
+  apiVersion: API_VERSIONS;
+  apiBaseUrl: string;
+  geoColumn: string;
+  accessToken: string;
 };
-export type ScatterResponse = [number, number][];
-export type TimeSeriesResponse = $TODO;
-export type HistogramResponse = number[];
+
+/** @internalRemarks Source: @carto/react-api */
+export type Source = {
+  type: MAP_TYPES;
+  connection: string;
+  credentials: Credentials;
+  data: string;
+  geoColumn?: string;
+  queryParameters?: unknown[];
+  filters?: Record<string, Filter>;
+  filtersLogicalOperator?: 'and' | 'or';
+};
+
+/** @internalRemarks Source: @carto/react-api, @deck.gl/carto */
+export enum FilterTypes {
+  In = 'in',
+  Between = 'between', // [a, b] both are included
+  ClosedOpen = 'closed_open', // [a, b) a is included, b is not
+  Time = 'time',
+  StringSearch = 'stringSearch',
+}
+
+/** @internalRemarks Source: @carto/react-api, @deck.gl/carto */
+export interface Filter {
+  [FilterTypes.In]: number[];
+  [FilterTypes.Between]: number[][];
+  [FilterTypes.ClosedOpen]: number[][];
+  [FilterTypes.Time]: number[][];
+  [FilterTypes.StringSearch]: string[];
+}
+
+export type FilterLogicalOperator = 'and' | 'or';

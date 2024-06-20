@@ -4,7 +4,7 @@ import {Ref, createRef, ref} from 'lit/directives/ref.js';
 import {cache} from 'lit/directives/cache.js';
 import * as echarts from 'echarts';
 import {TaskStatus} from '@lit/task';
-import {AggregationTypes} from '@carto/api-client';
+import {AggregationType} from '@carto/api-client';
 
 import {DEBOUNCE_TIME_MS} from '../constants.js';
 import {sleep} from '../utils.js';
@@ -25,13 +25,13 @@ export class HistogramWidget extends BaseWidget {
     return {
       ...super.properties,
       column: {type: String},
-      operation: {type: AggregationTypes},
+      operation: {type: String},
       ticks: {type: Array},
     };
   }
 
   declare column: string;
-  declare operation: AggregationTypes;
+  declare operation: AggregationType;
   declare ticks: number[];
 
   protected _chart: echarts.ECharts | null = null;
@@ -40,7 +40,7 @@ export class HistogramWidget extends BaseWidget {
   constructor() {
     super();
     this.column = '';
-    this.operation = AggregationTypes.COUNT;
+    this.operation = 'count';
     this.ticks = [];
   }
 

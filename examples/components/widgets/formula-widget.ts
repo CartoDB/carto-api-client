@@ -1,6 +1,6 @@
 import {html, css} from 'lit';
 import {Task} from '@lit/task';
-import {AggregationTypes} from '@carto/api-client';
+import {AggregationType} from '@carto/api-client';
 import {DEBOUNCE_TIME_MS} from '../constants.js';
 import {sleep} from '../utils.js';
 import {BaseWidget} from './base-widget.js';
@@ -34,17 +34,17 @@ export class FormulaWidget extends BaseWidget {
   static get properties() {
     return {
       ...super.properties,
-      operation: {type: AggregationTypes},
+      operation: {type: String},
       column: {type: String},
     };
   }
 
-  declare operation: AggregationTypes;
+  declare operation: AggregationType;
   declare column: string;
 
   constructor() {
     super();
-    this.operation = AggregationTypes.COUNT;
+    this.operation = 'count';
     this.column = '';
   }
 

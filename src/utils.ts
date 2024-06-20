@@ -1,6 +1,6 @@
-import {FILTER_TYPES} from './constants.js';
+import {Filter, FilterTypes} from './types.js';
+import {FILTER_TYPES} from './constants-internal.js';
 import {$TODO} from './types-internal.js';
-import {Filter, FilterTypes} from './vendor/carto-react-api.js';
 
 /**
  * @privateRemarks In C4R, this logic occurs in `useWidgetSource` and is termed

@@ -4,7 +4,7 @@ import {Ref, createRef, ref} from 'lit/directives/ref.js';
 import {cache} from 'lit/directives/cache.js';
 import * as echarts from 'echarts';
 import {TaskStatus} from '@lit/task';
-import {AggregationTypes} from '@carto/api-client';
+import {AggregationType} from '@carto/api-client';
 
 import {DEBOUNCE_TIME_MS} from '../constants.js';
 import {sleep} from '../utils.js';
@@ -26,15 +26,15 @@ export class ScatterWidget extends BaseWidget {
       ...super.properties,
       xAxisColumn: {type: String},
       yAxisColumn: {type: String},
-      xAxisJoinOperation: {type: AggregationTypes},
-      yAxisJoinOperation: {type: AggregationTypes},
+      xAxisJoinOperation: {type: String},
+      yAxisJoinOperation: {type: String},
     };
   }
 
   declare xAxisColumn: string;
-  declare xAxisJoinOperation: AggregationTypes;
+  declare xAxisJoinOperation: AggregationType;
   declare yAxisColumn: string;
-  declare yAxisJoinOperation: AggregationTypes;
+  declare yAxisJoinOperation: AggregationType;
 
   protected _chart: echarts.ECharts | null = null;
   protected _chartRef: Ref<HTMLElement> = createRef();
@@ -42,9 +42,9 @@ export class ScatterWidget extends BaseWidget {
   constructor() {
     super();
     this.xAxisColumn = '';
-    this.xAxisJoinOperation = AggregationTypes.COUNT;
+    this.xAxisJoinOperation = 'count';
     this.yAxisColumn = '';
-    this.yAxisJoinOperation = AggregationTypes.COUNT;
+    this.yAxisJoinOperation = 'count';
   }
 
   protected _task = new Task(this, {

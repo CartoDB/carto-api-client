@@ -1,9 +1,7 @@
+import {REQUEST_GET_MAX_URL_LENGTH} from '../constants-internal.js';
+import {API_VERSIONS, MAP_TYPES} from '../constants.js';
+import type {Credentials, Source, SpatialFilter} from '../types.js';
 import {assert, InvalidColumnError, getClient} from './carto-react-core.js';
-import {
-  MAP_TYPES,
-  API_VERSIONS,
-  REQUEST_GET_MAX_URL_LENGTH,
-} from './carto-constants.js';
 
 /******************************************************************************
  * model.js
@@ -22,47 +20,6 @@ const AVAILABLE_MODELS = [
 
 /** @internalRemarks Source: @carto/react-api */
 const DEFAULT_GEO_COLUMN = 'geom';
-
-/** @internalRemarks Source: @carto/react-api */
-export type SpatialFilter = GeoJSON.Polygon | GeoJSON.MultiPolygon;
-
-/** @internalRemarks Source: @carto/react-api */
-export type Credentials = {
-  apiVersion: API_VERSIONS;
-  apiBaseUrl: string;
-  geoColumn: string;
-  accessToken: string;
-};
-
-/** @internalRemarks Source: @carto/react-api */
-export type Source = {
-  type: MAP_TYPES;
-  connection: string;
-  credentials: Credentials;
-  data: string;
-  geoColumn?: string;
-  queryParameters?: unknown[];
-  filters?: Record<string, Filter>;
-  filtersLogicalOperator?: 'and' | 'or';
-};
-
-/** @internalRemarks Source: @carto/react-api, @deck.gl/carto */
-export enum FilterTypes {
-  In = 'in',
-  Between = 'between', // [a, b] both are included
-  ClosedOpen = 'closed_open', // [a, b) a is included, b is not
-  Time = 'time',
-  StringSearch = 'stringSearch',
-}
-
-/** @internalRemarks Source: @carto/react-api, @deck.gl/carto */
-export interface Filter {
-  [FilterTypes.In]: number[];
-  [FilterTypes.Between]: number[][];
-  [FilterTypes.ClosedOpen]: number[][];
-  [FilterTypes.Time]: number[][];
-  [FilterTypes.StringSearch]: string[];
-}
 
 /** @internalRemarks Source: @carto/react-api */
 export interface ModelRequestOptions {

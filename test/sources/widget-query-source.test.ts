@@ -1,5 +1,5 @@
 import {afterEach, describe, expect, test, vi} from 'vitest';
-import {AggregationTypes, WidgetQuerySource} from '@carto/api-client';
+import {WidgetQuerySource} from '@carto/api-client';
 
 const createMockResponse = (data: unknown) => ({
   ok: true,
@@ -53,7 +53,7 @@ describe('getCategories', () => {
 
     const actualCategories = await widgetSource.getCategories({
       column: 'store_type',
-      operation: AggregationTypes.COUNT,
+      operation: 'count',
     });
 
     expect(mockFetch).toHaveBeenCalledOnce();
@@ -65,7 +65,7 @@ describe('getCategories', () => {
       source: 'SELECT * FROM my-table',
       params: JSON.stringify({
         column: 'store_type',
-        operation: AggregationTypes.COUNT,
+        operation: 'count',
         operationColumn: 'store_type',
       }),
       queryParameters: '',
@@ -92,7 +92,7 @@ describe('getFormula', () => {
 
     const actualFormula = await widgetSource.getFormula({
       column: 'store_type',
-      operation: AggregationTypes.COUNT,
+      operation: 'count',
     });
 
     expect(mockFetch).toHaveBeenCalledOnce();
@@ -104,7 +104,7 @@ describe('getFormula', () => {
       source: 'SELECT * FROM my-table',
       params: JSON.stringify({
         column: 'store_type',
-        operation: AggregationTypes.COUNT,
+        operation: 'count',
       }),
       queryParameters: '',
       filters: JSON.stringify({}),
@@ -186,9 +186,9 @@ describe('getScatter', () => {
 
     const actualTable = await widgetSource.getScatter({
       xAxisColumn: 'a',
-      xAxisJoinOperation: AggregationTypes.COUNT,
+      xAxisJoinOperation: 'count',
       yAxisColumn: 'b',
-      yAxisJoinOperation: AggregationTypes.COUNT,
+      yAxisJoinOperation: 'count',
     });
 
     expect(mockFetch).toHaveBeenCalledOnce();
@@ -200,9 +200,9 @@ describe('getScatter', () => {
       source: 'SELECT * FROM my-table',
       params: JSON.stringify({
         xAxisColumn: 'a',
-        xAxisJoinOperation: AggregationTypes.COUNT,
+        xAxisJoinOperation: 'count',
         yAxisColumn: 'b',
-        yAxisJoinOperation: AggregationTypes.COUNT,
+        yAxisJoinOperation: 'count',
         limit: 500,
       }),
       queryParameters: '',
@@ -241,7 +241,7 @@ describe('getHistogram', () => {
 
     const actualHistogram = await widgetSource.getHistogram({
       column: 'a',
-      operation: AggregationTypes.COUNT,
+      operation: 'count',
       ticks,
     });
 
@@ -254,7 +254,7 @@ describe('getHistogram', () => {
       source: 'SELECT * FROM my-table',
       params: JSON.stringify({
         column: 'a',
-        operation: AggregationTypes.COUNT,
+        operation: 'count',
         ticks,
       }),
       queryParameters: '',

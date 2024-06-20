@@ -3,7 +3,7 @@ import {Task, TaskStatus} from '@lit/task';
 import {Ref, createRef, ref} from 'lit/directives/ref.js';
 import {cache} from 'lit/directives/cache.js';
 import * as echarts from 'echarts';
-import {AggregationTypes} from '@carto/api-client';
+import {AggregationType} from '@carto/api-client';
 
 import {DEFAULT_PALETTE, DEFAULT_TEXT_STYLE} from './styles.js';
 import {DEBOUNCE_TIME_MS} from '../constants.js';
@@ -23,14 +23,14 @@ export class CategoryWidget extends BaseWidget {
   static get properties() {
     return {
       ...super.properties,
-      operation: {type: AggregationTypes},
+      operation: {type: String},
       column: {type: String},
       _filterValues: {state: true},
     };
   }
 
   declare column: string;
-  declare operation: AggregationTypes;
+  declare operation: AggregationType;
 
   protected _chart: echarts.ECharts | null = null;
   protected _chartRef: Ref<HTMLElement> = createRef();
@@ -38,7 +38,7 @@ export class CategoryWidget extends BaseWidget {
 
   constructor() {
     super();
-    this.operation = AggregationTypes.COUNT;
+    this.operation = 'count';
     this.column = '';
     this._filterValues = [];
   }

@@ -1,4 +1,4 @@
-import {executeModel, Filter, Source} from '../vendor/carto-react-api.js';
+import {executeModel} from '../vendor/carto-react-api.js';
 import {
   CategoryRequestOptions,
   CategoryResponse,
@@ -14,15 +14,12 @@ import {
   TableResponse,
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
-} from '../types.js';
-import {
-  API_VERSIONS,
-  DEFAULT_API_BASE_URL,
-  DEFAULT_CLIENT,
-  MAP_TYPES,
-} from '../vendor/carto-constants.js';
+} from './types.js';
+import {Source, Filter, FilterLogicalOperator} from '../types.js';
 import {SourceOptions} from '@deck.gl/carto';
 import {getWidgetFilters, normalizeObjectKeys} from '../utils.js';
+import {API_VERSIONS, MAP_TYPES} from '../constants.js';
+import {DEFAULT_API_BASE_URL, DEFAULT_CLIENT} from '../constants-internal.js';
 
 /**
  *
@@ -30,7 +27,7 @@ import {getWidgetFilters, normalizeObjectKeys} from '../utils.js';
  */
 export interface WidgetBaseSourceProps extends SourceOptions {
   type?: MAP_TYPES;
-  filtersLogicalOperator?: 'and' | 'or';
+  filtersLogicalOperator?: FilterLogicalOperator;
   queryParameters?: unknown[];
   geoColumn?: string;
   provider?: string;
