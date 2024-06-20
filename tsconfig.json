@@ -1,8 +1,5 @@
 {
-  "include": [
-    "src/**/*.ts",
-    "examples/**/*.{svelte,ts,tsx,vue}"
-  ],
+  "include": ["src/**/*.ts", "examples/**/*.{svelte,ts,tsx,vue}"],
   "compilerOptions": {
     "baseUrl": "./packages",
     "outDir": "dist",

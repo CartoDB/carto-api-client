@@ -26,7 +26,8 @@ export class InvalidColumnError extends Error {
 
   static is(error) {
     return (
-      error instanceof InvalidColumnError || error.message?.includes(ERR_START_MESSAGE)
+      error instanceof InvalidColumnError ||
+      error.message?.includes(ERR_START_MESSAGE)
     );
   }
 }
