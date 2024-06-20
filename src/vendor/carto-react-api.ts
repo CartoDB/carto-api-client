@@ -9,6 +9,7 @@ import {
  * model.js
  */
 
+/** @internalRemarks Source: @carto/react-api */
 const AVAILABLE_MODELS = [
   'category',
   'histogram',
@@ -19,10 +20,13 @@ const AVAILABLE_MODELS = [
   'table',
 ];
 
+/** @internalRemarks Source: @carto/react-api */
 const DEFAULT_GEO_COLUMN = 'geom';
 
+/** @internalRemarks Source: @carto/react-api */
 export type SpatialFilter = GeoJSON.Polygon | GeoJSON.MultiPolygon;
 
+/** @internalRemarks Source: @carto/react-api */
 export type Credentials = {
   apiVersion: API_VERSIONS;
   apiBaseUrl: string;
@@ -30,6 +34,7 @@ export type Credentials = {
   accessToken: string;
 };
 
+/** @internalRemarks Source: @carto/react-api */
 export type Source = {
   type: MAP_TYPES;
   connection: string;
@@ -41,6 +46,7 @@ export type Source = {
   filtersLogicalOperator?: 'and' | 'or';
 };
 
+/** @internalRemarks Source: @carto/react-api, @deck.gl/carto */
 export enum FilterTypes {
   In = 'in',
   Between = 'between', // [a, b] both are included
@@ -49,6 +55,7 @@ export enum FilterTypes {
   StringSearch = 'stringSearch',
 }
 
+/** @internalRemarks Source: @carto/react-api, @deck.gl/carto */
 export interface Filter {
   [FilterTypes.In]: number[];
   [FilterTypes.Between]: number[][];
@@ -57,6 +64,7 @@ export interface Filter {
   [FilterTypes.StringSearch]: string[];
 }
 
+/** @internalRemarks Source: @carto/react-api */
 export interface ModelRequestOptions {
   method: 'GET' | 'POST';
   abortController?: AbortController;
@@ -64,7 +72,10 @@ export interface ModelRequestOptions {
   body?: string;
 }
 
-/** Execute a SQL model request. */
+/**
+ * Execute a SQL model request.
+ * @internalRemarks Source: @carto/react-api
+ */
 export function executeModel(props: {
   model: string;
   source: Source;
@@ -156,6 +167,7 @@ export function executeModel(props: {
 
 /**
  * Return more descriptive error from API
+ * @internalRemarks Source: @carto/react-api
  */
 export function dealWithApiError({
   response,
@@ -186,12 +198,14 @@ export function dealWithApiError({
   }
 }
 
+/** @internalRemarks Source: @carto/react-api */
 export function checkCredentials(credentials: Credentials) {
   if (!credentials || !credentials.apiBaseUrl || !credentials.accessToken) {
     throw new Error('Missing or bad credentials provided');
   }
 }
 
+/** @internalRemarks Source: @carto/react-api */
 export async function makeCall({
   url,
   credentials,
@@ -233,4 +247,5 @@ export async function makeCall({
   return data;
 }
 
+/** @internalRemarks Source: @carto/react-api */
 export const CLIENT_ID = 'carto-for-react';

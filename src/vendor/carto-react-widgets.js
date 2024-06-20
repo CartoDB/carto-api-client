@@ -1,5 +1,8 @@
-// Due to each data warehouse has its own behavior with columns,
-// we need to normalize them and transform every key to lowercase
+/**
+ * Due to each data warehouse has its own behavior with columns,
+ * we need to normalize them and transform every key to lowercase
+ * @internalRemarks Source: @carto/react-widgets
+ */
 export function normalizeObjectKeys(el) {
   if (Array.isArray(el)) {
     return el.map(normalizeObjectKeys);
