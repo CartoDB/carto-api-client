@@ -1,3 +1,5 @@
+export const CLIENT_ID = 'carto-api-client';
+
 /** @internalRemarks Source: @carto/constants */
 export enum MAP_TYPES {
   TABLE = 'table',
