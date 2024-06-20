@@ -1,4 +1,4 @@
-import {executeModel} from '../vendor/carto-react-api.js';
+import {executeModel} from '../models/index.js';
 import {
   CategoryRequestOptions,
   CategoryResponse,

@@ -1,5 +1,5 @@
-import {Credentials} from '../types';
-import {InvalidColumnError} from '../vendor/carto-react-core';
+import {Credentials} from '../types.js';
+import {InvalidColumnError} from '../utils.js';
 
 /** @internalRemarks Source: @carto/react-api */
 export interface ModelRequestOptions {

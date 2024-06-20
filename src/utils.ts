@@ -56,3 +56,27 @@ export function normalizeObjectKeys<T, R extends Row<T>>(el: R): R {
     return acc;
   }, {} as Record<string, T>) as R;
 }
+
+/** @internalRemarks Source: @carto/react-core */
+export function assert(condition: unknown, message: string) {
+  if (!condition) {
+    throw new Error(message);
+  }
+}
+
+/** @internalRemarks Source: @carto/react-core */
+export class InvalidColumnError extends Error {
+  protected static readonly NAME = 'InvalidColumnError';
+
+  constructor(message: string) {
+    super(`${InvalidColumnError.NAME}: ${message}`);
+    this.name = InvalidColumnError.NAME;
+  }
+
+  static is(error: unknown) {
+    return (
+      error instanceof InvalidColumnError ||
+      (error as Error).message?.includes(InvalidColumnError.NAME)
+    );
+  }
+}

@@ -1,7 +1,8 @@
+import {getClient} from '../client';
 import {API_VERSIONS, MAP_TYPES} from '../constants';
 import {REQUEST_GET_MAX_URL_LENGTH} from '../constants-internal';
 import {Source, SpatialFilter} from '../types';
-import {assert, getClient} from '../vendor/carto-react-core';
+import {assert} from '../utils';
 import {ModelRequestOptions, checkCredentials, makeCall} from './common';
 
 /** @internalRemarks Source: @carto/react-api */
