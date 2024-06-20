@@ -35,3 +35,24 @@ export function getWidgetFilters(
 
   return widgetFilters;
 }
+
+type Row<T> = Record<string, T> | Record<string, T>[] | T[] | T;
+
+/**
+ * Due to each data warehouse having its own behavior with columns,
+ * we need to normalize them and transform every key to lowercase.
+ * @internalRemarks Source: @carto/react-widgets
+ */
+export function normalizeObjectKeys<T, R extends Row<T>>(el: R): R {
+  if (Array.isArray(el)) {
+    return el.map((value) => normalizeObjectKeys(value)) as R;
+  } else if (typeof el !== 'object') {
+    return el;
+  }
+
+  return Object.entries(el as Record<string, T>).reduce((acc, [key, value]) => {
+    acc[key.toLowerCase()] =
+      typeof value === 'object' && value ? normalizeObjectKeys(value) : value;
+    return acc;
+  }, {} as Record<string, T>) as R;
+}

@@ -1,5 +1,4 @@
-import {executeModel, Filter} from '../vendor/carto-react-api.js';
-import {normalizeObjectKeys} from '../vendor/carto-react-widgets.js';
+import {executeModel, Filter, Source} from '../vendor/carto-react-api.js';
 import {
   CategoryRequestOptions,
   CategoryResponse,
@@ -23,11 +22,11 @@ import {
   MAP_TYPES,
 } from '../vendor/carto-constants.js';
 import {SourceOptions} from '@deck.gl/carto';
-import {getWidgetFilters} from '../utils.js';
-import {$TODO} from '../types-internal.js';
+import {getWidgetFilters, normalizeObjectKeys} from '../utils.js';
 
 /**
  *
+ * TODO(cleanup): Consolidate {@link SourceOptions} and {@link Source}.
  */
 export interface WidgetBaseSourceProps extends SourceOptions {
   type?: MAP_TYPES;
@@ -66,7 +65,7 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     this.connectionName = props.connectionName;
   }
 
-  protected getSource(owner?: string): $TODO {
+  protected getSource(owner?: string): Source {
     return {
       ...(this.props as any),
       filters: getWidgetFilters(owner, (this.props as any).filters),
@@ -84,13 +83,16 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       ...params
     } = props;
     const {column, operation} = params;
+
+    type FormulaModelResponse = {rows: {value: number}[]};
+
     return executeModel({
       model: 'formula',
       source: this.getSource(filterOwner),
       spatialFilter,
       params: {column: column ?? '*', operation, operationExp},
       opts: {abortController},
-    }).then((res: $TODO) => normalizeObjectKeys(res.rows[0]));
+    }).then((res: FormulaModelResponse) => normalizeObjectKeys(res.rows[0]));
   }
 
   async getCategories(
@@ -98,6 +100,8 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
   ): Promise<CategoryResponse> {
     const {filterOwner, spatialFilter, abortController, ...params} = props;
     const {column, operation, operationColumn} = params;
+
+    type CategoriesModelResponse = {rows: {name: string; value: number}[]};
 
     return executeModel({
       model: 'category',
@@ -109,12 +113,14 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
         operationColumn: operationColumn || column,
       },
       opts: {abortController},
-    }).then((res: $TODO) => normalizeObjectKeys(res.rows));
+    }).then((res: CategoriesModelResponse) => normalizeObjectKeys(res.rows));
   }
 
   async getRange(props: RangeRequestOptions): Promise<RangeResponse> {
     const {filterOwner, spatialFilter, abortController, ...params} = props;
     const {column} = params;
+
+    type RangeModelResponse = {rows: unknown[]};
 
     return executeModel({
       model: 'range',
@@ -122,12 +128,17 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       spatialFilter,
       params: {column},
       opts: {abortController},
-    }).then((res: $TODO) => normalizeObjectKeys(res.rows[0]));
+    }).then((res: RangeModelResponse) => normalizeObjectKeys(res.rows[0]));
   }
 
   async getTable(props: TableRequestOptions): Promise<TableResponse> {
     const {filterOwner, spatialFilter, abortController, ...params} = props;
     const {columns, sortBy, sortDirection, page = 0, rowsPerPage = 10} = params;
+
+    type TableModelResponse = {
+      rows: Record<string, number | string>[];
+      metadata: {total: number};
+    };
 
     return executeModel({
       model: 'table',
@@ -142,7 +153,7 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       },
       opts: {abortController},
     })
-      .then((res: $TODO) => ({
+      .then((res: TableModelResponse) => ({
         rows: normalizeObjectKeys(res.rows),
         totalCount: res.metadata.total,
       }))
@@ -161,6 +172,8 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     // Make sure this is sync with the same constant in cloud-native/maps-api
     const HARD_LIMIT = 500;
 
+    type ScatterModelResponse = {rows: {x: number; y: number}[]};
+
     return executeModel({
       model: 'scatterplot',
       source: this.getSource(filterOwner),
@@ -174,7 +187,7 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       },
       opts: {abortController},
     })
-      .then((res) => normalizeObjectKeys(res.rows))
+      .then((res: ScatterModelResponse) => normalizeObjectKeys(res.rows))
       .then((res) => res.map(({x, y}: {x: number; y: number}) => [x, y]));
   }
 
@@ -194,6 +207,11 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       splitByCategoryValues,
     } = params;
 
+    type TimeSeriesModelResponse = {
+      rows: unknown[];
+      metadata: {categories: unknown[]};
+    };
+
     executeModel({
       model: 'timeseries',
       source: this.getSource(filterOwner),
@@ -210,7 +228,7 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
         splitByCategoryValues,
       },
       opts: {abortController},
-    }).then((res) => ({
+    }).then((res: TimeSeriesModelResponse) => ({
       rows: normalizeObjectKeys(res.rows),
       categories: res.metadata?.categories,
     }));
@@ -222,13 +240,15 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     const {filterOwner, spatialFilter, abortController, ...params} = props;
     const {column, operation, ticks} = params;
 
+    type HistogramModelResponse = {rows: {tick: number; value: number}[]};
+
     const data = await executeModel({
       model: 'histogram',
       source: this.getSource(filterOwner),
       spatialFilter,
       params: {column, operation, ticks},
       opts: {abortController},
-    }).then((res) => normalizeObjectKeys(res.rows));
+    }).then((res: HistogramModelResponse) => normalizeObjectKeys(res.rows));
 
     if (data.length) {
       // Given N ticks the API returns up to N+1 bins, omitting any empty bins. Bins
