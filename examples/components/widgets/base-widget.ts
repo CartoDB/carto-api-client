@@ -23,7 +23,7 @@ export abstract class BaseWidget extends LitElement {
   declare caption: string;
   declare data: Promise<{widgetSource: WidgetSource}> | null;
   declare viewState: MapViewState | null;
-  declare spatialFilter: GeoJSON.Geometry | null;
+  declare spatialFilter: SpatialFilter | null;
 
   protected readonly _widgetId = crypto.randomUUID();
 
