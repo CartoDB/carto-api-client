@@ -1,7 +1,6 @@
 {
   "include": ["src/**/*.ts", "examples/**/*.{svelte,ts,tsx,vue}"],
   "compilerOptions": {
-    "baseUrl": "./packages",
     "outDir": "dist",
     "paths": {
       "@carto/api-client": ["./"]
@@ -11,6 +10,7 @@
     "moduleResolution": "bundler",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
     "lib": ["es2022", "DOM", "DOM.Iterable"],
     "types": ["vite/client"],
     "jsx": "react",

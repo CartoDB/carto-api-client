@@ -1,2 +1,3 @@
-export {executeModel, Model} from './model.js';
-export {ModelRequestOptions} from './common.js';
+export {executeModel} from './model.js';
+export type {Model} from './model.js';
+export type {ModelRequestOptions} from './common.js';
