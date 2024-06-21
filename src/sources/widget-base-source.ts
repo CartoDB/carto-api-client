@@ -15,21 +15,23 @@ import {
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
 } from './types.js';
-import {Source, Filter, FilterLogicalOperator} from '../types.js';
+import {Source, Filter, FilterLogicalOperator, Credentials} from '../types.js';
 import {SourceOptions} from '@deck.gl/carto';
 import {getWidgetFilters, normalizeObjectKeys} from '../utils.js';
 import {API_VERSIONS, MAP_TYPES} from '../constants.js';
-import {DEFAULT_API_BASE_URL, DEFAULT_CLIENT} from '../constants-internal.js';
+import {
+  DEFAULT_API_BASE_URL,
+  DEFAULT_GEO_COLUMN,
+} from '../constants-internal.js';
+import {getClient} from '../client.js';
 
 /**
- *
  * TODO(cleanup): Consolidate {@link SourceOptions} and {@link Source}.
  */
-export interface WidgetBaseSourceProps extends SourceOptions {
+export interface WidgetBaseSourceProps extends SourceOptions, Credentials {
   type?: MAP_TYPES;
   filtersLogicalOperator?: FilterLogicalOperator;
   queryParameters?: unknown[];
-  geoColumn?: string;
   provider?: string;
   filters?: Record<string, Filter>;
 }
@@ -38,12 +40,7 @@ export type WidgetSource = WidgetBaseSource<WidgetBaseSourceProps>;
 
 export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
   readonly props: Props;
-  readonly credentials: {
-    apiBaseUrl: string;
-    apiVersion: API_VERSIONS;
-    accessToken: string;
-    clientId: string;
-  };
+  readonly credentials: Required<Credentials> & {clientId: string};
   readonly connectionName: string;
 
   static defaultProps: Partial<WidgetBaseSourceProps> = {
@@ -53,13 +50,14 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
 
   constructor(props: Props) {
     this.props = {...WidgetBaseSource.defaultProps, ...props};
-    this.credentials = {
-      apiVersion: API_VERSIONS.V3,
-      apiBaseUrl: DEFAULT_API_BASE_URL || props.apiBaseUrl,
-      clientId: DEFAULT_CLIENT || props.clientId,
-      accessToken: props.accessToken,
-    };
     this.connectionName = props.connectionName;
+    this.credentials = {
+      apiVersion: props.apiVersion || API_VERSIONS.V3,
+      apiBaseUrl: props.apiBaseUrl || DEFAULT_API_BASE_URL,
+      clientId: props.clientId || getClient(),
+      accessToken: props.accessToken,
+      geoColumn: props.geoColumn || DEFAULT_GEO_COLUMN,
+    };
   }
 
   protected getSource(owner?: string): Source {

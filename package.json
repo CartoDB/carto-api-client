@@ -7,10 +7,12 @@
   "type": "module",
   "sideEffects": false,
   "source": "src/index.ts",
-  "types": "./dist/api-client.d.ts",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/api-client.cjs",
+  "module": "./dist/api-client.modern.js",
   "exports": {
     ".": {
-      "types": "./dist/api-client.d.ts",
+      "types": "./dist/index.d.ts",
       "require": "./dist/api-client.cjs",
       "default": "./dist/api-client.modern.js"
     }
@@ -24,7 +26,7 @@
     "build": "microbundle --format cjs,modern --no-compress --define VERSION=$npm_package_version",
     "build:watch": "microbundle watch --format cjs,modern --no-compress --define VERSION=$npm_package_version",
     "dev": "concurrently \"yarn build:watch\" \"vite --config examples/vite.config.ts --open\"",
-    "test": "vitest",
+    "test": "vitest --typecheck",
     "clean": "rimraf dist/*",
     "format": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --write"
   },
@@ -63,7 +65,7 @@
     "svelte": "^4.2.17",
     "typescript": "~5.3.3",
     "vite": "^5.2.10",
-    "vitest": "^1.6.0",
+    "vitest": "1.6.0",
     "vue": "^3.4.27"
   }
 }

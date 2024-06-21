@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "include": ["**/*.ts"],
+  "compilerOptions": {
+    "paths": {
+      "@carto/api-client": ["../"]
+    },
+    "rootDir": ".",
+    "declaration": false,
+    "strict": false
+  }
+}

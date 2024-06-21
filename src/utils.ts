@@ -12,6 +12,8 @@ import {$TODO} from './types-internal.js';
  *      [rawSource?.filters, id]
  *   );
  * ```
+ *
+ * @internal
  */
 export function getWidgetFilters(
   owner?: string,
@@ -41,7 +43,9 @@ type Row<T> = Record<string, T> | Record<string, T>[] | T[] | T;
 /**
  * Due to each data warehouse having its own behavior with columns,
  * we need to normalize them and transform every key to lowercase.
+ *
  * @internalRemarks Source: @carto/react-widgets
+ * @internal
  */
 export function normalizeObjectKeys<T, R extends Row<T>>(el: R): R {
   if (Array.isArray(el)) {
@@ -64,7 +68,10 @@ export function assert(condition: unknown, message: string) {
   }
 }
 
-/** @internalRemarks Source: @carto/react-core */
+/**
+ * @internalRemarks Source: @carto/react-core
+ * @internal
+ */
 export class InvalidColumnError extends Error {
   protected static readonly NAME = 'InvalidColumnError';
 

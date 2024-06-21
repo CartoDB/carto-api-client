@@ -28,9 +28,9 @@ export type SpatialFilter = GeoJSON.Polygon | GeoJSON.MultiPolygon;
 
 /** @internalRemarks Source: @carto/react-api */
 export type Credentials = {
-  apiVersion: API_VERSIONS;
-  apiBaseUrl: string;
-  geoColumn: string;
+  apiVersion?: API_VERSIONS;
+  apiBaseUrl?: string;
+  geoColumn?: string;
   accessToken: string;
 };
 
@@ -57,11 +57,11 @@ export enum FilterTypes {
 
 /** @internalRemarks Source: @carto/react-api, @deck.gl/carto */
 export interface Filter {
-  [FilterTypes.In]: number[];
-  [FilterTypes.Between]: number[][];
-  [FilterTypes.ClosedOpen]: number[][];
-  [FilterTypes.Time]: number[][];
-  [FilterTypes.StringSearch]: string[];
+  [FilterTypes.In]?: number[];
+  [FilterTypes.Between]?: number[][];
+  [FilterTypes.ClosedOpen]?: number[][];
+  [FilterTypes.Time]?: number[][];
+  [FilterTypes.StringSearch]?: string[];
 }
 
 export type FilterLogicalOperator = 'and' | 'or';

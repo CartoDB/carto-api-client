@@ -21,3 +21,9 @@ export const DEFAULT_API_BASE_URL = 'https://gcp-us-east1.api.carto.com';
  * @internal
  */
 export const DEFAULT_CLIENT = 'deck-gl-carto';
+
+/**
+ * @internalRemarks Source: @carto/react-api
+ * @internal
+ */
+export const DEFAULT_GEO_COLUMN = 'geom';

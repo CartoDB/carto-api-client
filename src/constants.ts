@@ -1,5 +1,7 @@
 export const CLIENT_ID = 'carto-api-client';
 
+// TODO(cleanup): Lots of inconsistency in naming and usage of enums in the project.
+
 /** @internalRemarks Source: @carto/constants */
 export enum MAP_TYPES {
   TABLE = 'table',

@@ -1,6 +1,9 @@
 import {getClient} from '../client';
 import {API_VERSIONS, MAP_TYPES} from '../constants';
-import {REQUEST_GET_MAX_URL_LENGTH} from '../constants-internal';
+import {
+  DEFAULT_GEO_COLUMN,
+  REQUEST_GET_MAX_URL_LENGTH,
+} from '../constants-internal';
 import {Source, SpatialFilter} from '../types';
 import {assert} from '../utils';
 import {ModelRequestOptions, checkCredentials, makeCall} from './common';
@@ -17,9 +20,6 @@ const AVAILABLE_MODELS = [
 ] as const;
 
 export type Model = (typeof AVAILABLE_MODELS)[number];
-
-/** @internalRemarks Source: @carto/react-api */
-const DEFAULT_GEO_COLUMN = 'geom';
 
 /**
  * Execute a SQL model request.
