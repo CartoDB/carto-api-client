@@ -27,6 +27,7 @@
     "build:watch": "microbundle watch --format cjs,modern --no-compress --define VERSION=$npm_package_version",
     "dev": "concurrently \"yarn build:watch\" \"vite --config examples/vite.config.ts --open\"",
     "test": "vitest --typecheck",
+    "coverage": "vitest run --coverage",
     "clean": "rimraf dist/*",
     "format": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --write"
   },
@@ -50,6 +51,7 @@
     "@types/react-dom": "^18.3.0",
     "@types/semver": "^7.5.8",
     "@vitejs/plugin-vue": "^5.0.5",
+    "@vitest/coverage-istanbul": "^1.6.0",
     "@webcomponents/webcomponentsjs": "^2.8.0",
     "concurrently": "^8.2.2",
     "echarts": "^5.5.0",
