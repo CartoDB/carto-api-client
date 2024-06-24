@@ -7,14 +7,14 @@
   "type": "module",
   "sideEffects": false,
   "source": "src/index.ts",
-  "types": "./dist/index.d.ts",
-  "main": "./dist/api-client.cjs",
-  "module": "./dist/api-client.modern.js",
+  "types": "./build/index.d.ts",
+  "main": "./build/api-client.cjs",
+  "module": "./build/api-client.modern.js",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/api-client.cjs",
-      "default": "./dist/api-client.modern.js"
+      "types": "./build/index.d.ts",
+      "require": "./build/api-client.cjs",
+      "default": "./build/api-client.modern.js"
     }
   },
   "browserslist": [
@@ -31,8 +31,13 @@
     "coverage": "vitest run --coverage",
     "lint": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --check",
     "format": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --write",
-    "clean": "rimraf dist/*"
+    "clean": "rimraf build/*"
   },
+  "files": [
+    "build",
+    "src",
+    "README.md"
+  ],
   "devDependencies": {
     "@deck.gl/aggregation-layers": "^9.0.14",
     "@deck.gl/carto": "^9.0.14",

@@ -8,11 +8,6 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 export default defineConfig({
   root: 'examples',
-  resolve: {
-    alias: {
-      '@carto/api-client': resolve(__dirname, '../'),
-    },
-  },
   plugins: [
     vue({
       template: {
