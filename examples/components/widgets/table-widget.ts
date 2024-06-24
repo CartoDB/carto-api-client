@@ -58,7 +58,7 @@ export class TableWidget extends BaseWidget {
       return widgetSource.getTable({
         columns,
         spatialFilter: this.getSpatialFilterOrViewState(),
-      }); // TODO: signal
+      });
     },
     args: () =>
       [this.data, this.columns, this.viewState, this.spatialFilter] as const,

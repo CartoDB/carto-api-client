@@ -12,6 +12,7 @@ import {
 } from '../components/index-react.js';
 import {MapView} from '@deck.gl/core';
 import {VectorTileLayer} from '@deck.gl/carto';
+import {FilterEvent} from '../components/types.js';
 
 const MAP_VIEW = new MapView({repeat: true});
 const MAP_STYLE =
@@ -80,7 +81,7 @@ export function App(): JSX.Element {
           header="Store type"
           operation="count"
           column="storetype"
-          onfilter={(e) => setFilters((e as any).detail.filters)} // TODO: types
+          onfilter={(e) => setFilters((e as FilterEvent).detail.filters)}
         ></CategoryWidget>
 
         <PieWidget
@@ -89,7 +90,7 @@ export function App(): JSX.Element {
           header="Store type"
           operation="count"
           column="storetype"
-          onfilter={(e) => setFilters((e as any).detail.filters)} // TODO: types
+          onfilter={(e) => setFilters((e as FilterEvent).detail.filters)}
         ></PieWidget>
 
         <TableWidget

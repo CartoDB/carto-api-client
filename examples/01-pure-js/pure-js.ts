@@ -97,11 +97,10 @@ function updateWidgets() {
  * INITIALIZATION
  */
 
-// TODO: Improve type definitions.
 function bindWidget(selector: string): Widget {
   const widget = document.querySelector<Widget>(selector)!;
 
-  (widget as any).addEventListener('filter', (event: FilterEvent) => {
+  widget.addEventListener('filter', (event: FilterEvent) => {
     filters = event.detail.filters;
     updateSources();
   });

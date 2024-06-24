@@ -66,7 +66,7 @@ export class ScatterWidget extends BaseWidget {
         xAxisJoinOperation,
         yAxisColumn,
         yAxisJoinOperation,
-      }); // TODO: signal
+      });
     },
     args: () =>
       [

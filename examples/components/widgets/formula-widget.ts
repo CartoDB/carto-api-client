@@ -60,7 +60,7 @@ export class FormulaWidget extends BaseWidget {
         operation,
         column,
         spatialFilter: this.getSpatialFilterOrViewState(),
-      }); // TODO: signal
+      });
       return response.value;
     },
     args: () =>

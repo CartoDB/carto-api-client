@@ -57,7 +57,7 @@ export class CategoryWidget extends BaseWidget {
         spatialFilter: this.getSpatialFilterOrViewState(),
         operation,
         column,
-      }); // TODO: signal
+      });
     },
     args: () =>
       [
@@ -156,7 +156,7 @@ export class CategoryWidget extends BaseWidget {
     categories.sort((a, b) => (a.value > b.value ? -1 : 1));
 
     const data = categories.map(({name, value}, index) => {
-      let color = DEFAULT_PALETTE[index]; // TODO: >8 categories allowed?
+      let color = DEFAULT_PALETTE[index % DEFAULT_PALETTE.length];
       if (this._filterValues.length > 0) {
         color = this._filterValues.includes(name) ? color : '#cccccc';
       }

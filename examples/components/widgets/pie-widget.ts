@@ -22,7 +22,7 @@ export class PieWidget extends CategoryWidget {
     categories.sort((a, b) => (a.value > b.value ? -1 : 1));
 
     const data = categories.map(({name, value}, index) => {
-      let color = DEFAULT_PALETTE[index]; // TODO: >8 categories allowed?
+      let color = DEFAULT_PALETTE[index % DEFAULT_PALETTE.length];
       if (this._filterValues.length > 0) {
         color = this._filterValues.includes(name) ? color : '#cccccc';
       }
