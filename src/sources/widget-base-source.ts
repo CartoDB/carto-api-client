@@ -64,9 +64,10 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
   protected getSource(owner?: string): Source {
     return {
       ...(this.props as $TODO),
-      filters: getApplicableFilters(owner, this.props.filters),
       credentials: this.credentials,
       connection: this.connectionName,
+      filters: getApplicableFilters(owner, this.props.filters),
+      filtersLogicalOperator: this.props.filtersLogicalOperator,
     };
   }
 

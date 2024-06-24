@@ -70,15 +70,21 @@ export interface HistogramRequestOptions extends BaseRequestOptions {
  */
 
 export type FormulaResponse = {value: number};
+
 export type CategoryResponse = {name: string; value: number}[];
+
 export type RangeResponse = {min: number; max: number};
+
 export type TableResponse = {
   totalCount: number;
   rows: Record<string, number | string>[];
 };
+
 export type ScatterResponse = [number, number][];
+
 export type TimeSeriesResponse = {
   rows: {name: string; value: number}[];
   categories: string[];
 };
+
 export type HistogramResponse = number[];
