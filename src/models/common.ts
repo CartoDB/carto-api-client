@@ -1,3 +1,4 @@
+import {$TODO} from '../types-internal.js';
 import {Credentials} from '../types.js';
 import {InvalidColumnError} from '../utils.js';
 
@@ -18,7 +19,7 @@ export function dealWithApiError({
   data,
 }: {
   response: Response;
-  data: any;
+  data: $TODO;
 }) {
   if (data.error === 'Column not found') {
     throw new InvalidColumnError(`${data.error} ${data.column_name}`);

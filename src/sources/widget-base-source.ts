@@ -24,6 +24,7 @@ import {
   DEFAULT_GEO_COLUMN,
 } from '../constants-internal.js';
 import {getClient} from '../client.js';
+import {$TODO} from '../types-internal.js';
 
 /**
  * TODO(cleanup): Consolidate {@link SourceOptions} and {@link Source}.
@@ -62,7 +63,7 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
 
   protected getSource(owner?: string): Source {
     return {
-      ...(this.props as any),
+      ...(this.props as $TODO),
       filters: getApplicableFilters(owner, this.props.filters),
       credentials: this.credentials,
       connection: this.connectionName,

@@ -4,7 +4,6 @@ import {
   SortDirection,
   SpatialFilter,
 } from '../types';
-import {$TODO} from '../types-internal';
 
 /******************************************************************************
  * WIDGET API REQUESTS

@@ -5,6 +5,7 @@ import {
   REQUEST_GET_MAX_URL_LENGTH,
 } from '../constants-internal';
 import {Source, SpatialFilter} from '../types';
+import {$TODO} from '../types-internal';
 import {assert} from '../utils';
 import {ModelRequestOptions, checkCredentials, makeCall} from './common';
 
@@ -92,11 +93,11 @@ export function executeModel(props: {
     url = urlWithSearchParams;
   } else {
     // undo the JSON.stringify, @TODO find a better pattern
-    queryParams.params = params as any;
-    queryParams.filters = filters as any;
-    queryParams.queryParameters = source.queryParameters as any;
+    queryParams.params = params as $TODO;
+    queryParams.filters = filters as $TODO;
+    queryParams.queryParameters = source.queryParameters as $TODO;
     if (spatialFilters) {
-      queryParams.spatialFilters = spatialFilters as any;
+      queryParams.spatialFilters = spatialFilters as $TODO;
     }
   }
   return makeCall({
