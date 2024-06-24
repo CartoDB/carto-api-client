@@ -15,9 +15,9 @@ import {
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
 } from './types.js';
-import {Source, Filter, FilterLogicalOperator, Credentials} from '../types.js';
+import {Source, FilterLogicalOperator, Credentials, Filter} from '../types.js';
 import {SourceOptions} from '@deck.gl/carto';
-import {getWidgetFilters, normalizeObjectKeys} from '../utils.js';
+import {getApplicableFilters, normalizeObjectKeys} from '../utils.js';
 import {ApiVersion, MapType} from '../constants.js';
 import {
   DEFAULT_API_BASE_URL,
@@ -63,7 +63,7 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
   protected getSource(owner?: string): Source {
     return {
       ...(this.props as any),
-      filters: getWidgetFilters(owner, (this.props as any).filters),
+      filters: getApplicableFilters(owner, this.props.filters),
       credentials: this.credentials,
       connection: this.connectionName,
     };

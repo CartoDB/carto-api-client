@@ -1,8 +1,3 @@
-import {FilterType} from './constants';
-
-/** @internal */
-export const FILTER_TYPES = new Set(Object.values(FilterType));
-
 /**
  * Threshold to use GET requests, vs POST
  * @internalRemarks Source: @carto/constants

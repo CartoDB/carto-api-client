@@ -1,41 +1,36 @@
-import {Filter, FilterTypes} from './types.js';
-import {FILTER_TYPES} from './constants-internal.js';
+import {Filter} from './types.js';
+import {FilterType} from './constants.js';
 import {$TODO} from './types-internal.js';
 
+const FILTER_TYPES = new Set(Object.values(FilterType));
+const isFilterType = (type: string): type is FilterType =>
+  FILTER_TYPES.has(type as FilterType);
+
 /**
- * @privateRemarks In C4R, this logic occurs in `useWidgetSource` and is termed
- * `getApplicableFilters`. Keep these terms in mind for public API?
- *
- * ```javascript
- *   const applicableFilters = useMemo(
- *      () => getApplicableFilters(rawSource?.filters, id),
- *      [rawSource?.filters, id]
- *   );
- * ```
- *
+ * @privateRemarks Source: @carto/react-widgets
  * @internal
  */
-export function getWidgetFilters(
+export function getApplicableFilters(
   owner?: string,
-  allFilters?: Record<string, Filter>
+  filters?: Record<string, Filter>
 ): Record<string, Filter> {
-  if (!allFilters) return {};
-  if (!owner) return allFilters;
+  if (!filters) return {};
 
-  const widgetFilters: Record<string, Filter> = {};
+  const applicableFilters: Record<string, Filter> = {};
 
-  for (const column in allFilters) {
-    for (const type in allFilters[column]) {
-      if (!FILTER_TYPES.has(type as FilterTypes)) continue;
+  for (const column in filters) {
+    for (const type in filters[column]) {
+      if (!isFilterType(type)) continue;
 
-      const filter = (allFilters as $TODO)[column][type];
+      const filter = filters[column][type];
       if (filter && filter.owner !== owner) {
-        widgetFilters[column] = allFilters[column];
+        applicableFilters[column] ||= {};
+        applicableFilters[column][type] = filter as $TODO;
       }
     }
   }
 
-  return widgetFilters;
+  return applicableFilters;
 }
 
 type Row<T> = Record<string, T> | Record<string, T>[] | T[] | T;

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import '../components/index.js';
-import {Filter, FilterEvent, vectorTableSource} from '@carto/api-client';
+import {FilterEvent} from '../components/index.js';
+import {Filter, vectorTableSource} from '@carto/api-client';
 import {Map} from 'maplibre-gl';
 import {Deck, MapViewState} from '@deck.gl/core';
 import {VectorTileLayer} from '@deck.gl/carto';

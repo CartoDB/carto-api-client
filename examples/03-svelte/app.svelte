@@ -1,12 +1,13 @@
 <script lang="ts">
   import '../components/index.js';
-  import type {Filter, FilterEvent, VectorTableSourceResponse} from '@carto/api-client';
+  import type {Filter, VectorTableSourceResponse} from '@carto/api-client';
   import {vectorTableSource} from '@carto/api-client';
   import {Map} from 'maplibre-gl';
   import type {MapViewState} from '@deck.gl/core';
   import {Deck} from '@deck.gl/core';
   import {VectorTileLayer} from '@deck.gl/carto';
   import {onDestroy, onMount} from 'svelte';
+  import { FilterEvent } from '../components/index.js';
 
   const ACCESS_TOKEN = import.meta.env.VITE_CARTO_ACCESS_TOKEN;
   const MAP_STYLE =
