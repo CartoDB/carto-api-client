@@ -31,10 +31,10 @@ import {$TODO} from '../types-internal.js';
  */
 export interface WidgetBaseSourceProps extends SourceOptions, Credentials {
   type?: MapType;
+  filters?: Record<string, Filter>;
   filtersLogicalOperator?: FilterLogicalOperator;
   queryParameters?: unknown[];
   provider?: string;
-  filters?: Record<string, Filter>;
 }
 
 export type WidgetSource = WidgetBaseSource<WidgetBaseSourceProps>;
@@ -67,7 +67,6 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       credentials: this.credentials,
       connection: this.connectionName,
       filters: getApplicableFilters(owner, this.props.filters),
-      filtersLogicalOperator: this.props.filtersLogicalOperator,
     };
   }
 
