@@ -1,4 +1,9 @@
-import {AggregationType, SpatialFilter} from '../types';
+import {
+  AggregationType,
+  SortColumnType,
+  SortDirection,
+  SpatialFilter,
+} from '../types';
 import {$TODO} from '../types-internal';
 
 /******************************************************************************
@@ -29,9 +34,9 @@ export interface RangeRequestOptions extends BaseRequestOptions {
 
 export interface TableRequestOptions extends BaseRequestOptions {
   columns: string[];
-  sortBy?: $TODO;
-  sortDirection?: $TODO;
-  sortByColumnType?: $TODO;
+  sortBy?: string;
+  sortDirection?: SortDirection;
+  sortByColumnType?: SortColumnType;
   page?: number;
   rowsPerPage?: number;
 }
@@ -67,12 +72,14 @@ export interface HistogramRequestOptions extends BaseRequestOptions {
 
 export type FormulaResponse = {value: number};
 export type CategoryResponse = {name: string; value: number}[];
-export type RangeResponse = $TODO;
+export type RangeResponse = {min: number; max: number};
 export type TableResponse = {
-  hasData: boolean;
   totalCount: number;
   rows: Record<string, number | string>[];
 };
 export type ScatterResponse = [number, number][];
-export type TimeSeriesResponse = $TODO;
+export type TimeSeriesResponse = {
+  rows: {name: string; value: number}[];
+  categories: string[];
+};
 export type HistogramResponse = number[];

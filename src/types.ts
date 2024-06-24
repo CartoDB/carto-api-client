@@ -59,3 +59,10 @@ export interface Filter {
 
 /** @internalRemarks Source: @carto/react-core */
 export type FilterLogicalOperator = 'and' | 'or';
+
+/******************************************************************************
+ * SORTING
+ */
+
+export type SortDirection = 'asc' | 'desc';
+export type SortColumnType = 'number' | 'string' | 'date';

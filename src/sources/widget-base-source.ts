@@ -115,7 +115,7 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     const {filterOwner, spatialFilter, abortController, ...params} = props;
     const {column} = params;
 
-    type RangeModelResponse = {rows: unknown[]};
+    type RangeModelResponse = {rows: {min: number; max: number}[]};
 
     return executeModel({
       model: 'range',
@@ -147,16 +147,10 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
         offset: page * rowsPerPage,
       },
       opts: {abortController},
-    })
-      .then((res: TableModelResponse) => ({
-        rows: normalizeObjectKeys(res.rows),
-        totalCount: res.metadata.total,
-      }))
-      .then((res) => {
-        const {rows, totalCount} = res;
-        const hasData = totalCount > 0;
-        return {rows, totalCount, hasData};
-      });
+    }).then((res: TableModelResponse) => ({
+      rows: normalizeObjectKeys(res.rows),
+      totalCount: res.metadata.total,
+    }));
   }
 
   async getScatter(props: ScatterRequestOptions): Promise<ScatterResponse> {
@@ -203,11 +197,11 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     } = params;
 
     type TimeSeriesModelResponse = {
-      rows: unknown[];
-      metadata: {categories: unknown[]};
+      rows: {name: string; value: number}[];
+      metadata: {categories: string[]};
     };
 
-    executeModel({
+    return executeModel({
       model: 'timeseries',
       source: this.getSource(filterOwner),
       spatialFilter,

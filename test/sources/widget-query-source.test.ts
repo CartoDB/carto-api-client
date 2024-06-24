@@ -1,5 +1,5 @@
 import {afterEach, describe, expect, test, vi} from 'vitest';
-import {WidgetQuerySource} from '@carto/api-client';
+import {TimeSeriesResponse, WidgetQuerySource} from '@carto/api-client';
 
 const createMockResponse = (data: unknown) => ({
   ok: true,
@@ -114,7 +114,35 @@ describe('getFormula', () => {
 });
 
 describe('getRange', () => {
-  test.todo('default', async () => {});
+  test('default', async () => {
+    const widgetSource = new WidgetQuerySource({
+      accessToken: '<token>',
+      connectionName: 'carto_dw',
+      sqlQuery: 'SELECT * FROM my-table',
+    });
+
+    const expectedRange = {min: 5, max: 25};
+
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValueOnce(createMockResponse({rows: [expectedRange]}));
+    vi.stubGlobal('fetch', mockFetch);
+
+    const actualRange = await widgetSource.getRange({column: 'employees'});
+
+    expect(mockFetch).toHaveBeenCalledOnce();
+    expect(actualRange).toEqual(expectedRange);
+
+    const params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
+    expect(Object.fromEntries(params)).toMatchObject({
+      type: 'query',
+      source: 'SELECT * FROM my-table',
+      params: JSON.stringify({column: 'employees'}),
+      queryParameters: '',
+      filters: JSON.stringify({}),
+      filtersLogicalOperator: 'and',
+    });
+  });
 });
 
 describe('getTable', () => {
@@ -146,7 +174,6 @@ describe('getTable', () => {
     expect(actualTable).toEqual({
       rows: expectedRows,
       totalCount: 3,
-      hasData: true,
     });
 
     const params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
@@ -213,7 +240,55 @@ describe('getScatter', () => {
 });
 
 describe('getTimeSeries', () => {
-  test.todo('default', async () => {});
+  test('default', async () => {
+    const widgetSource = new WidgetQuerySource({
+      accessToken: '<token>',
+      connectionName: 'carto_dw',
+      sqlQuery: 'SELECT * FROM my-table',
+    });
+
+    const expectedTimeSeries = {
+      rows: [
+        {name: '2024-01-01', value: 16},
+        {name: '2024-01-02', value: 2},
+        {name: '2024-01-03', value: 1},
+      ],
+      categories: ['count of records'],
+    };
+
+    const mockFetch = vi.fn().mockResolvedValueOnce(
+      createMockResponse({
+        rows: expectedTimeSeries.rows,
+        metadata: {
+          categories: expectedTimeSeries.categories,
+        },
+      })
+    );
+    vi.stubGlobal('fetch', mockFetch);
+
+    const actualTimeSeries = await widgetSource.getTimeSeries({
+      column: 'date',
+      operation: 'count',
+      operationColumn: 'purchases',
+    });
+
+    expect(mockFetch).toHaveBeenCalledOnce();
+    expect(actualTimeSeries).toEqual(expectedTimeSeries);
+
+    const params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
+    expect(Object.fromEntries(params)).toMatchObject({
+      type: 'query',
+      source: 'SELECT * FROM my-table',
+      params: JSON.stringify({
+        column: 'date',
+        operationColumn: 'purchases',
+        operation: 'count',
+      }),
+      queryParameters: '',
+      filters: JSON.stringify({}),
+      filtersLogicalOperator: 'and',
+    });
+  });
 });
 
 describe('getHistogram', () => {
