@@ -26,10 +26,12 @@
     "build": "microbundle --format cjs,modern --no-compress --define VERSION=$npm_package_version",
     "build:watch": "microbundle watch --format cjs,modern --no-compress --define VERSION=$npm_package_version",
     "dev": "concurrently \"yarn build:watch\" \"vite --config examples/vite.config.ts --open\"",
-    "test": "vitest --typecheck",
+    "test": "vitest run --typecheck",
+    "test:watch": "vitest watch --typecheck",
     "coverage": "vitest run --coverage",
-    "clean": "rimraf dist/*",
-    "format": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --write"
+    "lint": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --check",
+    "format": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --write",
+    "clean": "rimraf dist/*"
   },
   "devDependencies": {
     "@deck.gl/aggregation-layers": "^9.0.14",
