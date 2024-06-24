@@ -1,4 +1,4 @@
-import type {API_VERSIONS, MAP_TYPES} from './constants';
+import type {ApiVersion, MapType, FilterType} from './constants';
 
 /******************************************************************************
  * AGGREGATION
@@ -28,7 +28,7 @@ export type SpatialFilter = GeoJSON.Polygon | GeoJSON.MultiPolygon;
 
 /** @internalRemarks Source: @carto/react-api */
 export type Credentials = {
-  apiVersion?: API_VERSIONS;
+  apiVersion?: ApiVersion;
   apiBaseUrl?: string;
   geoColumn?: string;
   accessToken: string;
@@ -36,7 +36,7 @@ export type Credentials = {
 
 /** @internalRemarks Source: @carto/react-api */
 export type Source = {
-  type: MAP_TYPES;
+  type: MapType;
   connection: string;
   credentials: Credentials;
   data: string;
@@ -47,21 +47,15 @@ export type Source = {
 };
 
 /** @internalRemarks Source: @carto/react-api, @deck.gl/carto */
-export enum FilterTypes {
-  In = 'in',
-  Between = 'between', // [a, b] both are included
-  ClosedOpen = 'closed_open', // [a, b) a is included, b is not
-  Time = 'time',
-  StringSearch = 'stringSearch',
-}
-
-/** @internalRemarks Source: @carto/react-api, @deck.gl/carto */
 export interface Filter {
-  [FilterTypes.In]?: number[];
-  [FilterTypes.Between]?: number[][];
-  [FilterTypes.ClosedOpen]?: number[][];
-  [FilterTypes.Time]?: number[][];
-  [FilterTypes.StringSearch]?: string[];
+  [FilterType.IN]?: number[];
+  /** [a, b] both are included. */
+  [FilterType.BETWEEN]?: number[][];
+  /** [a, b) a is included, b is not. */
+  [FilterType.CLOSED_OPEN]?: number[][];
+  [FilterType.TIME]?: number[][];
+  [FilterType.STRING_SEARCH]?: string[];
 }
 
+/** @internalRemarks Source: @carto/react-core */
 export type FilterLogicalOperator = 'and' | 'or';

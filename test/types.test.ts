@@ -1,12 +1,12 @@
 import {assertType, test} from 'vitest';
 import {
-  API_VERSIONS,
+  ApiVersion,
   AggregationType,
   Credentials,
   Filter,
   FilterLogicalOperator,
-  FilterTypes,
-  MAP_TYPES,
+  FilterType,
+  MapType,
   Source,
   SpatialFilter,
 } from '@carto/api-client';
@@ -59,7 +59,7 @@ test('Credentials', () => {
   assertType<Credentials>({
     accessToken: '••••',
     geoColumn: 'geometry',
-    apiVersion: API_VERSIONS.V3,
+    apiVersion: ApiVersion.V3,
     apiBaseUrl: 'https://example.com',
   });
 
@@ -71,7 +71,7 @@ test('Credentials', () => {
 
 test('Source', () => {
   assertType<Source>({
-    type: MAP_TYPES.TABLE,
+    type: MapType.TABLE,
     data: 'my_data',
     connection: 'my_connection',
     credentials: {accessToken: '••••'},
@@ -81,15 +81,15 @@ test('Source', () => {
   assertType<Source>({});
 });
 
-test('FilterTypes', () => {
-  assertType<FilterTypes>(FilterTypes.In);
-  assertType<FilterTypes>(FilterTypes.Between);
-  assertType<FilterTypes>(FilterTypes.ClosedOpen);
-  assertType<FilterTypes>(FilterTypes.Time);
-  assertType<FilterTypes>(FilterTypes.StringSearch);
+test('FilterType', () => {
+  assertType<FilterType>(FilterType.IN);
+  assertType<FilterType>(FilterType.BETWEEN);
+  assertType<FilterType>(FilterType.CLOSED_OPEN);
+  assertType<FilterType>(FilterType.TIME);
+  assertType<FilterType>(FilterType.STRING_SEARCH);
 
   // @ts-expect-error
-  assertType<FilterTypes>('invalid');
+  assertType<FilterType>('invalid');
 });
 
 test('Filter', () => {

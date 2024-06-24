@@ -2,4 +2,5 @@
  * INTERNAL
  */
 
+/** @internal */
 export type $TODO = any;

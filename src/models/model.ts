@@ -1,5 +1,5 @@
 import {getClient} from '../client';
-import {API_VERSIONS, MAP_TYPES} from '../constants';
+import {ApiVersion, MapType} from '../constants';
 import {
   DEFAULT_GEO_COLUMN,
   REQUEST_GET_MAX_URL_LENGTH,
@@ -48,11 +48,11 @@ export function executeModel(props: {
   checkCredentials(source.credentials);
 
   assert(
-    source.credentials.apiVersion === API_VERSIONS.V3,
+    source.credentials.apiVersion === ApiVersion.V3,
     'SQL Model API is a feature only available in CARTO 3.'
   );
   assert(
-    source.type !== MAP_TYPES.TILESET,
+    source.type !== MapType.TILESET,
     'executeModel: Tileset not supported'
   );
 

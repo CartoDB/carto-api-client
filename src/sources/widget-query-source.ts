@@ -3,7 +3,7 @@ import {
   QuadbinQuerySourceOptions,
   VectorQuerySourceOptions,
 } from '@deck.gl/carto';
-import {MAP_TYPES} from '../constants.js';
+import {MapType} from '../constants.js';
 import {WidgetBaseSource, WidgetBaseSourceProps} from './widget-base-source.js';
 import {Source} from '../types.js';
 
@@ -18,7 +18,7 @@ export class WidgetQuerySource extends WidgetBaseSource<
   protected override getSource(owner: string): Source {
     return {
       ...super.getSource(owner),
-      type: MAP_TYPES.QUERY,
+      type: MapType.QUERY,
       data: this.props.sqlQuery,
     };
   }

@@ -45,14 +45,14 @@ export interface ScatterRequestOptions extends BaseRequestOptions {
 
 export interface TimeSeriesRequestOptions extends BaseRequestOptions {
   column: string;
-  stepSize?: $TODO;
-  stepMultiplier?: $TODO;
+  stepSize?: number;
+  stepMultiplier?: number;
   operation?: AggregationType;
   operationColumn?: string;
   joinOperation?: AggregationType;
-  splitByCategory?: $TODO;
-  splitByCategoryLimit?: $TODO;
-  splitByCategoryValues?: $TODO;
+  splitByCategory?: string;
+  splitByCategoryLimit?: number;
+  splitByCategoryValues?: string[];
 }
 
 export interface HistogramRequestOptions extends BaseRequestOptions {

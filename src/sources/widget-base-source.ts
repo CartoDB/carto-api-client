@@ -18,7 +18,7 @@ import {
 import {Source, Filter, FilterLogicalOperator, Credentials} from '../types.js';
 import {SourceOptions} from '@deck.gl/carto';
 import {getWidgetFilters, normalizeObjectKeys} from '../utils.js';
-import {API_VERSIONS, MAP_TYPES} from '../constants.js';
+import {ApiVersion, MapType} from '../constants.js';
 import {
   DEFAULT_API_BASE_URL,
   DEFAULT_GEO_COLUMN,
@@ -29,7 +29,7 @@ import {getClient} from '../client.js';
  * TODO(cleanup): Consolidate {@link SourceOptions} and {@link Source}.
  */
 export interface WidgetBaseSourceProps extends SourceOptions, Credentials {
-  type?: MAP_TYPES;
+  type?: MapType;
   filtersLogicalOperator?: FilterLogicalOperator;
   queryParameters?: unknown[];
   provider?: string;
@@ -52,7 +52,7 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     this.props = {...WidgetBaseSource.defaultProps, ...props};
     this.connectionName = props.connectionName;
     this.credentials = {
-      apiVersion: props.apiVersion || API_VERSIONS.V3,
+      apiVersion: props.apiVersion || ApiVersion.V3,
       apiBaseUrl: props.apiBaseUrl || DEFAULT_API_BASE_URL,
       clientId: props.clientId || getClient(),
       accessToken: props.accessToken,
