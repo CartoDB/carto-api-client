@@ -1,7 +1,11 @@
 {
   "name": "@carto/api-client",
-  "private": true,
-  "packageManager": "yarn@4.2.2",
+  "version": "0.0.1-1",
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha"
+  },
+  "packageManager": "yarn@4.3.1",
   "author": "Don McCurdy <donmccurdy@carto.com>",
   "license": "UNLICENSED",
   "type": "module",
@@ -31,7 +35,9 @@
     "coverage": "vitest run --coverage",
     "lint": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --check",
     "format": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --write",
-    "clean": "rimraf build/*"
+    "clean": "rimraf build/*",
+    "prepack": "yarn clean && yarn build",
+    "prepublish": "yarn lint && yarn test"
   },
   "files": [
     "build",

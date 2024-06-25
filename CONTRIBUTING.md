@@ -1,9 +1,66 @@
 # Contributing
 
+## Local development requirements
+
+- Yarn v4+
+- Node.js v18+
+
 ## Quickstart
 
-TODO
+```bash
+# install dependencies
+yarn
 
-## Dependencies
+# build package once
+yarn build
 
-New `dependencies` are added to individual packages in `packages/*` as required. New `devDependencies` are added to the workspace root `package.json` only. The `devDependencies` for all `packages/*/package.json` should be empty.
+# build package and watch for changes
+yarn build --watch
+
+# build package, watch for changes, and start a local server for examples
+yarn dev
+```
+
+After running `yarn dev`, a browser window will open with links to examples. Local URL will be `localhost:5173`, or may use another available port number.
+
+Tests, coverage, and other developmen-related scripts are defined in `package.json#scripts`.
+
+```bash
+# run tests once
+yarn test
+
+# run tests and watch for changes
+yarn test:watch
+
+# run tests and gather code coverage
+yarn coverage
+
+# lint for style and formatting errors
+yarn lint
+
+# fix style and formatting errors
+yarn format
+```
+
+## Releases
+
+> **TODO:** Configure an automatic release process with GitHub actions.
+
+1. Create a new version
+  ```bash
+  yarn version [ major | minor | patch | prerelease ]
+  ```
+2. Update changelog and commit
+  ```bash
+  git add -u
+  git commit -m "vX.Y.Z"
+  git tag -a "vX.Y.Z"
+  ```
+3. Publish to npm
+  ```bash
+  yarn npm publish [ --tag alpha ]
+  ```
+4. Push to GitHub
+  ```bash
+  git push && git push --tags
+  ```
