@@ -80,8 +80,7 @@ const categories = await widgetSource.getCategories({
 
 ### Spatial filter
 
-To filter the widget source by a geospatial column, including the map viewport,
-pass a `spatialFilter` parameter (GeoJSON Polygon or MultiPolygon geometry) to any widget data fetching function.
+To filter the widget source to a spatial region, pass a `spatialFilter` parameter (GeoJSON Polygon or MultiPolygon geometry) to any data fetching function.
 
 ```javascript
 // → {name: string; value: number}[]
@@ -101,6 +100,28 @@ const categories = await widgetSource.getCategories({
     ],
   }
 });
+```
+
+To create a spatial filter from the current [deck.gl `viewState`](https://deck.gl/docs/developer-guide/views#using-a-view-with-view-state):
+
+```javascript
+import {WebMercatorViewport} from '@deck.gl/core';
+
+function createViewStatePolygon(viewState) {
+  const viewport = new WebMercatorViewport(viewState);
+  return {
+    type: 'Polygon',
+    coordinates: [
+      [
+        viewport.unproject([0, 0]),
+        viewport.unproject([viewport.width, 0]),
+        viewport.unproject([viewport.width, viewport.height]),
+        viewport.unproject([0, viewport.height]),
+        viewport.unproject([0, 0]),
+      ],
+    ],
+  };
+}
 ```
 
 ## Versioning
