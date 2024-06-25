@@ -16,6 +16,9 @@ WORK IN PROGRESS.
 
 ### Fetching data
 
+Import `vectorTableSource`, `vectorQuerySource`, and other data source functions
+from the `@carto/api-client` package. These are drop-in replacements for the equivalent functions from the `@deck.gl/carto` package, and the same data source may be used with any number of layers or widgets. Tileset sources are not yet supported.
+
 ```javascript
 import { vectorTableSource } from '@carto/api-client';
 
