@@ -15,58 +15,57 @@ import {
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
 } from './types.js';
-import {Source, FilterLogicalOperator, Credentials, Filter} from '../types.js';
+import {FilterLogicalOperator, Filter} from '../types.js';
 import {SourceOptions} from '@deck.gl/carto';
 import {getApplicableFilters, normalizeObjectKeys} from '../utils.js';
-import {ApiVersion, MapType} from '../constants.js';
+import {ApiVersion} from '../constants.js';
 import {
   DEFAULT_API_BASE_URL,
   DEFAULT_GEO_COLUMN,
 } from '../constants-internal.js';
 import {getClient} from '../client.js';
-import {$TODO} from '../types-internal.js';
+import {ModelSource} from '../models/model.js';
 
-/**
- * TODO(cleanup): Consolidate {@link SourceOptions} and {@link Source}.
- */
-export interface WidgetBaseSourceProps extends SourceOptions, Credentials {
-  type?: MapType;
+export interface WidgetBaseSourceProps extends Omit<SourceOptions, 'filters'> {
+  apiVersion?: ApiVersion;
+  geoColumn?: string;
   filters?: Record<string, Filter>;
   filtersLogicalOperator?: FilterLogicalOperator;
-  queryParameters?: unknown[];
-  provider?: string;
 }
 
 export type WidgetSource = WidgetBaseSource<WidgetBaseSourceProps>;
 
-export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
+export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
   readonly props: Props;
-  readonly credentials: Required<Credentials> & {clientId: string};
-  readonly connectionName: string;
 
   static defaultProps: Partial<WidgetBaseSourceProps> = {
+    apiVersion: ApiVersion.V3,
+    apiBaseUrl: DEFAULT_API_BASE_URL,
+    clientId: getClient(),
     filters: {},
     filtersLogicalOperator: 'and',
+    geoColumn: DEFAULT_GEO_COLUMN,
   };
 
   constructor(props: Props) {
     this.props = {...WidgetBaseSource.defaultProps, ...props};
-    this.connectionName = props.connectionName;
-    this.credentials = {
-      apiVersion: props.apiVersion || ApiVersion.V3,
-      apiBaseUrl: props.apiBaseUrl || DEFAULT_API_BASE_URL,
-      clientId: props.clientId || getClient(),
-      accessToken: props.accessToken,
-      geoColumn: props.geoColumn || DEFAULT_GEO_COLUMN,
-    };
   }
 
-  protected getSource(owner?: string): Source {
+  protected abstract getModelSource(owner: string | undefined): ModelSource;
+
+  protected _getModelSource(
+    owner?: string
+  ): Omit<ModelSource, 'type' | 'data'> {
+    const props = this.props;
     return {
-      ...(this.props as $TODO),
-      credentials: this.credentials,
-      connection: this.connectionName,
-      filters: getApplicableFilters(owner, this.props.filters),
+      apiVersion: props.apiVersion as ApiVersion,
+      apiBaseUrl: props.apiBaseUrl as string,
+      clientId: props.clientId as string,
+      accessToken: props.accessToken,
+      connectionName: props.connectionName,
+      filters: getApplicableFilters(owner, props.filters),
+      filtersLogicalOperator: props.filtersLogicalOperator,
+      geoColumn: props.geoColumn,
     };
   }
 
@@ -84,8 +83,7 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
 
     return executeModel({
       model: 'formula',
-      source: this.getSource(filterOwner),
-      spatialFilter,
+      source: {...this.getModelSource(filterOwner), spatialFilter},
       params: {column: column ?? '*', operation, operationExp},
       opts: {abortController},
     }).then((res: FormulaModelResponse) => normalizeObjectKeys(res.rows[0]));
@@ -101,8 +99,7 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
 
     return executeModel({
       model: 'category',
-      source: this.getSource(filterOwner),
-      spatialFilter,
+      source: {...this.getModelSource(filterOwner), spatialFilter},
       params: {
         column,
         operation,
@@ -120,8 +117,7 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
 
     return executeModel({
       model: 'range',
-      source: this.getSource(filterOwner),
-      spatialFilter,
+      source: {...this.getModelSource(filterOwner), spatialFilter},
       params: {column},
       opts: {abortController},
     }).then((res: RangeModelResponse) => normalizeObjectKeys(res.rows[0]));
@@ -138,8 +134,7 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
 
     return executeModel({
       model: 'table',
-      source: this.getSource(filterOwner),
-      spatialFilter,
+      source: {...this.getModelSource(filterOwner), spatialFilter},
       params: {
         column: columns,
         sortBy,
@@ -166,8 +161,7 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
 
     return executeModel({
       model: 'scatterplot',
-      source: this.getSource(filterOwner),
-      spatialFilter,
+      source: {...this.getModelSource(filterOwner), spatialFilter},
       params: {
         xAxisColumn,
         xAxisJoinOperation,
@@ -204,8 +198,7 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
 
     return executeModel({
       model: 'timeseries',
-      source: this.getSource(filterOwner),
-      spatialFilter,
+      source: {...this.getModelSource(filterOwner), spatialFilter},
       params: {
         column,
         stepSize,
@@ -234,8 +227,7 @@ export class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
 
     const data = await executeModel({
       model: 'histogram',
-      source: this.getSource(filterOwner),
-      spatialFilter,
+      source: {...this.getModelSource(filterOwner), spatialFilter},
       params: {column, operation, ticks},
       opts: {abortController},
     }).then((res: HistogramModelResponse) => normalizeObjectKeys(res.rows));

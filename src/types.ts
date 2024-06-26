@@ -1,32 +1,4 @@
-import type {ApiVersion, MapType, FilterType} from './constants';
-
-/******************************************************************************
- * AUTHENTICATION
- */
-
-/** @internalRemarks Source: @carto/react-api */
-export type Credentials = {
-  apiVersion?: ApiVersion;
-  apiBaseUrl?: string;
-  geoColumn?: string;
-  accessToken: string;
-};
-
-/******************************************************************************
- * SOURCES
- */
-
-/** @internalRemarks Source: @carto/react-api */
-export type Source = {
-  type: MapType;
-  connection: string;
-  credentials: Credentials;
-  data: string;
-  geoColumn?: string;
-  queryParameters?: unknown[];
-  filters?: Record<string, Filter>;
-  filtersLogicalOperator?: 'and' | 'or';
-};
+import type {FilterType} from './constants';
 
 /******************************************************************************
  * AGGREGATION
@@ -74,3 +46,24 @@ export type FilterLogicalOperator = 'and' | 'or';
 
 export type SortDirection = 'asc' | 'desc';
 export type SortColumnType = 'number' | 'string' | 'date';
+
+/******************************************************************************
+ * SQL QUERY PARAMETERS
+ */
+
+/** @internalRemarks Source: @deck.gl/carto */
+export type QueryParameterValue =
+  | string
+  | number
+  | boolean
+  | Array<QueryParameterValue>
+  | object;
+
+/** @internalRemarks Source: @deck.gl/carto */
+export type NamedQueryParameter = Record<string, QueryParameterValue>;
+
+/** @internalRemarks Source: @deck.gl/carto */
+export type PositionalQueryParameter = QueryParameterValue[];
+
+/** @internalRemarks Source: @deck.gl/carto */
+export type QueryParameters = NamedQueryParameter | PositionalQueryParameter;

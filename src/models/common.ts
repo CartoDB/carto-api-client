@@ -1,5 +1,4 @@
 import {$TODO} from '../types-internal.js';
-import {Credentials} from '../types.js';
 import {InvalidColumnError} from '../utils.js';
 
 /** @internalRemarks Source: @carto/react-api */
@@ -44,20 +43,13 @@ export function dealWithApiError({
 }
 
 /** @internalRemarks Source: @carto/react-api */
-export function checkCredentials(credentials: Credentials) {
-  if (!credentials || !credentials.apiBaseUrl || !credentials.accessToken) {
-    throw new Error('Missing or bad credentials provided');
-  }
-}
-
-/** @internalRemarks Source: @carto/react-api */
 export async function makeCall({
   url,
-  credentials,
+  accessToken,
   opts,
 }: {
   url: string;
-  credentials: Credentials;
+  accessToken: string;
   opts: ModelRequestOptions;
 }) {
   let response;
@@ -66,15 +58,13 @@ export async function makeCall({
   try {
     response = await fetch(url.toString(), {
       headers: {
-        Authorization: `Bearer ${credentials.accessToken}`,
-        ...(isPost ? {'Content-Type': 'application/json'} : {}),
+        Authorization: `Bearer ${accessToken}`,
+        ...(isPost && {'Content-Type': 'application/json'}),
       },
-      ...(isPost
-        ? {
-            method: opts?.method,
-            body: opts?.body,
-          }
-        : {}),
+      ...(isPost && {
+        method: opts?.method,
+        body: opts?.body,
+      }),
       signal: opts?.abortController?.signal,
       ...opts?.otherOptions,
     });

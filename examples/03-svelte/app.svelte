@@ -7,7 +7,7 @@
   import {Deck} from '@deck.gl/core';
   import {VectorTileLayer} from '@deck.gl/carto';
   import {onDestroy, onMount} from 'svelte';
-  import { FilterEvent } from '../components/index.js';
+  import type {FilterEvent} from '../components/index.js';
 
   const ACCESS_TOKEN = import.meta.env.VITE_CARTO_ACCESS_TOKEN;
   const MAP_STYLE =

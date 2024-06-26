@@ -1,8 +1,7 @@
-import {afterEach, describe, expect, test, vi} from 'vitest';
+import {afterEach, expect, test, vi} from 'vitest';
 import {
   FilterType,
   MapType,
-  Source,
   WidgetBaseSource,
   WidgetBaseSourceProps,
 } from '@carto/api-client';
@@ -13,9 +12,9 @@ const createMockResponse = (data: unknown) => ({
 });
 
 class WidgetTestSource extends WidgetBaseSource<WidgetBaseSourceProps> {
-  protected override getSource(owner: string): Source {
+  protected override getModelSource(owner: string) {
     return {
-      ...super.getSource(owner),
+      ...super._getModelSource(owner),
       type: 'test' as MapType,
       data: 'test-data',
     };
@@ -36,8 +35,6 @@ test('constructor', () => {
     connectionName: 'carto_dw',
   });
   expect(widgetSource).toBeTruthy();
-  expect(widgetSource.connectionName).toBe('carto_dw');
-  expect(widgetSource.credentials).toMatchObject({accessToken: '<token>'});
   expect(widgetSource.props).toMatchObject({
     accessToken: '<token>',
     connectionName: 'carto_dw',

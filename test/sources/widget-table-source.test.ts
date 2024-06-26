@@ -21,8 +21,6 @@ test('constructor', () => {
     tableName: 'my-table',
   });
   expect(widgetSource).toBeTruthy();
-  expect(widgetSource.connectionName).toBe('carto_dw');
-  expect(widgetSource.credentials).toMatchObject({accessToken: '<token>'});
   expect(widgetSource.props).toMatchObject({
     accessToken: '<token>',
     connectionName: 'carto_dw',
@@ -30,12 +28,11 @@ test('constructor', () => {
   });
 });
 
-test('getSource', async () => {
+test('getModelSource', async () => {
   const widgetSource = new WidgetTableSource({
     accessToken: '<token>',
     connectionName: 'carto_dw',
     tableName: 'my-table',
-    queryParameters: [2.5],
   });
 
   const mockFetch = vi
@@ -59,7 +56,6 @@ test('getSource', async () => {
       column: 'store_type',
       operation: 'count',
     }),
-    queryParameters: '[2.5]',
     filters: JSON.stringify({}),
     filtersLogicalOperator: 'and',
   });

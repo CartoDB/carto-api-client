@@ -21,8 +21,6 @@ test('constructor', () => {
     sqlQuery: 'SELECT * FROM my-table',
   });
   expect(widgetSource).toBeTruthy();
-  expect(widgetSource.connectionName).toBe('carto_dw');
-  expect(widgetSource.credentials).toMatchObject({accessToken: '<token>'});
   expect(widgetSource.props).toMatchObject({
     accessToken: '<token>',
     connectionName: 'carto_dw',
@@ -30,7 +28,7 @@ test('constructor', () => {
   });
 });
 
-test('getSource', async () => {
+test('getModelSource', async () => {
   const widgetSource = new WidgetQuerySource({
     accessToken: '<token>',
     connectionName: 'carto_dw',

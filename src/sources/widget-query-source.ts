@@ -5,21 +5,22 @@ import {
 } from '@deck.gl/carto';
 import {MapType} from '../constants.js';
 import {WidgetBaseSource, WidgetBaseSourceProps} from './widget-base-source.js';
-import {Source} from '../types.js';
+import {ModelSource} from '../models/model.js';
 
 type LayerQuerySourceOptions =
-  | VectorQuerySourceOptions
-  | H3QuerySourceOptions
-  | QuadbinQuerySourceOptions;
+  | Omit<VectorQuerySourceOptions, 'filters'>
+  | Omit<H3QuerySourceOptions, 'filters'>
+  | Omit<QuadbinQuerySourceOptions, 'filters'>;
 
 export class WidgetQuerySource extends WidgetBaseSource<
   LayerQuerySourceOptions & WidgetBaseSourceProps
 > {
-  protected override getSource(owner: string): Source {
+  protected override getModelSource(owner: string): ModelSource {
     return {
-      ...super.getSource(owner),
+      ...super._getModelSource(owner),
       type: MapType.QUERY,
       data: this.props.sqlQuery,
+      queryParameters: this.props.queryParameters,
     };
   }
 }

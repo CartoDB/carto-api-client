@@ -1,13 +1,18 @@
-import {getClient} from '../client';
-import {ApiVersion, MapType} from '../constants';
+import {getClient} from '../client.js';
+import {ApiVersion, MapType} from '../constants.js';
 import {
   DEFAULT_GEO_COLUMN,
   REQUEST_GET_MAX_URL_LENGTH,
-} from '../constants-internal';
-import {Source, SpatialFilter} from '../types';
-import {$TODO} from '../types-internal';
-import {assert} from '../utils';
-import {ModelRequestOptions, checkCredentials, makeCall} from './common';
+} from '../constants-internal.js';
+import {
+  Filter,
+  FilterLogicalOperator,
+  QueryParameters,
+  SpatialFilter,
+} from '../types.js';
+import {$TODO} from '../types-internal.js';
+import {assert} from '../utils.js';
+import {ModelRequestOptions, makeCall} from './common.js';
 
 /** @internalRemarks Source: @carto/react-api */
 const AVAILABLE_MODELS = [
@@ -22,15 +27,31 @@ const AVAILABLE_MODELS = [
 
 export type Model = (typeof AVAILABLE_MODELS)[number];
 
+export interface ModelSource {
+  type: MapType;
+  apiVersion: ApiVersion;
+  apiBaseUrl: string;
+  accessToken: string;
+  clientId: string;
+  connectionName: string;
+  data: string;
+  filters?: Record<string, Filter>;
+  filtersLogicalOperator?: FilterLogicalOperator;
+  geoColumn?: string;
+  spatialFilter?: SpatialFilter;
+  queryParameters?: QueryParameters;
+}
+
+const {V3} = ApiVersion;
+
 /**
  * Execute a SQL model request.
  * @internalRemarks Source: @carto/react-api
  */
 export function executeModel(props: {
   model: Model;
-  source: Source;
+  source: ModelSource;
   params: Record<string, unknown>;
-  spatialFilter?: SpatialFilter;
   opts?: Partial<ModelRequestOptions>;
 }) {
   assert(props.source, 'executeModel: missing source');
@@ -38,28 +59,23 @@ export function executeModel(props: {
   assert(props.params, 'executeModel: missing params');
 
   assert(
-    AVAILABLE_MODELS.indexOf(props.model) !== -1,
+    AVAILABLE_MODELS.includes(props.model),
     `executeModel: model provided isn't valid. Available models: ${AVAILABLE_MODELS.join(
       ', '
     )}`
   );
 
-  const {source, model, params, spatialFilter, opts} = props;
+  const {model, source, params, opts} = props;
+  const {type, apiVersion, apiBaseUrl, accessToken, connectionName} = source;
 
-  checkCredentials(source.credentials);
+  assert(apiBaseUrl, 'executeModel: missing apiBaseUrl');
+  assert(accessToken, 'executeModel: missing accessToken');
+  assert(apiVersion === V3, 'executeModel: SQL Model API requires CARTO 3+');
+  assert(type !== MapType.TILESET, 'executeModel: Tilesets not supported');
 
-  assert(
-    source.credentials.apiVersion === ApiVersion.V3,
-    'SQL Model API is a feature only available in CARTO 3.'
-  );
-  assert(
-    source.type !== MapType.TILESET,
-    'executeModel: Tileset not supported'
-  );
+  let url = `${apiBaseUrl}/v3/sql/${connectionName}/model/${model}`;
 
-  let url = `${source.credentials.apiBaseUrl}/v3/sql/${source.connection}/model/${model}`;
-
-  const {filters, filtersLogicalOperator = 'and', data, type} = source;
+  const {filters, filtersLogicalOperator = 'and', data} = source;
   const queryParameters = source.queryParameters
     ? JSON.stringify(source.queryParameters)
     : '';
@@ -75,10 +91,10 @@ export function executeModel(props: {
   };
 
   // API supports multiple filters, we apply it only to geoColumn
-  const spatialFilters = spatialFilter
+  const spatialFilters = source.spatialFilter
     ? {
         [source.geoColumn ? source.geoColumn : DEFAULT_GEO_COLUMN]:
-          spatialFilter,
+          source.spatialFilter,
       }
     : undefined;
 
@@ -102,7 +118,7 @@ export function executeModel(props: {
   }
   return makeCall({
     url,
-    credentials: source.credentials,
+    accessToken: source.accessToken,
     opts: {
       ...opts,
       method: isGet ? 'GET' : 'POST',
