@@ -55,15 +55,15 @@ To filter the widget source by a non-geospatial column, pass a `filters`
 property to the source factory function.
 
 ```javascript
-import { vectorTableSource } from '@carto/api-client';
+import {vectorTableSource} from '@carto/api-client';
 
 const data = vectorTableSource({
   accessToken: '••••',
   connectionName: 'carto_dw',
   tableName: 'carto-demo-data.demo_tables.retail_stores',
   filters: {
-    'store_type': {owner: 'widget-id', values: ['retail']}
-  }
+    store_type: {owner: 'widget-id', values: ['retail']},
+  },
 });
 ```
 

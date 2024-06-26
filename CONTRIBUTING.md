@@ -47,20 +47,27 @@ yarn format
 > **TODO:** Configure an automatic release process with GitHub actions.
 
 1. Create a new version
-  ```bash
-  yarn version [ major | minor | patch | prerelease ]
-  ```
+
+```bash
+yarn version [ major | minor | patch | prerelease ]
+```
+
 2. Update changelog and commit
-  ```bash
-  git add -u
-  git commit -m "vX.Y.Z"
-  git tag -a "vX.Y.Z"
-  ```
+
+```bash
+git add -u
+git commit -m "vX.Y.Z"
+git tag -a "vX.Y.Z"
+```
+
 3. Publish to npm
-  ```bash
-  yarn npm publish [ --tag alpha ]
-  ```
+
+```bash
+yarn npm publish [ --tag alpha ]
+```
+
 4. Push to GitHub
-  ```bash
-  git push && git push --tags
-  ```
+
+```bash
+git push && git push --tags
+```
