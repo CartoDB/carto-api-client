@@ -89,9 +89,9 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
    * charts including grouped bar charts, pie charts, and tree charts.
    */
   async getCategories(
-    props: CategoryRequestOptions
+    options: CategoryRequestOptions
   ): Promise<CategoryResponse> {
-    const {filterOwner, spatialFilter, abortController, ...params} = props;
+    const {filterOwner, spatialFilter, abortController, ...params} = options;
     const {column, operation, operationColumn} = params;
 
     type CategoriesModelResponse = {rows: {name: string; value: number}[]};
@@ -116,14 +116,14 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
    * Returns a scalar numerical statistic over all matching data. Suitable
    * for 'headline' or 'scorecard' figures such as counts and sums.
    */
-  async getFormula(props: FormulaRequestOptions): Promise<FormulaResponse> {
+  async getFormula(options: FormulaRequestOptions): Promise<FormulaResponse> {
     const {
       filterOwner,
       spatialFilter,
       abortController,
       operationExp,
       ...params
-    } = props;
+    } = options;
     const {column, operation} = params;
 
     type FormulaModelResponse = {rows: {value: number}[]};
@@ -145,9 +145,9 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
    * over a numerical range. Suitable for histogram charts.
    */
   async getHistogram(
-    props: HistogramRequestOptions
+    options: HistogramRequestOptions
   ): Promise<HistogramResponse> {
-    const {filterOwner, spatialFilter, abortController, ...params} = props;
+    const {filterOwner, spatialFilter, abortController, ...params} = options;
     const {column, operation, ticks} = params;
 
     type HistogramModelResponse = {rows: {tick: number; value: number}[]};
@@ -181,8 +181,8 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
    * Suitable for displaying certain 'headline' or 'scorecard' statistics,
    * or rendering a range slider UI for filtering.
    */
-  async getRange(props: RangeRequestOptions): Promise<RangeResponse> {
-    const {filterOwner, spatialFilter, abortController, ...params} = props;
+  async getRange(options: RangeRequestOptions): Promise<RangeResponse> {
+    const {filterOwner, spatialFilter, abortController, ...params} = options;
     const {column} = params;
 
     type RangeModelResponse = {rows: {min: number; max: number}[]};
@@ -203,8 +203,8 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
    * Returns a list of bivariate datapoints defined as numerical 'x' and 'y'
    * values. Suitable for rendering scatter plots.
    */
-  async getScatter(props: ScatterRequestOptions): Promise<ScatterResponse> {
-    const {filterOwner, spatialFilter, abortController, ...params} = props;
+  async getScatter(options: ScatterRequestOptions): Promise<ScatterResponse> {
+    const {filterOwner, spatialFilter, abortController, ...params} = options;
     const {xAxisColumn, xAxisJoinOperation, yAxisColumn, yAxisJoinOperation} =
       params;
 
@@ -237,8 +237,8 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
    * Returns a list of arbitrary data rows, with support for pagination and
    * sorting. Suitable for displaying tables and lists.
    */
-  async getTable(props: TableRequestOptions): Promise<TableResponse> {
-    const {filterOwner, spatialFilter, abortController, ...params} = props;
+  async getTable(options: TableRequestOptions): Promise<TableResponse> {
+    const {filterOwner, spatialFilter, abortController, ...params} = options;
     const {columns, sortBy, sortDirection, page = 0, rowsPerPage = 10} = params;
 
     type TableModelResponse = {
@@ -272,9 +272,9 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
    * time intervals. Suitable for rendering time series charts.
    */
   async getTimeSeries(
-    props: TimeSeriesRequestOptions
+    options: TimeSeriesRequestOptions
   ): Promise<TimeSeriesResponse> {
-    const {filterOwner, abortController, spatialFilter, ...params} = props;
+    const {filterOwner, abortController, spatialFilter, ...params} = options;
     const {
       column,
       operationColumn,
