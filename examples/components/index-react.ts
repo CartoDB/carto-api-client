@@ -9,14 +9,8 @@ import {
   TableWidget as _TableWidget,
 } from './index.js';
 
-// TODO: React <=18 requires these wrappers to support Web Components. Because
-// the wrappers depend on the `react` npm package, they belong in a separate
-// package from the base Web Components, out of scope for POC.
+// React <=18 requires these wrappers to support Web Components.
 // See: https://lit.dev/docs/frameworks/react/
-//
-// TODO: I'd intended to make these wrappers a subpath under `@carto/ui/react`,
-// but am having trouble making that play well with Vite in local development,
-// so the wrappers are here for now. See: https://github.com/vitejs/vite/discussions/17417
 
 export const CategoryWidget = createComponent({
   tagName: 'category-widget',
