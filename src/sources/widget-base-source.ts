@@ -35,6 +35,11 @@ export interface WidgetBaseSourceProps extends Omit<SourceOptions, 'filters'> {
 
 export type WidgetSource = WidgetBaseSource<WidgetBaseSourceProps>;
 
+/**
+ * Source for Widget API requests on a data source defined by a SQL query.
+ *
+ * Abstract class. Use {@link WidgetQuerySource} or {@link WidgetTableSource}.
+ */
 export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
   readonly props: Props;
 
@@ -51,6 +56,12 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     this.props = {...WidgetBaseSource.defaultProps, ...props};
   }
 
+  /**
+   * Subclasses of {@link WidgetBaseSource} must implement this method, calling
+   * {@link WidgetBaseSource.prototype._getModelSource} for common source
+   * properties, and adding additional required properties including 'type' and
+   * 'data'.
+   */
   protected abstract getModelSource(owner: string | undefined): ModelSource;
 
   protected _getModelSource(
@@ -69,26 +80,14 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     };
   }
 
-  async getFormula(props: FormulaRequestOptions): Promise<FormulaResponse> {
-    const {
-      filterOwner,
-      spatialFilter,
-      abortController,
-      operationExp,
-      ...params
-    } = props;
-    const {column, operation} = params;
+  /****************************************************************************
+   * CATEGORIES
+   */
 
-    type FormulaModelResponse = {rows: {value: number}[]};
-
-    return executeModel({
-      model: 'formula',
-      source: {...this.getModelSource(filterOwner), spatialFilter},
-      params: {column: column ?? '*', operation, operationExp},
-      opts: {abortController},
-    }).then((res: FormulaModelResponse) => normalizeObjectKeys(res.rows[0]));
-  }
-
+  /**
+   * Returns a list of labeled datapoints for categorical data. Suitable for
+   * charts including grouped bar charts, pie charts, and tree charts.
+   */
   async getCategories(
     props: CategoryRequestOptions
   ): Promise<CategoryResponse> {
@@ -109,6 +108,79 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     }).then((res: CategoriesModelResponse) => normalizeObjectKeys(res.rows));
   }
 
+  /****************************************************************************
+   * FORMULA
+   */
+
+  /**
+   * Returns a scalar numerical statistic over all matching data. Suitable
+   * for 'headline' or 'scorecard' figures such as counts and sums.
+   */
+  async getFormula(props: FormulaRequestOptions): Promise<FormulaResponse> {
+    const {
+      filterOwner,
+      spatialFilter,
+      abortController,
+      operationExp,
+      ...params
+    } = props;
+    const {column, operation} = params;
+
+    type FormulaModelResponse = {rows: {value: number}[]};
+
+    return executeModel({
+      model: 'formula',
+      source: {...this.getModelSource(filterOwner), spatialFilter},
+      params: {column: column ?? '*', operation, operationExp},
+      opts: {abortController},
+    }).then((res: FormulaModelResponse) => normalizeObjectKeys(res.rows[0]));
+  }
+
+  /****************************************************************************
+   * HISTOGRAM
+   */
+
+  /**
+   * Returns a list of labeled datapoints for 'bins' of data defined as ticks
+   * over a numerical range. Suitable for histogram charts.
+   */
+  async getHistogram(
+    props: HistogramRequestOptions
+  ): Promise<HistogramResponse> {
+    const {filterOwner, spatialFilter, abortController, ...params} = props;
+    const {column, operation, ticks} = params;
+
+    type HistogramModelResponse = {rows: {tick: number; value: number}[]};
+
+    const data = await executeModel({
+      model: 'histogram',
+      source: {...this.getModelSource(filterOwner), spatialFilter},
+      params: {column, operation, ticks},
+      opts: {abortController},
+    }).then((res: HistogramModelResponse) => normalizeObjectKeys(res.rows));
+
+    if (data.length) {
+      // Given N ticks the API returns up to N+1 bins, omitting any empty bins. Bins
+      // include 1 bin below the lowest tick, N-1 between ticks, and 1 bin above the highest tick.
+      const result = Array(ticks.length + 1).fill(0);
+      data.forEach(
+        ({tick, value}: {tick: number; value: number}) => (result[tick] = value)
+      );
+      return result;
+    }
+
+    return [];
+  }
+
+  /****************************************************************************
+   * RANGE
+   */
+
+  /**
+   * Returns a range (min and max) for a numerical column of matching rows.
+   * Suitable for displaying certain 'headline' or 'scorecard' statistics,
+   * or rendering a range slider UI for filtering.
+   */
   async getRange(props: RangeRequestOptions): Promise<RangeResponse> {
     const {filterOwner, spatialFilter, abortController, ...params} = props;
     const {column} = params;
@@ -123,32 +195,14 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     }).then((res: RangeModelResponse) => normalizeObjectKeys(res.rows[0]));
   }
 
-  async getTable(props: TableRequestOptions): Promise<TableResponse> {
-    const {filterOwner, spatialFilter, abortController, ...params} = props;
-    const {columns, sortBy, sortDirection, page = 0, rowsPerPage = 10} = params;
+  /****************************************************************************
+   * SCATTER
+   */
 
-    type TableModelResponse = {
-      rows: Record<string, number | string>[];
-      metadata: {total: number};
-    };
-
-    return executeModel({
-      model: 'table',
-      source: {...this.getModelSource(filterOwner), spatialFilter},
-      params: {
-        column: columns,
-        sortBy,
-        sortDirection,
-        limit: rowsPerPage,
-        offset: page * rowsPerPage,
-      },
-      opts: {abortController},
-    }).then((res: TableModelResponse) => ({
-      rows: normalizeObjectKeys(res.rows),
-      totalCount: res.metadata.total,
-    }));
-  }
-
+  /**
+   * Returns a list of bivariate datapoints defined as numerical 'x' and 'y'
+   * values. Suitable for rendering scatter plots.
+   */
   async getScatter(props: ScatterRequestOptions): Promise<ScatterResponse> {
     const {filterOwner, spatialFilter, abortController, ...params} = props;
     const {xAxisColumn, xAxisJoinOperation, yAxisColumn, yAxisJoinOperation} =
@@ -175,6 +229,48 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       .then((res) => res.map(({x, y}: {x: number; y: number}) => [x, y]));
   }
 
+  /****************************************************************************
+   * TABLE
+   */
+
+  /**
+   * Returns a list of arbitrary data rows, with support for pagination and
+   * sorting. Suitable for displaying tables and lists.
+   */
+  async getTable(props: TableRequestOptions): Promise<TableResponse> {
+    const {filterOwner, spatialFilter, abortController, ...params} = props;
+    const {columns, sortBy, sortDirection, page = 0, rowsPerPage = 10} = params;
+
+    type TableModelResponse = {
+      rows: Record<string, number | string>[];
+      metadata: {total: number};
+    };
+
+    return executeModel({
+      model: 'table',
+      source: {...this.getModelSource(filterOwner), spatialFilter},
+      params: {
+        column: columns,
+        sortBy,
+        sortDirection,
+        limit: rowsPerPage,
+        offset: page * rowsPerPage,
+      },
+      opts: {abortController},
+    }).then((res: TableModelResponse) => ({
+      rows: normalizeObjectKeys(res.rows),
+      totalCount: res.metadata.total,
+    }));
+  }
+
+  /****************************************************************************
+   * TIME SERIES
+   */
+
+  /**
+   * Returns a series of labeled numerical values, grouped into equally-sized
+   * time intervals. Suitable for rendering time series charts.
+   */
   async getTimeSeries(
     props: TimeSeriesRequestOptions
   ): Promise<TimeSeriesResponse> {
@@ -215,33 +311,5 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       rows: normalizeObjectKeys(res.rows),
       categories: res.metadata?.categories,
     }));
-  }
-
-  async getHistogram(
-    props: HistogramRequestOptions
-  ): Promise<HistogramResponse> {
-    const {filterOwner, spatialFilter, abortController, ...params} = props;
-    const {column, operation, ticks} = params;
-
-    type HistogramModelResponse = {rows: {tick: number; value: number}[]};
-
-    const data = await executeModel({
-      model: 'histogram',
-      source: {...this.getModelSource(filterOwner), spatialFilter},
-      params: {column, operation, ticks},
-      opts: {abortController},
-    }).then((res: HistogramModelResponse) => normalizeObjectKeys(res.rows));
-
-    if (data.length) {
-      // Given N ticks the API returns up to N+1 bins, omitting any empty bins. Bins
-      // include 1 bin below the lowest tick, N-1 between ticks, and 1 bin above the highest tick.
-      const result = Array(ticks.length + 1).fill(0);
-      data.forEach(
-        ({tick, value}: {tick: number; value: number}) => (result[tick] = value)
-      );
-      return result;
-    }
-
-    return [];
   }
 }

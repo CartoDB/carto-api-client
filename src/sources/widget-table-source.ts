@@ -12,6 +12,28 @@ type LayerTableSourceOptions =
   | Omit<H3TableSourceOptions, 'filters'>
   | Omit<QuadbinTableSourceOptions, 'filters'>;
 
+/**
+ * Source for Widget API requests on a data source defined as a table.
+ *
+ * Generally not intended to be constructed directly. Instead, call
+ * {@link vectorTableSource}, {@link h3TableSource}, or {@link quadbinTableSource},
+ * which can be shared with map layers. Sources contain a `widgetSource` property,
+ * for use by widget implementations.
+ *
+ * Example:
+ *
+ * ```javascript
+ * import { vectorTableSource } from '@carto/api-client';
+ *
+ * const data = vectorTableSource({
+ *   accessToken: '••••',
+ *   connectionName: 'carto_dw',
+ *   tableName: 'carto-demo-data.demo_tables.retail_stores'
+ * });
+ *
+ * const { widgetSource } = await data;
+ * ```
+ */
 export class WidgetTableSource extends WidgetBaseSource<
   LayerTableSourceOptions & WidgetBaseSourceProps
 > {
