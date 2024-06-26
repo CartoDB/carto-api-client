@@ -50,7 +50,7 @@ export type VectorTableSourceOptions =
 export type VectorQuerySourceOptions =
   WrappedSourceOptions<_VectorQuerySourceOptions>;
 
-/** Wrapper adding widget support to {@link _vectorTableSource}. */
+/** Wrapper adding Widget API support to [vectorTableSource](https://deck.gl/docs/api-reference/carto/data-sources). */
 export async function vectorTableSource(
   props: VectorTableSourceOptions
 ): Promise<VectorTableSourceResponse> {
@@ -58,7 +58,7 @@ export async function vectorTableSource(
   return {...response, widgetSource: new WidgetTableSource(props)};
 }
 
-/** Wrapper adding widget support to {@link _vectorQuerySource}. */
+/** Wrapper adding Widget API support to [vectorQuerySource](https://deck.gl/docs/api-reference/carto/data-sources). */
 export async function vectorQuerySource(
   props: VectorQuerySourceOptions
 ): Promise<VectorQuerySourceResponse> {
@@ -66,7 +66,7 @@ export async function vectorQuerySource(
   return {...response, widgetSource: new WidgetQuerySource(props)};
 }
 
-/** Wrapper adding widget support to {@link _vectorTilesetSource}. */
+/** Wrapper adding Widget API support to [vectorTilesetSource](https://deck.gl/docs/api-reference/carto/data-sources). */
 export async function vectorTilesetSource() {
   throw new Error('not implemented');
 }
@@ -78,7 +78,7 @@ export async function vectorTilesetSource() {
 export type H3TableSourceOptions = WrappedSourceOptions<_H3TableSourceOptions>;
 export type H3QuerySourceOptions = WrappedSourceOptions<_H3QuerySourceOptions>;
 
-/** Wrapper adding widget support to {@link _h3TableSource}. */
+/** Wrapper adding Widget API support to [h3TableSource](https://deck.gl/docs/api-reference/carto/data-sources). */
 export async function h3TableSource(
   props: H3TableSourceOptions
 ): Promise<H3TableSourceResponse> {
@@ -86,7 +86,7 @@ export async function h3TableSource(
   return {...response, widgetSource: new WidgetTableSource(props)};
 }
 
-/** Wrapper adding widget support to {@link _h3QuerySource}. */
+/** Wrapper adding Widget API support to [h3QuerySource](https://deck.gl/docs/api-reference/carto/data-sources). */
 export async function h3QuerySource(
   props: H3QuerySourceOptions
 ): Promise<H3QuerySourceResponse> {
@@ -94,7 +94,7 @@ export async function h3QuerySource(
   return {...response, widgetSource: new WidgetQuerySource(props)};
 }
 
-/** Wrapper adding widget support to {@link _h3TilesetSource}. */
+/** Wrapper adding Widget API support to [h3TilesetSource](https://deck.gl/docs/api-reference/carto/data-sources). */
 export async function h3TilesetSource() {
   throw new Error('not implemented');
 }
@@ -109,7 +109,7 @@ export type QuadbinTableSourceOptions =
 export type QuadbinQuerySourceOptions =
   WrappedSourceOptions<_QuadbinQuerySourceOptions>;
 
-/** Wrapper adding widget support to {@link _quadbinTableSource}. */
+/** Wrapper adding Widget API support to [quadbinTableSource](https://deck.gl/docs/api-reference/carto/data-sources). */
 export async function quadbinTableSource(
   props: QuadbinTableSourceOptions & WidgetBaseSourceProps
 ): Promise<QuadbinTableSourceResponse> {
@@ -117,7 +117,7 @@ export async function quadbinTableSource(
   return {...response, widgetSource: new WidgetTableSource(props)};
 }
 
-/** Wrapper adding widget support to {@link _quadbinQuerySource}. */
+/** Wrapper adding Widget API support to [quadbinQuerySource](https://deck.gl/docs/api-reference/carto/data-sources). */
 export async function quadbinQuerySource(
   props: QuadbinQuerySourceOptions & WidgetBaseSourceProps
 ): Promise<QuadbinQuerySourceResponse> {
@@ -125,7 +125,7 @@ export async function quadbinQuerySource(
   return {...response, widgetSource: new WidgetQuerySource(props)};
 }
 
-/** Wrapper adding widget support to {@link _quadbinTilesetSource}. */
+/** Wrapper adding Widget API support to [quadbinTilesetSource](https://deck.gl/docs/api-reference/carto/data-sources). */
 export async function quadbinTilesetSource() {
   throw new Error('not implemented');
 }
