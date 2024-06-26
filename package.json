@@ -1,6 +1,6 @@
 {
   "name": "@carto/api-client",
-  "version": "0.0.1-1",
+  "version": "0.0.1-2",
   "publishConfig": {
     "access": "public",
     "tag": "alpha"
@@ -82,5 +82,6 @@
     "vite": "^5.2.10",
     "vitest": "1.6.0",
     "vue": "^3.4.27"
-  }
+  },
+  "stableVersion": "0.0.1-1"
 }
