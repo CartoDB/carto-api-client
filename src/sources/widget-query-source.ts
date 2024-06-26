@@ -3,7 +3,7 @@ import {
   QuadbinQuerySourceOptions,
   VectorQuerySourceOptions,
 } from '@deck.gl/carto';
-import {MapType} from '../constants.js';
+import {MapType} from '../constants-internal.js';
 import {WidgetBaseSource, WidgetBaseSourceProps} from './widget-base-source.js';
 import {ModelSource} from '../models/model.js';
 

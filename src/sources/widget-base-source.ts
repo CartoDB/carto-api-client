@@ -18,10 +18,10 @@ import {
 import {FilterLogicalOperator, Filter} from '../types.js';
 import {SourceOptions} from '@deck.gl/carto';
 import {getApplicableFilters, normalizeObjectKeys} from '../utils.js';
-import {ApiVersion} from '../constants.js';
 import {
   DEFAULT_API_BASE_URL,
   DEFAULT_GEO_COLUMN,
+  ApiVersion,
 } from '../constants-internal.js';
 import {getClient} from '../client.js';
 import {ModelSource} from '../models/model.js';

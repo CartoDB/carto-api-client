@@ -1,13 +1,9 @@
 import {assertType, test} from 'vitest';
 import {
-  ApiVersion,
   AggregationType,
-  Credentials,
   Filter,
   FilterLogicalOperator,
   FilterType,
-  MapType,
-  Source,
   SpatialFilter,
 } from '@carto/api-client';
 
@@ -53,34 +49,6 @@ test('SpatialFilter', () => {
   assertType<SpatialFilter>({type: 'Point', coordinates: [102.0, 0.5]});
 });
 
-test('Credentials', () => {
-  assertType<Credentials>({accessToken: '••••'});
-  assertType<Credentials>({accessToken: '••••', geoColumn: 'geometry'});
-  assertType<Credentials>({
-    accessToken: '••••',
-    geoColumn: 'geometry',
-    apiVersion: ApiVersion.V3,
-    apiBaseUrl: 'https://example.com',
-  });
-
-  // @ts-expect-error
-  assertType<Credentials>({});
-  // @ts-expect-error
-  assertType<Credentials>({accessToken: '••••', apiVersion: 'invalid'});
-});
-
-test('Source', () => {
-  assertType<Source>({
-    type: MapType.TABLE,
-    data: 'my_data',
-    connection: 'my_connection',
-    credentials: {accessToken: '••••'},
-  });
-
-  // @ts-expect-error
-  assertType<Source>({});
-});
-
 test('FilterType', () => {
   assertType<FilterType>(FilterType.IN);
   assertType<FilterType>(FilterType.BETWEEN);
@@ -94,9 +62,9 @@ test('FilterType', () => {
 
 test('Filter', () => {
   assertType<Filter>({});
-  assertType<Filter>({in: [4, 8]});
-  assertType<Filter>({between: [[4, 8]]});
-  assertType<Filter>({stringSearch: ['a', 'b', 'c']});
+  assertType<Filter>({in: {values: [4, 8]}});
+  assertType<Filter>({between: {values: [[4, 8]]}});
+  assertType<Filter>({stringSearch: {values: ['a', 'b', 'c']}});
 
   // @ts-expect-error
   assertType<Filter>({invalid: [4, 8]});

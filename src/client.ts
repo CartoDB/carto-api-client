@@ -1,17 +1,25 @@
-import {CLIENT_ID} from './constants.js';
-
 /**
- * Default client
+ * @internal
  * @internalRemarks Source: @carto/react-core
  */
-let client = CLIENT_ID;
+let client = 'carto-api-client';
 
-/** @internalRemarks Source: @carto/react-core */
+/**
+ * Returns current client ID, used to categorize API requests. For internal use only.
+ *
+ * @internal
+ * @internalRemarks Source: @carto/react-core
+ */
 export function getClient() {
   return client;
 }
 
-/** @internalRemarks Source: @carto/react-core */
+/**
+ * Sets current client ID, used to categorize API requests. For internal use only.
+ *
+ * @internal
+ * @internalRemarks Source: @carto/react-core
+ */
 export function setClient(c: string) {
   client = c;
 }

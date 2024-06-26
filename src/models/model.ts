@@ -1,8 +1,8 @@
 import {getClient} from '../client.js';
-import {ApiVersion, MapType} from '../constants.js';
 import {
+  ApiVersion,
   DEFAULT_GEO_COLUMN,
-  REQUEST_GET_MAX_URL_LENGTH,
+  MapType,
 } from '../constants-internal.js';
 import {
   Filter,
@@ -43,6 +43,7 @@ export interface ModelSource {
 }
 
 const {V3} = ApiVersion;
+const REQUEST_GET_MAX_URL_LENGTH = 2048;
 
 /**
  * Execute a SQL model request.

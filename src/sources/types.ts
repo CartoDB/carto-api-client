@@ -1,3 +1,4 @@
+import {GroupDateType} from '..';
 import {
   AggregationType,
   SortColumnType,
@@ -49,7 +50,7 @@ export interface ScatterRequestOptions extends BaseRequestOptions {
 
 export interface TimeSeriesRequestOptions extends BaseRequestOptions {
   column: string;
-  stepSize?: number;
+  stepSize?: GroupDateType;
   stepMultiplier?: number;
   operation?: AggregationType;
   operationColumn?: string;

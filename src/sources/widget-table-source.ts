@@ -4,7 +4,7 @@ import {
   VectorTableSourceOptions,
 } from '@deck.gl/carto';
 import {WidgetBaseSource, WidgetBaseSourceProps} from './widget-base-source.js';
-import {MapType} from '../constants.js';
+import {MapType} from '../constants-internal.js';
 import {ModelSource} from '../models/model.js';
 
 type LayerTableSourceOptions =

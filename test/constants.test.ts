@@ -1,12 +1,13 @@
 import {expect, test} from 'vitest';
-import {CLIENT_ID, MapType, ApiVersion} from '@carto/api-client';
+import {GroupDateType, FilterType} from '@carto/api-client';
 
-test('constants', () => {
-  expect(CLIENT_ID).toBe('carto-api-client');
-  expect(MapType.TABLE).toBe('table');
-  expect(MapType.QUERY).toBe('query');
-  expect(MapType.TILESET).toBe('tileset');
-  expect(ApiVersion.V1).toBe('v1');
-  expect(ApiVersion.V2).toBe('v2');
-  expect(ApiVersion.V3).toBe('v3');
+test('GroupDateType', () => {
+  expect(GroupDateType.DAYS).toBe('day');
+  expect(GroupDateType.HOURS).toBe('hour');
+});
+
+test('FilterType', () => {
+  expect(FilterType.IN).toBe('in');
+  expect(FilterType.STRING_SEARCH).toBe('stringSearch');
+  expect(FilterType.CLOSED_OPEN).toBe('closed_open');
 });

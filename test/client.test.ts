@@ -1,5 +1,8 @@
 import {expect, test} from 'vitest';
-import {getClient, setClient, CLIENT_ID} from '@carto/api-client';
+import {getClient, setClient} from '@carto/api-client';
+
+// Source: src/client.ts
+const CLIENT_ID = 'carto-api-client';
 
 test('client', () => {
   expect(getClient()).toBe(CLIENT_ID);

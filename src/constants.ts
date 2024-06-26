@@ -1,20 +1,8 @@
-export const CLIENT_ID = 'carto-api-client';
-
-/** @internalRemarks Source: @carto/constants */
-export enum MapType {
-  TABLE = 'table',
-  QUERY = 'query',
-  TILESET = 'tileset',
-}
-
-/** @internalRemarks Source: @carto/constants */
-export enum ApiVersion {
-  V1 = 'v1',
-  V2 = 'v2',
-  V3 = 'v3',
-}
-
-/** @internalRemarks Source: @carto/react-core */
+/**
+ * Defines a step size increment for use with {@link TimeSeriesRequestOptions}.
+ *
+ * @internalRemarks Source: @carto/react-core
+ */
 export enum GroupDateType {
   YEARS = 'year',
   MONTHS = 'month',
@@ -25,7 +13,20 @@ export enum GroupDateType {
   SECONDS = 'second',
 }
 
-/** @internalRemarks Source: @carto/react-api, @deck.gl/carto */
+/**
+ * Defines a comparator used when matching a column's values against given filter values.
+ *
+ * Example:
+ *
+ * ```javascript
+ * import { FilterType } from '@carto/api-client';
+ * const filters = {
+ *   column_name: { [FilterType.IN]: { values: ['a', 'b', 'c'] } }
+ * };
+ * ```
+ *
+ * @internalRemarks Source: @carto/react-api, @deck.gl/carto
+ */
 export enum FilterType {
   IN = 'in',
   /** [a, b] both are included. */

@@ -1,9 +1,6 @@
-/**
- * Threshold to use GET requests, vs POST
- * @internalRemarks Source: @carto/constants
- * @internal
+/******************************************************************************
+ * DEFAULTS
  */
-export const REQUEST_GET_MAX_URL_LENGTH = 2048;
 
 /**
  * @internalRemarks Source: @carto/constants
@@ -22,3 +19,27 @@ export const DEFAULT_CLIENT = 'deck-gl-carto';
  * @internal
  */
 export const DEFAULT_GEO_COLUMN = 'geom';
+
+/******************************************************************************
+ * ENUMS
+ */
+
+/**
+ * @internal
+ * @internalRemarks Source: @carto/constants
+ */
+export enum MapType {
+  TABLE = 'table',
+  QUERY = 'query',
+  TILESET = 'tileset',
+}
+
+/**
+ * @internal
+ * @internalRemarks Source: @carto/constants
+ */
+export enum ApiVersion {
+  V1 = 'v1',
+  V2 = 'v2',
+  V3 = 'v3',
+}

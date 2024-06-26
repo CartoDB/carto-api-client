@@ -5,9 +5,8 @@ import type {FilterType} from './constants';
  */
 
 /**
- * Enum for the different types of aggregations available for widgets
- * @enum {string}
- * @readonly
+ * Enum for the different types of aggregations available for widgets.
+ *
  * @internalRemarks Source: @carto/constants
  * @internalRemarks Converted from enum to type union, for improved declarative API.
  */
