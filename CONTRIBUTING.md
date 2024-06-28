@@ -1,11 +1,15 @@
 # Contributing
 
+_Contributions are subject to CARTO's [community contributions policy](https://carto.com/contributions/)._
+
 ## Local development requirements
 
 - Yarn v4+
 - Node.js v18+
 
 ## Quickstart
+
+To install and build `@carto/api-client` locally from source:
 
 ```bash
 # install dependencies
@@ -21,9 +25,9 @@ yarn build --watch
 yarn dev
 ```
 
-After running `yarn dev`, a browser window will open with links to examples. Local URL will be `localhost:5173`, or may use another available port number.
+After running `yarn dev`, a browser window will open with links each example. The local URL will generally be `localhost:5173`.
 
-Tests, coverage, and other developmen-related scripts are defined in `package.json#scripts`.
+To run tests, coverage, or a linter:
 
 ```bash
 # run tests once
@@ -41,6 +45,8 @@ yarn lint
 # fix style and formatting errors
 yarn format
 ```
+
+Tests, coverage, and other development-related scripts are defined in `package.json#scripts`.
 
 ## Releases
 
