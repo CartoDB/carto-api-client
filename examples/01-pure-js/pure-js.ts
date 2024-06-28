@@ -2,13 +2,12 @@ import maplibregl from 'maplibre-gl';
 import {Deck} from '@deck.gl/core';
 import {VectorTileLayer} from '@deck.gl/carto';
 import {
-  FilterEvent,
   Filter,
   vectorTableSource,
   VectorTableSourceResponse,
 } from '@carto/api-client';
 import '../components/index.js';
-import type {Widget} from '../components/index.js';
+import type {Widget, FilterEvent} from '../components/index.js';
 
 /**************************************************************************
  * REACTIVE STATE
@@ -100,8 +99,8 @@ function updateWidgets() {
 function bindWidget(selector: string): Widget {
   const widget = document.querySelector<Widget>(selector)!;
 
-  widget.addEventListener('filter', (event: FilterEvent) => {
-    filters = event.detail.filters;
+  widget.addEventListener('filter', (event) => {
+    filters = (event as FilterEvent).detail.filters;
     updateSources();
   });
 
