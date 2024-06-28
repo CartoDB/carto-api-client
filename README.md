@@ -1,6 +1,11 @@
 # `@carto/api-client`
 
-WORK IN PROGRESS.
+JavaScript (and TypeScript) client library for [CARTO](https://carto.com/) APIs and framework-agnostic [CARTO + deck.gl](https://docs.carto.com/carto-for-developers/carto-for-deck.gl) applications. 
+
+Includes:
+
+- [Widget](https://docs.carto.com/carto-for-developers/carto-for-react/guides/widgets) APIs
+- &hellip; TBD
 
 ## Installation
 
