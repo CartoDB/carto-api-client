@@ -88,7 +88,14 @@ jobs:
             console.log(`Release type: ${releaseType}`)
             return releaseType
 
-      - name: Configure yarn to publish
+      - name: Create the new package version
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          RELEASE_TAG: ${{ steps.check-tag-format.outputs.version }}
+        run: |
+          yarn version --no-git-tag-version --new-version "${RELEASE_TAG}"
+
+      - name: Configure yarn to publish packages
         if: startsWith(github.ref, 'refs/tags/')
         env:
           # The following token has been manually issued in the CartoDB
@@ -98,7 +105,7 @@ jobs:
           yarn config set npmPublishRegistry "https://registry.npmjs.org/"
           yarn config set npmAuthToken "${NODE_AUTH_TOKEN}"
 
-      - name: Publish release
+      - name: Publish package
         if: startsWith(github.ref, 'refs/tags/')
         env:
           # The following token has been manually issued in the CartoDB
