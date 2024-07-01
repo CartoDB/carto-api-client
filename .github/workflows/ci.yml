@@ -91,7 +91,7 @@ jobs:
       - name: Create the new package version
         if: startsWith(github.ref, 'refs/tags/')
         env:
-          RELEASE_TAG: ${{ steps.check-tag-format.outputs.version }}
+          RELEASE_TAG: ${{ steps.check-tag-format.outputs.full_without_prefix }}
         run: |
           yarn version --no-git-tag-version --new-version "${RELEASE_TAG}"
 
