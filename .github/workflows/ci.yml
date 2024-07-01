@@ -1,8 +1,5 @@
 name: CI
 
-env:
-  YARN_VERSION: v4.3.1
-
 on:
   push:
     # FIXME:
@@ -44,8 +41,10 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
 
-      - name: Install yarn
-        run: npm install -g yarn@${YARN_VERSION}
+      # - name: Install yarn
+      #   run: |
+      #     npm install -g yarn
+      #     yarn --version
 
       - name: Install
         run: yarn install
@@ -99,6 +98,7 @@ jobs:
         env:
           RELEASE_TAG: ${{ steps.check-tag-format.outputs.full_without_prefix }}
         run: |
+          yarn --version
           yarn version --no-git-tag-version --new-version "${RELEASE_TAG}"
 
       - name: Configure yarn to publish packages
