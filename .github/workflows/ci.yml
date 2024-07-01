@@ -95,6 +95,7 @@ jobs:
           # organization for npmjs.com
           NODE_AUTH_TOKEN: ${{ secrets.NPM_CARTODB_AUTH_TOKEN }}
         run: |
+          yarn config set npmPublishRegistry "https://registry.npmjs.org/"
           yarn config set npmAuthToken "${NODE_AUTH_TOKEN}"
 
       - name: Publish release
