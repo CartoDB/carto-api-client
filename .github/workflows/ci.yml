@@ -88,20 +88,20 @@ jobs:
             console.log(`Release type: ${releaseType}`)
             return releaseType
 
-      # This additional step is needed to configure the yarn auth token
-      # https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages#publishing-packages-using-yarn
       - name: Configure yarn to publish
         if: startsWith(github.ref, 'refs/tags/')
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # The following token has been manually issued in the CartoDB
+          # organization for npmjs.com
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_CARTODB_AUTH_TOKEN }}
         run: |
-          cat ~/.npmrc
           yarn config set npmPublishRegistry "https://npm.pkg.github.com"
           yarn config set npmAuthToken "${NODE_AUTH_TOKEN}"
-
 
       - name: Publish release
         if: startsWith(github.ref, 'refs/tags/')
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # The following token has been manually issued in the CartoDB
+          # organization for npmjs.com
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_CARTODB_AUTH_TOKEN }}
         run: yarn npm publish --tag ${{steps.get-release-type.outputs.result}}
