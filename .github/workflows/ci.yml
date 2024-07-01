@@ -39,8 +39,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
           registry-url: https://npm.pkg.github.com
 
-      # - name: Enable Corepack
-      #   run: corepack enable
+      - name: Enable Corepack
+        run: corepack enable
 
       # - name: Install
       #   run: yarn install
