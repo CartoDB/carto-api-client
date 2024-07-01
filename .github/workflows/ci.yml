@@ -13,6 +13,7 @@ on:
 
 jobs:
   build:
+    name: Build [Node.js ${{ matrix.node-version }}]
     runs-on: ubuntu-22.04
 
     strategy:
@@ -32,13 +33,11 @@ jobs:
       # Build
       ###
 
-      # - name: Set up Node.js ${{ matrix.node-version }}
-      #   uses: actions/setup-node@v4
-      #   with:
-      #     # FIXME: Is this necessary?
-      #     node-version: ${{ matrix.node-version }}
-      #     registry-url: https://npm.pkg.github.com
-      #     scope: '@CartoDB'
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: https://npm.pkg.github.com
 
       # - name: Enable Corepack
       #   run: corepack enable
@@ -88,8 +87,8 @@ jobs:
             console.log(`Release type: ${releaseType}`)
             return releaseType
 
-      # - name: Publish release
-      #   if: startsWith(github.ref, 'refs/tags/')
-      #   env:
-      #     NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   run: npm publish
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm publish --tag ${{steps.get-release-type.outputs.result}}
