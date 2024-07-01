@@ -1,6 +1,6 @@
 {
   "name": "@carto/api-client",
-  "version": "0.0.30",
+  "version": "0.0.32",
   "publishConfig": {
     "access": "public",
     "tag": "alpha"
