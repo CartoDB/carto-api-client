@@ -1,6 +1,6 @@
 # `@carto/api-client`
 
-JavaScript (and TypeScript) client library for [CARTO](https://carto.com/) APIs and framework-agnostic [CARTO + deck.gl](https://docs.carto.com/carto-for-developers/carto-for-deck.gl) applications. 
+JavaScript (and TypeScript) client library for [CARTO](https://carto.com/) APIs and framework-agnostic [CARTO + deck.gl](https://docs.carto.com/carto-for-developers/carto-for-deck.gl) applications.
 
 Includes:
 
