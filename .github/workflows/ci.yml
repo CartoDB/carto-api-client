@@ -2,10 +2,11 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    # FIXME:
+    # branches: [main]
     tags: [v*]
 
-  pull_request:
+  # pull_request:
     # FIMXE:
     # branches: [main]
 
