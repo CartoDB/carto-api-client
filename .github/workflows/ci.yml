@@ -68,8 +68,7 @@ jobs:
 
       - name: Exit on invalid tag format
         if: startsWith(github.ref, 'refs/tags/') && steps.check-tag-format.outputs.is_valid == 'false'
-        run: |
-          echo "Tag must follow SemVer convention. Aborting." && exit 1
+        run: echo "Tag must follow SemVer convention. Aborting." && exit 1
 
       - name: Get release type
         if: startsWith(github.ref, 'refs/tags/')
@@ -84,9 +83,9 @@ jobs:
             if (!releaseTypeMatch) {
               releaseType = 'latest'
             } else {
-              releaseType =  refName.match(regex)[0]
+              releaseType =  releaseTypeMatch[0]
             }
-            console.log(`Release type: ${releaseType}`);
+            console.log(`Release type: ${releaseType}`)
             return releaseType
 
       # - name: Publish release
