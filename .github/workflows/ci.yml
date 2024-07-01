@@ -2,14 +2,11 @@ name: CI
 
 on:
   push:
-    # FIXME:
-    # branches: [main]
-    # branches: [feature/sc-420243/ci-configuration]
+    branches: [main]
     tags: [v*]
 
-  # pull_request:
-    # FIMXE:
-    # branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   build:
@@ -18,9 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        # FIXME:
-        # node-version: [18.x, 20.x, 22.x]
-        node-version: [18.x]
+        node-version: [18.x, 20.x, 22.x]
 
     env:
       CI: true
@@ -29,9 +24,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      ###
+      ##########################################################################
       # Build
-      ###
+      ##########################################################################
 
       - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -41,28 +36,21 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
 
-      # - name: Install yarn
-      #   run: |
-      #     npm install -g yarn
-      #     yarn --version
-
       - name: Install
         run: yarn install
 
       - name: Build
         run: yarn build
 
-      # FIXME:
+      - name: Lint
+        run: yarn lint
 
-      # - name: Lint
-      #   run: yarn lint
+      - name: Test
+        run: yarn test
 
-      # - name: Test
-      #   run: yarn test
-
-      ###
-      # Release
-      ###
+      ##########################################################################
+      # Publish
+      ##########################################################################
 
       - name: Check tag format
         id: check-tag-format
@@ -106,8 +94,5 @@ jobs:
       - name: Publish package
         if: startsWith(github.ref, 'refs/tags/')
         env:
-          # The following token has been manually issued in the CartoDB
-          # organization for npmjs.com
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_CARTODB_AUTH_TOKEN }}
           RELEASE_TYPE: ${{ steps.get-release-type.outputs.result }}
         run: yarn npm publish --tag ${RELEASE_TYPE}
