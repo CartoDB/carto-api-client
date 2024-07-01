@@ -91,6 +91,13 @@ jobs:
             console.log(`Release type: ${releaseType}`)
             return releaseType
 
+      - name: Configure yarn auth
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          yarn config set npmAuthToken "${NODE_AUTH_TOKEN}"
+
       - name: Publish release
         if: startsWith(github.ref, 'refs/tags/')
         env:
