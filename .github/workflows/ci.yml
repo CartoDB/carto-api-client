@@ -55,9 +55,7 @@ jobs:
         with:
           script: |
             const regex = /(alpha|beta)/
-            // FIXME:
-            // const refName = context.ref.replace('refs/tags/', '')
-            const refName = 'v0.0.1-alpha.0'
+            const refName = context.ref.replace('refs/tags/', '')
             const releaseType = (refName.match(regex))[0]
             console.log(`Release type: ${releaseType}`)
             return releaseType
