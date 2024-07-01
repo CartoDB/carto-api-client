@@ -1,5 +1,8 @@
 name: CI
 
+env:
+  YARN_VERSION: 4.3.1
+
 on:
   push:
     # FIXME:
@@ -40,6 +43,9 @@ jobs:
 
       - name: Enable Corepack
         run: corepack enable
+
+      - name: Install yarn
+        run: npm install -g yarn@${YARN_VERSION}
 
       - name: Install
         run: yarn install
