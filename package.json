@@ -1,5 +1,5 @@
 {
-  "name": "@carto/api-client",
+  "name": "@cartodb/api-client",
   "version": "0.0.1-2",
   "publishConfig": {
     "access": "public",

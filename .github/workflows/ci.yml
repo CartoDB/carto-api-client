@@ -95,7 +95,6 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cat ~/.npmrc
           yarn config set npmPublishRegistry "https://npm.pkg.github.com"
           yarn config set npmAuthToken "${NODE_AUTH_TOKEN}"
 
