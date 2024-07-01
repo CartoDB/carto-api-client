@@ -1,7 +1,7 @@
 name: CI
 
 env:
-  YARN_VERSION: 4.3.1
+  YARN_VERSION: v4.3.1
 
 on:
   push:
