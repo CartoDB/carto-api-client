@@ -4,6 +4,7 @@ on:
   push:
     # FIXME:
     # branches: [main]
+    branches: [feature/sc-420243/ci-configuration]
     tags: [v*]
 
   # pull_request:
