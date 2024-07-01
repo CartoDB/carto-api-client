@@ -38,6 +38,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: https://npm.pkg.github.com
+          scope: '@CartoDB'
 
       - name: Enable Corepack
         run: corepack enable
