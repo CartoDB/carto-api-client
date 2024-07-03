@@ -48,11 +48,11 @@ jobs:
       - name: Lint
         run: yarn lint
 
-      - name: Test
-        run: yarn test
-
       - name: Build
         run: yarn build
+
+      - name: Test
+        run: yarn test
 
       ##########################################################################
       # Publish
