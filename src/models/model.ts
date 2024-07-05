@@ -67,7 +67,8 @@ export function executeModel(props: {
   );
 
   const {model, source, params, opts} = props;
-  const {type, apiVersion, apiBaseUrl, accessToken, connectionName} = source;
+  const {type, apiVersion, apiBaseUrl, accessToken, connectionName, clientId} =
+    source;
 
   assert(apiBaseUrl, 'executeModel: missing apiBaseUrl');
   assert(accessToken, 'executeModel: missing accessToken');
@@ -83,7 +84,7 @@ export function executeModel(props: {
 
   const queryParams: Record<string, string> = {
     type,
-    client: getClient(),
+    client: clientId,
     source: data,
     params: JSON.stringify(params),
     queryParameters,
