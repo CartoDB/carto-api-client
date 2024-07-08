@@ -2,13 +2,10 @@ import {afterEach, expect, test, vi} from 'vitest';
 import {
   vectorQuerySource,
   vectorTableSource,
-  vectorTilesetSource,
   h3QuerySource,
   h3TableSource,
-  h3TilesetSource,
   quadbinQuerySource,
   quadbinTableSource,
-  quadbinTilesetSource,
   WidgetQuerySource,
   WidgetTableSource,
 } from '@carto/api-client';
@@ -60,11 +57,6 @@ test('vectorTableSource', async () => {
   expect(widgetSource).toBeInstanceOf(WidgetTableSource);
 });
 
-test('vectorTilesetSource', async () => {
-  expect(vectorTilesetSource).toBeDefined();
-  expect(() => vectorTilesetSource()).rejects.toThrowError(/not implemented/i);
-});
-
 /******************************************************************************
  * H3 SOURCES
  */
@@ -95,11 +87,6 @@ test('h3TableSource', async () => {
   expect(widgetSource).toBeInstanceOf(WidgetTableSource);
 });
 
-test('h3TilesetSource', async () => {
-  expect(h3TilesetSource).toBeDefined();
-  expect(() => h3TilesetSource()).rejects.toThrowError(/not implemented/i);
-});
-
 /******************************************************************************
  * QUADBIN SOURCES
  */
@@ -128,9 +115,4 @@ test('quadbinTableSource', async () => {
   });
 
   expect(widgetSource).toBeInstanceOf(WidgetTableSource);
-});
-
-test('quadbinTilesetSource', async () => {
-  expect(quadbinTilesetSource).toBeDefined();
-  expect(() => quadbinTilesetSource()).rejects.toThrowError(/not implemented/i);
 });
