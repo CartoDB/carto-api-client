@@ -132,6 +132,20 @@ function createViewStatePolygon(viewState) {
 }
 ```
 
+### Specifying columns to fetch
+
+Factory functions, like `vectorTableSource`, support both layers
+and widgets. While reusing the same sources has advantages, including simplicity, it's important to understand which columns are fetched, which
+depends on the source type.
+
+- **Table sources:** Layers fetch only columns specified by the `columns`
+  parameter. Widgets fetch only the columns they need, and are unaffected by
+  the `columns` parameter.
+- **Query sources:** Source SQL query must include all columns needed by any
+  layers or widgets using the source. Layers fetch only the subset specified
+  by the `columns` parameter. Widgets fetch only the subset they need, and are unaffected by the `columns` parameter.
+- **Tileset sources:** Not yet supported.
+
 ## Versioning
 
 Package versioning follows [Semantic Versioning 2.0.0](https://semver.org/).

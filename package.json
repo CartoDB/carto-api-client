@@ -21,7 +21,11 @@
       "default": "./build/api-client.modern.js"
     }
   },
-  "browserslist": ["defaults", "not IE 11", "node >= 18"],
+  "browserslist": [
+    "defaults",
+    "not IE 11",
+    "node >= 18"
+  ],
   "scripts": {
     "build": "microbundle --format cjs,modern --no-compress --define VERSION=$npm_package_version",
     "build:watch": "microbundle watch --format cjs,modern --no-compress --define VERSION=$npm_package_version",
@@ -35,7 +39,12 @@
     "prepack": "yarn clean && yarn build",
     "prepublish": "yarn lint && yarn test"
   },
-  "files": ["build", "src", "README.md", "LICENSE.md"],
+  "files": [
+    "build",
+    "src",
+    "README.md",
+    "LICENSE.md"
+  ],
   "devDependencies": {
     "@deck.gl/aggregation-layers": "^9.0.14",
     "@deck.gl/carto": "^9.0.14",
