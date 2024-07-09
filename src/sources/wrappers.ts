@@ -11,6 +11,7 @@ import {
   H3QuerySourceOptions as _H3QuerySourceOptions,
   QuadbinTableSourceOptions as _QuadbinTableSourceOptions,
   QuadbinQuerySourceOptions as _QuadbinQuerySourceOptions,
+  SourceOptions,
 } from '@deck.gl/carto';
 import {WidgetBaseSourceProps} from './widget-base-source.js';
 import {WidgetQuerySource} from './widget-query-source.js';
@@ -54,6 +55,7 @@ export type VectorQuerySourceOptions =
 export async function vectorTableSource(
   props: VectorTableSourceOptions
 ): Promise<VectorTableSourceResponse> {
+  assignDefaultProps(props);
   const response = await _vectorTableSource(props as _VectorTableSourceOptions);
   return {...response, widgetSource: new WidgetTableSource(props)};
 }
@@ -62,13 +64,9 @@ export async function vectorTableSource(
 export async function vectorQuerySource(
   props: VectorQuerySourceOptions
 ): Promise<VectorQuerySourceResponse> {
+  assignDefaultProps(props);
   const response = await _vectorQuerySource(props as _VectorQuerySourceOptions);
   return {...response, widgetSource: new WidgetQuerySource(props)};
-}
-
-/** Wrapper adding Widget API support to [vectorTilesetSource](https://deck.gl/docs/api-reference/carto/data-sources). */
-export async function vectorTilesetSource() {
-  throw new Error('not implemented');
 }
 
 /******************************************************************************
@@ -82,6 +80,7 @@ export type H3QuerySourceOptions = WrappedSourceOptions<_H3QuerySourceOptions>;
 export async function h3TableSource(
   props: H3TableSourceOptions
 ): Promise<H3TableSourceResponse> {
+  assignDefaultProps(props);
   const response = await _h3TableSource(props);
   return {...response, widgetSource: new WidgetTableSource(props)};
 }
@@ -90,13 +89,9 @@ export async function h3TableSource(
 export async function h3QuerySource(
   props: H3QuerySourceOptions
 ): Promise<H3QuerySourceResponse> {
+  assignDefaultProps(props);
   const response = await _h3QuerySource(props);
   return {...response, widgetSource: new WidgetQuerySource(props)};
-}
-
-/** Wrapper adding Widget API support to [h3TilesetSource](https://deck.gl/docs/api-reference/carto/data-sources). */
-export async function h3TilesetSource() {
-  throw new Error('not implemented');
 }
 
 /******************************************************************************
@@ -113,6 +108,7 @@ export type QuadbinQuerySourceOptions =
 export async function quadbinTableSource(
   props: QuadbinTableSourceOptions & WidgetBaseSourceProps
 ): Promise<QuadbinTableSourceResponse> {
+  assignDefaultProps(props);
   const response = await _quadbinTableSource(props);
   return {...response, widgetSource: new WidgetTableSource(props)};
 }
@@ -121,11 +117,21 @@ export async function quadbinTableSource(
 export async function quadbinQuerySource(
   props: QuadbinQuerySourceOptions & WidgetBaseSourceProps
 ): Promise<QuadbinQuerySourceResponse> {
+  assignDefaultProps(props);
   const response = await _quadbinQuerySource(props);
   return {...response, widgetSource: new WidgetQuerySource(props)};
 }
 
-/** Wrapper adding Widget API support to [quadbinTilesetSource](https://deck.gl/docs/api-reference/carto/data-sources). */
-export async function quadbinTilesetSource() {
-  throw new Error('not implemented');
+/******************************************************************************
+ * DEFAULT PROPS
+ */
+
+declare const deck: {VERSION?: string} | undefined;
+function assignDefaultProps<T extends SourceOptions>(props: T): void {
+  if (typeof deck !== 'undefined' && deck && deck.VERSION) {
+    props.clientId ||= 'deck-gl-carto';
+    // TODO: Uncomment if/when `@deck.gl/carto` devDependency is removed,
+    // and source functions are moved here rather than wrapped.
+    // props.deckglVersion ||= deck.VERSION;
+  }
 }
