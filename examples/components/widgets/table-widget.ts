@@ -2,7 +2,7 @@ import {css, html} from 'lit';
 import {Task} from '@lit/task';
 import {DEBOUNCE_TIME_MS} from '../constants.js';
 import {sleep} from '../utils.js';
-import {TableResponse} from '@carto/api-client';
+import {SortDirection, TableResponse} from '@carto/api-client';
 import {cache} from 'lit/directives/cache.js';
 import {map} from 'lit/directives/map.js';
 import {BaseWidget} from './base-widget.js';
@@ -35,18 +35,27 @@ export class TableWidget extends BaseWidget {
     return {
       ...super.properties,
       columns: {type: Array},
+      sortBy: {type: String},
+      sortDirection: {type: String},
+      limit: {type: Number},
     };
   }
 
   declare columns: string[];
+  declare sortBy: string | undefined;
+  declare sortDirection: SortDirection;
+  declare limit: number;
 
   constructor() {
     super();
     this.columns = [];
+    this.sortBy = undefined;
+    this.sortDirection = 'desc';
+    this.limit = 10;
   }
 
   private _task = new Task(this, {
-    task: async ([data, columns], {signal}) => {
+    task: async ([data, columns, sortBy, sortDirection, limit], {signal}) => {
       if (!data) {
         return {hasData: false, rows: [], totalCount: -1};
       }
@@ -57,11 +66,21 @@ export class TableWidget extends BaseWidget {
       const {widgetSource} = await data;
       return widgetSource.getTable({
         columns,
+        ...(sortBy && {sortBy, sortDirection}),
+        rowsPerPage: limit,
         spatialFilter: this.getSpatialFilterOrViewState(),
       });
     },
     args: () =>
-      [this.data, this.columns, this.viewState, this.spatialFilter] as const,
+      [
+        this.data,
+        this.columns,
+        this.sortBy,
+        this.sortDirection,
+        this.limit,
+        this.viewState,
+        this.spatialFilter,
+      ] as const,
   });
 
   override render() {
@@ -89,10 +108,10 @@ export class TableWidget extends BaseWidget {
 }
 
 function renderTableBody(response: TableResponse) {
-  if (!response.hasData) {
+  if (!response.totalCount) {
     return html`<tbody>
       <tr>
-        <td>No rows</td>
+        <td>No results</td>
       </tr>
     </tbody>`;
   }
