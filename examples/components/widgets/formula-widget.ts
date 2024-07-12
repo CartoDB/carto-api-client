@@ -4,32 +4,32 @@ import {AggregationType} from '@carto/api-client';
 import {DEBOUNCE_TIME_MS} from '../constants.js';
 import {sleep} from '../utils.js';
 import {BaseWidget} from './base-widget.js';
-import {WIDGET_BASE_CSS} from './styles.js';
 
 export class FormulaWidget extends BaseWidget {
-  static override styles = css`
-    ${WIDGET_BASE_CSS}
-
-    :host {
-      display: block;
-      border: solid 1px gray;
-      padding: 16px;
-      max-width: 800px;
-    }
-    h3,
-    p,
-    figure {
-      margin: 0;
-      padding: 0;
-    }
-    figcaption {
-      font-size: 0.8em;
-      opacity: 0.8;
-    }
-    .scorecard {
-      font-size: 2.4em;
-    }
-  `;
+  static override styles = [
+    BaseWidget.styles,
+    css`
+      :host {
+        display: block;
+        border: solid 1px gray;
+        padding: 16px;
+        max-width: 800px;
+      }
+      h3,
+      p,
+      figure {
+        margin: 0;
+        padding: 0;
+      }
+      figcaption {
+        font-size: 0.8em;
+        opacity: 0.8;
+      }
+      .scorecard {
+        font-size: 2.4em;
+      }
+    `,
+  ];
 
   static get properties() {
     return {

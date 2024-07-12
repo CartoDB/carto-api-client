@@ -3,33 +3,33 @@ import {Task} from '@lit/task';
 import {DEBOUNCE_TIME_MS} from '../constants.js';
 import {sleep} from '../utils.js';
 import {TableResponse} from '@carto/api-client';
-import {WIDGET_BASE_CSS} from './styles.js';
 import {cache} from 'lit/directives/cache.js';
 import {map} from 'lit/directives/map.js';
 import {BaseWidget} from './base-widget.js';
 
 export class TableWidget extends BaseWidget {
-  static override styles = css`
-    ${WIDGET_BASE_CSS}
+  static override styles = [
+    BaseWidget.styles,
+    css`
+      .table {
+        width: 100%;
+      }
 
-    .table {
-      width: 100%;
-    }
+      td,
+      th {
+        text-align: right;
+      }
 
-    td,
-    th {
-      text-align: right;
-    }
+      td:first-child,
+      th:first-child {
+        text-align: left;
+      }
 
-    td:first-child,
-    th:first-child {
-      text-align: left;
-    }
-
-    tbody tr:nth-child(2n + 1) {
-      background: #f5f5f5;
-    }
-  `;
+      tbody tr:nth-child(2n + 1) {
+        background: #f5f5f5;
+      }
+    `,
+  ];
 
   static get properties() {
     return {
