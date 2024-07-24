@@ -4,7 +4,7 @@
   "repository": "github:CartoDB/carto-api-client",
   "author": "Don McCurdy <donmccurdy@carto.com>",
   "packageManager": "yarn@4.3.1",
-  "version": "0.0.37",
+  "version": "0.0.38",
   "license": "MIT",
   "publishConfig": {
     "access": "public",
@@ -39,7 +39,10 @@
     "format": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --write",
     "clean": "rimraf build/*",
     "prepack": "yarn clean && yarn build",
-    "prepublish": "yarn lint && yarn test"
+    "prepublish": "yarn prepublish:test && yarn prepublish:tag && yarn prepublish:push",
+    "prepublish:test": "yarn lint && yarn test",
+    "prepublish:tag": "TAG=$npm_package_version && git add -u && git commit -m $TAG && git tag -a $TAG -m $TAG",
+    "prepublish:push": "git push && git push --tags"
   },
   "files": [
     "build",
