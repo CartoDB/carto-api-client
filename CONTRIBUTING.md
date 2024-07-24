@@ -60,8 +60,7 @@ yarn version [ major | minor | patch | prerelease ]
 
 ```bash
 git add -u
-git commit -m "vX.Y.Z"
-git tag -a "vX.Y.Z"
+TAG=vX.Y.Z && git commit -m $TAG && git tag -a $TAG -m $TAG
 ```
 
 3. Push to GitHub
