@@ -72,6 +72,7 @@ jobs:
         id: get-release-type
         uses: actions/github-script@v7
         with:
+          result-encoding: string
           script: |
             const regex = /(alpha|beta)/
             const refName = context.ref.replace('refs/tags/', '')
