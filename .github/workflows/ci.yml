@@ -87,7 +87,7 @@ jobs:
 
       # This may indicate that the tag set has a typo, e.g., alpah, betta, etc.
       - name: Verify tag format
-        if: !steps.check-tag-format.outputs.is_stable && steps.get-release-type.outputs.result == 'latest'
+        if: steps.check-tag-format.outputs.is_stable == 'false' && steps.get-release-type.outputs.result == 'latest'
         run: echo "Tag set may be incorrect. Please, review" && exit 1
 
       - name: Configure yarn to publish packages
