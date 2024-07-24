@@ -50,8 +50,6 @@ Tests, coverage, and other development-related scripts are defined in `package.j
 
 ## Releases
 
-> **TODO:** Configure an automatic release process with GitHub actions.
-
 1. Create a new version
 
 ```bash
@@ -66,14 +64,10 @@ git commit -m "vX.Y.Z"
 git tag -a "vX.Y.Z"
 ```
 
-3. Publish to npm
-
-```bash
-yarn npm publish [ --tag alpha ]
-```
-
-4. Push to GitHub
+3. Push to GitHub
 
 ```bash
 git push && git push --tags
 ```
+
+4. GitHub CI will publish to npm automatically
