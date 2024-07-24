@@ -39,10 +39,11 @@
     "format": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --write",
     "clean": "rimraf build/*",
     "prepack": "yarn clean && yarn build",
-    "prepublish": "yarn prepublish:test && yarn prepublish:tag && yarn prepublish:push",
-    "prepublish:test": "yarn lint && yarn test",
-    "prepublish:tag": "TAG=v$npm_package_version && git add -u && git commit -m $TAG && git tag -a $TAG -m $TAG",
-    "prepublish:push": "git push && git push --tags"
+    "postversion": "yarn postversion:check && yarn postversion:commit && yarn postversion:push",
+    "postversion:check": "yarn lint && yarn test",
+    "postversion:commit": "TAG=v$npm_package_version && git add -u && git commit -m $TAG && git tag -a $TAG -m $TAG",
+    "postversion:push": "git push && git push --tags",
+    "prepublish": "yarn lint && yarn test"
   },
   "files": [
     "build",

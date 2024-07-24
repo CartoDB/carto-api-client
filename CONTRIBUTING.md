@@ -50,23 +50,10 @@ Tests, coverage, and other development-related scripts are defined in `package.j
 
 ## Releases
 
-1. Create a new version
+1. Update changelog
 
-```bash
-yarn version [ major | minor | patch | prerelease ]
-```
+2. Create a new version: `yarn version [ major | minor | patch | prerelease ]`
 
-2. Update changelog and commit
-
-```bash
-git add -u
-TAG=vX.Y.Z && git commit -m $TAG && git tag -a $TAG -m $TAG
-```
-
-3. Push to GitHub
-
-```bash
-git push && git push --tags
-```
+3. Commit, tag, and push to GitHub: `yarn postversion`
 
 4. GitHub CI will publish to npm automatically
