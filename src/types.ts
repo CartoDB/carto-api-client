@@ -27,7 +27,7 @@ export type SpatialFilter = GeoJSON.Polygon | GeoJSON.MultiPolygon;
 
 /** @internalRemarks Source: @carto/react-api, @deck.gl/carto */
 export interface Filter {
-  [FilterType.IN]?: {owner?: string; values: number[]};
+  [FilterType.IN]?: {owner?: string; values: number[] | string[]};
   /** [a, b] both are included. */
   [FilterType.BETWEEN]?: {owner?: string; values: number[][]};
   /** [a, b) a is included, b is not. */

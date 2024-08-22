@@ -23,7 +23,8 @@ export function getApplicableFilters(
       if (!isFilterType(type)) continue;
 
       const filter = filters[column][type];
-      if (filter && filter.owner !== owner) {
+      const isApplicable = !owner || !filter?.owner || filter?.owner !== owner;
+      if (filter && isApplicable) {
         applicableFilters[column] ||= {};
         applicableFilters[column][type] = filter as $TODO;
       }

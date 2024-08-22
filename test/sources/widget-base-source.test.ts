@@ -1,7 +1,6 @@
 import {afterEach, expect, test, vi} from 'vitest';
 import {
   FilterType,
-  MapType,
   WidgetBaseSource,
   WidgetBaseSourceProps,
 } from '@carto/api-client';
@@ -15,9 +14,11 @@ class WidgetTestSource extends WidgetBaseSource<WidgetBaseSourceProps> {
   protected override getModelSource(owner: string) {
     return {
       ...super._getModelSource(owner),
-      type: 'test' as MapType,
+      type: 'test',
       data: 'test-data',
-    };
+    } as unknown as ReturnType<
+      WidgetBaseSource<WidgetBaseSourceProps>['getModelSource']
+    >;
   }
 }
 
@@ -89,58 +90,138 @@ test('getCategories', async () => {
  * filters
  */
 
-test('filters', async () => {
+test('filters - global', async () => {
+  // Filters without 'owners' must affect API calls with or without
+  // a 'filterOwner' assigned. When 'filterOwner' is null, undefined,
+  // or an empty string, all filters are applied.
+
   const widgetSource = new WidgetTestSource({
     accessToken: '<token>',
     connectionName: 'carto_dw',
-    filters: {
-      store_type: {
-        [FilterType.IN]: {
-          owner: 'a',
-          values: [1, 2, 3],
-        },
-      },
-      country: {
-        [FilterType.IN]: {
-          owner: 'b',
-          values: [4, 5, 6],
-        },
-      },
-    },
+    filters: {country: {[FilterType.IN]: {values: ['Spain']}}},
   });
 
   const mockFetch = vi
     .fn()
     .mockResolvedValue(createMockResponse({rows: [{value: 123}]}));
+
   vi.stubGlobal('fetch', mockFetch);
 
-  await widgetSource.getFormula({
-    filterOwner: 'a',
-    column: 'store_type',
-    operation: 'count',
-  });
-
-  expect(mockFetch).toHaveBeenCalledOnce();
-
-  let params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
-  expect(Object.fromEntries(params)).toMatchObject({
-    filters: JSON.stringify({country: {in: {owner: 'b', values: [4, 5, 6]}}}),
+  const expectedParams = {
+    filters: JSON.stringify({country: {in: {values: ['Spain']}}}),
     filtersLogicalOperator: 'and',
+  };
+
+  expect(await getActualParams('mywidget')).toMatchObject(expectedParams);
+  expect(await getActualParams(null)).toMatchObject(expectedParams);
+  expect(await getActualParams(undefined)).toMatchObject(expectedParams);
+  expect(await getActualParams('')).toMatchObject(expectedParams);
+
+  async function getActualParams(
+    filterOwner: string | null | undefined
+  ): Promise<Record<string, string>> {
+    await widgetSource.getFormula({
+      column: 'store_name',
+      operation: 'count',
+      filterOwner,
+    });
+    const params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
+    return Object.fromEntries(params);
+  }
+});
+
+test('filters - owner', async () => {
+  // Filters with 'owner' must affect all API calls *except*
+  // those with a matching 'filterOwner'. When 'owner' is null,
+  // undefined, or an empty string, it affects all calls.
+
+  const filters = {
+    a: {
+      [FilterType.IN]: {
+        owner: 'a',
+        values: [1, 2, 3],
+      },
+    },
+    b: {
+      [FilterType.IN]: {
+        owner: 'b',
+        values: [4, 5, 6],
+      },
+    },
+    c: {
+      [FilterType.IN]: {
+        owner: null,
+        values: [7, 8, 9],
+      },
+    },
+    d: {
+      [FilterType.IN]: {
+        owner: undefined,
+        values: [10, 11, 12],
+      },
+    },
+    e: {
+      [FilterType.IN]: {
+        owner: '',
+        values: [13, 14, 15],
+      },
+    },
+  };
+
+  const widgetSource = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+    filters,
   });
 
-  await widgetSource.getFormula({
-    column: 'store_type',
-    operation: 'count',
-  });
+  const mockFetch = vi
+    .fn()
+    .mockResolvedValue(createMockResponse({rows: [{value: 123}]}));
 
-  params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
-  expect(Object.fromEntries(params)).toMatchObject({
+  vi.stubGlobal('fetch', mockFetch);
+
+  expect(await getActualParams('a')).toMatchObject({
     filters: JSON.stringify({
-      store_type: {in: {owner: 'a', values: [1, 2, 3]}},
-      country: {in: {owner: 'b', values: [4, 5, 6]}},
+      ...filters,
+      a: undefined,
     }),
     filtersLogicalOperator: 'and',
   });
+
+  expect(await getActualParams('b')).toMatchObject({
+    filters: JSON.stringify({
+      ...filters,
+      b: undefined,
+    }),
+    filtersLogicalOperator: 'and',
+  });
+
+  expect(await getActualParams('c')).toMatchObject({
+    filters: JSON.stringify(filters),
+    filtersLogicalOperator: 'and',
+  });
+
+  expect(await getActualParams('d')).toMatchObject({
+    filters: JSON.stringify(filters),
+    filtersLogicalOperator: 'and',
+  });
+
+  expect(await getActualParams('e')).toMatchObject({
+    filters: JSON.stringify(filters),
+    filtersLogicalOperator: 'and',
+  });
+
+  async function getActualParams(
+    filterOwner: string | null | undefined
+  ): Promise<Record<string, string>> {
+    await widgetSource.getFormula({
+      column: 'store_name',
+      operation: 'count',
+      filterOwner,
+    });
+    const params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
+    return Object.fromEntries(params);
+  }
 });
 
 /******************************************************************************
