@@ -3,7 +3,13 @@ import {Task, TaskStatus} from '@lit/task';
 import {Ref, createRef, ref} from 'lit/directives/ref.js';
 import {cache} from 'lit/directives/cache.js';
 import * as echarts from 'echarts';
-import {AggregationType} from '@carto/api-client';
+import {
+  AggregationType,
+  Filter,
+  FilterType,
+  addFilter,
+  removeFilter,
+} from '@carto/api-client';
 
 import {DEFAULT_PALETTE, DEFAULT_TEXT_STYLE} from './styles.js';
 import {DEBOUNCE_TIME_MS} from '../constants.js';
@@ -129,19 +135,18 @@ export class CategoryWidget extends BaseWidget {
     if (!this.data) return;
 
     const {widgetSource} = await this.data;
-    const filters = {...widgetSource.props.filters} as Record<string, unknown>;
+    const filters = {...widgetSource.props.filters} as Record<string, Filter>;
     const column = this.column as string;
 
-    // TODO: Append filters from multiple widgets on the same columns.
     if (this._filterValues.length > 0) {
-      filters[column] = {
-        in: {
-          owner: this._widgetId,
-          values: Array.from(this._filterValues),
-        },
-      };
+      addFilter(filters, {
+        column,
+        type: FilterType.IN,
+        values: Array.from(this._filterValues),
+        owner: this._widgetId,
+      });
     } else {
-      delete filters[column];
+      removeFilter(filters, {column, owner: this._widgetId});
     }
 
     this.dispatchEvent(new CustomEvent('filter', {detail: {filters}}));
