@@ -86,7 +86,7 @@ export class InvalidColumnError extends Error {
 
 export function isEmptyObject(object: object): boolean {
   for (const _ in object) {
-    return true;
+    return false;
   }
-  return false;
+  return true;
 }
