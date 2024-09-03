@@ -53,7 +53,7 @@ export function removeFilter(
   }
 
   if (owner) {
-    for (const type in FilterType) {
+    for (const type of Object.values(FilterType)) {
       if (owner === filter[type as FilterType]?.owner) {
         delete filter[type as FilterType];
       }
