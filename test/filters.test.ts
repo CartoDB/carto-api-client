@@ -5,6 +5,8 @@ import {
   clearFilters,
   addFilter,
   removeFilter,
+  getFilter,
+  hasFilter,
 } from '@carto/api-client';
 
 test('addFilter', () => {
@@ -156,4 +158,77 @@ test('clearFilters', () => {
   });
 
   expect(filters).toMatchObject({});
+});
+
+test('getFilter', () => {
+  const filters = {
+    column_a: {
+      [FilterType.IN]: {values: [1, 2]},
+    },
+    column_b: {
+      [FilterType.IN]: {values: ['a', 'b'], owner: 'my-widget-3'},
+      [FilterType.BETWEEN]: {values: [[3, 4]], owner: 'my-widget-2'},
+    },
+  };
+
+  expect(
+    getFilter(filters, {column: 'no-such-column', type: FilterType.IN})
+  ).toBeNull();
+
+  expect(
+    getFilter(filters, {column: 'column_a', type: FilterType.IN})
+  ).toMatchObject({values: [1, 2]});
+  expect(
+    getFilter(filters, {column: 'column_a', type: FilterType.IN, owner: 'none'})
+  ).toBeNull();
+
+  expect(
+    getFilter(filters, {
+      column: 'column_b',
+      type: FilterType.IN,
+      owner: 'my-widget-3',
+    })
+  ).toMatchObject({values: ['a', 'b'], owner: 'my-widget-3'});
+  expect(
+    getFilter(filters, {
+      column: 'column_b',
+      type: FilterType.BETWEEN,
+      owner: 'my-widget-3',
+    })
+  ).toBeNull();
+  expect(
+    getFilter(filters, {
+      column: 'column_b',
+      type: FilterType.BETWEEN,
+      owner: 'my-widget-2',
+    })
+  ).toMatchObject({values: [[3, 4]], owner: 'my-widget-2'});
+});
+
+test('hasFilter', () => {
+  const filters = {
+    column_a: {
+      [FilterType.IN]: {values: [1, 2]},
+    },
+    column_b: {
+      [FilterType.IN]: {values: ['a', 'b'], owner: 'owner-3'},
+      [FilterType.BETWEEN]: {values: [[3, 4]], owner: 'owner-2'},
+    },
+  };
+
+  expect(hasFilter(filters, {column: 'no-such-column'})).toBe(false);
+  expect(hasFilter(filters, {column: 'no-such-column', owner: 'owner-4'})).toBe(
+    false
+  );
+
+  expect(hasFilter(filters, {column: 'column_a'})).toBe(true);
+  expect(hasFilter(filters, {column: 'column_a', owner: ''})).toBe(true);
+  expect(hasFilter(filters, {column: 'column_a', owner: null})).toBe(true);
+  expect(hasFilter(filters, {column: 'column_a', owner: undefined})).toBe(true);
+  expect(hasFilter(filters, {column: 'column_a', owner: 'owner-4'})).toBe(
+    false
+  );
+
+  expect(hasFilter(filters, {column: 'column_b', owner: 'owner-3'})).toBe(true);
+  expect(hasFilter(filters, {column: 'column_b', owner: 'owner-2'})).toBe(true);
 });

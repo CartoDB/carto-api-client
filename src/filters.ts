@@ -78,3 +78,52 @@ export function clearFilters(
   }
   return filters;
 }
+
+export type HasFilterOptions = {
+  column: string;
+  owner?: string;
+};
+
+export function hasFilter(
+  filters: Record<string, Filter>,
+  {column, owner}: HasFilterOptions
+): boolean {
+  const filter = filters[column];
+  if (!filter) {
+    return false;
+  }
+
+  if (!owner) {
+    return true;
+  }
+
+  for (const type of Object.values(FilterType)) {
+    if (owner === filter[type as FilterType]?.owner) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+export type GetFilterOptions<T extends FilterType> = {
+  column: string;
+  type: T;
+  owner?: string;
+};
+
+export function getFilter<T extends FilterType>(
+  filters: Record<string, Filter>,
+  {column, type, owner}: GetFilterOptions<T>
+): Filter[T] | null {
+  const filter = filters[column];
+  if (!filter) {
+    return null;
+  }
+
+  if (!owner || owner === filter[type as FilterType]?.owner) {
+    return filter[type] || null;
+  }
+
+  return null;
+}
