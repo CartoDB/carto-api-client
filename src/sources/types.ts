@@ -1,6 +1,5 @@
-import {GroupDateType} from '../constants';
 import {
-  AggregationType,
+  GroupDateType,
   SortColumnType,
   SortDirection,
   SpatialFilter,
@@ -20,14 +19,14 @@ interface BaseRequestOptions {
 /** Options for {@link WidgetBaseSource#getCategories}. */
 export interface CategoryRequestOptions extends BaseRequestOptions {
   column: string;
-  operation?: AggregationType;
+  operation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
   operationColumn?: string;
 }
 
 /** Options for {@link WidgetBaseSource#getFormula}. */
 export interface FormulaRequestOptions extends BaseRequestOptions {
   column: string;
-  operation?: AggregationType;
+  operation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
   operationExp?: string;
 }
 
@@ -35,7 +34,7 @@ export interface FormulaRequestOptions extends BaseRequestOptions {
 export interface HistogramRequestOptions extends BaseRequestOptions {
   column: string;
   ticks: number[];
-  operation?: AggregationType;
+  operation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
 }
 
 /** Options for {@link WidgetBaseSource#getRange}. */
@@ -46,9 +45,9 @@ export interface RangeRequestOptions extends BaseRequestOptions {
 /** Options for {@link WidgetBaseSource#getScatter}. */
 export interface ScatterRequestOptions extends BaseRequestOptions {
   xAxisColumn: string;
-  xAxisJoinOperation?: AggregationType;
+  xAxisJoinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
   yAxisColumn: string;
-  yAxisJoinOperation?: AggregationType;
+  yAxisJoinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
 }
 
 /** Options for {@link WidgetBaseSource#getTable}. */
@@ -57,8 +56,8 @@ export interface TableRequestOptions extends BaseRequestOptions {
   sortBy?: string;
   sortDirection?: SortDirection;
   sortByColumnType?: SortColumnType;
-  page?: number;
-  rowsPerPage?: number;
+  offset?: number;
+  limit?: number;
 }
 
 /** Options for {@link WidgetBaseSource#getTimeSeries}. */
@@ -66,9 +65,9 @@ export interface TimeSeriesRequestOptions extends BaseRequestOptions {
   column: string;
   stepSize?: GroupDateType;
   stepMultiplier?: number;
-  operation?: AggregationType;
+  operation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
   operationColumn?: string;
-  joinOperation?: AggregationType;
+  joinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
   splitByCategory?: string;
   splitByCategoryLimit?: number;
   splitByCategoryValues?: string[];

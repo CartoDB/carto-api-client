@@ -1,6 +1,5 @@
 import {html, css} from 'lit';
 import {Task} from '@lit/task';
-import {AggregationType} from '@carto/api-client';
 import {DEBOUNCE_TIME_MS} from '../constants.js';
 import {sleep} from '../utils.js';
 import {BaseWidget} from './base-widget.js';
@@ -39,7 +38,7 @@ export class FormulaWidget extends BaseWidget {
     };
   }
 
-  declare operation: AggregationType;
+  declare operation: 'count' | 'avg' | 'min' | 'max' | 'sum';
   declare column: string;
 
   constructor() {

@@ -321,6 +321,8 @@ test('getTable', async () => {
 
   const actualTable = await widgetSource.getTable({
     columns: ['name', 'revenue'],
+    limit: 20,
+    offset: 10,
   });
 
   expect(mockFetch).toHaveBeenCalledOnce();
@@ -335,8 +337,8 @@ test('getTable', async () => {
     source: 'test-data',
     params: JSON.stringify({
       column: ['name', 'revenue'],
-      limit: 10,
-      offset: 0,
+      limit: 20,
+      offset: 10,
     }),
     queryParameters: '',
     filters: JSON.stringify({}),

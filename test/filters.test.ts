@@ -1,6 +1,5 @@
 import {expect, test} from 'vitest';
 import {
-  GroupDateType,
   FilterType,
   clearFilters,
   addFilter,

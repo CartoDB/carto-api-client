@@ -3,13 +3,7 @@ import {Task, TaskStatus} from '@lit/task';
 import {Ref, createRef, ref} from 'lit/directives/ref.js';
 import {cache} from 'lit/directives/cache.js';
 import * as echarts from 'echarts';
-import {
-  AggregationType,
-  Filter,
-  FilterType,
-  addFilter,
-  removeFilter,
-} from '@carto/api-client';
+import {Filter, FilterType, addFilter, removeFilter} from '@carto/api-client';
 
 import {DEFAULT_PALETTE, DEFAULT_TEXT_STYLE} from './styles.js';
 import {DEBOUNCE_TIME_MS} from '../constants.js';
@@ -36,7 +30,7 @@ export class CategoryWidget extends BaseWidget {
   }
 
   declare column: string;
-  declare operation: AggregationType;
+  declare operation: 'count' | 'avg' | 'min' | 'max' | 'sum';
 
   protected _chart: echarts.ECharts | null = null;
   protected _chartRef: Ref<HTMLElement> = createRef();
