@@ -1,19 +1,4 @@
 /**
- * Defines a step size increment for use with {@link TimeSeriesRequestOptions}.
- *
- * @internalRemarks Source: @carto/react-core
- */
-export enum GroupDateType {
-  YEARS = 'year',
-  MONTHS = 'month',
-  WEEKS = 'week',
-  DAYS = 'day',
-  HOURS = 'hour',
-  MINUTES = 'minute',
-  SECONDS = 'second',
-}
-
-/**
  * Defines a comparator used when matching a column's values against given filter values.
  *
  * Example:

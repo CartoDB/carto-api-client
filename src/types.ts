@@ -1,4 +1,4 @@
-import type {FilterType} from './constants';
+import type {FilterType} from './constants.js';
 
 /******************************************************************************
  * AGGREGATION
@@ -38,6 +38,24 @@ export interface Filter {
 
 /** @internalRemarks Source: @carto/react-core */
 export type FilterLogicalOperator = 'and' | 'or';
+
+/******************************************************************************
+ * GROUPING
+ */
+
+/**
+ * Defines a step size increment for use with {@link TimeSeriesRequestOptions}.
+ *
+ * @internalRemarks Source: @carto/react-core
+ */
+export type GroupDateType =
+  | 'year'
+  | 'month'
+  | 'week'
+  | 'day'
+  | 'hour'
+  | 'minute'
+  | 'second';
 
 /******************************************************************************
  * SORTING

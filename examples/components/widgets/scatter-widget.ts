@@ -4,7 +4,6 @@ import {Ref, createRef, ref} from 'lit/directives/ref.js';
 import {cache} from 'lit/directives/cache.js';
 import * as echarts from 'echarts';
 import {TaskStatus} from '@lit/task';
-import {AggregationType} from '@carto/api-client';
 
 import {DEBOUNCE_TIME_MS} from '../constants.js';
 import {sleep} from '../utils.js';
@@ -32,9 +31,9 @@ export class ScatterWidget extends BaseWidget {
   }
 
   declare xAxisColumn: string;
-  declare xAxisJoinOperation: AggregationType;
+  declare xAxisJoinOperation: 'count' | 'avg' | 'min' | 'max' | 'sum';
   declare yAxisColumn: string;
-  declare yAxisJoinOperation: AggregationType;
+  declare yAxisJoinOperation: 'count' | 'avg' | 'min' | 'max' | 'sum';
 
   protected _chart: echarts.ECharts | null = null;
   protected _chartRef: Ref<HTMLElement> = createRef();

@@ -4,7 +4,6 @@ import {Ref, createRef, ref} from 'lit/directives/ref.js';
 import {cache} from 'lit/directives/cache.js';
 import * as echarts from 'echarts';
 import {TaskStatus} from '@lit/task';
-import {AggregationType} from '@carto/api-client';
 
 import {DEBOUNCE_TIME_MS} from '../constants.js';
 import {sleep} from '../utils.js';
@@ -31,7 +30,7 @@ export class HistogramWidget extends BaseWidget {
   }
 
   declare column: string;
-  declare operation: AggregationType;
+  declare operation: 'count' | 'avg' | 'min' | 'max' | 'sum';
   declare ticks: number[];
 
   protected _chart: echarts.ECharts | null = null;

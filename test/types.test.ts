@@ -4,6 +4,7 @@ import {
   Filter,
   FilterLogicalOperator,
   FilterType,
+  GroupDateType,
   SpatialFilter,
 } from '@carto/api-client';
 
@@ -76,4 +77,17 @@ test('FilterLogicalOperator', () => {
 
   // @ts-expect-error
   assertType<FilterLogicalOperator>('invalid');
+});
+
+test('GroupDateType', () => {
+  assertType<GroupDateType>('year');
+  assertType<GroupDateType>('month');
+  assertType<GroupDateType>('week');
+  assertType<GroupDateType>('day');
+  assertType<GroupDateType>('hour');
+  assertType<GroupDateType>('minute');
+  assertType<GroupDateType>('second');
+
+  // @ts-expect-error
+  assertType<GroupDateType>('invalid');
 });

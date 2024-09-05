@@ -1,10 +1,5 @@
 import {expect, test} from 'vitest';
-import {GroupDateType, FilterType} from '@carto/api-client';
-
-test('GroupDateType', () => {
-  expect(GroupDateType.DAYS).toBe('day');
-  expect(GroupDateType.HOURS).toBe('hour');
-});
+import {FilterType} from '@carto/api-client';
 
 test('FilterType', () => {
   expect(FilterType.IN).toBe('in');

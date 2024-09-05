@@ -239,7 +239,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
    */
   async getTable(options: TableRequestOptions): Promise<TableResponse> {
     const {filterOwner, spatialFilter, abortController, ...params} = options;
-    const {columns, sortBy, sortDirection, page = 0, rowsPerPage = 10} = params;
+    const {columns, sortBy, sortDirection, offset = 0, limit = 10} = params;
 
     type TableModelResponse = {
       rows: Record<string, number | string>[];
@@ -253,8 +253,8 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
         column: columns,
         sortBy,
         sortDirection,
-        limit: rowsPerPage,
-        offset: page * rowsPerPage,
+        limit,
+        offset,
       },
       opts: {abortController},
     }).then((res: TableModelResponse) => ({
