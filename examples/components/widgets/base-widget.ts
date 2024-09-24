@@ -1,5 +1,9 @@
 import {css, CSSResultGroup, LitElement} from 'lit';
-import {SpatialFilter, WidgetSource} from '@carto/api-client';
+import {
+  SpatialFilter,
+  WidgetSource,
+  createViewportSpatialFilter,
+} from '@carto/api-client';
 import {MapViewState, WebMercatorViewport} from '@deck.gl/core';
 
 export abstract class BaseWidget extends LitElement {
@@ -71,18 +75,7 @@ export abstract class BaseWidget extends LitElement {
 
     if (this.viewState) {
       const viewport = new WebMercatorViewport(this.viewState);
-      return {
-        type: 'Polygon',
-        coordinates: [
-          [
-            viewport.unproject([0, 0]),
-            viewport.unproject([viewport.width, 0]),
-            viewport.unproject([viewport.width, viewport.height]),
-            viewport.unproject([0, viewport.height]),
-            viewport.unproject([0, 0]),
-          ],
-        ],
-      };
+      return createViewportSpatialFilter(viewport.getBounds());
     }
 
     return undefined;
