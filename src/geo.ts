@@ -3,27 +3,37 @@ import bboxPolygon from '@turf/bbox-polygon';
 import union from '@turf/union';
 import {getType} from '@turf/invariant';
 import {polygon, multiPolygon, feature, featureCollection} from '@turf/helpers';
-import type {BBox, MultiPolygon, Polygon, Position} from 'geojson';
+import type {BBox, Geometry, MultiPolygon, Polygon, Position} from 'geojson';
 import {SpatialFilter} from './types';
 
 /**
- * TODO: Documentation.
+ * Returns a {@link SpatialFilter} for a given viewport, typically obtained
+ * from deck.gl's `viewport.getBounds()` method. If the viewport covers the
+ * entire world (to some margin of error in Web Mercator space), `undefined`
+ * is returned instead.
+ *
+ * If the viewport extends beyond longitude range [-180, +180], the polygon
+ * may be reformatted for compatibility with CARTO APIs.
  */
 export function createViewportSpatialFilter(
-  // Use explicit [number, ...], not BBox. The 'geojson' package is not a
-  // production dependency, and cannot be used in publicly exported APIs.
-  viewport: [number, number, number, number]
+  viewport: BBox
 ): SpatialFilter | undefined {
   if (_isGlobalViewport(viewport)) {
     return;
   }
+  return createPolygonSpatialFilter(bboxPolygon(viewport).geometry);
+}
 
-  const spatialFilter = _normalizeGeometry(bboxPolygon(viewport).geometry);
-  if (spatialFilter) {
-    return spatialFilter as SpatialFilter;
-  }
-
-  return undefined;
+/**
+ * Returns a {@link SpatialFilter} for a given {@link Polygon} or
+ * {@link MultiPolygon}. If the polygon(s) extend outside longitude
+ * range [-180, +180], the result may be reformatted for compatibility
+ * with CARTO APIs.
+ */
+export function createPolygonSpatialFilter(
+  spatialFilter: Polygon | MultiPolygon
+): SpatialFilter | undefined {
+  return (spatialFilter && _normalizeGeometry(spatialFilter)) || undefined;
 }
 
 /**
@@ -104,21 +114,25 @@ function _cleanMultiPolygonCoords(ccc: Position[][][]) {
 
 /** @internalRemarks Source: @carto/react-core */
 function _clean(
-  geometry: Polygon | MultiPolygon
+  geometry: Polygon | MultiPolygon | null
 ): Polygon | MultiPolygon | null {
   if (!geometry) {
     return null;
-  } else if (getType(geometry) === 'Polygon') {
+  }
+
+  if (_isPolygon(geometry)) {
     const coords = _cleanPolygonCoords((geometry as Polygon).coordinates);
     return coords ? polygon(coords).geometry : null;
-  } else if (getType(geometry) === 'MultiPolygon') {
+  }
+
+  if (_isMultiPolygon(geometry)) {
     const coords = _cleanMultiPolygonCoords(
       (geometry as MultiPolygon).coordinates
     );
     return coords ? multiPolygon(coords as Position[][][]).geometry : null;
-  } else {
-    return null;
   }
+
+  return null;
 }
 
 /** @internalRemarks Source: @carto/react-core */
@@ -153,4 +167,12 @@ function _tx(geometry: Polygon | MultiPolygon, distance: number) {
   } else {
     return null;
   }
+}
+
+function _isPolygon(geometry: Geometry): geometry is Polygon {
+  return getType(geometry) === 'Polygon';
+}
+
+function _isMultiPolygon(geometry: Geometry): geometry is MultiPolygon {
+  return getType(geometry) === 'MultiPolygon';
 }
