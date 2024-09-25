@@ -81,7 +81,7 @@ export async function h3TableSource(
   props: H3TableSourceOptions
 ): Promise<H3TableSourceResponse> {
   assignDefaultProps(props);
-  const response = await _h3TableSource(props);
+  const response = await _h3TableSource(props as _H3TableSourceOptions);
   return {...response, widgetSource: new WidgetTableSource(props)};
 }
 
@@ -90,7 +90,7 @@ export async function h3QuerySource(
   props: H3QuerySourceOptions
 ): Promise<H3QuerySourceResponse> {
   assignDefaultProps(props);
-  const response = await _h3QuerySource(props);
+  const response = await _h3QuerySource(props as _H3QuerySourceOptions);
   return {...response, widgetSource: new WidgetQuerySource(props)};
 }
 
@@ -109,7 +109,9 @@ export async function quadbinTableSource(
   props: QuadbinTableSourceOptions & WidgetBaseSourceProps
 ): Promise<QuadbinTableSourceResponse> {
   assignDefaultProps(props);
-  const response = await _quadbinTableSource(props);
+  const response = await _quadbinTableSource(
+    props as _QuadbinTableSourceOptions
+  );
   return {...response, widgetSource: new WidgetTableSource(props)};
 }
 
@@ -118,7 +120,9 @@ export async function quadbinQuerySource(
   props: QuadbinQuerySourceOptions & WidgetBaseSourceProps
 ): Promise<QuadbinQuerySourceResponse> {
   assignDefaultProps(props);
-  const response = await _quadbinQuerySource(props);
+  const response = await _quadbinQuerySource(
+    props as _QuadbinQuerySourceOptions
+  );
   return {...response, widgetSource: new WidgetQuerySource(props)};
 }
 
