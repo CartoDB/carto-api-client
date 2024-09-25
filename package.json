@@ -89,5 +89,13 @@
     "vite": "^5.2.10",
     "vitest": "1.6.0",
     "vue": "^3.4.27"
+  },
+  "dependencies": {
+    "@turf/bbox-clip": "^7.1.0",
+    "@turf/bbox-polygon": "^7.1.0",
+    "@turf/helpers": "^7.1.0",
+    "@turf/invariant": "^7.1.0",
+    "@turf/union": "^7.1.0",
+    "@types/geojson": "^7946.0.14"
   }
 }

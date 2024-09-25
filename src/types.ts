@@ -1,4 +1,5 @@
 import type {FilterType} from './constants.js';
+import type {Polygon, MultiPolygon} from 'geojson';
 
 /******************************************************************************
  * AGGREGATION
@@ -23,7 +24,7 @@ export type AggregationType =
  */
 
 /** @internalRemarks Source: @carto/react-api */
-export type SpatialFilter = GeoJSON.Polygon | GeoJSON.MultiPolygon;
+export type SpatialFilter = Polygon | MultiPolygon;
 
 /** @internalRemarks Source: @carto/react-api, @deck.gl/carto */
 export interface Filter {
