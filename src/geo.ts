@@ -8,9 +8,9 @@ import {SpatialFilter} from './types';
 
 /**
  * Returns a {@link SpatialFilter} for a given viewport, typically obtained
- * from deck.gl's `viewport.getBounds()` method. If the viewport covers the
- * entire world (to some margin of error in Web Mercator space), `undefined`
- * is returned instead.
+ * from deck.gl's `viewport.getBounds()` method ([west, south, east, north]).
+ * If the viewport covers the entire world (to some margin of error in Web
+ * Mercator space), `undefined` is returned instead.
  *
  * If the viewport extends beyond longitude range [-180, +180], the polygon
  * may be reformatted for compatibility with CARTO APIs.
