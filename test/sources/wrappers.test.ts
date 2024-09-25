@@ -14,10 +14,16 @@ const createMockFetchForTileJSON = () =>
   vi
     .fn()
     .mockResolvedValueOnce(
-      createMockFetchResponse({label: 'mapInit', tilejson: {url: ''}})
+      createMockFetchResponse({
+        label: 'mapInit',
+        tilejson: {url: ['https://example.com']},
+      })
     )
     .mockResolvedValueOnce(
-      createMockFetchResponse({label: 'tilejson', tilejson: {url: ''}})
+      createMockFetchResponse({
+        label: 'tilejson',
+        tilejson: {url: ['https://example.com']},
+      })
     );
 
 const createMockFetchResponse = (data: unknown) => ({
