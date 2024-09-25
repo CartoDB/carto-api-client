@@ -1,13 +1,8 @@
-import {
-  bboxClip,
-  bboxPolygon,
-  getType,
-  polygon,
-  multiPolygon,
-  union,
-  featureCollection,
-  feature,
-} from '@turf/turf';
+import bboxClip from '@turf/bbox-clip';
+import bboxPolygon from '@turf/bbox-polygon';
+import union from '@turf/union';
+import {getType} from '@turf/invariant';
+import {polygon, multiPolygon, feature, featureCollection} from '@turf/helpers';
 import type {BBox, MultiPolygon, Polygon, Position} from 'geojson';
 import {SpatialFilter} from './types';
 
