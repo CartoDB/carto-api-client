@@ -1,0 +1,101 @@
+{
+  "name": "@carto/api-client",
+  "description": "Client library for CARTO APIs and framework-agnostic CARTO + deck.gl applications",
+  "repository": "github:CartoDB/carto-api-client",
+  "author": "Don McCurdy <donmccurdy@carto.com>",
+  "packageManager": "yarn@4.3.1",
+  "version": "0.2.0",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "source": "src/index.ts",
+  "types": "./build/index.d.ts",
+  "main": "./build/api-client.cjs",
+  "module": "./build/api-client.modern.js",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "require": "./build/api-client.cjs",
+      "default": "./build/api-client.modern.js"
+    }
+  },
+  "browserslist": [
+    "defaults",
+    "not IE 11",
+    "node >= 18"
+  ],
+  "scripts": {
+    "build": "microbundle --format cjs,modern --no-compress --define VERSION=$npm_package_version",
+    "build:watch": "microbundle watch --format cjs,modern --no-compress --define VERSION=$npm_package_version",
+    "dev": "concurrently \"yarn build:watch\" \"vite --config examples/vite.config.ts --open\"",
+    "test": "vitest run --typecheck",
+    "test:watch": "vitest watch --typecheck",
+    "coverage": "vitest run --coverage",
+    "lint": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --check",
+    "format": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --write",
+    "clean": "rimraf build/*",
+    "postversion": "yarn postversion:check && yarn postversion:commit && yarn postversion:push",
+    "postversion:check": "yarn lint && yarn test",
+    "postversion:commit": "VERSION=v$npm_package_version && git add -u && git commit -m $VERSION && git tag -a $VERSION -m $VERSION",
+    "postversion:push": "git push && git push --tags",
+    "prepublish": "yarn lint && yarn test",
+    "prepack": "yarn clean && yarn build"
+  },
+  "files": [
+    "build",
+    "src",
+    "README.md",
+    "LICENSE.md"
+  ],
+  "devDependencies": {
+    "@deck.gl/aggregation-layers": "^9.0.30",
+    "@deck.gl/carto": "^9.0.30",
+    "@deck.gl/core": "^9.0.30",
+    "@deck.gl/extensions": "^9.0.30",
+    "@deck.gl/geo-layers": "^9.0.30",
+    "@deck.gl/layers": "^9.0.30",
+    "@deck.gl/mesh-layers": "^9.0.30",
+    "@deck.gl/react": "^9.0.30",
+    "@lit/react": "^1.0.5",
+    "@lit/task": "^1.0.1",
+    "@loaders.gl/core": "^4.2.3",
+    "@luma.gl/core": "^9.0.27",
+    "@luma.gl/engine": "^9.0.27",
+    "@sveltejs/vite-plugin-svelte": "^3.1.2",
+    "@types/json-schema": "^7.0.15",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/semver": "^7.5.8",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "@vitest/coverage-istanbul": "^1.6.0",
+    "@webcomponents/webcomponentsjs": "^2.8.0",
+    "concurrently": "^8.2.2",
+    "echarts": "^5.5.0",
+    "lit": "^3.1.4",
+    "lit-analyzer": "^1.2.1",
+    "maplibre-gl": "^4.6.0",
+    "microbundle": "^0.15.1",
+    "prettier": "^2.6.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-map-gl": "^7.1.7",
+    "rimraf": "^3.0.2",
+    "svelte": "^4.2.17",
+    "typescript": "~5.3.3",
+    "vite": "^5.2.10",
+    "vitest": "1.6.0",
+    "vue": "^3.4.27"
+  },
+  "dependencies": {
+    "@turf/bbox-clip": "^7.1.0",
+    "@turf/bbox-polygon": "^7.1.0",
+    "@turf/helpers": "^7.1.0",
+    "@turf/invariant": "^7.1.0",
+    "@turf/union": "^7.1.0",
+    "@types/geojson": "^7946.0.14"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "include": ["src/**/*.ts"],
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "build",
+    "target": "es2022",
+    "module": "es2022",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "declaration": true,
+    "allowSyntheticDefaultImports": true,
+    "lib": ["es2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
+    "jsx": "react",
+    "strict": true
+  }
+}

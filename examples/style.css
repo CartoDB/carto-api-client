@@ -1,0 +1,76 @@
+html,
+body {
+  background: #fafafa;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Courier New', monospace;
+}
+header {
+  position: fixed;
+  top: 1em;
+  left: 1em;
+  z-index: 100;
+  padding: 1em 2.5em;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #f0f0f0;
+}
+header h1 {
+  margin: 0;
+  font-weight: normal;
+  font-size: 1.2rem;
+}
+header a {
+  color: #4080f0;
+  margin-top: 0.5em;
+  display: block;
+  text-decoration: none;
+}
+header a::hover {
+  text-decoration: underline;
+}
+#app {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+#view {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+#view > #map,
+#view > #deck-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+#rail {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  position: relative;
+  width: 450px;
+  background-color: #fefefe;
+  padding: 1em;
+  overflow-y: auto;
+}
+#rail > figure {
+  width: 100%;
+  height: 200px;
+  margin: 0 0 1em 0;
+  background: #f0f0f0;
+  border-radius: 8px;
+}
+#footer {
+  position: absolute;
+  font-size: 0.8em;
+  bottom: 1em;
+  left: 1em;
+}

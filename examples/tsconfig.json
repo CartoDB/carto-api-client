@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "include": ["**/*.{ts,tsx}"],
+  "compilerOptions": {
+    "rootDir": ".",
+    "paths": {
+      "@carto/api-client": ["../"]
+    },
+    "jsx": "react",
+    "declaration": false
+  }
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>Examples / Pure JS</title>
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <main id="app">
+      <header>
+        <h1>Pure JS</h1>
+        <a href="../">← Back</a>
+      </header>
+      <section id="view">
+        <div id="map"></div>
+        <canvas id="deck-canvas"></canvas>
+      </section>
+      <section id="rail">
+        <formula-widget
+          id="formula"
+          header="Total"
+          operation="count"
+        ></formula-widget>
+
+        <category-widget
+          id="category"
+          header="Store type"
+          operation="count"
+          column="storetype"
+        ></category-widget>
+
+        <pie-widget
+          id="pie"
+          header="Store type"
+          operation="count"
+          column="storetype"
+        ></pie-widget>
+
+        <table-widget
+          id="table"
+          header="Store type"
+          columns='["storetype","revenue"]'
+        ></table-widget>
+
+        <scatter-widget
+          id="scatter"
+          header="Size vs. Revenue"
+          xAxisColumn="size_m2"
+          yAxisColumn="revenue"
+        ></scatter-widget>
+
+        <histogram-widget
+          id="histogram"
+          header="Revenue"
+          column="revenue"
+          ticks="[1250000, 1500000, 1750000]"
+        ></histogram-widget>
+      </section>
+      <footer id="footer"></footer>
+    </main>
+    <script type="module" src="./pure-js.ts"></script>
+  </body>
+</html>
