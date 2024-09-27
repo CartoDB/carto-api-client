@@ -17,8 +17,6 @@ npm install --save @carto/api-client
 
 ## Documentation
 
-WORK IN PROGRESS.
-
 ### Fetching data
 
 Import `vectorTableSource`, `vectorQuerySource`, and other data source functions
@@ -27,25 +25,23 @@ from the `@carto/api-client` package. These are drop-in replacements for the equ
 ```javascript
 import { vectorTableSource } from '@carto/api-client';
 
-const data = vectorTableSource({
+const data = await vectorTableSource({
   accessToken: '••••',
   connectionName: 'carto_dw',
   tableName: 'carto-demo-data.demo_tables.retail_stores'
 });
 
-const { widgetSource } = await data;
-
 // → {name: string; value: number}[]
-const categories = await widgetSource.getCategories({
+const categories = await data.widgetSource.getCategories({
   column: 'store_type',
   operation: 'count',
 });
 
 // → {value: number}
-const formula = await widgetSource.getFormula({operation: 'count'});
+const formula = await data.widgetSource.getFormula({operation: 'count'});
 
 // → {totalCount: number; rows: Record<string, number | string>[]}
-const table = await widgetSource.getTable({
+const table = await data.widgetSource.getTable({
   columns: ['a', 'b', 'c'],
   sortBy: ['a'],
   rowsPerPage: 20
@@ -62,7 +58,7 @@ property to the source factory function.
 ```javascript
 import {vectorTableSource} from '@carto/api-client';
 
-const data = vectorTableSource({
+const data = await vectorTableSource({
   accessToken: '••••',
   connectionName: 'carto_dw',
   tableName: 'carto-demo-data.demo_tables.retail_stores',
@@ -79,7 +75,7 @@ results should not be affected by a filter that the widget itself created.
 
 ```javascript
 // → {name: string; value: number}[]
-const categories = await widgetSource.getCategories({
+const categories = await data.widgetSource.getCategories({
   filterOwner: 'widget-id',
   column: 'store_type',
   operation: 'count',
@@ -92,7 +88,7 @@ To filter the widget source to a spatial region, pass a `spatialFilter` paramete
 
 ```javascript
 // → {name: string; value: number}[]
-const categories = await widgetSource.getCategories({
+const categories = await data.widgetSource.getCategories({
   column: 'store_type',
   operation: 'count',
   spatialFilter: {
@@ -114,22 +110,10 @@ To create a spatial filter from the current [deck.gl `viewState`](https://deck.g
 
 ```javascript
 import {WebMercatorViewport} from '@deck.gl/core';
+import {createViewportSpatialFilter} from '@carto/api-client';
 
-function createViewStatePolygon(viewState) {
-  const viewport = new WebMercatorViewport(viewState);
-  return {
-    type: 'Polygon',
-    coordinates: [
-      [
-        viewport.unproject([0, 0]),
-        viewport.unproject([viewport.width, 0]),
-        viewport.unproject([viewport.width, viewport.height]),
-        viewport.unproject([0, viewport.height]),
-        viewport.unproject([0, 0]),
-      ],
-    ],
-  };
-}
+const viewport = new WebMercatorViewport(viewState);
+const spatialFilter = createViewportSpatialFilter(viewport.getBounds());
 ```
 
 ### Specifying columns to fetch
