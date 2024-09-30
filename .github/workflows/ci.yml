@@ -53,6 +53,6 @@ jobs:
     name: 'Release (precheck)'
     needs: build
     if: |
-      {{ github.ref == 'ref/head/main' }} &&
+      github.ref == 'ref/head/main' &&
       "contains(github.event.head_commit.message, 'chore(release)')"
     uses: ./.github/workflows/release.yml
