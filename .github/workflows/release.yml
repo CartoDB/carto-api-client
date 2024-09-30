@@ -1,0 +1,79 @@
+name: Release
+
+on:
+  workflow_call:
+
+env:
+  NODE_VERSION: 20
+  CI: true
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-22.04
+
+    if: |
+      "contains(github.event.head_commit.message, 'chore(release)')" &&
+      startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Load version from git tag
+        id: version
+        uses: nowsprinting/check-version-format-action@v4
+
+      - name: Validate version from git tag
+        if: steps.version.outputs.is_valid != 'true'
+        run: echo "Tag must follow SemVer convention. Aborting." && exit 1
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Assign dist tag
+        id: dist-tag
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          script: |
+            console.log(`Ref tag: ${context.ref}`)
+            const refTagMatch = context.ref.match(/(alpha|beta)/)
+            if (!refTagMatch) {
+              distTag = 'latest'
+            } else {
+              distTag =  refTagMatch[0]
+            }
+            console.log(`npm dist tag: ${distTag}`)
+            return distTag
+
+      # TODO: Enable after reaching 1.0.0.
+      # This may indicate that the tag set has a typo ("alpah", etc.)
+      # - name: Validate parsed version
+      #   if: steps.version.outputs.is_stable == 'false' && steps.get-release-type.outputs.result == 'latest'
+      #   run: echo "Tag set may be incorrect. Please, review." && exit 1
+
+      - name: Install
+        run: |
+          corepack enable
+          yarn install
+
+      - name: Build
+        run: |
+          yarn lint
+          yarn build
+          yarn test
+
+      - name: Configure yarn to publish packages
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_CARTODB_AUTH_TOKEN }}
+        run: |
+          yarn config set npmPublishRegistry "https://registry.npmjs.org/"
+          yarn config set npmAuthToken "${NPM_AUTH_TOKEN}"
+
+      - name: Publish
+        env:
+          DIST_TAG: ${{ steps.dist-tag.outputs.result }}
+        run: yarn npm publish --tag ${DIST_TAG}
