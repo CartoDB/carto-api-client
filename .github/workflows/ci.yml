@@ -54,5 +54,6 @@ jobs:
     needs: build
     if: |
       github.ref == 'ref/head/main' &&
-      "contains(github.event.head_commit.message, 'chore(release)')"
+      github.event_name == 'push' &&
+      contains(github.event.head_commit.message, 'chore(release)')
     uses: ./.github/workflows/release.yml
