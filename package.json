@@ -40,7 +40,7 @@
     "clean": "rimraf build/*",
     "postversion": "yarn postversion:check && yarn postversion:commit && yarn postversion:push",
     "postversion:check": "yarn lint && yarn test",
-    "postversion:commit": "VERSION=v$npm_package_version && git add -u && git commit -m $VERSION && git tag -a $VERSION -m $VERSION",
+    "postversion:commit": "VERSION=v$npm_package_version && if [[ $(git rev-parse --abbrev-ref HEAD) == main ]]; then git checkout -b 'release/$VERSION'; fi && git add -u && git commit -m 'chore(release): $VERSION' && git tag -a $VERSION -m $VERSION",
     "postversion:push": "git push && git push --tags",
     "prepublish": "yarn lint && yarn test",
     "prepack": "yarn clean && yarn build"

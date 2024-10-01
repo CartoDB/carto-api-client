@@ -3,47 +3,38 @@ name: CI
 on:
   push:
     branches: [main]
-    tags: ['*']
-
   pull_request:
     branches: [main]
 
+env:
+  CI: true
+
 jobs:
+  ##########################################################################
+  # Build
+  ##########################################################################
+
   build:
     name: Build [Node.js ${{ matrix.node-version }}]
     runs-on: ubuntu-22.04
 
     strategy:
       matrix:
-        include:
-          - node-version: 18.x
-            publish: false
-          - node-version: 20.x
-            publish: true # Publish on npm
-          - node-version: 22.x
-            publish: false
-
-    env:
-      CI: true
+        node-version: [18.x, 20.x, 22.x]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      ##########################################################################
-      # Build
-      ##########################################################################
 
       - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Enable Corepack
-        run: corepack enable
-
       - name: Install
-        run: yarn install
+        run: |
+          corepack enable
+          yarn install
 
       - name: Lint
         run: yarn lint
@@ -54,56 +45,15 @@ jobs:
       - name: Test
         run: yarn test
 
-      ##########################################################################
-      # Publish
-      ##########################################################################
+  ##########################################################################
+  # Release precheck
+  ##########################################################################
 
-      - name: Check tag format
-        id: check-tag-format
-        if: startsWith(github.ref, 'refs/tags/') && matrix.publish
-        uses: nowsprinting/check-version-format-action@v4
-
-      - name: Exit on invalid tag format
-        if: startsWith(github.ref, 'refs/tags/') && !steps.check-tag-format.outputs.is_valid && matrix.publish
-        run: echo "Tag must follow SemVer convention. Aborting." && exit 1
-
-      - name: Get release type
-        if: startsWith(github.ref, 'refs/tags/') && matrix.publish
-        id: get-release-type
-        uses: actions/github-script@v7
-        with:
-          result-encoding: string
-          script: |
-            const regex = /(alpha|beta)/
-            const refName = context.ref.replace('refs/tags/', '')
-            console.log(`Ref tag: ${refName}`)
-            const releaseTypeMatch = refName.match(regex)
-            if (!releaseTypeMatch) {
-              releaseType = 'latest'
-            } else {
-              releaseType =  releaseTypeMatch[0]
-            }
-            console.log(`Release type: ${releaseType}`)
-            return releaseType
-
-      # TODO: Enable after reaching 1.0.0.
-      # This may indicate that the tag set has a typo, e.g., alpah, betta, etc.
-      # - name: Verify tag format
-      #   if: steps.check-tag-format.outputs.is_stable == 'false' && steps.get-release-type.outputs.result == 'latest'
-      #   run: echo "Tag set may be incorrect. Please, review" && exit 1
-
-      - name: Configure yarn to publish packages
-        if: startsWith(github.ref, 'refs/tags/') && matrix.publish
-        env:
-          # The following token has been manually issued in the CartoDB
-          # organization for npmjs.com
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_CARTODB_AUTH_TOKEN }}
-        run: |
-          yarn config set npmPublishRegistry "https://registry.npmjs.org/"
-          yarn config set npmAuthToken "${NODE_AUTH_TOKEN}"
-
-      - name: Publish package
-        if: startsWith(github.ref, 'refs/tags/') && matrix.publish
-        env:
-          RELEASE_TYPE: ${{ steps.get-release-type.outputs.result }}
-        run: yarn npm publish --tag ${RELEASE_TYPE}
+  release_precheck:
+    name: 'Release (precheck)'
+    needs: build
+    if: |
+      github.ref == 'ref/head/main' &&
+      github.event_name == 'push' &&
+      contains(github.event.head_commit.message, 'chore(release)')
+    uses: ./.github/workflows/release.yml
