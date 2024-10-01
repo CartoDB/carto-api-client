@@ -15,13 +15,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Load version from git tag
+      # - name: Load version from git tag
+      #   id: version
+      #   uses: nowsprinting/check-version-format-action@v4
+
+      - uses: actions-ecosystem/action-get-latest-tag@v1
         id: version
-        uses: nowsprinting/check-version-format-action@v4
+        with:
+          semver_only: true
+          with_initial_version: false
 
       - name: Validate version from git tag
-        if: steps.version.outputs.is_valid != 'true'
+        if: steps.version.outputs.tag == ''
         run: echo "Tag must follow SemVer convention. Aborting." && exit 1
+
+      # - name: Validate version from git tag
+      #   if: steps.version.outputs.is_valid != 'true'
+      #   run: echo "Tag must follow SemVer convention. Aborting." && exit 1
 
       - name: Set up Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
