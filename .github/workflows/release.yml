@@ -15,8 +15,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: actions-ecosystem/action-get-latest-tag@v1
+      - name: Retrieve version
         id: version
+        run: |
+          echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
+
+      # - uses: actions-ecosystem/action-get-latest-tag@v1
+      #   id: version
 
       # - name: Validate version from git tag
       #   if: steps.version.outputs.is_valid != 'true'
