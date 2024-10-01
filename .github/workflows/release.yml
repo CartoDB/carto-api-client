@@ -44,13 +44,8 @@ jobs:
         with:
           result-encoding: string
           script: |
-            console.log(`Ref tag: ${context.ref}`)
-            const refTagMatch = context.ref.match(/(alpha|beta)/)
-            if (!refTagMatch) {
-              distTag = 'latest'
-            } else {
-              distTag =  refTagMatch[0]
-            }
+            console.log(`git tag: ${steps.version.outputs.tag}`)
+            const distTag = steps.version.outputs.tag.match(/^v\d+\.\d+\.\d+$/) ? 'latest' : 'alpha'
             console.log(`npm dist tag: ${distTag}`)
             return distTag
 
