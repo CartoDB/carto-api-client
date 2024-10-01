@@ -38,7 +38,7 @@ jobs:
         with:
           result-encoding: string
           script: |
-            const gitTag = '${{ steps.version.outputs.tag }}'
+            const gitTag = '${{ steps.version.outputs.TAG_NAME }}'
             console.log(`git tag: ${gitTag}`)
             if (gitTag.match(/^v\d+\.\d+\.\d+$/)) {
               distTag = 'latest'
