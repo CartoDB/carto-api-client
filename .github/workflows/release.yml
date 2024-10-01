@@ -15,19 +15,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # - name: Load version from git tag
-      #   id: version
-      #   uses: nowsprinting/check-version-format-action@v4
-
       - uses: actions-ecosystem/action-get-latest-tag@v1
         id: version
-        with:
-          semver_only: true
-          with_initial_version: false
-
-      - name: Validate version from git tag
-        if: steps.version.outputs.tag == ''
-        run: echo "Tag must follow SemVer convention. Aborting." && exit 1
 
       # - name: Validate version from git tag
       #   if: steps.version.outputs.is_valid != 'true'
@@ -46,15 +35,15 @@ jobs:
           script: |
             const gitTag = '${{ steps.version.outputs.tag }}'
             console.log(`git tag: ${gitTag}`)
-            const distTag = gitTag.match(/^v\d+\.\d+\.\d+$/) ? 'latest' : 'alpha'
+            if (gitTag.match(/^v\d+\.\d+\.\d+$/)) {
+              distTag = 'latest'
+            } else if (gitTag.match(/^v\d+\.\d+\.\d+/)) {
+              distTag = 'alpha'
+            } else {
+              core.setFailed('Tag must follow SemVer convention. Aborting.');
+            }
             console.log(`npm dist tag: ${distTag}`)
             return distTag
-
-      # TODO: Enable after reaching 1.0.0.
-      # This may indicate that the tag set has a typo ("alpah", etc.)
-      # - name: Validate parsed version
-      #   if: steps.version.outputs.is_stable == 'false' && steps.get-release-type.outputs.result == 'latest'
-      #   run: echo "Tag set may be incorrect. Please, review." && exit 1
 
       - name: Install
         run: |
