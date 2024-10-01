@@ -4,7 +4,7 @@
   "repository": "github:CartoDB/carto-api-client",
   "author": "Don McCurdy <donmccurdy@carto.com>",
   "packageManager": "yarn@4.3.1",
-  "version": "0.2.0",
+  "version": "0.2.1-0",
   "license": "MIT",
   "publishConfig": {
     "access": "public",
@@ -40,7 +40,7 @@
     "clean": "rimraf build/*",
     "postversion": "yarn postversion:check && yarn postversion:commit && yarn postversion:push",
     "postversion:check": "yarn lint && yarn test",
-    "postversion:commit": "VERSION=v$npm_package_version && if [[ $(git rev-parse --abbrev-ref HEAD) == main ]]; then git checkout -b 'release/$VERSION'; fi && git add -u && git commit -m 'chore(release): $VERSION' && git tag -a $VERSION -m $VERSION",
+    "postversion:commit": "VERSION=v$npm_package_version && node scripts/postversion-commit.js",
     "postversion:push": "git push && git push --tags",
     "prepublish": "yarn lint && yarn test",
     "prepack": "yarn clean && yarn build"
@@ -97,5 +97,6 @@
     "@turf/invariant": "^7.1.0",
     "@turf/union": "^7.1.0",
     "@types/geojson": "^7946.0.14"
-  }
+  },
+  "stableVersion": "0.2.0"
 }
