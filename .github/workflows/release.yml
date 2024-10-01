@@ -44,8 +44,9 @@ jobs:
         with:
           result-encoding: string
           script: |
-            console.log(`git tag: ${steps.version.outputs.tag}`)
-            const distTag = steps.version.outputs.tag.match(/^v\d+\.\d+\.\d+$/) ? 'latest' : 'alpha'
+            const gitTag = '${{ steps.version.outputs.tag }}'
+            console.log(`git tag: ${gitTag}`)
+            const distTag = gitTag.match(/^v\d+\.\d+\.\d+$/) ? 'latest' : 'alpha'
             console.log(`npm dist tag: ${distTag}`)
             return distTag
 
