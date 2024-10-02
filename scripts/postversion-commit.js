@@ -10,7 +10,7 @@ import {valid} from 'semver';
 
 // Read and validate pkg.version.
 const pkgJSON = await readFile(resolve('./package.json'), 'utf-8');
-const {version} = JSON.parse(pkgJSON);
+const version = 'v' + JSON.parse(pkgJSON).version;
 if (!valid(version)) {
   throw new Error(`Invalid version, "${version}"`);
 }
