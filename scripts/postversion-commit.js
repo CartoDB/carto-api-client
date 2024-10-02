@@ -1,5 +1,5 @@
 import {execSync} from 'node:child_process';
-import {version} from '../package.json';
+import pkg from '../package.json' assert {type: 'json'};
 
 /**
  * Utility for committing and tagging a release commit in
@@ -11,9 +11,9 @@ const currentBranch = execSync('git rev-parse --abbrev-ref HEAD')
   .trim();
 
 if (currentBranch === 'main') {
-  execSync(`git checkout -b 'release/${version}'`);
+  execSync(`git checkout -b 'release/${pkg.version}'`);
 }
 
 execSync('git add -u');
-execSync(`git commit -m 'chore(release): ${version}'`);
-execSync(`git tag -a ${version} -m ${version}`);
+execSync(`git commit -m 'chore(release): ${pkg.version}'`);
+execSync(`git tag -a ${pkg.version} -m ${pkg.version}`);
