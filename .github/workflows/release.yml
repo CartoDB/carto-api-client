@@ -11,25 +11,13 @@ jobs:
     name: Release
     runs-on: ubuntu-22.04
 
-    # Fetching tags: https://stackoverflow.com/a/76181083
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 10
-          fetch-tags: true
 
-      # Step output: https://stackoverflow.com/a/65616499
-      # Reading latest tag: https://stackoverflow.com/a/33733020
-      - name: Read git tag
-        id: git-tag
-        run: echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
-
-      - name: Verify git tag
-        env:
-          GIT_TAG: ${{ steps.git-tag.outputs.TAG_NAME }}
-        if: startsWith(env.GIT_TAG, 'v') == false
-        run: echo "Missing or invalid git tag; aborting" && exit 1
+      - name: Read package version
+        id: version
+        run: echo "PKG_VERSION=v$(npm pkg get version | xargs)" >> $GITHUB_OUTPUT
 
       - name: Set up Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
@@ -42,14 +30,14 @@ jobs:
         with:
           result-encoding: string
           script: |
-            const gitTag = '${{ steps.git-tag.outputs.TAG_NAME }}'
-            console.log(`git tag: ${gitTag}`)
-            if (gitTag.match(/^v\d+\.\d+\.\d+$/)) {
+            const version = '${{ steps.version.outputs.PKG_VERSION }}'
+            console.log(`version: ${version}`)
+            if (version.match(/^v\d+\.\d+\.\d+$/)) {
               distTag = 'latest'
-            } else if (gitTag.match(/^v\d+\.\d+\.\d+/)) {
+            } else if (version.match(/^v\d+\.\d+\.\d+/)) {
               distTag = 'alpha'
             } else {
-              core.setFailed('Tag must follow SemVer convention. Aborting.');
+              core.setFailed('Version must follow SemVer convention. Aborting.');
             }
             console.log(`npm dist tag: ${distTag}`)
             return distTag
