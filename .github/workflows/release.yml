@@ -20,12 +20,15 @@ jobs:
       # - https://stackoverflow.com/a/33733020
       - name: Read git tag
         id: git-tag
-        run: echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
+        run: |
+          echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
+          echo "TEST=TESTTESTTEST" >> $GITHUB_OUTPUT
 
       # TODO: TESTING
       - name: Test git tag
         env:
           GIT_TAG: ${{ steps.git-tag.outputs.TAG_NAME }}
+          TEST: ${{ steps.git-tag.outputs.TEST }}
         if: contains(env.GIT_TAG, 'v') == false
         run: echo "Missing GIT_TAG; aborting" && exit 1
 

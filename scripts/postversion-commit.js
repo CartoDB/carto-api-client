@@ -1,19 +1,17 @@
 import {execSync} from 'node:child_process';
-import pkg from '../package.json' assert {type: 'json'};
 
 /**
  * Utility for committing and tagging a release commit in
  * git, called as part of the `yarn postversion` script.
  */
 
-const currentBranch = execSync('git rev-parse --abbrev-ref HEAD')
-  .toString()
-  .trim();
+const branch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
+const {version} = require('../package.json');
 
-if (currentBranch === 'main') {
-  execSync(`git checkout -b 'release/${pkg.version}'`);
+if (branch === 'main') {
+  execSync(`git checkout -b 'release/${version}'`);
 }
 
 execSync('git add -u');
-execSync(`git commit -m 'chore(release): ${pkg.version}'`);
-execSync(`git tag -a ${pkg.version} -m ${pkg.version}`);
+execSync(`git commit -m 'chore(release): ${version}'`);
+execSync(`git tag -a ${version} -m ${version}`);
