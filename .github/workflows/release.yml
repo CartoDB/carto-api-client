@@ -1,6 +1,11 @@
 name: Release
 
-on: [workflow_call, workflow_dispatch]
+on:
+  workflow_call:
+    secrets:
+      NPM_CARTODB_AUTH_TOKEN:
+        required: true
+  workflow_dispatch:
 
 env:
   NODE_VERSION: 20
