@@ -15,6 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Read version from 'package.json'; git tags are lost on a merged PR.
       - name: Read package version
         id: version
         run: echo "PKG_VERSION=v$(npm pkg get version | xargs)" >> $GITHUB_OUTPUT
@@ -24,6 +25,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      # Determine whether to tag the release as 'latest' or 'alpha'.
       - name: Assign dist tag
         id: dist-tag
         uses: actions/github-script@v7
@@ -47,11 +49,9 @@ jobs:
           corepack enable
           yarn install
 
+      # Build. Tests are run automatically by `yarn prepublish`.
       - name: Build
-        run: |
-          yarn lint
-          yarn build
-          yarn test
+        run: yarn build
 
       - name: Configure yarn to publish packages
         env:
