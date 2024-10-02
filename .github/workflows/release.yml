@@ -29,6 +29,8 @@ jobs:
         env:
           GIT_TAG: ${{ steps.git-tag.outputs.TAG_NAME }}
           TEST: ${{ steps.git-tag.outputs.TEST }}
+          REF_NAME: ${{ github.ref_name }}
+          REF: ${{ github.ref }}
         if: contains(env.GIT_TAG, 'v') == false
         run: echo "Missing GIT_TAG; aborting" && exit 1
 
