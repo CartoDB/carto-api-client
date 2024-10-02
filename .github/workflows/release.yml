@@ -11,21 +11,25 @@ jobs:
     name: Release
     runs-on: ubuntu-22.04
 
+    # Fetching tags: https://stackoverflow.com/a/76181083
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 10
+          fetch-tags: true
 
-      - name: Retrieve version
-        id: version
-        run: |
-          echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
+      # Step output: https://stackoverflow.com/a/65616499
+      # Reading latest tag: https://stackoverflow.com/a/33733020
+      - name: Read git tag
+        id: git-tag
+        run: echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
 
-      # - uses: actions-ecosystem/action-get-latest-tag@v1
-      #   id: version
-
-      # - name: Validate version from git tag
-      #   if: steps.version.outputs.is_valid != 'true'
-      #   run: echo "Tag must follow SemVer convention. Aborting." && exit 1
+      - name: Verify git tag
+        env:
+          GIT_TAG: ${{ steps.git-tag.outputs.TAG_NAME }}
+        if: startsWith(env.GIT_TAG, 'v') == false
+        run: echo "Missing or invalid git tag; aborting" && exit 1
 
       - name: Set up Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
@@ -38,7 +42,7 @@ jobs:
         with:
           result-encoding: string
           script: |
-            const gitTag = '${{ steps.version.outputs.TAG_NAME }}'
+            const gitTag = '${{ steps.git-tag.outputs.TAG_NAME }}'
             console.log(`git tag: ${gitTag}`)
             if (gitTag.match(/^v\d+\.\d+\.\d+$/)) {
               distTag = 'latest'
