@@ -53,7 +53,6 @@ jobs:
     name: 'Release (precheck)'
     needs: build
     if: |
-      github.ref == 'ref/head/main' &&
-      github.event_name == 'push' &&
+      github.ref_name == 'main' &&
       startsWith(github.event.head_commit.message, 'chore(release)')
     uses: ./.github/workflows/release.yml
