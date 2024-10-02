@@ -22,12 +22,14 @@ jobs:
         id: git-tag
         run: |
           echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
+          echo "TAG_NAME2=$(git describe)" >> $GITHUB_OUTPUT
           echo "TEST=TESTTESTTEST" >> $GITHUB_OUTPUT
 
       # TODO: TESTING v2
       - name: Test git tag
         env:
           GIT_TAG: ${{ steps.git-tag.outputs.TAG_NAME }}
+          GIT_TAG2: ${{ steps.git-tag.outputs.TAG_NAME2 }}
           TEST: ${{ steps.git-tag.outputs.TEST }}
           REF_NAME: ${{ github.ref_name }}
           REF: ${{ github.ref }}
