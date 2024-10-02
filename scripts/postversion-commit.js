@@ -6,7 +6,7 @@ import {execSync} from 'node:child_process';
  */
 
 const branch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
-const {version} = require('../package.json');
+const {version} = await import('../package.json');
 
 if (branch === 'main') {
   execSync(`git checkout -b 'release/${version}'`);
