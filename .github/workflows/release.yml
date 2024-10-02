@@ -24,7 +24,7 @@ jobs:
           echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
           echo "TEST=TESTTESTTEST" >> $GITHUB_OUTPUT
 
-      # TODO: TESTING
+      # TODO: TESTING v2
       - name: Test git tag
         env:
           GIT_TAG: ${{ steps.git-tag.outputs.TAG_NAME }}
