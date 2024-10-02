@@ -56,4 +56,6 @@ Tests, coverage, and other development-related scripts are defined in `package.j
 
 3. Commit, tag, and push to GitHub: `yarn postversion`
 
-4. GitHub CI will publish to npm automatically
+4. Publish
+   - If working on `main`, the previous step will automatically create and push a branch. Open a pull request, get any required approvals, and merge. Merged pull requests with commit messages beginning `chore(release)` will trigger a release automatically.
+   - If working on a branch, a commit for the release will be pushed to the branch. You'll then need to [manually run a workflow](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/manually-running-a-workflow), “Release”, selecting the target branch in the menu.
