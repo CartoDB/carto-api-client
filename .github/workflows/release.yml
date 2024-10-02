@@ -11,6 +11,7 @@ jobs:
     name: Release
     runs-on: ubuntu-22.04
 
+    # Fetching tags: https://stackoverflow.com/a/76181083
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,29 +19,17 @@ jobs:
           fetch-depth: 10
           fetch-tags: true
 
-      # References:
-      # - https://stackoverflow.com/a/65616499
-      # - https://stackoverflow.com/a/33733020
+      # Step output: https://stackoverflow.com/a/65616499
+      # Reading latest tag: https://stackoverflow.com/a/33733020
       - name: Read git tag
         id: git-tag
-        run: |
-          echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
-          echo "TAG_NAME2=$(git describe)" >> $GITHUB_OUTPUT
-          echo "TEST=TESTTESTTEST" >> $GITHUB_OUTPUT
+        run: echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
 
-      # TODO: TESTING v2
-      - name: Test git tag
+      - name: Verify git tag
         env:
           GIT_TAG: ${{ steps.git-tag.outputs.TAG_NAME }}
-          GIT_TAG2: ${{ steps.git-tag.outputs.TAG_NAME2 }}
-          TEST: ${{ steps.git-tag.outputs.TEST }}
-          REF_NAME: ${{ github.ref_name }}
-          REF: ${{ github.ref }}
-          MESSAGE: ${{ github.event.head_commit.message }}
-          MESSAGE_RUN: ${{ github.event.workflow_run.head_commit.message }}
-          MESSAGE_DISPATCH: ${{ github.event.workflow_dispatch.head_commit.message }}
-        if: contains(env.GIT_TAG, 'v') == false
-        run: echo "Missing GIT_TAG; aborting" && exit 1
+        if: startsWith(env.GIT_TAG, 'v') == false
+        run: echo "Missing or invalid git tag; aborting" && exit 1
 
       - name: Set up Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4

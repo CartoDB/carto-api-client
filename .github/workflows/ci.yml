@@ -55,5 +55,5 @@ jobs:
     if: |
       github.ref == 'ref/head/main' &&
       github.event_name == 'push' &&
-      contains(github.event.head_commit.message, 'chore(release)')
+      startsWith(github.event.head_commit.message, 'chore(release)')
     uses: ./.github/workflows/release.yml
