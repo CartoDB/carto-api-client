@@ -40,7 +40,7 @@
     "clean": "rimraf build/*",
     "postversion": "yarn postversion:check && yarn postversion:commit && yarn postversion:push",
     "postversion:check": "yarn lint && yarn test",
-    "postversion:commit": "VERSION=v$npm_package_version && node scripts/postversion-commit.js",
+    "postversion:commit": "node scripts/postversion-commit.js",
     "postversion:push": "git push && git push --tags",
     "prepublish": "yarn lint && yarn test",
     "prepack": "yarn clean && yarn build"
