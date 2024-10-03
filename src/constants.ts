@@ -1,3 +1,6 @@
+/** Current version of @carto/api-client. */
+export const API_CLIENT_VERSION = __CARTO_API_CLIENT_VERSION;
+
 /**
  * Defines a comparator used when matching a column's values against given filter values.
  *

@@ -1,4 +1,3 @@
-import {getClient} from '../client.js';
 import {
   ApiVersion,
   DEFAULT_GEO_COLUMN,
