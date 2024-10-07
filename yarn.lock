@@ -1449,7 +1449,7 @@ __metadata:
   resolution: "@carto/api-client@workspace:."
   dependencies:
     "@deck.gl/aggregation-layers": "npm:^9.0.30"
-    "@deck.gl/carto": "npm:^9.0.32"
+    "@deck.gl/carto": "npm:^9.0.30"
     "@deck.gl/core": "npm:^9.0.30"
     "@deck.gl/extensions": "npm:^9.0.30"
     "@deck.gl/geo-layers": "npm:^9.0.30"
@@ -1512,7 +1512,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@deck.gl/carto@npm:^9.0.32":
+"@deck.gl/carto@npm:^9.0.30":
   version: 9.0.32
   resolution: "@deck.gl/carto@npm:9.0.32"
   dependencies:
