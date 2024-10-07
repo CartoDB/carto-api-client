@@ -346,6 +346,53 @@ test('getTable', async () => {
   });
 });
 
+test('getTable - snowflake', async () => {
+  const widgetSource = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+  });
+
+  const expectedRows = [
+    {name: 'Veggie Mart', rEVenUe: 1200},
+    {name: 'EZ Drive Thru', rEVenUe: 400},
+    {name: "Buddy's Convenience", rEVenUe: 800},
+  ];
+
+  // NOTICE: Snowflake returns uppercase keys.
+  const mockFetch = vi
+    .fn()
+    .mockResolvedValueOnce(
+      createMockResponse({ROWS: expectedRows, METADATA: {TOTAL: 3}})
+    );
+  vi.stubGlobal('fetch', mockFetch);
+
+  const actualTable = await widgetSource.getTable({
+    columns: ['name', 'revenue'],
+    limit: 20,
+    offset: 10,
+  });
+
+  expect(mockFetch).toHaveBeenCalledOnce();
+  expect(actualTable).toEqual({
+    rows: expectedRows,
+    totalCount: 3,
+  });
+
+  const params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
+  expect(Object.fromEntries(params)).toMatchObject({
+    type: 'test',
+    source: 'test-data',
+    params: JSON.stringify({
+      column: ['name', 'revenue'],
+      limit: 20,
+      offset: 10,
+    }),
+    queryParameters: '',
+    filters: JSON.stringify({}),
+    filtersLogicalOperator: 'and',
+  });
+});
+
 /******************************************************************************
  * getScatter
  */

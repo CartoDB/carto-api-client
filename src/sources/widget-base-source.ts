@@ -258,8 +258,9 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       },
       opts: {abortController},
     }).then((res: TableModelResponse) => ({
-      rows: normalizeObjectKeys(res.rows),
-      totalCount: res.metadata.total,
+      // Avoid `normalizeObjectKeys()`, which changes column names.
+      rows: res.rows ?? (res as any).ROWS,
+      totalCount: res.metadata?.total ?? (res as any).METADATA?.TOTAL,
     }));
   }
 

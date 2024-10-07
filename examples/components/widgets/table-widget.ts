@@ -67,7 +67,7 @@ export class TableWidget extends BaseWidget {
       return widgetSource.getTable({
         columns,
         ...(sortBy && {sortBy, sortDirection}),
-        rowsPerPage: limit,
+        limit,
         spatialFilter: this.getSpatialFilterOrViewState(),
       });
     },
@@ -132,6 +132,17 @@ function renderTableBody(response: TableResponse) {
 
 function renderTableRow(row: unknown[]) {
   return html`<tr>
-    ${map(row, (value) => html`<td>${value}</td>`)}
+    ${map(row, renderTableCell)}
   </tr>`;
+}
+
+const _numberFormatter = new Intl.NumberFormat();
+function renderTableCell(value: unknown) {
+  let formattedValue: string;
+  if (typeof value === 'number') {
+    return _numberFormatter.format(value);
+  } else {
+    formattedValue = String(value);
+  }
+  return html`<td>${formattedValue}</td>`;
 }
