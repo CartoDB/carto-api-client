@@ -1449,7 +1449,7 @@ __metadata:
   resolution: "@carto/api-client@workspace:."
   dependencies:
     "@deck.gl/aggregation-layers": "npm:^9.0.30"
-    "@deck.gl/carto": "npm:^9.0.30"
+    "@deck.gl/carto": "npm:^9.0.32"
     "@deck.gl/core": "npm:^9.0.30"
     "@deck.gl/extensions": "npm:^9.0.30"
     "@deck.gl/geo-layers": "npm:^9.0.30"
@@ -1512,9 +1512,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@deck.gl/carto@npm:^9.0.30":
-  version: 9.0.30
-  resolution: "@deck.gl/carto@npm:9.0.30"
+"@deck.gl/carto@npm:^9.0.32":
+  version: 9.0.32
+  resolution: "@deck.gl/carto@npm:9.0.32"
   dependencies:
     "@loaders.gl/gis": "npm:^4.2.0"
     "@loaders.gl/loader-utils": "npm:^4.2.0"
@@ -1544,7 +1544,7 @@ __metadata:
     "@deck.gl/geo-layers": ^9.0.0
     "@deck.gl/layers": ^9.0.0
     "@loaders.gl/core": ^4.2.0
-  checksum: 10c0/bf09c093013585ab585bca96bf1ad676a679a73db28bb2a5b2f3606b23565a7fa0a20d2e0cc1fe3a505c2c3023bdae064f235245dd1aeb18d67bd11ce6af6ea6
+  checksum: 10c0/8c71f148d126c1ed2e5fc770fc7a85399a3d758ba6762c2c6cd2de49402fc3bcdd566d45c98ec315c4f5e4d65afdfe0222e852805d4665b08fd2cbece5166d4a
   languageName: node
   linkType: hard
 
@@ -7158,11 +7158,11 @@ __metadata:
   linkType: hard
 
 "moment-timezone@npm:^0.5.33":
-  version: 0.5.45
-  resolution: "moment-timezone@npm:0.5.45"
+  version: 0.5.46
+  resolution: "moment-timezone@npm:0.5.46"
   dependencies:
     moment: "npm:^2.29.4"
-  checksum: 10c0/7497f23c4b8c875dbf07c03f9a1253f79edaeedc29d5732e36bfd3c5577e25aed1924fbd84cbb713ce1920dbe822be0e21bd487851a7d13907226f289a5e568b
+  checksum: 10c0/003fd278d1aa3e63afff340a318735db80157b7a343e3f807cac10e026def214f0e71b52d582b89a11ee0a19f5d9f0da2752b7959d855429f2b715d4859d3722
   languageName: node
   linkType: hard
 
