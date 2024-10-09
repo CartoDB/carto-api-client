@@ -21,6 +21,7 @@ function buildV3Path(
   return joinPath(apiBaseUrl, version, endpoint, ...rest);
 }
 
+/** @internal Required by fetchMap(). */
 export function buildPublicMapUrl({
   apiBaseUrl,
   cartoMapId,
@@ -31,6 +32,7 @@ export function buildPublicMapUrl({
   return buildV3Path(apiBaseUrl, 'v3', 'maps', 'public', cartoMapId);
 }
 
+/** @internal Required by fetchMap(). */
 export function buildStatsUrl({
   attribute,
   apiBaseUrl,

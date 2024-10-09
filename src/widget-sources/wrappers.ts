@@ -11,7 +11,6 @@ import {
   H3QuerySourceOptions as _H3QuerySourceOptions,
   QuadbinTableSourceOptions as _QuadbinTableSourceOptions,
   QuadbinQuerySourceOptions as _QuadbinQuerySourceOptions,
-  SourceOptions,
 } from '../sources/index.js';
 import {WidgetBaseSourceProps} from './widget-base-source.js';
 import {WidgetQuerySource} from './widget-query-source.js';
