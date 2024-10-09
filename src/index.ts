@@ -12,3 +12,14 @@ export {
   requestWithParameters,
   query,
 } from './api/index.js';
+
+export {
+  SOURCE_DEFAULTS,
+  SourceOptions,
+  TableSourceOptions,
+  QuerySourceOptions,
+  GeojsonResult,
+  JsonResult,
+  TilejsonResult,
+  QueryResult,
+} from './sources/index.js';

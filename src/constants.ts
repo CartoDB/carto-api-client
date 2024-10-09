@@ -28,3 +28,28 @@ export enum ApiVersion {
   V2 = 'v2',
   V3 = 'v3',
 }
+
+/******************************************************************************
+ * DEFAULTS
+ */
+
+/** @internalRemarks Source: @carto/constants, @deck.gl/carto */
+export const DEFAULT_API_BASE_URL = 'https://gcp-us-east1.api.carto.com';
+
+/** @internalRemarks Source: @carto/constants, @deck.gl/carto */
+export const DEFAULT_CLIENT = 'deck-gl-carto';
+
+/** @internalRemarks Source: @carto/constants, @deck.gl/carto */
+export const DEFAULT_GEO_COLUMN = 'geom';
+
+/**
+ * Fastly default limit is 8192; leave some padding.
+ * @internalRemarks Source: @deck.gl/carto
+ */
+export const DEFAULT_MAX_LENGTH_URL = 7000;
+
+/** @internalRemarks Source: @deck.gl/carto */
+export const DEFAULT_TILE_SIZE = 512;
+
+/** @internalRemarks Source: @deck.gl/carto */
+export const DEFAULT_TILE_RESOLUTION = 0.5;
