@@ -3,7 +3,12 @@
 // Copyright (c) vis.gl contributors
 
 export {SOURCE_DEFAULTS} from './base-source';
-export type {TilejsonResult, GeojsonResult, JsonResult} from './types';
+export type {
+  TilejsonResult,
+  GeojsonResult,
+  JsonResult,
+  QueryResult,
+} from './types';
 
 export {boundaryQuerySource} from './boundary-query-source';
 export type {BoundaryQuerySourceOptions} from './boundary-query-source';
