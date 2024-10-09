@@ -2,7 +2,7 @@ import {
   H3TableSourceOptions,
   QuadbinTableSourceOptions,
   VectorTableSourceOptions,
-} from '@deck.gl/carto';
+} from '../sources/index.js';
 import {WidgetBaseSource, WidgetBaseSourceProps} from './widget-base-source.js';
 import {MapType} from '../constants-internal.js';
 import {ModelSource} from '../models/model.js';

@@ -16,7 +16,6 @@ import {
   TimeSeriesResponse,
 } from './types.js';
 import {FilterLogicalOperator, Filter} from '../types.js';
-import {SourceOptions} from '@deck.gl/carto';
 import {getApplicableFilters, normalizeObjectKeys} from '../utils.js';
 import {
   DEFAULT_API_BASE_URL,
@@ -25,6 +24,7 @@ import {
 } from '../constants-internal.js';
 import {getClient} from '../client.js';
 import {ModelSource} from '../models/model.js';
+import {SourceOptions} from '../sources/index.js';
 
 export interface WidgetBaseSourceProps extends Omit<SourceOptions, 'filters'> {
   apiVersion?: ApiVersion;
