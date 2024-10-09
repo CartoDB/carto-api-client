@@ -10,7 +10,7 @@ import type {
 } from '../sources/types';
 import {buildQueryUrl} from './endpoints';
 import {requestWithParameters} from './request-with-parameters';
-import {APIErrorContext} from './types';
+import {APIErrorContext} from './carto-api-error';
 
 export type QueryOptions = SourceOptions &
   Omit<QuerySourceOptions, 'spatialDataColumn'>;

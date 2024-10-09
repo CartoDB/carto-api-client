@@ -7,10 +7,9 @@ import {
   DEFAULT_API_BASE_URL,
   DEFAULT_CLIENT,
   DEFAULT_MAX_LENGTH_URL,
-} from '../constants';
+} from '../constants-internal';
 import {buildSourceUrl} from '../api/endpoints';
 import {requestWithParameters} from '../api/request-with-parameters';
-import type {APIErrorContext, MapType} from '../api/types';
 import type {
   GeojsonResult,
   JsonResult,
@@ -19,6 +18,8 @@ import type {
   TilejsonMapInstantiation,
   TilejsonResult,
 } from './types';
+import {MapType} from '../types';
+import {APIErrorContext} from '../api';
 
 export const SOURCE_DEFAULTS: SourceOptionalOptions = {
   apiBaseUrl: DEFAULT_API_BASE_URL,

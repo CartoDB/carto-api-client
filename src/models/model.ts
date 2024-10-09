@@ -1,17 +1,15 @@
-import {
-  ApiVersion,
-  DEFAULT_GEO_COLUMN,
-  MapType,
-} from '../constants-internal.js';
+import {DEFAULT_GEO_COLUMN} from '../constants-internal.js';
 import {
   Filter,
   FilterLogicalOperator,
+  MapType,
   QueryParameters,
   SpatialFilter,
 } from '../types.js';
 import {$TODO} from '../types-internal.js';
 import {assert} from '../utils.js';
 import {ModelRequestOptions, makeCall} from './common.js';
+import {ApiVersion} from '../constants.js';
 
 /** @internalRemarks Source: @carto/react-api */
 const AVAILABLE_MODELS = [
@@ -72,7 +70,7 @@ export function executeModel(props: {
   assert(apiBaseUrl, 'executeModel: missing apiBaseUrl');
   assert(accessToken, 'executeModel: missing accessToken');
   assert(apiVersion === V3, 'executeModel: SQL Model API requires CARTO 3+');
-  assert(type !== MapType.TILESET, 'executeModel: Tilesets not supported');
+  assert(type !== 'tileset', 'executeModel: Tilesets not supported');
 
   let url = `${apiBaseUrl}/v3/sql/${connectionName}/model/${model}`;
 

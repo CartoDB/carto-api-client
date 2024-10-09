@@ -3,7 +3,7 @@
 // Copyright (c) vis.gl contributors
 
 /* eslint-disable camelcase */
-import {DEFAULT_TILE_RESOLUTION} from '../constants';
+import {DEFAULT_TILE_RESOLUTION} from '../constants-internal';
 import {baseSource} from './base-source';
 import type {
   FilterOptions,

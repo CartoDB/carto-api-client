@@ -2,16 +2,11 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-export {CartoAPIError} from './carto-api-error';
-export type {
+export {
+  CartoAPIError,
   APIErrorContext,
-  Format,
-  MapType,
-  RequestType,
-  QueryParameters,
-  Basemap,
-  MapLibreBasemap,
-  GoogleBasemap,
-} from './types';
-export {query} from './query';
-export type {QueryOptions} from './query';
+  APIRequestType,
+} from './carto-api-error.js';
+export {query} from './query.js';
+export type {QueryOptions} from './query.js';
+export {requestWithParameters} from './request-with-parameters.js';

@@ -2,7 +2,23 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-import type {APIErrorContext} from './types';
+import {MapType} from '../types';
+
+export type APIRequestType =
+  | 'Map data'
+  | 'Map instantiation'
+  | 'Public map'
+  | 'Tile stats'
+  | 'SQL'
+  | 'Basemap style';
+
+export type APIErrorContext = {
+  requestType: APIRequestType;
+  mapId?: string;
+  connection?: string;
+  source?: string;
+  type?: MapType;
+};
 
 /**
  *

@@ -20,11 +20,11 @@ import {getApplicableFilters, normalizeObjectKeys} from '../utils.js';
 import {
   DEFAULT_API_BASE_URL,
   DEFAULT_GEO_COLUMN,
-  ApiVersion,
 } from '../constants-internal.js';
 import {getClient} from '../client.js';
 import {ModelSource} from '../models/model.js';
 import {SourceOptions} from '../sources/index.js';
+import {ApiVersion} from '../constants.js';
 
 export interface WidgetBaseSourceProps extends Omit<SourceOptions, 'filters'> {
   apiVersion?: ApiVersion;

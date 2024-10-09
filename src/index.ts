@@ -7,9 +7,8 @@ export * from './types.js';
 
 export {
   APIErrorContext,
-  Format, // TODO: Move to `types.ts`?
-  MapType, // TODO: De-duplicate?
-  RequestType, // TODO: Move to `types.ts`?
-  QueryParameters, // TODO: Move to `types.ts`?
-  QueryOptions, // TODO: Move to `types.ts`?
+  APIRequestType,
+  QueryOptions,
+  requestWithParameters,
+  query,
 } from './api/index.js';

@@ -4,7 +4,6 @@ import {
   VectorTableSourceOptions,
 } from '../sources/index.js';
 import {WidgetBaseSource, WidgetBaseSourceProps} from './widget-base-source.js';
-import {MapType} from '../constants-internal.js';
 import {ModelSource} from '../models/model.js';
 
 type LayerTableSourceOptions =
@@ -40,7 +39,7 @@ export class WidgetTableSource extends WidgetBaseSource<
   protected override getModelSource(owner: string): ModelSource {
     return {
       ...super._getModelSource(owner),
-      type: MapType.TABLE,
+      type: 'table',
       data: this.props.tableName,
     };
   }

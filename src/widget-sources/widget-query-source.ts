@@ -3,7 +3,6 @@ import {
   QuadbinQuerySourceOptions,
   VectorQuerySourceOptions,
 } from '../sources/index.js';
-import {MapType} from '../constants-internal.js';
 import {WidgetBaseSource, WidgetBaseSourceProps} from './widget-base-source.js';
 import {ModelSource} from '../models/model.js';
 
@@ -40,7 +39,7 @@ export class WidgetQuerySource extends WidgetBaseSource<
   protected override getModelSource(owner: string): ModelSource {
     return {
       ...super._getModelSource(owner),
-      type: MapType.QUERY,
+      type: 'query',
       data: this.props.sqlQuery,
       queryParameters: this.props.queryParameters,
     };

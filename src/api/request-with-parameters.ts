@@ -3,13 +3,12 @@
 // Copyright (c) vis.gl contributors
 
 import {isPureObject} from '../utils';
-import {CartoAPIError} from './carto-api-error';
-import type {APIErrorContext} from './types';
+import {CartoAPIError, APIErrorContext} from './carto-api-error';
 import {
   DEFAULT_CLIENT,
   DEFAULT_MAX_LENGTH_URL,
   V3_MINOR_VERSION,
-} from '../constants';
+} from '../constants-internal';
 
 const DEFAULT_HEADERS = {
   Accept: 'application/json',
