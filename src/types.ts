@@ -2,6 +2,16 @@ import type {FilterType} from './constants.js';
 import type {Polygon, MultiPolygon} from 'geojson';
 
 /******************************************************************************
+ * MAPS AND TILES
+ */
+
+/** @internalRemarks Source: @deck.gl/carto */
+export type Format = 'json' | 'geojson' | 'tilejson';
+
+/** @internalRemarks Source: @carto/constants, @deck.gl/carto */
+export type MapType = 'boundary' | 'query' | 'table' | 'tileset' | 'raster';
+
+/******************************************************************************
  * AGGREGATION
  */
 
@@ -26,6 +36,12 @@ export type AggregationType =
 /** @internalRemarks Source: @carto/react-api */
 export type SpatialFilter = Polygon | MultiPolygon;
 
+/** @internalRemarks Source: @deck.gl/carto */
+export interface Filters {
+  [column: string]: Filter;
+}
+
+// TODO: Would `{[FilterType.IN]?: number[] | string[]}` also be valid?
 /** @internalRemarks Source: @carto/react-api, @deck.gl/carto */
 export interface Filter {
   [FilterType.IN]?: {owner?: string; values: number[] | string[]};

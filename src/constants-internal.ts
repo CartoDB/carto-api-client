@@ -1,45 +1,24 @@
 /******************************************************************************
- * DEFAULTS
+ * VERSIONS
  */
 
 /**
- * @internalRemarks Source: @carto/constants
+ * Current version of @carto/api-client.
  * @internal
  */
-export const DEFAULT_API_BASE_URL = 'https://gcp-us-east1.api.carto.com';
+export const API_CLIENT_VERSION = __CARTO_API_CLIENT_VERSION;
+
+/** @internal */
+export const V3_MINOR_VERSION = '3.4';
 
 /**
- * @internalRemarks Source: @carto/constants
+ * @internalRemarks Source: @deck.gl/carto
  * @internal
  */
-export const DEFAULT_CLIENT = 'deck-gl-carto';
+export const DEFAULT_AGGREGATION_RES_LEVEL_H3 = 4;
 
 /**
- * @internalRemarks Source: @carto/react-api
+ * @internalRemarks Source: @deck.gl/carto
  * @internal
  */
-export const DEFAULT_GEO_COLUMN = 'geom';
-
-/******************************************************************************
- * ENUMS
- */
-
-/**
- * @internal
- * @internalRemarks Source: @carto/constants
- */
-export enum MapType {
-  TABLE = 'table',
-  QUERY = 'query',
-  TILESET = 'tileset',
-}
-
-/**
- * @internal
- * @internalRemarks Source: @carto/constants
- */
-export enum ApiVersion {
-  V1 = 'v1',
-  V2 = 'v2',
-  V3 = 'v3',
-}
+export const DEFAULT_AGGREGATION_RES_LEVEL_QUADBIN = 6;

@@ -5,3 +5,6 @@
  * ```
  */
 declare const __CARTO_API_CLIENT_VERSION: string;
+
+/** Defined by @deck.gl/core. */
+declare const deck: {VERSION: string | undefined} | undefined;

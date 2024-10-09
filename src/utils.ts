@@ -90,3 +90,11 @@ export function isEmptyObject(object: object): boolean {
   }
   return true;
 }
+
+/** @internal */
+export const isObject: (x: unknown) => boolean = (x) =>
+  x !== null && typeof x === 'object';
+
+/** @internal */
+export const isPureObject: (x: any) => boolean = (x) =>
+  isObject(x) && x.constructor === {}.constructor;
