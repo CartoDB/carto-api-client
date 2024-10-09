@@ -37,7 +37,8 @@ export async function requestWithParameters<T = any>({
   parameters = {
     v: V3_MINOR_VERSION,
     clientId: DEFAULT_CLIENT,
-    deckglVersion: deck?.VERSION,
+    ...(typeof deck !== 'undefined' &&
+      deck.VERSION && {deckglVersion: deck.VERSION}),
     ...parameters,
   };
 
