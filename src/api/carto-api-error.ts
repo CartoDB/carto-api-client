@@ -49,8 +49,8 @@ export class CartoAPIError extends Error {
     let message = `${errorContext.requestType} API request failed`;
     message += `\n${responseString}`;
     for (const key of Object.keys(errorContext)) {
-      if (key === 'requestType') continue; // eslint-disable-line no-continue
-      message += `\n${formatErrorKey(key)}: ${errorContext[key]}`;
+      if (key === 'requestType') continue;
+      message += `\n${formatErrorKey(key)}: ${(errorContext as any)[key]}`;
     }
     message += '\n';
 
@@ -67,6 +67,6 @@ export class CartoAPIError extends Error {
 /**
  * Converts camelCase to Camel Case
  */
-function formatErrorKey(key) {
+function formatErrorKey(key: string) {
   return key.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase());
 }

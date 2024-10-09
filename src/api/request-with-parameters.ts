@@ -5,7 +5,11 @@
 import {isPureObject} from '../utils';
 import {CartoAPIError} from './carto-api-error';
 import type {APIErrorContext} from './types';
-import {DEFAULT_MAX_LENGTH_URL, V3_MINOR_VERSION} from '../constants';
+import {
+  DEFAULT_CLIENT,
+  DEFAULT_MAX_LENGTH_URL,
+  V3_MINOR_VERSION,
+} from '../constants';
 
 const DEFAULT_HEADERS = {
   Accept: 'application/json',

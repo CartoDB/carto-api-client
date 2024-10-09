@@ -41,8 +41,9 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
     endpoint,
   };
   for (const key in optionalOptions) {
-    if (optionalOptions[key]) {
-      mergedOptions[key] = optionalOptions[key];
+    if (optionalOptions[key as keyof typeof optionalOptions]) {
+      (mergedOptions as any)[key] =
+        optionalOptions[key as keyof typeof optionalOptions];
     }
   }
   const baseUrl = buildSourceUrl(mergedOptions);
