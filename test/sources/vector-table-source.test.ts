@@ -1,7 +1,3 @@
-// deck.gl
-// SPDX-License-Identifier: MIT
-// Copyright (c) vis.gl contributors
-
 import {WidgetTableSource, vectorTableSource} from '@carto/api-client';
 import {describe, afterEach, vi, test, expect, beforeEach} from 'vitest';
 
