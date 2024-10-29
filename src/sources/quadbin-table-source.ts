@@ -4,6 +4,7 @@
 
 /* eslint-disable camelcase */
 import {DEFAULT_AGGREGATION_RES_LEVEL_QUADBIN} from '../constants-internal';
+import {WidgetTableSource, WidgetTableSourceResult} from '../widget-sources';
 import {baseSource} from './base-source';
 import type {
   AggregationOptions,
@@ -30,7 +31,7 @@ type UrlParameters = {
 
 export const quadbinTableSource = async function (
   options: QuadbinTableSourceOptions
-): Promise<TilejsonResult> {
+): Promise<TilejsonResult & WidgetTableSourceResult> {
   const {
     aggregationExp,
     aggregationResLevel = DEFAULT_AGGREGATION_RES_LEVEL_QUADBIN,
@@ -52,9 +53,10 @@ export const quadbinTableSource = async function (
   if (filters) {
     urlParameters.filters = filters;
   }
-  return baseSource<UrlParameters>(
-    'table',
-    options,
-    urlParameters
-  ) as Promise<TilejsonResult>;
+  return baseSource<UrlParameters>('table', options, urlParameters).then(
+    (result) => ({
+      ...(result as TilejsonResult),
+      widgetSource: new WidgetTableSource(options),
+    })
+  );
 };

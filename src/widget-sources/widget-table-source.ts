@@ -11,6 +11,8 @@ type LayerTableSourceOptions =
   | Omit<H3TableSourceOptions, 'filters'>
   | Omit<QuadbinTableSourceOptions, 'filters'>;
 
+export type WidgetTableSourceResult = {widgetSource: WidgetTableSource};
+
 /**
  * Source for Widget API requests on a data source defined as a table.
  *

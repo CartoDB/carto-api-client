@@ -11,6 +11,8 @@ type LayerQuerySourceOptions =
   | Omit<H3QuerySourceOptions, 'filters'>
   | Omit<QuadbinQuerySourceOptions, 'filters'>;
 
+export type WidgetQuerySourceResult = {widgetSource: WidgetQuerySource};
+
 /**
  * Source for Widget API requests on a data source defined by a SQL query.
  *

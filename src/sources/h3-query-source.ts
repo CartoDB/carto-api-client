@@ -4,6 +4,7 @@
 
 /* eslint-disable camelcase */
 import {DEFAULT_AGGREGATION_RES_LEVEL_H3} from '../constants-internal';
+import {WidgetQuerySource, WidgetQuerySourceResult} from '../widget-sources';
 import {baseSource} from './base-source';
 import type {
   AggregationOptions,
@@ -30,7 +31,7 @@ type UrlParameters = {
 
 export const h3QuerySource = async function (
   options: H3QuerySourceOptions
-): Promise<TilejsonResult> {
+): Promise<TilejsonResult & WidgetQuerySourceResult> {
   const {
     aggregationExp,
     aggregationResLevel = DEFAULT_AGGREGATION_RES_LEVEL_H3,
@@ -55,9 +56,10 @@ export const h3QuerySource = async function (
   if (filters) {
     urlParameters.filters = filters;
   }
-  return baseSource<UrlParameters>(
-    'query',
-    options,
-    urlParameters
-  ) as Promise<TilejsonResult>;
+  return baseSource<UrlParameters>('query', options, urlParameters).then(
+    (result) => ({
+      ...(result as TilejsonResult),
+      widgetSource: new WidgetQuerySource(options),
+    })
+  );
 };

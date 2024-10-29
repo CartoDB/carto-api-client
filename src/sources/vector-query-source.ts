@@ -4,6 +4,10 @@
 
 /* eslint-disable camelcase */
 import {DEFAULT_TILE_RESOLUTION} from '../constants.js';
+import {
+  WidgetQuerySource,
+  WidgetQuerySourceResult,
+} from '../widget-sources/index.js';
 import {baseSource} from './base-source';
 import type {
   FilterOptions,
@@ -31,7 +35,7 @@ type UrlParameters = {
 
 export const vectorQuerySource = async function (
   options: VectorQuerySourceOptions
-): Promise<TilejsonResult> {
+): Promise<TilejsonResult & WidgetQuerySourceResult> {
   const {
     columns,
     filters,
@@ -57,9 +61,10 @@ export const vectorQuerySource = async function (
   if (queryParameters) {
     urlParameters.queryParameters = queryParameters;
   }
-  return baseSource<UrlParameters>(
-    'query',
-    options,
-    urlParameters
-  ) as Promise<TilejsonResult>;
+  return baseSource<UrlParameters>('query', options, urlParameters).then(
+    (result) => ({
+      ...(result as TilejsonResult),
+      widgetSource: new WidgetQuerySource(options),
+    })
+  );
 };
