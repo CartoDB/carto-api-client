@@ -15,7 +15,7 @@ beforeEach(() => {
 
 afterEach(() => void vi.restoreAllMocks());
 
-test('query', async (t) => {
+test('query', async () => {
   const mockFetch = vi.mocked(fetch);
 
   const response = await query({
