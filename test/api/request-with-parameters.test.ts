@@ -197,7 +197,7 @@ describe('requestWithParameters', () => {
       Array.from(new URL(calls[0][0] as string).searchParams.entries())
     ).toEqual([
       ['v', '3.4'],
-      ['clientId', 'deck-gl-carto'],
+      ['client', 'deck-gl-carto'],
       ['deckglVersion', 'untranspiled source'],
       ['object', '{"a":1,"b":2}'],
       ['array', '[1,2,3]'],
