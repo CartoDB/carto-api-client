@@ -3,7 +3,10 @@
 // Copyright (c) vis.gl contributors
 
 /* eslint-disable camelcase */
-import {DEFAULT_API_BASE_URL, DEFAULT_MAX_LENGTH_URL} from '../constants';
+import {
+  DEFAULT_API_BASE_URL,
+  DEFAULT_MAX_LENGTH_URL,
+} from '../constants-internal';
 import {buildSourceUrl} from '../api/endpoints';
 import {requestWithParameters} from '../api/request-with-parameters';
 import type {

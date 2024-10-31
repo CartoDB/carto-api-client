@@ -1,4 +1,4 @@
-import {DEFAULT_GEO_COLUMN} from '../constants.js';
+import {DEFAULT_GEO_COLUMN} from '../constants-internal.js';
 import {
   Filter,
   FilterLogicalOperator,

@@ -5,7 +5,7 @@
 import {isPureObject} from '../utils';
 import {CartoAPIError, APIErrorContext} from './carto-api-error';
 import {V3_MINOR_VERSION} from '../constants-internal';
-import {DEFAULT_MAX_LENGTH_URL} from '../constants';
+import {DEFAULT_MAX_LENGTH_URL} from '../constants-internal';
 import {getClient} from '../client';
 
 const DEFAULT_HEADERS = {
