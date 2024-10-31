@@ -37,9 +37,6 @@ export enum ApiVersion {
 export const DEFAULT_API_BASE_URL = 'https://gcp-us-east1.api.carto.com';
 
 /** @internalRemarks Source: @carto/constants, @deck.gl/carto */
-export const DEFAULT_CLIENT = 'deck-gl-carto';
-
-/** @internalRemarks Source: @carto/constants, @deck.gl/carto */
 export const DEFAULT_GEO_COLUMN = 'geom';
 
 /**

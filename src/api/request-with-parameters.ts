@@ -5,7 +5,8 @@
 import {isPureObject} from '../utils';
 import {CartoAPIError, APIErrorContext} from './carto-api-error';
 import {V3_MINOR_VERSION} from '../constants-internal';
-import {DEFAULT_CLIENT, DEFAULT_MAX_LENGTH_URL} from '../constants';
+import {DEFAULT_MAX_LENGTH_URL} from '../constants';
+import {getClient} from '../client';
 
 const DEFAULT_HEADERS = {
   Accept: 'application/json',
@@ -32,7 +33,7 @@ export async function requestWithParameters<T = any>({
   // user-provided parameters.
   parameters = {
     v: V3_MINOR_VERSION,
-    client: DEFAULT_CLIENT,
+    client: getClient(),
     ...(typeof deck !== 'undefined' &&
       deck.VERSION && {deckglVersion: deck.VERSION}),
     ...parameters,

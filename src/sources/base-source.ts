@@ -3,11 +3,7 @@
 // Copyright (c) vis.gl contributors
 
 /* eslint-disable camelcase */
-import {
-  DEFAULT_API_BASE_URL,
-  DEFAULT_CLIENT,
-  DEFAULT_MAX_LENGTH_URL,
-} from '../constants';
+import {DEFAULT_API_BASE_URL, DEFAULT_MAX_LENGTH_URL} from '../constants';
 import {buildSourceUrl} from '../api/endpoints';
 import {requestWithParameters} from '../api/request-with-parameters';
 import type {
@@ -20,10 +16,11 @@ import type {
 } from './types';
 import {MapType} from '../types';
 import {APIErrorContext} from '../api';
+import {getClient} from '../client';
 
 export const SOURCE_DEFAULTS: SourceOptionalOptions = {
   apiBaseUrl: DEFAULT_API_BASE_URL,
-  clientId: DEFAULT_CLIENT,
+  clientId: getClient(),
   format: 'tilejson',
   headers: {},
   maxLengthURL: DEFAULT_MAX_LENGTH_URL,
