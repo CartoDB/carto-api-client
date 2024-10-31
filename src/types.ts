@@ -41,7 +41,6 @@ export interface Filters {
   [column: string]: Filter;
 }
 
-// TODO: Would `{[FilterType.IN]?: number[] | string[]}` also be valid?
 /** @internalRemarks Source: @carto/react-api, @deck.gl/carto */
 export interface Filter {
   [FilterType.IN]?: {owner?: string; values: number[] | string[]};

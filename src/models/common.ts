@@ -1,4 +1,3 @@
-import {$TODO} from '../types-internal.js';
 import {InvalidColumnError} from '../utils.js';
 
 /** @internalRemarks Source: @carto/react-api */
@@ -7,6 +6,12 @@ export interface ModelRequestOptions {
   abortController?: AbortController;
   otherOptions?: Record<string, unknown>;
   body?: string;
+}
+
+interface ModelErrorResponse {
+  error?: string | string[];
+  hint?: string;
+  column_name?: string;
 }
 
 /**
@@ -18,13 +23,16 @@ export function dealWithApiError({
   data,
 }: {
   response: Response;
-  data: $TODO;
+  data: ModelErrorResponse;
 }) {
   if (data.error === 'Column not found') {
     throw new InvalidColumnError(`${data.error} ${data.column_name}`);
   }
 
-  if (data.error?.includes('Missing columns')) {
+  if (
+    typeof data.error === 'string' &&
+    data.error?.includes('Missing columns')
+  ) {
     throw new InvalidColumnError(data.error);
   }
 
