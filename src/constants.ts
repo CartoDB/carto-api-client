@@ -28,3 +28,6 @@ export enum ApiVersion {
   V2 = 'v2',
   V3 = 'v3',
 }
+
+/** @internalRemarks Source: @carto/constants, @deck.gl/carto */
+export const DEFAULT_API_BASE_URL = 'https://gcp-us-east1.api.carto.com';
