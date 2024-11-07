@@ -34,7 +34,7 @@
     "dev": "concurrently \"yarn build:watch\" \"vite --config examples/vite.config.ts --open\"",
     "test": "vitest run --typecheck",
     "test:watch": "vitest watch --typecheck",
-    "coverage": "vitest run --coverage",
+    "coverage": "vitest run --coverage.enabled --coverage.all false",
     "lint": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --check",
     "format": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --write",
     "clean": "rimraf build/*",
