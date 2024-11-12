@@ -97,3 +97,16 @@ export const isObject: (x: unknown) => boolean = (x) =>
 /** @internal */
 export const isPureObject: (x: any) => boolean = (x) =>
   isObject(x) && x.constructor === {}.constructor;
+
+/** @internal */
+export function assignOptions<T extends Record<string, unknown>>(
+  base: Record<string, unknown>,
+  optional: Record<string, unknown>
+): T {
+  for (const key in optional) {
+    if (optional[key]) {
+      base[key] = optional[key];
+    }
+  }
+  return base as T;
+}
