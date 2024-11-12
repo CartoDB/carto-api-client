@@ -141,7 +141,9 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
         tileResolution: tileResolution || DEFAULT_TILE_RESOLUTION,
       },
       opts: {abortController},
-    }).then((res: FeaturesModelResponse) => normalizeObjectKeys(res));
+    }).then((res: FeaturesModelResponse) => ({
+      rows: normalizeObjectKeys(res.rows),
+    }));
   }
 
   /****************************************************************************

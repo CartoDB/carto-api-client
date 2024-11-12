@@ -225,6 +225,55 @@ test('filters - owner', async () => {
 });
 
 /******************************************************************************
+ * getFeatures
+ */
+
+test('getFeatures', async () => {
+  const widgetSource = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+  });
+
+  const expectedRows = [
+    {_carto_feature_id: 'a', name: 'Veggie Mart', revenue: 1200},
+    {_carto_feature_id: 'b', name: 'EZ Drive Thru', revenue: 400},
+    {_carto_feature_id: 'c', name: "Buddy's Convenience", revenue: 800},
+  ];
+
+  const mockFetch = vi
+    .fn()
+    .mockResolvedValueOnce(
+      createMockResponse({rows: expectedRows, meta: {foo: 'bar'}})
+    );
+  vi.stubGlobal('fetch', mockFetch);
+
+  const actualFeatures = await widgetSource.getFeatures({
+    columns: ['_carto_feature_id', 'name', 'revenue'],
+    featureIds: ['a', 'b', 'c'],
+    dataType: 'points',
+  });
+
+  expect(mockFetch).toHaveBeenCalledOnce();
+  expect(actualFeatures).toEqual({rows: expectedRows});
+
+  const params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
+  expect(Object.fromEntries(params)).toMatchObject({
+    type: 'test',
+    source: 'test-data',
+    params: JSON.stringify({
+      columns: ['_carto_feature_id', 'name', 'revenue'],
+      dataType: 'points',
+      featureIds: ['a', 'b', 'c'],
+      limit: 1000,
+      tileResolution: 0.5,
+    }),
+    queryParameters: '',
+    filters: JSON.stringify({}),
+    filtersLogicalOperator: 'and',
+  });
+});
+
+/******************************************************************************
  * getFormula
  */
 
