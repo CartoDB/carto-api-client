@@ -1,6 +1,5 @@
 import {Filter} from './types.js';
 import {FilterType} from './constants.js';
-import {$TODO} from './types-internal.js';
 
 const FILTER_TYPES = new Set(Object.values(FilterType));
 const isFilterType = (type: string): type is FilterType =>
@@ -26,7 +25,7 @@ export function getApplicableFilters(
       const isApplicable = !owner || !filter?.owner || filter?.owner !== owner;
       if (filter && isApplicable) {
         applicableFilters[column] ||= {};
-        applicableFilters[column][type] = filter as $TODO;
+        (applicableFilters[column][type] as typeof filter) = filter;
       }
     }
   }
@@ -90,3 +89,11 @@ export function isEmptyObject(object: object): boolean {
   }
   return true;
 }
+
+/** @internal */
+export const isObject: (x: unknown) => boolean = (x) =>
+  x !== null && typeof x === 'object';
+
+/** @internal */
+export const isPureObject: (x: any) => boolean = (x) =>
+  isObject(x) && x.constructor === {}.constructor;

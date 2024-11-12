@@ -2,15 +2,16 @@ import {
   H3TableSourceOptions,
   QuadbinTableSourceOptions,
   VectorTableSourceOptions,
-} from '@deck.gl/carto';
+} from '../sources/index.js';
 import {WidgetBaseSource, WidgetBaseSourceProps} from './widget-base-source.js';
-import {MapType} from '../constants-internal.js';
 import {ModelSource} from '../models/model.js';
 
 type LayerTableSourceOptions =
   | Omit<VectorTableSourceOptions, 'filters'>
   | Omit<H3TableSourceOptions, 'filters'>
   | Omit<QuadbinTableSourceOptions, 'filters'>;
+
+export type WidgetTableSourceResult = {widgetSource: WidgetTableSource};
 
 /**
  * Source for Widget API requests on a data source defined as a table.
@@ -40,7 +41,7 @@ export class WidgetTableSource extends WidgetBaseSource<
   protected override getModelSource(owner: string): ModelSource {
     return {
       ...super._getModelSource(owner),
-      type: MapType.TABLE,
+      type: 'table',
       data: this.props.tableName,
     };
   }

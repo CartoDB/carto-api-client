@@ -4,7 +4,7 @@
   "repository": "github:CartoDB/carto-api-client",
   "author": "Don McCurdy <donmccurdy@carto.com>",
   "packageManager": "yarn@4.3.1",
-  "version": "0.3.1",
+  "version": "0.4.0-alpha.5",
   "license": "MIT",
   "publishConfig": {
     "access": "public",
@@ -52,7 +52,6 @@
     "LICENSE.md"
   ],
   "dependencies": {
-    "@deck.gl/carto": "^9.0.30",
     "@turf/bbox-clip": "^7.1.0",
     "@turf/bbox-polygon": "^7.1.0",
     "@turf/helpers": "^7.1.0",
@@ -62,6 +61,7 @@
   },
   "devDependencies": {
     "@deck.gl/aggregation-layers": "^9.0.30",
+    "@deck.gl/carto": "^9.0.30",
     "@deck.gl/core": "^9.0.30",
     "@deck.gl/extensions": "^9.0.30",
     "@deck.gl/geo-layers": "^9.0.30",
@@ -98,5 +98,6 @@
     "vite": "^5.2.10",
     "vitest": "1.6.0",
     "vue": "^3.4.27"
-  }
+  },
+  "stableVersion": "0.3.1"
 }

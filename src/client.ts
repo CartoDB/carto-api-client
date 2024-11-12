@@ -1,8 +1,8 @@
 /**
  * @internal
- * @internalRemarks Source: @carto/react-core
+ * @internalRemarks Source: @carto/react-core, @carto/constants, @deck.gl/carto
  */
-let client = 'carto-api-client';
+let client = 'deck-gl-carto';
 
 /**
  * Returns current client ID, used to categorize API requests. For internal use only.

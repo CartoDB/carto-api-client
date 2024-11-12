@@ -1,45 +1,32 @@
-/******************************************************************************
- * DEFAULTS
- */
-
 /**
- * @internalRemarks Source: @carto/constants
+ * Current version of @carto/api-client.
  * @internal
  */
-export const DEFAULT_API_BASE_URL = 'https://gcp-us-east1.api.carto.com';
+export const API_CLIENT_VERSION = __CARTO_API_CLIENT_VERSION;
 
-/**
- * @internalRemarks Source: @carto/constants
- * @internal
- */
-export const DEFAULT_CLIENT = 'deck-gl-carto';
+/** @internal */
+export const V3_MINOR_VERSION = '3.4';
 
-/**
- * @internalRemarks Source: @carto/react-api
- * @internal
- */
+/** @internalRemarks Source: @carto/constants, @deck.gl/carto */
 export const DEFAULT_GEO_COLUMN = 'geom';
 
-/******************************************************************************
- * ENUMS
+/**
+ * Fastly default limit is 8192; leave some padding.
+ * @internalRemarks Source: @deck.gl/carto
  */
+export const DEFAULT_MAX_LENGTH_URL = 7000;
+
+/** @internalRemarks Source: @deck.gl/carto */
+export const DEFAULT_TILE_RESOLUTION = 0.5;
 
 /**
+ * @internalRemarks Source: @deck.gl/carto
  * @internal
- * @internalRemarks Source: @carto/constants
  */
-export enum MapType {
-  TABLE = 'table',
-  QUERY = 'query',
-  TILESET = 'tileset',
-}
+export const DEFAULT_AGGREGATION_RES_LEVEL_H3 = 4;
 
 /**
+ * @internalRemarks Source: @deck.gl/carto
  * @internal
- * @internalRemarks Source: @carto/constants
  */
-export enum ApiVersion {
-  V1 = 'v1',
-  V2 = 'v2',
-  V3 = 'v3',
-}
+export const DEFAULT_AGGREGATION_RES_LEVEL_QUADBIN = 6;

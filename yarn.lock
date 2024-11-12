@@ -1513,8 +1513,8 @@ __metadata:
   linkType: hard
 
 "@deck.gl/carto@npm:^9.0.30":
-  version: 9.0.32
-  resolution: "@deck.gl/carto@npm:9.0.32"
+  version: 9.0.33
+  resolution: "@deck.gl/carto@npm:9.0.33"
   dependencies:
     "@loaders.gl/gis": "npm:^4.2.0"
     "@loaders.gl/loader-utils": "npm:^4.2.0"
@@ -1544,7 +1544,7 @@ __metadata:
     "@deck.gl/geo-layers": ^9.0.0
     "@deck.gl/layers": ^9.0.0
     "@loaders.gl/core": ^4.2.0
-  checksum: 10c0/8c71f148d126c1ed2e5fc770fc7a85399a3d758ba6762c2c6cd2de49402fc3bcdd566d45c98ec315c4f5e4d65afdfe0222e852805d4665b08fd2cbece5166d4a
+  checksum: 10c0/97a50471fdf417919bf991fa40219f887582ddd71d2b4877146aa5ebd1e4cc0779021ed0e05cf0dcefc79194ef10d47c6df8a1b770726c917ebff9fa85e73864
   languageName: node
   linkType: hard
 
