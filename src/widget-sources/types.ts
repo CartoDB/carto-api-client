@@ -1,3 +1,4 @@
+import {TileResolution} from '../sources/types';
 import {
   GroupDateType,
   SortColumnType,
@@ -21,6 +22,41 @@ export interface CategoryRequestOptions extends BaseRequestOptions {
   column: string;
   operation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
   operationColumn?: string;
+}
+
+export interface FeaturesRequestOptions extends BaseRequestOptions {
+  /**
+   * Feature IDs, as found in `_carto_feature_id`. Feature IDs are a hash
+   * of geometry, and features with identical geometry will have the same
+   * feature ID. Order is important; features in the result set will be
+   * sorted according to the order of IDs in the request.
+   */
+  featureIds: string[];
+
+  /**
+   * Columns to be returned for each picked object. Note that for datasets
+   * containing features with identical geometry, more than one result per
+   * requested feature ID may be returned. To match results back to the
+   * requested feature ID, include `_carto_feature_id` in the columns list.
+   */
+  columns: string[];
+
+  /** Topology of objects to be picked. */
+  dataType: 'points' | 'lines' | 'polygons';
+
+  /**
+   * Maximum number of objects to return in the result set. For datasets
+   * containing features with identical geometry, those features will have
+   * the same feature IDs, and so more results may be returned than feature IDs
+   * given in the request.
+   */
+  limit?: number;
+
+  /**
+   * Must match `tileResolution` used when obtaining the `_carto_feature_id`
+   * column, typically in a layer's tile requests.
+   */
+  tileResolution?: TileResolution;
 }
 
 /** Options for {@link WidgetBaseSource#getFormula}. */
@@ -76,6 +112,9 @@ export interface TimeSeriesRequestOptions extends BaseRequestOptions {
 /******************************************************************************
  * WIDGET API RESPONSES
  */
+
+/** Response from {@link WidgetBaseSource#getFeatures}. */
+export type FeaturesResponse = {rows: Record<string, unknown>[]};
 
 /** Response from {@link WidgetBaseSource#getFormula}. */
 export type FormulaResponse = {value: number};

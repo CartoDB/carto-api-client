@@ -16,6 +16,7 @@ const AVAILABLE_MODELS = [
   'category',
   'histogram',
   'formula',
+  'pick',
   'timeseries',
   'range',
   'scatterplot',

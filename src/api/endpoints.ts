@@ -82,13 +82,3 @@ export function buildQueryUrl({
 }): string {
   return buildV3Path(apiBaseUrl, 'v3', 'sql', connectionName, 'query');
 }
-
-export function buildPickingUrl({
-  apiBaseUrl,
-  connectionName,
-}: {
-  apiBaseUrl: string;
-  connectionName: string;
-}): string {
-  return buildV3Path(apiBaseUrl, 'v3', 'sql', connectionName, 'model', 'pick');
-}

@@ -17,7 +17,6 @@ import type {
 import {MapType} from '../types';
 import {APIErrorContext} from '../api';
 import {getClient} from '../client';
-import {assignOptions} from '../utils';
 
 export const SOURCE_DEFAULTS: SourceOptionalOptions = {
   apiBaseUrl: DEFAULT_API_BASE_URL,
@@ -33,19 +32,18 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
   urlParameters: UrlParameters
 ): Promise<TilejsonResult | GeojsonResult | JsonResult> {
   const {accessToken, connectionName, cache, ...optionalOptions} = options;
-
-  const mergedOptions = assignOptions<
-    SourceOptionalOptions & SourceRequiredOptions & {endpoint: MapType}
-  >(
-    {
-      ...SOURCE_DEFAULTS,
-      accessToken,
-      connectionName,
-      endpoint,
-    },
-    optionalOptions
-  );
-
+  const mergedOptions = {
+    ...SOURCE_DEFAULTS,
+    accessToken,
+    connectionName,
+    endpoint,
+  };
+  for (const key in optionalOptions) {
+    if (optionalOptions[key as keyof typeof optionalOptions]) {
+      (mergedOptions as any)[key] =
+        optionalOptions[key as keyof typeof optionalOptions];
+    }
+  }
   const baseUrl = buildSourceUrl(mergedOptions);
   const {clientId, maxLengthURL, format} = mergedOptions;
   const headers = {
