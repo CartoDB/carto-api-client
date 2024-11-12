@@ -18,16 +18,9 @@ import {buildPickingUrl} from './api/endpoints';
 
 /** @internal */
 export type BasePickingOptions = {
-  /** TODO */
   accessToken: string;
-
-  /** TODO */
   connectionName: string;
-
-  /** TODO */
   apiBaseUrl?: string;
-
-  /** TODO */
   clientId?: string;
 
   /** Source type. */
@@ -69,7 +62,6 @@ export type BasePickingOptions = {
    */
   tileResolution?: TileResolution;
 
-  /** TODO */
   queryParameters?: QueryParameters;
 
   /**
@@ -78,7 +70,6 @@ export type BasePickingOptions = {
    */
   filters?: Filters;
 
-  /** TODO */
   filtersLogicalOperator?: FilterLogicalOperator;
 
   /**
