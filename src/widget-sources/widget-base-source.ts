@@ -2,6 +2,8 @@ import {executeModel} from '../models/index.js';
 import {
   CategoryRequestOptions,
   CategoryResponse,
+  FeaturesRequestOptions,
+  FeaturesResponse,
   FormulaRequestOptions,
   FormulaResponse,
   HistogramRequestOptions,
@@ -21,7 +23,10 @@ import {getClient} from '../client.js';
 import {ModelSource} from '../models/model.js';
 import {SourceOptions} from '../sources/index.js';
 import {ApiVersion, DEFAULT_API_BASE_URL} from '../constants.js';
-import {DEFAULT_GEO_COLUMN} from '../constants-internal.js';
+import {
+  DEFAULT_GEO_COLUMN,
+  DEFAULT_TILE_RESOLUTION,
+} from '../constants-internal.js';
 
 export interface WidgetBaseSourceProps extends Omit<SourceOptions, 'filters'> {
   apiVersion?: ApiVersion;
@@ -103,6 +108,43 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       },
       opts: {abortController},
     }).then((res: CategoriesModelResponse) => normalizeObjectKeys(res.rows));
+  }
+
+  /****************************************************************************
+   * FEATURES
+   */
+
+  /**
+   * Given a list of feature IDs (as found in `_carto_feature_id`) returns all
+   * matching features. In datasets containing features with duplicate geometries,
+   * feature IDs may be duplicated (IDs are a hash of geometry) and so more
+   * results may be returned than IDs in the request.
+   * @internal
+   * @experimental
+   */
+  async getFeatures(
+    options: FeaturesRequestOptions
+  ): Promise<FeaturesResponse> {
+    const {filterOwner, spatialFilter, abortController, ...params} = options;
+    const {columns, dataType, featureIds, z, limit, tileResolution} = params;
+
+    type FeaturesModelResponse = {rows: Record<string, unknown>[]};
+
+    return executeModel({
+      model: 'pick',
+      source: {...this.getModelSource(filterOwner), spatialFilter},
+      params: {
+        columns,
+        dataType,
+        featureIds,
+        z,
+        limit: limit || 1000,
+        tileResolution: tileResolution || DEFAULT_TILE_RESOLUTION,
+      },
+      opts: {abortController},
+    }).then((res: FeaturesModelResponse) => ({
+      rows: normalizeObjectKeys(res.rows),
+    }));
   }
 
   /****************************************************************************

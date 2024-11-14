@@ -16,6 +16,7 @@ const AVAILABLE_MODELS = [
   'category',
   'histogram',
   'formula',
+  'pick',
   'timeseries',
   'range',
   'scatterplot',
@@ -74,7 +75,13 @@ export function executeModel(props: {
 
   let url = `${apiBaseUrl}/v3/sql/${connectionName}/model/${model}`;
 
-  const {filters, filtersLogicalOperator = 'and', data} = source;
+  const {
+    data,
+    filters,
+    filtersLogicalOperator = 'and',
+    geoColumn = DEFAULT_GEO_COLUMN,
+  } = source;
+
   const queryParameters = source.queryParameters
     ? JSON.stringify(source.queryParameters)
     : '';
@@ -89,12 +96,14 @@ export function executeModel(props: {
     filtersLogicalOperator,
   };
 
+  // Picking Model API requires 'spatialDataColumn'.
+  if (model === 'pick') {
+    queryParams.spatialDataColumn = geoColumn;
+  }
+
   // API supports multiple filters, we apply it only to geoColumn
   const spatialFilters = source.spatialFilter
-    ? {
-        [source.geoColumn ? source.geoColumn : DEFAULT_GEO_COLUMN]:
-          source.spatialFilter,
-      }
+    ? {[geoColumn]: source.spatialFilter}
     : undefined;
 
   if (spatialFilters) {
