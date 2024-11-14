@@ -24,6 +24,11 @@ export interface CategoryRequestOptions extends BaseRequestOptions {
   operationColumn?: string;
 }
 
+/**
+ * Options for {@link WidgetBaseSource#getFeatures}.
+ * @experimental
+ * @internal
+ */
 export interface FeaturesRequestOptions extends BaseRequestOptions {
   /**
    * Feature IDs, as found in `_carto_feature_id`. Feature IDs are a hash
@@ -116,7 +121,11 @@ export interface TimeSeriesRequestOptions extends BaseRequestOptions {
  * WIDGET API RESPONSES
  */
 
-/** Response from {@link WidgetBaseSource#getFeatures}. */
+/**
+ * Response from {@link WidgetBaseSource#getFeatures}.
+ * @experimental
+ * @internal
+ */
 export type FeaturesResponse = {rows: Record<string, unknown>[]};
 
 /** Response from {@link WidgetBaseSource#getFormula}. */
