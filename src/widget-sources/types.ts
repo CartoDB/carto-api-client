@@ -44,6 +44,9 @@ export interface FeaturesRequestOptions extends BaseRequestOptions {
   /** Topology of objects to be picked. */
   dataType: 'points' | 'lines' | 'polygons';
 
+  /** Zoom level, required if using 'points' data type. */
+  z?: number;
+
   /**
    * Maximum number of objects to return in the result set. For datasets
    * containing features with identical geometry, those features will have

@@ -126,7 +126,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     options: FeaturesRequestOptions
   ): Promise<FeaturesResponse> {
     const {filterOwner, spatialFilter, abortController, ...params} = options;
-    const {columns, dataType, featureIds, limit, tileResolution} = params;
+    const {columns, dataType, featureIds, z, limit, tileResolution} = params;
 
     type FeaturesModelResponse = {rows: Record<string, unknown>[]};
 
@@ -137,6 +137,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
         columns,
         dataType,
         featureIds,
+        z,
         limit: limit || 1000,
         tileResolution: tileResolution || DEFAULT_TILE_RESOLUTION,
       },
