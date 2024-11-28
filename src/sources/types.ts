@@ -47,6 +47,24 @@ export type SourceOptionalOptions = {
    * @default {@link DEFAULT_MAX_LENGTH_URL}
    */
   maxLengthURL?: number;
+
+  /**
+   * Local cache options.
+   *  * `canReadCache`: If `true`, the source will try to read from the local memory cache.
+   *  * `canStoreInCache`: If `true`, the source will store the response in the local memory cache.
+   *  * `cache`: A map of promises that are used to store the responses.
+   *
+   * If not provided, source will try to detect `CacheControl: no-cache or no-store` headers in the response and disable respective caching modes.
+   *
+   * By default, local in-memory caching is enabled
+   */
+  localCache?: LocalCacheOptions;
+};
+
+export type LocalCacheOptions = {
+  canReadCache?: boolean;
+  canStoreInCache?: boolean;
+  cache?: Map<string, Promise<unknown>>;
 };
 
 export type SourceOptions = SourceRequiredOptions &
