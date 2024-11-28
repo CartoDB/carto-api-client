@@ -7,13 +7,14 @@ import {CartoAPIError, APIErrorContext} from './carto-api-error';
 import {V3_MINOR_VERSION} from '../constants-internal';
 import {DEFAULT_MAX_LENGTH_URL} from '../constants-internal';
 import {getClient} from '../client';
+import {LocalCacheOptions} from '../sources/types';
 
 const DEFAULT_HEADERS = {
   Accept: 'application/json',
   'Content-Type': 'application/json',
 };
 
-const REQUEST_CACHE = new Map<string, Promise<unknown>>();
+const DEFAULT_REQUEST_CACHE = new Map<string, Promise<unknown>>();
 
 export async function requestWithParameters<T = any>({
   baseUrl,
@@ -21,12 +22,14 @@ export async function requestWithParameters<T = any>({
   headers: customHeaders = {},
   errorContext,
   maxLengthURL = DEFAULT_MAX_LENGTH_URL,
+  localCache,
 }: {
   baseUrl: string;
   parameters?: Record<string, unknown>;
   headers?: Record<string, string>;
   errorContext: APIErrorContext;
   maxLengthURL?: number;
+  localCache?: LocalCacheOptions;
 }): Promise<T> {
   // Parameters added to all requests issued with `requestWithParameters()`.
   // These parameters override parameters already in the base URL, but not
@@ -41,7 +44,14 @@ export async function requestWithParameters<T = any>({
 
   baseUrl = excludeURLParameters(baseUrl, Object.keys(parameters));
   const key = createCacheKey(baseUrl, parameters, customHeaders);
-  if (REQUEST_CACHE.has(key)) {
+
+  const {
+    cache: REQUEST_CACHE,
+    canReadCache,
+    canStoreInCache,
+  } = getCacheSettings(localCache, customHeaders);
+
+  if (canReadCache && REQUEST_CACHE.has(key)) {
     return REQUEST_CACHE.get(key) as Promise<T>;
   }
 
@@ -73,12 +83,36 @@ export async function requestWithParameters<T = any>({
       return json;
     })
     .catch((error: Error) => {
-      REQUEST_CACHE.delete(key);
+      if (canStoreInCache) {
+        REQUEST_CACHE.delete(key);
+      }
       throw new CartoAPIError(error, errorContext, response, responseJson);
     });
 
-  REQUEST_CACHE.set(key, jsonPromise);
+  if (canStoreInCache) {
+    REQUEST_CACHE.set(key, jsonPromise);
+  }
   return jsonPromise;
+}
+
+function getCacheSettings(
+  localCache: LocalCacheOptions | undefined,
+  headers: Record<string, string>
+) {
+  const cacheControl = headers['Cache-Control'];
+  const canReadCache = localCache
+    ? localCache.canReadCache
+    : !cacheControl?.includes('no-cache');
+  const canStoreInCache = localCache
+    ? localCache.canStoreInCache
+    : !cacheControl?.includes('no-store');
+  const cache = localCache?.cache || DEFAULT_REQUEST_CACHE;
+
+  return {
+    cache,
+    canReadCache,
+    canStoreInCache,
+  };
 }
 
 function createCacheKey(

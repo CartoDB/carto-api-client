@@ -23,6 +23,7 @@ export const query = async function (
     apiBaseUrl = SOURCE_DEFAULTS.apiBaseUrl,
     clientId = SOURCE_DEFAULTS.clientId,
     maxLengthURL = SOURCE_DEFAULTS.maxLengthURL,
+    localCache,
     connectionName,
     sqlQuery,
     queryParameters,
@@ -52,5 +53,6 @@ export const query = async function (
     headers,
     errorContext,
     maxLengthURL,
+    localCache,
   });
 };
