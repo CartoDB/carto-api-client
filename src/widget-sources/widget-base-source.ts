@@ -93,14 +93,18 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
   async getCategories(
     options: CategoryRequestOptions
   ): Promise<CategoryResponse> {
-    const {filterOwner, spatialFilter, abortController, ...params} = options;
+    const {filterOwner, spatialFilter, spatialFiltersResolution, abortController, ...params} = options;
     const {column, operation, operationColumn} = params;
 
     type CategoriesModelResponse = {rows: {name: string; value: number}[]};
 
     return executeModel({
       model: 'category',
-      source: {...this.getModelSource(filterOwner), spatialFilter},
+      source: {
+        ...this.getModelSource(filterOwner),
+        spatialFilter,
+        spatialFiltersResolution,
+      },
       params: {
         column,
         operation,
@@ -125,14 +129,18 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
   async getFeatures(
     options: FeaturesRequestOptions
   ): Promise<FeaturesResponse> {
-    const {filterOwner, spatialFilter, abortController, ...params} = options;
+    const {filterOwner, spatialFilter, spatialFiltersResolution, abortController, ...params} = options;
     const {columns, dataType, featureIds, z, limit, tileResolution} = params;
 
     type FeaturesModelResponse = {rows: Record<string, unknown>[]};
 
     return executeModel({
       model: 'pick',
-      source: {...this.getModelSource(filterOwner), spatialFilter},
+      source: {
+        ...this.getModelSource(filterOwner),
+        spatialFiltersResolution,
+        spatialFilter
+      },
       params: {
         columns,
         dataType,
@@ -159,6 +167,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     const {
       filterOwner,
       spatialFilter,
+      spatialFiltersResolution,
       abortController,
       operationExp,
       ...params
@@ -169,7 +178,11 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
 
     return executeModel({
       model: 'formula',
-      source: {...this.getModelSource(filterOwner), spatialFilter},
+      source: {
+        ...this.getModelSource(filterOwner),
+        spatialFiltersResolution,
+        spatialFilter
+      },
       params: {column: column ?? '*', operation, operationExp},
       opts: {abortController},
     }).then((res: FormulaModelResponse) => normalizeObjectKeys(res.rows[0]));
@@ -186,14 +199,18 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
   async getHistogram(
     options: HistogramRequestOptions
   ): Promise<HistogramResponse> {
-    const {filterOwner, spatialFilter, abortController, ...params} = options;
+    const {filterOwner, spatialFilter, spatialFiltersResolution, abortController, ...params} = options;
     const {column, operation, ticks} = params;
 
     type HistogramModelResponse = {rows: {tick: number; value: number}[]};
 
     const data = await executeModel({
       model: 'histogram',
-      source: {...this.getModelSource(filterOwner), spatialFilter},
+      source: {
+        ...this.getModelSource(filterOwner),
+        spatialFiltersResolution,
+        spatialFilter
+      },
       params: {column, operation, ticks},
       opts: {abortController},
     }).then((res: HistogramModelResponse) => normalizeObjectKeys(res.rows));
@@ -221,14 +238,18 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
    * or rendering a range slider UI for filtering.
    */
   async getRange(options: RangeRequestOptions): Promise<RangeResponse> {
-    const {filterOwner, spatialFilter, abortController, ...params} = options;
+    const {filterOwner, spatialFilter, spatialFiltersResolution, abortController, ...params} = options;
     const {column} = params;
 
     type RangeModelResponse = {rows: {min: number; max: number}[]};
 
     return executeModel({
       model: 'range',
-      source: {...this.getModelSource(filterOwner), spatialFilter},
+      source: {
+        ...this.getModelSource(filterOwner),
+        spatialFiltersResolution,
+        spatialFilter
+      },
       params: {column},
       opts: {abortController},
     }).then((res: RangeModelResponse) => normalizeObjectKeys(res.rows[0]));
@@ -243,7 +264,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
    * values. Suitable for rendering scatter plots.
    */
   async getScatter(options: ScatterRequestOptions): Promise<ScatterResponse> {
-    const {filterOwner, spatialFilter, abortController, ...params} = options;
+    const {filterOwner, spatialFilter, spatialFiltersResolution, abortController, ...params} = options;
     const {xAxisColumn, xAxisJoinOperation, yAxisColumn, yAxisJoinOperation} =
       params;
 
@@ -254,7 +275,11 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
 
     return executeModel({
       model: 'scatterplot',
-      source: {...this.getModelSource(filterOwner), spatialFilter},
+      source: {
+        ...this.getModelSource(filterOwner),
+        spatialFiltersResolution,
+        spatialFilter
+      },
       params: {
         xAxisColumn,
         xAxisJoinOperation,
@@ -277,7 +302,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
    * sorting. Suitable for displaying tables and lists.
    */
   async getTable(options: TableRequestOptions): Promise<TableResponse> {
-    const {filterOwner, spatialFilter, abortController, ...params} = options;
+    const {filterOwner, spatialFilter, spatialFiltersResolution, abortController, ...params} = options;
     const {columns, sortBy, sortDirection, offset = 0, limit = 10} = params;
 
     type TableModelResponse = {
@@ -287,7 +312,11 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
 
     return executeModel({
       model: 'table',
-      source: {...this.getModelSource(filterOwner), spatialFilter},
+      source: {
+        ...this.getModelSource(filterOwner),
+        spatialFiltersResolution,
+        spatialFilter
+      },
       params: {
         column: columns,
         sortBy,
@@ -314,7 +343,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
   async getTimeSeries(
     options: TimeSeriesRequestOptions
   ): Promise<TimeSeriesResponse> {
-    const {filterOwner, abortController, spatialFilter, ...params} = options;
+    const {filterOwner, abortController, spatialFilter, spatialFiltersResolution, ...params} = options;
     const {
       column,
       operationColumn,
@@ -334,7 +363,11 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
 
     return executeModel({
       model: 'timeseries',
-      source: {...this.getModelSource(filterOwner), spatialFilter},
+      source: {
+        ...this.getModelSource(filterOwner),
+        spatialFiltersResolution,
+        spatialFilter
+      },
       params: {
         column,
         stepSize,

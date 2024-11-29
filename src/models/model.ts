@@ -41,6 +41,7 @@ export interface ModelSource {
   queryParameters?: QueryParameters;
   spatialDataColumn?: string;
   spatialDataType?: SpatialDataType;
+  spatialFiltersResolution?: number;
 }
 
 const {V3} = ApiVersion;

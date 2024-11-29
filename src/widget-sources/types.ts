@@ -13,6 +13,7 @@ import {
 /** Common options for {@link WidgetBaseSource} requests. */
 interface BaseRequestOptions {
   spatialFilter?: SpatialFilter;
+  spatialFiltersResolution?: number;
   abortController?: AbortController;
   filterOwner?: string;
 }
