@@ -18,7 +18,10 @@ import type {
 export type H3QuerySourceOptions = SourceOptions &
   QuerySourceOptions &
   AggregationOptions &
-  FilterOptions;
+  FilterOptions & {
+    spatialDataType: 'h3';
+  };
+
 type UrlParameters = {
   aggregationExp: string;
   aggregationResLevel?: string;
@@ -59,7 +62,12 @@ export const h3QuerySource = async function (
   return baseSource<UrlParameters>('query', options, urlParameters).then(
     (result) => ({
       ...(result as TilejsonResult),
-      widgetSource: new WidgetQuerySource(options),
+      widgetSource: new WidgetQuerySource({
+        ...options,
+        // NOTE: passing redundant spatialDataColumn here to apply the default value 'h3'
+        spatialDataColumn,
+        spatialDataType: 'h3',
+      }),
     })
   );
 };

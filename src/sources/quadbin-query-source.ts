@@ -18,7 +18,9 @@ import type {
 export type QuadbinQuerySourceOptions = SourceOptions &
   QuerySourceOptions &
   AggregationOptions &
-  FilterOptions;
+  FilterOptions & {
+    spatialDataType: 'quadbin';
+  };
 
 type UrlParameters = {
   aggregationExp: string;
@@ -60,7 +62,12 @@ export const quadbinQuerySource = async function (
   return baseSource<UrlParameters>('query', options, urlParameters).then(
     (result) => ({
       ...(result as TilejsonResult),
-      widgetSource: new WidgetQuerySource(options),
+      widgetSource: new WidgetQuerySource({
+        ...options,
+        // NOTE: passing redundant spatialDataColumn here to apply the default value 'quadbin'
+        spatialDataColumn,
+        spatialDataType: 'quadbin',
+      }),
     })
   );
 };

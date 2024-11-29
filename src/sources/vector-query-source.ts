@@ -21,7 +21,9 @@ import type {
 export type VectorQuerySourceOptions = SourceOptions &
   QuerySourceOptions &
   FilterOptions &
-  ColumnsOption;
+  ColumnsOption & {
+    spatialDataType: 'geo'
+  };
 
 type UrlParameters = {
   columns?: string;

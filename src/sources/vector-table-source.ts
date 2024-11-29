@@ -21,7 +21,10 @@ import type {
 export type VectorTableSourceOptions = SourceOptions &
   TableSourceOptions &
   FilterOptions &
-  ColumnsOption;
+  ColumnsOption & {
+    spatialDataType: 'geo';
+  };
+
 type UrlParameters = {
   columns?: string;
   filters?: Record<string, unknown>;
