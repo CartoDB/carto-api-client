@@ -10,6 +10,7 @@ import {$TODO} from '../types-internal.js';
 import {assert} from '../utils.js';
 import {ModelRequestOptions, makeCall} from './common.js';
 import {ApiVersion} from '../constants.js';
+import { SpatialDataType } from '../sources/types.js';
 
 /** @internalRemarks Source: @carto/react-api */
 const AVAILABLE_MODELS = [
@@ -38,6 +39,8 @@ export interface ModelSource {
   geoColumn?: string;
   spatialFilter?: SpatialFilter;
   queryParameters?: QueryParameters;
+  spatialDataColumn?: string;
+  spatialDataType?: SpatialDataType;
 }
 
 const {V3} = ApiVersion;

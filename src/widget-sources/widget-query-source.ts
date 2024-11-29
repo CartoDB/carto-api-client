@@ -44,6 +44,8 @@ export class WidgetQuerySource extends WidgetBaseSource<
       type: 'query',
       data: this.props.sqlQuery,
       queryParameters: this.props.queryParameters,
+      spatialDataColumn: this.props.spatialDataColumn,
+      spatialDataType: this.props.spatialDataType,
     };
   }
 }
