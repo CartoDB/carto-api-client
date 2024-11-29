@@ -32,7 +32,7 @@ type UrlParameters = {
 };
 
 export const h3TableSource = async function (
-  options: H3TableSourceOptions
+  options: Omit<H3TableSourceOptions, 'spatialDataType'>
 ): Promise<TilejsonResult & WidgetTableSourceResult> {
   const {
     aggregationExp,

@@ -32,7 +32,7 @@ type UrlParameters = {
 };
 
 export const quadbinTableSource = async function (
-  options: QuadbinTableSourceOptions
+  options: Omit<QuadbinTableSourceOptions, 'spatialDataType'>
 ): Promise<TilejsonResult & WidgetTableSourceResult> {
   const {
     aggregationExp,

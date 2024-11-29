@@ -33,7 +33,7 @@ type UrlParameters = {
 };
 
 export const h3QuerySource = async function (
-  options: H3QuerySourceOptions
+  options: Omit<H3QuerySourceOptions, 'spatialDataType'>
 ): Promise<TilejsonResult & WidgetQuerySourceResult> {
   const {
     aggregationExp,

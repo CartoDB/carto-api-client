@@ -33,7 +33,7 @@ type UrlParameters = {
 };
 
 export const quadbinQuerySource = async function (
-  options: QuadbinQuerySourceOptions
+  options: Omit<QuadbinQuerySourceOptions, 'spatialDataType'>
 ): Promise<TilejsonResult & WidgetQuerySourceResult> {
   const {
     aggregationExp,
