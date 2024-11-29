@@ -1,4 +1,4 @@
-import {TileResolution} from '../sources/types';
+import {SpatialFilterPolyfillMode, TileResolution} from '../sources/types';
 import {
   GroupDateType,
   SortColumnType,
@@ -14,6 +14,7 @@ import {
 interface BaseRequestOptions {
   spatialFilter?: SpatialFilter;
   spatialFiltersResolution?: number;
+  spatialFiltersMode?: SpatialFilterPolyfillMode;
   abortController?: AbortController;
   filterOwner?: string;
 }

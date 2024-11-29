@@ -93,7 +93,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
   async getCategories(
     options: CategoryRequestOptions
   ): Promise<CategoryResponse> {
-    const {filterOwner, spatialFilter, spatialFiltersResolution, abortController, ...params} = options;
+    const {filterOwner, spatialFilter, spatialFiltersMode, spatialFiltersResolution, abortController, ...params} = options;
     const {column, operation, operationColumn} = params;
 
     type CategoriesModelResponse = {rows: {name: string; value: number}[]};
@@ -102,8 +102,9 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       model: 'category',
       source: {
         ...this.getModelSource(filterOwner),
-        spatialFilter,
         spatialFiltersResolution,
+        spatialFiltersMode,
+        spatialFilter,
       },
       params: {
         column,
@@ -129,7 +130,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
   async getFeatures(
     options: FeaturesRequestOptions
   ): Promise<FeaturesResponse> {
-    const {filterOwner, spatialFilter, spatialFiltersResolution, abortController, ...params} = options;
+    const {filterOwner, spatialFilter, spatialFiltersMode, spatialFiltersResolution, abortController, ...params} = options;
     const {columns, dataType, featureIds, z, limit, tileResolution} = params;
 
     type FeaturesModelResponse = {rows: Record<string, unknown>[]};
@@ -139,6 +140,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       source: {
         ...this.getModelSource(filterOwner),
         spatialFiltersResolution,
+        spatialFiltersMode,
         spatialFilter
       },
       params: {
@@ -167,6 +169,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     const {
       filterOwner,
       spatialFilter,
+      spatialFiltersMode,
       spatialFiltersResolution,
       abortController,
       operationExp,
@@ -181,6 +184,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       source: {
         ...this.getModelSource(filterOwner),
         spatialFiltersResolution,
+        spatialFiltersMode,
         spatialFilter
       },
       params: {column: column ?? '*', operation, operationExp},
@@ -199,7 +203,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
   async getHistogram(
     options: HistogramRequestOptions
   ): Promise<HistogramResponse> {
-    const {filterOwner, spatialFilter, spatialFiltersResolution, abortController, ...params} = options;
+    const {filterOwner, spatialFilter, spatialFiltersMode, spatialFiltersResolution, abortController, ...params} = options;
     const {column, operation, ticks} = params;
 
     type HistogramModelResponse = {rows: {tick: number; value: number}[]};
@@ -209,6 +213,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       source: {
         ...this.getModelSource(filterOwner),
         spatialFiltersResolution,
+        spatialFiltersMode,
         spatialFilter
       },
       params: {column, operation, ticks},
@@ -238,7 +243,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
    * or rendering a range slider UI for filtering.
    */
   async getRange(options: RangeRequestOptions): Promise<RangeResponse> {
-    const {filterOwner, spatialFilter, spatialFiltersResolution, abortController, ...params} = options;
+    const {filterOwner, spatialFilter, spatialFiltersMode, spatialFiltersResolution, abortController, ...params} = options;
     const {column} = params;
 
     type RangeModelResponse = {rows: {min: number; max: number}[]};
@@ -248,6 +253,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       source: {
         ...this.getModelSource(filterOwner),
         spatialFiltersResolution,
+        spatialFiltersMode,
         spatialFilter
       },
       params: {column},
@@ -264,7 +270,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
    * values. Suitable for rendering scatter plots.
    */
   async getScatter(options: ScatterRequestOptions): Promise<ScatterResponse> {
-    const {filterOwner, spatialFilter, spatialFiltersResolution, abortController, ...params} = options;
+    const {filterOwner, spatialFilter, spatialFiltersMode, spatialFiltersResolution, abortController, ...params} = options;
     const {xAxisColumn, xAxisJoinOperation, yAxisColumn, yAxisJoinOperation} =
       params;
 
@@ -278,6 +284,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       source: {
         ...this.getModelSource(filterOwner),
         spatialFiltersResolution,
+        spatialFiltersMode,
         spatialFilter
       },
       params: {
@@ -302,7 +309,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
    * sorting. Suitable for displaying tables and lists.
    */
   async getTable(options: TableRequestOptions): Promise<TableResponse> {
-    const {filterOwner, spatialFilter, spatialFiltersResolution, abortController, ...params} = options;
+    const {filterOwner, spatialFilter, spatialFiltersMode, spatialFiltersResolution, abortController, ...params} = options;
     const {columns, sortBy, sortDirection, offset = 0, limit = 10} = params;
 
     type TableModelResponse = {
@@ -315,6 +322,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       source: {
         ...this.getModelSource(filterOwner),
         spatialFiltersResolution,
+        spatialFiltersMode,
         spatialFilter
       },
       params: {
@@ -343,7 +351,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
   async getTimeSeries(
     options: TimeSeriesRequestOptions
   ): Promise<TimeSeriesResponse> {
-    const {filterOwner, abortController, spatialFilter, spatialFiltersResolution, ...params} = options;
+    const {filterOwner, abortController, spatialFilter, spatialFiltersMode, spatialFiltersResolution, ...params} = options;
     const {
       column,
       operationColumn,
@@ -366,6 +374,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       source: {
         ...this.getModelSource(filterOwner),
         spatialFiltersResolution,
+        spatialFiltersMode,
         spatialFilter
       },
       params: {
