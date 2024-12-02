@@ -35,7 +35,7 @@ type UrlParameters = {
 };
 
 export const vectorTableSource = async function (
-  options: VectorTableSourceOptions
+  options: Omit<VectorTableSourceOptions, 'spatialDataType'>
 ): Promise<TilejsonResult & WidgetTableSourceResult> {
   const {
     columns,
@@ -61,7 +61,10 @@ export const vectorTableSource = async function (
   return baseSource<UrlParameters>('table', options, urlParameters).then(
     (result) => ({
       ...(result as TilejsonResult),
-      widgetSource: new WidgetTableSource(options),
+      widgetSource: new WidgetTableSource({
+        ...options,
+        spatialDataType: 'geo',
+      }),
     })
   );
 };

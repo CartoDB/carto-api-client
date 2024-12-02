@@ -36,7 +36,7 @@ type UrlParameters = {
 };
 
 export const vectorQuerySource = async function (
-  options: VectorQuerySourceOptions
+  options: Omit<VectorQuerySourceOptions, 'spatialDataType'>
 ): Promise<TilejsonResult & WidgetQuerySourceResult> {
   const {
     columns,
@@ -66,7 +66,10 @@ export const vectorQuerySource = async function (
   return baseSource<UrlParameters>('query', options, urlParameters).then(
     (result) => ({
       ...(result as TilejsonResult),
-      widgetSource: new WidgetQuerySource(options),
+      widgetSource: new WidgetQuerySource({
+        ...options,
+        spatialDataType: 'geo',
+      }),
     })
   );
 };
