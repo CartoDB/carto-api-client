@@ -62,7 +62,7 @@ export const quadbinTableSource = async function (
         ...options,
         // NOTE: passing redundant spatialDataColumn here to apply the default value 'quadbin'
         spatialDataColumn,
-        spatialDataType: 'quadbin'
+        spatialDataType: 'quadbin',
       }),
     })
   );

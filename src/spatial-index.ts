@@ -1,17 +1,23 @@
-import { DEFAULT_AGGREGATION_RES_LEVEL_H3, DEFAULT_AGGREGATION_RES_LEVEL_QUADBIN } from "./constants-internal";
-import { ModelSource } from "./models/model";
-import { AggregationOptions } from "./sources/types";
+import {
+  DEFAULT_AGGREGATION_RES_LEVEL_H3,
+  DEFAULT_AGGREGATION_RES_LEVEL_QUADBIN,
+} from './constants-internal';
+import {ModelSource} from './models/model';
+import {AggregationOptions} from './sources/types';
 
 const DEFAULT_TILE_SIZE = 512;
 const QUADBIN_ZOOM_MAX_OFFSET = 4;
 
-export function getSpatialFiltersResolution({ source, viewState }: {
+export function getSpatialFiltersResolution({
+  source,
+  viewState,
+}: {
   source: ModelSource & AggregationOptions;
   viewState: {
     zoom: number;
     latitude: number;
     longitude: number;
-  }
+  };
 }) {
   if (source.spatialDataType === 'geo') {
     return undefined;
@@ -27,14 +33,18 @@ export function getSpatialFiltersResolution({ source, viewState }: {
       ? DEFAULT_AGGREGATION_RES_LEVEL_H3
       : DEFAULT_AGGREGATION_RES_LEVEL_QUADBIN);
 
-  const aggregationResLevelOffset = Math.max(0, Math.floor(aggregationResLevel));
+  const aggregationResLevelOffset = Math.max(
+    0,
+    Math.floor(aggregationResLevel)
+  );
 
   const currentZoomInt = Math.ceil(currentZoom);
   if (source.spatialDataType === 'h3') {
     const tileSize = DEFAULT_TILE_SIZE;
     const maxResolutionForZoom =
-      maxH3SpatialFiltersResolutions.find(([zoom]) => zoom === currentZoomInt)?.[1] ??
-      Math.max(0, currentZoomInt - 3);
+      maxH3SpatialFiltersResolutions.find(
+        ([zoom]) => zoom === currentZoomInt
+      )?.[1] ?? Math.max(0, currentZoomInt - 3);
 
     const maxSpatialFiltersResolution = maxResolutionForZoom
       ? Math.min(dataResolution, maxResolutionForZoom)
@@ -42,7 +52,7 @@ export function getSpatialFiltersResolution({ source, viewState }: {
 
     const hexagonResolution =
       getHexagonResolution(
-        { zoom: currentZoom, latitude: viewState.latitude },
+        {zoom: currentZoom, latitude: viewState.latitude},
         tileSize
       ) + aggregationResLevelOffset;
 
@@ -51,9 +61,13 @@ export function getSpatialFiltersResolution({ source, viewState }: {
 
   if (source.spatialDataType === 'quadbin') {
     const maxResolutionForZoom = currentZoomInt + QUADBIN_ZOOM_MAX_OFFSET;
-    const maxSpatialFiltersResolution = Math.min(dataResolution, maxResolutionForZoom);
+    const maxSpatialFiltersResolution = Math.min(
+      dataResolution,
+      maxResolutionForZoom
+    );
 
-    const quadsResolution = Math.floor(viewState.zoom) + aggregationResLevelOffset;
+    const quadsResolution =
+      Math.floor(viewState.zoom) + aggregationResLevelOffset;
     return Math.min(quadsResolution, maxSpatialFiltersResolution);
   }
 
@@ -80,7 +94,7 @@ const maxH3SpatialFiltersResolutions = [
   [4, 2],
   [3, 1],
   [2, 1],
-  [1, 0]
+  [1, 0],
 ];
 
 // stolen from https://github.com/visgl/deck.gl/blob/master/modules/carto/src/layers/h3-tileset-2d.ts
@@ -99,8 +113,13 @@ export function getHexagonResolution(
   // expressed as an offset to the viewport zoom.
   const zoomOffset = Math.log2(tileSize / DEFAULT_TILE_SIZE);
   const hexagonScaleFactor = (2 / 3) * (viewport.zoom - zoomOffset);
-  const latitudeScaleFactor = Math.log(1 / Math.cos((Math.PI * viewport.latitude) / 180));
+  const latitudeScaleFactor = Math.log(
+    1 / Math.cos((Math.PI * viewport.latitude) / 180)
+  );
 
   // Clip and bias
-  return Math.max(0, Math.floor(hexagonScaleFactor + latitudeScaleFactor - BIAS));
+  return Math.max(
+    0,
+    Math.floor(hexagonScaleFactor + latitudeScaleFactor - BIAS)
+  );
 }

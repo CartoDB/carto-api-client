@@ -22,7 +22,7 @@ export type VectorQuerySourceOptions = SourceOptions &
   QuerySourceOptions &
   FilterOptions &
   ColumnsOption & {
-    spatialDataType: 'geo'
+    spatialDataType: 'geo';
   };
 
 type UrlParameters = {
