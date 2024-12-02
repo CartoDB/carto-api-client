@@ -49,22 +49,25 @@ export type SourceOptionalOptions = {
   maxLengthURL?: number;
 
   /**
-   * Local cache options.
-   *  * `canReadCache`: If `true`, the source will try to read from the local memory cache.
-   *  * `canStoreInCache`: If `true`, the source will store the response in the local memory cache.
-   *  * `cache`: A map of promises that are used to store the responses.
-   *
-   * If not provided, source will try to detect `CacheControl: no-cache or no-store` headers in the response and disable respective caching modes.
-   *
-   * By default, local in-memory caching is enabled
+   * By default, local in-memory caching is enabled.
    */
   localCache?: LocalCacheOptions;
 };
 
 export type LocalCacheOptions = {
-  canReadCache?: boolean;
-  canStoreInCache?: boolean;
+  /**
+   * Map that stores requests and their responses.
+   */
   cache?: Map<string, Promise<unknown>>;
+
+  /**
+   * Cache control
+   *  * `no-cache`: If present, the source will always fetch from original source.
+   *  * `no-store`: If present, source will not store result in cache (for later reuse).
+   *
+   * See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control#directives
+   */
+  cacheControl?: ('no-cache' | 'no-store')[];
 };
 
 export type SourceOptions = SourceRequiredOptions &
