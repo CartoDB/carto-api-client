@@ -49,7 +49,7 @@ export async function requestWithParameters<T = any>({
     cache: REQUEST_CACHE,
     canReadCache,
     canStoreInCache,
-  } = getCacheSettings(localCache, customHeaders);
+  } = getCacheSettings(localCache);
 
   if (canReadCache && REQUEST_CACHE.has(key)) {
     return REQUEST_CACHE.get(key) as Promise<T>;
@@ -95,17 +95,13 @@ export async function requestWithParameters<T = any>({
   return jsonPromise;
 }
 
-function getCacheSettings(
-  localCache: LocalCacheOptions | undefined,
-  headers: Record<string, string>
-) {
-  const cacheControl = headers['Cache-Control'];
-  const canReadCache = localCache
-    ? localCache.canReadCache
-    : !cacheControl?.includes('no-cache');
-  const canStoreInCache = localCache
-    ? localCache.canStoreInCache
-    : !cacheControl?.includes('no-store');
+function getCacheSettings(localCache: LocalCacheOptions | undefined) {
+  const canReadCache = localCache?.cacheControl?.includes('no-cache')
+    ? false
+    : true;
+  const canStoreInCache = localCache?.cacheControl?.includes('no-store')
+    ? false
+    : true;
   const cache = localCache?.cache || DEFAULT_REQUEST_CACHE;
 
   return {
