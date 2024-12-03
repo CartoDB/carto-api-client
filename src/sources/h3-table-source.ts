@@ -18,9 +18,7 @@ import type {
 export type H3TableSourceOptions = SourceOptions &
   TableSourceOptions &
   AggregationOptions &
-  FilterOptions & {
-    spatialDataType: 'h3';
-  };
+  FilterOptions;
 
 type UrlParameters = {
   aggregationExp: string;
@@ -32,7 +30,7 @@ type UrlParameters = {
 };
 
 export const h3TableSource = async function (
-  options: Omit<H3TableSourceOptions, 'spatialDataType'>
+  options: H3TableSourceOptions
 ): Promise<TilejsonResult & WidgetTableSourceResult> {
   const {
     aggregationExp,

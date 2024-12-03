@@ -13,7 +13,7 @@ export function getSpatialFiltersResolution({
   viewState,
 }: {
   source: {
-    spatialDataType: ModelSource['spatialDataType'];
+    spatialDataType?: ModelSource['spatialDataType'];
     dataResolution?: ModelSource['dataResolution'];
     aggregationResLevel?: AggregationOptions['aggregationResLevel']
   };

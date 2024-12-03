@@ -43,8 +43,6 @@ export class WidgetTableSource extends WidgetBaseSource<
       ...super._getModelSource(owner),
       type: 'table',
       data: this.props.tableName,
-      spatialDataColumn: this.props.spatialDataColumn,
-      spatialDataType: this.props.spatialDataType,
     };
   }
 }

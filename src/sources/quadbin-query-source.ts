@@ -18,9 +18,7 @@ import type {
 export type QuadbinQuerySourceOptions = SourceOptions &
   QuerySourceOptions &
   AggregationOptions &
-  FilterOptions & {
-    spatialDataType: 'quadbin';
-  };
+  FilterOptions;
 
 type UrlParameters = {
   aggregationExp: string;
@@ -33,7 +31,7 @@ type UrlParameters = {
 };
 
 export const quadbinQuerySource = async function (
-  options: Omit<QuadbinQuerySourceOptions, 'spatialDataType'>
+  options: QuadbinQuerySourceOptions
 ): Promise<TilejsonResult & WidgetQuerySourceResult> {
   const {
     aggregationExp,
