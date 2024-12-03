@@ -12,7 +12,11 @@ export function getSpatialFiltersResolution({
   source,
   viewState,
 }: {
-  source: ModelSource & AggregationOptions;
+  source: {
+    spatialDataType: ModelSource['spatialDataType'];
+    dataResolution?: ModelSource['dataResolution'];
+    aggregationResLevel?: AggregationOptions['aggregationResLevel']
+  };
   viewState: {
     zoom: number;
     latitude: number;
@@ -22,8 +26,6 @@ export function getSpatialFiltersResolution({
   if (source.spatialDataType === 'geo') {
     return undefined;
   }
-
-  const currentZoom = viewState.zoom ?? 1;
 
   const dataResolution = source.dataResolution ?? Number.MAX_VALUE;
 
@@ -38,7 +40,7 @@ export function getSpatialFiltersResolution({
     Math.floor(aggregationResLevel)
   );
 
-  const currentZoomInt = Math.ceil(currentZoom);
+  const currentZoomInt = Math.ceil(viewState.zoom);
   if (source.spatialDataType === 'h3') {
     const tileSize = DEFAULT_TILE_SIZE;
     const maxResolutionForZoom =
@@ -50,11 +52,7 @@ export function getSpatialFiltersResolution({
       ? Math.min(dataResolution, maxResolutionForZoom)
       : dataResolution;
 
-    const hexagonResolution =
-      getHexagonResolution(
-        {zoom: currentZoom, latitude: viewState.latitude},
-        tileSize
-      ) + aggregationResLevelOffset;
+    const hexagonResolution = getHexagonResolution(viewState, tileSize) + aggregationResLevelOffset;
 
     return Math.min(hexagonResolution, maxSpatialFiltersResolution);
   }
