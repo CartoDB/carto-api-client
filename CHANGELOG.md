@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.4
+
+### 0.4.0
+
+- feat: Add Picking Model API
+- refactor: Migrate sources from `@deck.gl/carto` to `@carto/api-client`
+- deps: Remove `@deck.gl/carto` bundled dependency
+
 ## 0.3
 
 ### 0.3.0
