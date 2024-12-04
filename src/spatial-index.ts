@@ -4,6 +4,7 @@ import {
 } from './constants-internal';
 import {ModelSource} from './models/model';
 import {AggregationOptions} from './sources/types';
+import { assert } from './utils';
 
 const DEFAULT_TILE_SIZE = 512;
 const QUADBIN_ZOOM_MAX_OFFSET = 4;
@@ -17,7 +18,7 @@ export function getSpatialFiltersResolution({
     dataResolution?: ModelSource['dataResolution'];
     aggregationResLevel?: AggregationOptions['aggregationResLevel']
   };
-  viewState: {
+  viewState?: {
     zoom: number;
     latitude: number;
     longitude: number;
@@ -26,6 +27,8 @@ export function getSpatialFiltersResolution({
   if (source.spatialDataType === 'geo') {
     return undefined;
   }
+
+  assert(viewState, "viewState prop is required to compute automatic spatialFiltersResolution when using spatialFilter with spatial indexes. Either pass a `spatialFiltersResolution` prop or a `viewState` prop to avoid this error")
 
   const dataResolution = source.dataResolution ?? Number.MAX_VALUE;
 
