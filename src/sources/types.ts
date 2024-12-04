@@ -201,6 +201,29 @@ export interface Tilejson {
   vector_layers: VectorLayer[];
   tilestats: Tilestats;
   tileResolution?: TileResolution;
+
+  // extra for Carto
+  /**
+   * Resolution of data in spatial-index dataset (e.g. H3, Quadbin).
+   */
+  dataresolution?: number;
+
+  /**
+   * Array of ratios of dropped features per zoom level.
+   *
+   * Example: `[0,0,0.5]` - means that 50% of features are dropped at zoom 2 and bigger
+   */
+  fraction_dropped_per_zoom?: number[];
+
+  /**
+   * Names of bands - rasters only.
+   */
+  raster_bands?: string[];
+
+  /**
+   * Raster metadata - rasters only.
+   */
+  rasterMetadata?: RasterMetadata;
 }
 
 export interface Tilestats {
@@ -221,11 +244,114 @@ export interface Attribute {
 }
 
 export interface VectorLayer {
+  // tilejson standard
   id: string;
   minzoom: number;
   maxzoom: number;
   fields: Record<string, string>;
+
+  // extra for Carto
+  geometry_type?: string;
 }
+
+export type RasterMetadataBandStats = {
+  approximated_stats?: boolean;
+  min: number;
+  max: number;
+  mean: number;
+  stddev: number;
+  sum: number;
+  sum_squares: number;
+  count: number;
+  /**
+   * Quantiles by number of buckets.
+   *
+   * Example:
+   * {
+   *   3: [20, 40] for 3 buckets, first 20% of data is in first bucket, 40% in second and 40% in third.
+   *   4: [20, 30, 50], for 4 buckets ...
+   * }
+   */
+  quantiles?: Record<number, number[]>;
+
+  /**
+   * Top values by number of values.
+   *
+   * Key of dictionary is value, value is count.
+   * Key order is random.
+   *
+   * Example:
+   *   {
+   *    3: 5 - means there are 5 pixels with value 3
+   *    11: 222
+   *    12: 333 - means that 12 is most common value with count 333
+   *    ...
+   *  }
+   */
+  top_values?: Record<number, number>;
+
+  /**
+   * Raster loader version.
+   */
+  version?: string;
+};
+
+export enum RasterBandColorinterp {
+  Gray = 'gray',
+  Red = 'red',
+  Green = 'green',
+  Blue = 'blue',
+  Alpha = 'alpha',
+  Palette = 'palette',
+}
+
+export type RasterMetadataBand = {
+  type: string;
+  name: string;
+  stats: RasterMetadataBandStats;
+  /**
+   * Known values:
+   *  * `palette`: use unique value and `colortable` ad default mapping
+   *  * `red`, `green`, `blue`: use the band as color channel
+   *  * `gray`: use the band as grayscale
+   */
+  colorinterp?: string | RasterBandColorinterp; // use RasterBandColorinterp, but it's external value, so let's use string
+
+  /**
+   * Default color mapping for unique values (or if coloprinterp is `palette`)
+   */
+  colortable?: Record<string, number[]>;
+
+  /**
+   * No value representation.
+   * Observed values:
+   *   * `'nan'` for `NaN`
+   *   * `number`: both as string as number, so parsing is needed
+   */
+  nodata: string | number; // 255, '0', 'nan'
+};
+
+export type RasterMetadata = {
+  block_resolution: number;
+  minresolution: number;
+  maxresolution: number;
+  nodata: number | string;
+  bands: RasterMetadataBand[];
+  bounds: [
+    longitudeMin: number,
+    latitudeMin: number,
+    longitudeMax: number,
+    latitudeMax: number
+  ];
+  center: [latitude: number, longitude: number, zoom: number];
+  width: number;
+  height: number;
+  block_width: number;
+  block_height: number;
+  num_blocks: number;
+  num_pixels: number;
+  pixel_resolution: number;
+};
 
 export type TilejsonResult = Tilejson & {accessToken: string};
 export type GeojsonResult = {type: 'FeatureCollection'; features: Feature[]};
