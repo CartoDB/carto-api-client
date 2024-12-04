@@ -28,7 +28,7 @@ import {
   DEFAULT_GEO_COLUMN,
   DEFAULT_TILE_RESOLUTION,
 } from '../constants-internal.js';
-import { getSpatialFiltersResolution } from '../spatial-index.js';
+import {getSpatialFiltersResolution} from '../spatial-index.js';
 
 export interface WidgetBaseSourceProps extends Omit<SourceOptions, 'filters'> {
   apiVersion?: ApiVersion;
@@ -110,7 +110,10 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
 
     let spatialFiltersResolution = options.spatialFiltersResolution;
     if (spatialFilter && !spatialFiltersResolution) {
-      spatialFiltersResolution = getSpatialFiltersResolution({ source, viewState })
+      spatialFiltersResolution = getSpatialFiltersResolution({
+        source,
+        viewState,
+      });
     }
 
     type CategoriesModelResponse = {rows: {name: string; value: number}[]};
@@ -157,10 +160,13 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     } = options;
     const {columns, dataType, featureIds, z, limit, tileResolution} = params;
     const source = this.getModelSource(filterOwner);
-    
+
     let spatialFiltersResolution = options.spatialFiltersResolution;
     if (spatialFilter && !spatialFiltersResolution) {
-      spatialFiltersResolution = getSpatialFiltersResolution({ source, viewState })
+      spatialFiltersResolution = getSpatialFiltersResolution({
+        source,
+        viewState,
+      });
     }
 
     type FeaturesModelResponse = {rows: Record<string, unknown>[]};
@@ -207,10 +213,13 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     } = options;
     const {column, operation} = params;
     const source = this.getModelSource(filterOwner);
-    
+
     let spatialFiltersResolution = options.spatialFiltersResolution;
     if (spatialFilter && !spatialFiltersResolution) {
-      spatialFiltersResolution = getSpatialFiltersResolution({ source, viewState })
+      spatialFiltersResolution = getSpatialFiltersResolution({
+        source,
+        viewState,
+      });
     }
 
     type FormulaModelResponse = {rows: {value: number}[]};
@@ -249,10 +258,13 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     } = options;
     const {column, operation, ticks} = params;
     const source = this.getModelSource(filterOwner);
-    
+
     let spatialFiltersResolution = options.spatialFiltersResolution;
     if (spatialFilter && !spatialFiltersResolution) {
-      spatialFiltersResolution = getSpatialFiltersResolution({ source, viewState })
+      spatialFiltersResolution = getSpatialFiltersResolution({
+        source,
+        viewState,
+      });
     }
 
     type HistogramModelResponse = {rows: {tick: number; value: number}[]};
@@ -302,10 +314,13 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     } = options;
     const {column} = params;
     const source = this.getModelSource(filterOwner);
-    
+
     let spatialFiltersResolution = options.spatialFiltersResolution;
     if (spatialFilter && !spatialFiltersResolution) {
-      spatialFiltersResolution = getSpatialFiltersResolution({ source, viewState })
+      spatialFiltersResolution = getSpatialFiltersResolution({
+        source,
+        viewState,
+      });
     }
 
     type RangeModelResponse = {rows: {min: number; max: number}[]};
@@ -344,10 +359,13 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       params;
 
     const source = this.getModelSource(filterOwner);
-    
+
     let spatialFiltersResolution = options.spatialFiltersResolution;
     if (spatialFilter && !spatialFiltersResolution) {
-      spatialFiltersResolution = getSpatialFiltersResolution({ source, viewState })
+      spatialFiltersResolution = getSpatialFiltersResolution({
+        source,
+        viewState,
+      });
     }
 
     // Make sure this is sync with the same constant in cloud-native/maps-api
@@ -395,10 +413,13 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     } = options;
     const {columns, sortBy, sortDirection, offset = 0, limit = 10} = params;
     const source = this.getModelSource(filterOwner);
-    
+
     let spatialFiltersResolution = options.spatialFiltersResolution;
     if (spatialFilter && !spatialFiltersResolution) {
-      spatialFiltersResolution = getSpatialFiltersResolution({ source, viewState })
+      spatialFiltersResolution = getSpatialFiltersResolution({
+        source,
+        viewState,
+      });
     }
 
     type TableModelResponse = {
@@ -461,10 +482,13 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     } = params;
 
     const source = this.getModelSource(filterOwner);
-    
+
     let spatialFiltersResolution = options.spatialFiltersResolution;
     if (spatialFilter && !spatialFiltersResolution) {
-      spatialFiltersResolution = getSpatialFiltersResolution({ source, viewState })
+      spatialFiltersResolution = getSpatialFiltersResolution({
+        source,
+        viewState,
+      });
     }
 
     type TimeSeriesModelResponse = {

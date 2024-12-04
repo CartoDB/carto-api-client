@@ -14,7 +14,7 @@ export interface ViewState {
   zoom: number;
   latitude: number;
   longitude: number;
-};
+}
 
 /** Common options for {@link WidgetBaseSource} requests. */
 interface BaseRequestOptions {

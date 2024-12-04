@@ -96,7 +96,7 @@ export type AggregationOptions = {
    */
   aggregationResLevel?: number;
 
-  /** 
+  /**
    * Original resolution of the spatial index data as stored in the DW
    */
   dataResolution?: number;
@@ -110,7 +110,6 @@ export type FilterOptions = {
 };
 
 export type QuerySourceOptions = {
-
   /** Full SQL query with query paremeter placeholders (if any). */
   sqlQuery: string;
 
