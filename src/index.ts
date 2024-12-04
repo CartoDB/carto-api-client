@@ -4,7 +4,6 @@ export * from './filters.js';
 export * from './geo.js';
 export * from './widget-sources/index.js';
 export * from './types.js';
-export * from './spatial-index.js';
 
 export {
   APIErrorContext,
