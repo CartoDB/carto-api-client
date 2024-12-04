@@ -69,11 +69,13 @@ export class TableWidget extends BaseWidget {
         ...(sortBy && {sortBy, sortDirection}),
         limit,
         spatialFilter: this.getSpatialFilterOrViewState(),
-        viewState: this.viewState ? {
-          zoom: this.viewState.zoom,
-          latitude: this.viewState.latitude,
-          longitude: this.viewState.longitude,
-        } : undefined,
+        viewState: this.viewState
+          ? {
+              zoom: this.viewState.zoom,
+              latitude: this.viewState.latitude,
+              longitude: this.viewState.longitude,
+            }
+          : undefined,
       });
     },
     args: () =>
@@ -141,7 +143,10 @@ function renderTableRow(row: unknown[]) {
   </tr>`;
 }
 
-const _numberFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2, notation: 'compact' });
+const _numberFormatter = new Intl.NumberFormat('en-US', {
+  maximumFractionDigits: 2,
+  notation: 'compact',
+});
 function renderTableCell(value: unknown) {
   let formattedValue: string;
   if (typeof value === 'number') {

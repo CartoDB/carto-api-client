@@ -57,11 +57,13 @@ export class CategoryWidget extends BaseWidget {
         spatialFilter: this.getSpatialFilterOrViewState(),
         operation,
         column,
-        viewState: this.viewState ? {
-          zoom: this.viewState.zoom,
-          latitude: this.viewState.latitude,
-          longitude: this.viewState.longitude,
-        } : undefined,
+        viewState: this.viewState
+          ? {
+              zoom: this.viewState.zoom,
+              latitude: this.viewState.latitude,
+              longitude: this.viewState.longitude,
+            }
+          : undefined,
       });
     },
     args: () =>

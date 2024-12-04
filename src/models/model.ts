@@ -105,7 +105,8 @@ export function executeModel(props: {
     filtersLogicalOperator,
   };
 
-  const spatialDataColumn = source.spatialDataColumn || source.geoColumn || DEFAULT_GEO_COLUMN;
+  const spatialDataColumn =
+    source.spatialDataColumn || source.geoColumn || DEFAULT_GEO_COLUMN;
 
   // Picking Model API requires 'spatialDataColumn'.
   if (model === 'pick') {

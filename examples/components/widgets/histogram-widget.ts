@@ -58,11 +58,13 @@ export class HistogramWidget extends BaseWidget {
         column,
         operation,
         ticks,
-        viewState: this.viewState ? {
-          zoom: this.viewState.zoom,
-          latitude: this.viewState.latitude,
-          longitude: this.viewState.longitude,
-        } : undefined,
+        viewState: this.viewState
+          ? {
+              zoom: this.viewState.zoom,
+              latitude: this.viewState.latitude,
+              longitude: this.viewState.longitude,
+            }
+          : undefined,
       });
     },
     args: () =>
