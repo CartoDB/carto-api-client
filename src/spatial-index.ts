@@ -4,6 +4,7 @@ import {
 } from './constants-internal';
 import {ModelSource} from './models/model';
 import {AggregationOptions} from './sources/types';
+import { assert } from './utils';
 
 const DEFAULT_TILE_SIZE = 512;
 const QUADBIN_ZOOM_MAX_OFFSET = 4;
@@ -12,8 +13,12 @@ export function getSpatialFiltersResolution({
   source,
   viewState,
 }: {
-  source: ModelSource & AggregationOptions;
-  viewState: {
+  source: {
+    spatialDataType?: ModelSource['spatialDataType'];
+    dataResolution?: ModelSource['dataResolution'];
+    aggregationResLevel?: AggregationOptions['aggregationResLevel']
+  };
+  viewState?: {
     zoom: number;
     latitude: number;
     longitude: number;
@@ -23,7 +28,7 @@ export function getSpatialFiltersResolution({
     return undefined;
   }
 
-  const currentZoom = viewState.zoom ?? 1;
+  assert(viewState, "viewState prop is required to compute automatic spatialFiltersResolution when using spatialFilter with spatial indexes. Either pass a `spatialFiltersResolution` prop or a `viewState` prop to avoid this error")
 
   const dataResolution = source.dataResolution ?? Number.MAX_VALUE;
 
@@ -38,7 +43,7 @@ export function getSpatialFiltersResolution({
     Math.floor(aggregationResLevel)
   );
 
-  const currentZoomInt = Math.ceil(currentZoom);
+  const currentZoomInt = Math.ceil(viewState.zoom);
   if (source.spatialDataType === 'h3') {
     const tileSize = DEFAULT_TILE_SIZE;
     const maxResolutionForZoom =
@@ -50,11 +55,7 @@ export function getSpatialFiltersResolution({
       ? Math.min(dataResolution, maxResolutionForZoom)
       : dataResolution;
 
-    const hexagonResolution =
-      getHexagonResolution(
-        {zoom: currentZoom, latitude: viewState.latitude},
-        tileSize
-      ) + aggregationResLevelOffset;
+    const hexagonResolution = getHexagonResolution(viewState, tileSize) + aggregationResLevelOffset;
 
     return Math.min(hexagonResolution, maxSpatialFiltersResolution);
   }

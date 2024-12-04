@@ -21,9 +21,7 @@ import type {
 export type VectorQuerySourceOptions = SourceOptions &
   QuerySourceOptions &
   FilterOptions &
-  ColumnsOption & {
-    spatialDataType: 'geo';
-  };
+  ColumnsOption;
 
 type UrlParameters = {
   columns?: string;
@@ -36,7 +34,7 @@ type UrlParameters = {
 };
 
 export const vectorQuerySource = async function (
-  options: Omit<VectorQuerySourceOptions, 'spatialDataType'>
+  options: VectorQuerySourceOptions
 ): Promise<TilejsonResult & WidgetQuerySourceResult> {
   const {
     columns,

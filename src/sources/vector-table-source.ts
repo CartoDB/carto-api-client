@@ -21,9 +21,7 @@ import type {
 export type VectorTableSourceOptions = SourceOptions &
   TableSourceOptions &
   FilterOptions &
-  ColumnsOption & {
-    spatialDataType: 'geo';
-  };
+  ColumnsOption;
 
 type UrlParameters = {
   columns?: string;
@@ -35,7 +33,7 @@ type UrlParameters = {
 };
 
 export const vectorTableSource = async function (
-  options: Omit<VectorTableSourceOptions, 'spatialDataType'>
+  options: VectorTableSourceOptions
 ): Promise<TilejsonResult & WidgetTableSourceResult> {
   const {
     columns,

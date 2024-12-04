@@ -47,6 +47,33 @@ export type SourceOptionalOptions = {
    * @default {@link DEFAULT_MAX_LENGTH_URL}
    */
   maxLengthURL?: number;
+
+  /**
+   * The column name and the type of geospatial support.
+   *
+   * If not present, defaults to `'geom'` for generic queries, `'quadbin'` for Quadbin sources and `'h3'` for H3 sources.
+   */
+  spatialDataColumn?: string;
+
+  /**
+   * The type of geospatial support. Defaults to `'geo'`.
+   */
+  spatialDataType?: SpatialDataType;
+
+  /**
+   * Relative resolution of a tile. Higher values increase density and data size. At `tileResolution = 1`, tile geometry is
+   * quantized to a 1024x1024 grid. Increasing or decreasing the resolution will increase or decrease the dimensions of
+   * the quantization grid proportionately.
+   *
+   * Supported `tileResolution` values, with corresponding grid sizes:
+   *
+   * - 0.25: 256x256
+   * - 0.5: 512x512
+   * - 1: 1024x1024
+   * - 2: 2048x2048
+   * - 4: 4096x4096
+   */
+  tileResolution?: TileResolution;
 };
 
 export type SourceOptions = SourceRequiredOptions &
@@ -68,6 +95,11 @@ export type AggregationOptions = {
    * @default 6 for quadbin and 4 for h3 sources
    */
   aggregationResLevel?: number;
+
+  /** 
+   * Original resolution of the spatial index data as stored in the DW
+   */
+  dataResolution?: number;
 };
 
 export type FilterOptions = {
@@ -78,30 +110,9 @@ export type FilterOptions = {
 };
 
 export type QuerySourceOptions = {
-  /**
-   * The column name and the type of geospatial support.
-   *
-   * If not present, defaults to `'geom'` for generic queries, `'quadbin'` for Quadbin sources and `'h3'` for H3 sources.
-   */
-  spatialDataColumn?: string;
 
-  /** SQL query. */
+  /** Full SQL query with query paremeter placeholders (if any). */
   sqlQuery: string;
-
-  /**
-   * Relative resolution of a tile. Higher values increase density and data size. At `tileResolution = 1`, tile geometry is
-   * quantized to a 1024x1024 grid. Increasing or decreasing the resolution will increase or decrease the dimensions of
-   * the quantization grid proportionately.
-   *
-   * Supported `tileResolution` values, with corresponding grid sizes:
-   *
-   * - 0.25: 256x256
-   * - 0.5: 512x512
-   * - 1: 1024x1024
-   * - 2: 2048x2048
-   * - 4: 4096x4096
-   */
-  tileResolution?: TileResolution;
 
   /**
    * Values for named or positional paramteres in the query.
@@ -135,28 +146,6 @@ export type TableSourceOptions = {
    * Fully qualified name of table.
    */
   tableName: string;
-
-  /**
-   * The column name and the type of geospatial support.
-   *
-   * If not present, defaults to `'geom'` for generic tables, `'quadbin'` for Quadbin sources and `'h3'` for H3 sources.
-   */
-  spatialDataColumn?: string;
-
-  /**
-   * Relative resolution of a tile. Higher values increase density and data size. At `tileResolution = 1`, tile geometry is
-   * quantized to a 1024x1024 grid. Increasing or decreasing the resolution will increase or decrease the dimensions of
-   * the quantization grid proportionately.
-   *
-   * Supported `tileResolution` values, with corresponding grid sizes:
-   *
-   * - 0.25: 256x256
-   * - 0.5: 512x512
-   * - 1: 1024x1024
-   * - 2: 2048x2048
-   * - 4: 4096x4096
-   */
-  tileResolution?: TileResolution;
 };
 
 export type TilesetSourceOptions = {
