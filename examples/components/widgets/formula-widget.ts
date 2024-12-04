@@ -59,6 +59,11 @@ export class FormulaWidget extends BaseWidget {
         operation,
         column,
         spatialFilter: this.getSpatialFilterOrViewState(),
+        viewState: this.viewState ? {
+          zoom: this.viewState.zoom,
+          latitude: this.viewState.latitude,
+          longitude: this.viewState.longitude,
+        } : undefined,
       });
       return response.value;
     },

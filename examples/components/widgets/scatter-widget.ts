@@ -65,6 +65,11 @@ export class ScatterWidget extends BaseWidget {
         xAxisJoinOperation,
         yAxisColumn,
         yAxisJoinOperation,
+        viewState: this.viewState ? {
+          zoom: this.viewState.zoom,
+          latitude: this.viewState.latitude,
+          longitude: this.viewState.longitude,
+        } : undefined,
       });
     },
     args: () =>
