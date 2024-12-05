@@ -17,10 +17,6 @@ export function getSpatialFiltersResolution({
   source: Partial<ModelSource & AggregationOptions>;
   viewState?: ViewState;
 }) {
-  if (source.spatialDataType === 'geo') {
-    return undefined;
-  }
-
   assert(
     viewState,
     'viewState prop is required to compute automatic spatialFiltersResolution when using spatialFilter with spatial indexes. Either pass a `spatialFiltersResolution` prop or a `viewState` prop to avoid this error'
