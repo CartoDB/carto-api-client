@@ -2,9 +2,10 @@ import {
   DEFAULT_AGGREGATION_RES_LEVEL_H3,
   DEFAULT_AGGREGATION_RES_LEVEL_QUADBIN,
 } from './constants-internal';
-import {ModelSource} from './models/model';
-import {AggregationOptions} from './sources/types';
+import type {ModelSource} from './models/model';
+import type {AggregationOptions} from './sources/types';
 import {assert} from './utils';
+import type { ViewState } from './widget-sources';
 
 const DEFAULT_TILE_SIZE = 512;
 const QUADBIN_ZOOM_MAX_OFFSET = 4;
@@ -14,11 +15,7 @@ export function getSpatialFiltersResolution({
   viewState,
 }: {
   source: Partial<ModelSource & AggregationOptions>;
-  viewState?: {
-    zoom: number;
-    latitude: number;
-    longitude: number;
-  };
+  viewState?: ViewState;
 }) {
   if (source.spatialDataType === 'geo') {
     return undefined;
