@@ -191,39 +191,51 @@ export interface Tilejson {
   attribution: string;
   scheme: string;
   tiles: string[];
-  properties_tiles: string[];
-  minresolution: number;
-  maxresolution: number;
   minzoom: number;
   maxzoom: number;
-  bounds: [number, number, number, number];
-  center: [number, number, number];
+  bounds: [left: number, bottom: number, right: number, top: number];
+  center: [longitute: number, latitude: number, zoom: number];
   vector_layers: VectorLayer[];
+
+  //
+  // Carto additions over standard Tilejson properties
+  //
+
+  minresolution: number;
+  maxresolution: number;
+  properties_tiles: string[];
   tilestats: Tilestats;
   tileResolution?: TileResolution;
 
-  // extra for Carto
   /**
    * Resolution of data in spatial-index dataset (e.g. H3, Quadbin).
+   *
+   * @internal
    */
   dataresolution?: number;
 
   /**
    * Array of ratios of dropped features per zoom level.
    *
-   * Example: `[0,0,0.5]` - means that 50% of features are dropped at zoom 2 and bigger
+   * Example: `[0,0,0.5]` - means that 50% of features are dropped at zoom 2 and bigger.
+   *
+   * @internal
    */
   fraction_dropped_per_zoom?: number[];
 
   /**
    * Names of bands - rasters only.
+   *
+   * @internal
    */
   raster_bands?: string[];
 
   /**
    * Raster metadata - rasters only.
+   *
+   * @internal
    */
-  rasterMetadata?: RasterMetadata;
+  raster_metadata?: RasterMetadata;
 }
 
 export interface Tilestats {
@@ -250,7 +262,7 @@ export interface VectorLayer {
   maxzoom: number;
   fields: Record<string, string>;
 
-  // extra for Carto
+  // Carto additions over standard Tilejson properties
   geometry_type?: string;
 }
 
@@ -263,14 +275,18 @@ export type RasterMetadataBandStats = {
   sum: number;
   sum_squares: number;
   count: number;
+
   /**
    * Quantiles by number of buckets.
    *
    * Example:
-   * {
-   *   3: [20, 40] for 3 buckets, first 20% of data is in first bucket, 40% in second and 40% in third.
-   *   4: [20, 30, 50], for 4 buckets ...
-   * }
+   * ```ts
+   *   {
+   *     // for 3 buckets, first 1/3 of items lies in range [min, 20], second 1/3 is in [20, 40], and last 1/3 is in [40, max]
+   *     3: [20, 40],
+   *     4: [20, 30, 50], for 4 buckets ...
+   *   }
+   * ```
    */
   quantiles?: Record<number, number[]>;
 
@@ -281,12 +297,14 @@ export type RasterMetadataBandStats = {
    * Key order is random.
    *
    * Example:
-   *   {
-   *    3: 5 - means there are 5 pixels with value 3
-   *    11: 222
-   *    12: 333 - means that 12 is most common value with count 333
-   *    ...
-   *  }
+   * ```
+   *  {
+   *    3: 5, // means there are 5 pixels with value 3
+   *    11: 222,
+   *    12: 333, // means that 12 is most common value with count 333
+   *    ...      // (assuming 333 was largest value in dict)
+   *   }
+   * ```
    */
   top_values?: Record<number, number>;
 
@@ -337,13 +355,8 @@ export type RasterMetadata = {
   maxresolution: number;
   nodata: number | string;
   bands: RasterMetadataBand[];
-  bounds: [
-    longitudeMin: number,
-    latitudeMin: number,
-    longitudeMax: number,
-    latitudeMax: number
-  ];
-  center: [latitude: number, longitude: number, zoom: number];
+  bounds: [left: number, bottom: number, right: number, top: number];
+  center: [longitute: number, latitude: number, zoom: number];
   width: number;
   height: number;
   block_width: number;
