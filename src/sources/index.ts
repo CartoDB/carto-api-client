@@ -4,6 +4,11 @@
 
 export {SOURCE_DEFAULTS} from './base-source';
 export type {
+  VectorLayer,
+  RasterMetadataBandStats,
+  RasterBandColorinterp,
+  RasterMetadataBand,
+  RasterMetadata,
   TilejsonResult,
   GeojsonResult,
   JsonResult,
