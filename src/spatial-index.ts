@@ -13,11 +13,7 @@ export function getSpatialFiltersResolution({
   source,
   viewState,
 }: {
-  source: {
-    spatialDataType?: ModelSource['spatialDataType'];
-    dataResolution?: ModelSource['dataResolution'];
-    aggregationResLevel?: AggregationOptions['aggregationResLevel'];
-  };
+  source: Partial<ModelSource & AggregationOptions>;
   viewState?: {
     zoom: number;
     latitude: number;
