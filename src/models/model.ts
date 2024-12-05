@@ -10,6 +10,7 @@ import {$TODO} from '../types-internal.js';
 import {assert} from '../utils.js';
 import {ModelRequestOptions, makeCall} from './common.js';
 import {ApiVersion} from '../constants.js';
+import {SpatialDataType, SpatialFilterPolyfillMode} from '../sources/types.js';
 
 /** @internalRemarks Source: @carto/react-api */
 const AVAILABLE_MODELS = [
@@ -35,9 +36,14 @@ export interface ModelSource {
   data: string;
   filters?: Record<string, Filter>;
   filtersLogicalOperator?: FilterLogicalOperator;
-  geoColumn?: string;
   spatialFilter?: SpatialFilter;
   queryParameters?: QueryParameters;
+  spatialDataColumn?: string;
+  spatialDataType?: SpatialDataType;
+  spatialFiltersResolution?: number;
+  spatialFiltersMode?: SpatialFilterPolyfillMode;
+  /** original resolution of the spatial index data as stored in the DW */
+  dataResolution?: number;
 }
 
 const {V3} = ApiVersion;
@@ -79,7 +85,9 @@ export function executeModel(props: {
     data,
     filters,
     filtersLogicalOperator = 'and',
-    geoColumn = DEFAULT_GEO_COLUMN,
+    spatialDataType = 'geo',
+    spatialFiltersMode = 'intersects',
+    spatialFiltersResolution = 0,
   } = source;
 
   const queryParameters = source.queryParameters
@@ -96,18 +104,29 @@ export function executeModel(props: {
     filtersLogicalOperator,
   };
 
+  const spatialDataColumn = source.spatialDataColumn || DEFAULT_GEO_COLUMN;
+
   // Picking Model API requires 'spatialDataColumn'.
   if (model === 'pick') {
-    queryParams.spatialDataColumn = geoColumn;
+    queryParams.spatialDataColumn = spatialDataColumn;
   }
 
-  // API supports multiple filters, we apply it only to geoColumn
+  // API supports multiple filters, we apply it only to spatialDataColumn
   const spatialFilters = source.spatialFilter
-    ? {[geoColumn]: source.spatialFilter}
+    ? {[spatialDataColumn]: source.spatialFilter}
     : undefined;
 
   if (spatialFilters) {
     queryParams.spatialFilters = JSON.stringify(spatialFilters);
+    queryParams.spatialDataColumn = spatialDataColumn;
+    queryParams.spatialDataType = spatialDataType;
+  }
+
+  if (spatialDataType !== 'geo') {
+    if (spatialFiltersResolution > 0) {
+      queryParams.spatialFiltersResolution = String(spatialFiltersResolution);
+    }
+    queryParams.spatialFiltersMode = spatialFiltersMode;
   }
 
   const urlWithSearchParams =

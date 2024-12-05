@@ -58,6 +58,7 @@ export class HistogramWidget extends BaseWidget {
         column,
         operation,
         ticks,
+        viewState: this.viewState ?? undefined,
       });
     },
     args: () =>

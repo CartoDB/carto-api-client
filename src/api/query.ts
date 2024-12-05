@@ -12,8 +12,7 @@ import {buildQueryUrl} from './endpoints';
 import {requestWithParameters} from './request-with-parameters';
 import {APIErrorContext} from './carto-api-error';
 
-export type QueryOptions = SourceOptions &
-  Omit<QuerySourceOptions, 'spatialDataColumn'>;
+export type QueryOptions = SourceOptions & QuerySourceOptions;
 type UrlParameters = {q: string; queryParameters?: string};
 
 export const query = async function (
