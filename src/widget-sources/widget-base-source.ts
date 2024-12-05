@@ -32,7 +32,6 @@ import {getSpatialFiltersResolution} from '../spatial-index.js';
 
 export interface WidgetBaseSourceProps extends Omit<SourceOptions, 'filters'> {
   apiVersion?: ApiVersion;
-  geoColumn?: string;
   filters?: Record<string, Filter>;
   filtersLogicalOperator?: FilterLogicalOperator;
 }
@@ -53,7 +52,6 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     clientId: getClient(),
     filters: {},
     filtersLogicalOperator: 'and',
-    geoColumn: DEFAULT_GEO_COLUMN,
   };
 
   constructor(props: Props) {
@@ -80,7 +78,6 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       connectionName: props.connectionName,
       filters: getApplicableFilters(owner, props.filters),
       filtersLogicalOperator: props.filtersLogicalOperator,
-      geoColumn: props.geoColumn,
       spatialDataType: props.spatialDataType,
       spatialDataColumn: props.spatialDataColumn,
     };

@@ -36,7 +36,6 @@ export interface ModelSource {
   data: string;
   filters?: Record<string, Filter>;
   filtersLogicalOperator?: FilterLogicalOperator;
-  geoColumn?: string;
   spatialFilter?: SpatialFilter;
   queryParameters?: QueryParameters;
   spatialDataColumn?: string;
@@ -105,15 +104,14 @@ export function executeModel(props: {
     filtersLogicalOperator,
   };
 
-  const spatialDataColumn =
-    source.spatialDataColumn || source.geoColumn || DEFAULT_GEO_COLUMN;
+  const spatialDataColumn = source.spatialDataColumn || DEFAULT_GEO_COLUMN;
 
   // Picking Model API requires 'spatialDataColumn'.
   if (model === 'pick') {
     queryParams.spatialDataColumn = spatialDataColumn;
   }
 
-  // API supports multiple filters, we apply it only to geoColumn
+  // API supports multiple filters, we apply it only to spatialDataColumn
   const spatialFilters = source.spatialFilter
     ? {[spatialDataColumn]: source.spatialFilter}
     : undefined;
