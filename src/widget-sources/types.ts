@@ -19,7 +19,6 @@ export interface ViewState {
 /** Common options for {@link WidgetBaseSource} requests. */
 interface BaseRequestOptions {
   spatialFilter?: SpatialFilter;
-  spatialFiltersResolution?: number;
   spatialFiltersMode?: SpatialFilterPolyfillMode;
   abortController?: AbortController;
   filterOwner?: string;

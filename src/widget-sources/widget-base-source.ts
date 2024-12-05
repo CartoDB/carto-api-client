@@ -105,8 +105,8 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     const {column, operation, operationColumn} = params;
     const source = this.getModelSource(filterOwner);
 
-    let spatialFiltersResolution = options.spatialFiltersResolution;
-    if (spatialFilter && !spatialFiltersResolution) {
+    let spatialFiltersResolution: number | undefined;
+    if (spatialFilter && source.spatialDataType !== 'geo') {
       spatialFiltersResolution = getSpatialFiltersResolution({
         source,
         viewState,
@@ -158,8 +158,8 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     const {columns, dataType, featureIds, z, limit, tileResolution} = params;
     const source = this.getModelSource(filterOwner);
 
-    let spatialFiltersResolution = options.spatialFiltersResolution;
-    if (spatialFilter && !spatialFiltersResolution) {
+    let spatialFiltersResolution: number | undefined;
+    if (spatialFilter && source.spatialDataType !== 'geo') {
       spatialFiltersResolution = getSpatialFiltersResolution({
         source,
         viewState,
@@ -211,8 +211,8 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     const {column, operation} = params;
     const source = this.getModelSource(filterOwner);
 
-    let spatialFiltersResolution = options.spatialFiltersResolution;
-    if (spatialFilter && !spatialFiltersResolution) {
+    let spatialFiltersResolution: number | undefined;
+    if (spatialFilter && source.spatialDataType !== 'geo') {
       spatialFiltersResolution = getSpatialFiltersResolution({
         source,
         viewState,
@@ -256,8 +256,8 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     const {column, operation, ticks} = params;
     const source = this.getModelSource(filterOwner);
 
-    let spatialFiltersResolution = options.spatialFiltersResolution;
-    if (spatialFilter && !spatialFiltersResolution) {
+    let spatialFiltersResolution: number | undefined;
+    if (spatialFilter && source.spatialDataType !== 'geo') {
       spatialFiltersResolution = getSpatialFiltersResolution({
         source,
         viewState,
@@ -312,8 +312,8 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     const {column} = params;
     const source = this.getModelSource(filterOwner);
 
-    let spatialFiltersResolution = options.spatialFiltersResolution;
-    if (spatialFilter && !spatialFiltersResolution) {
+    let spatialFiltersResolution: number | undefined;
+    if (spatialFilter && source.spatialDataType !== 'geo') {
       spatialFiltersResolution = getSpatialFiltersResolution({
         source,
         viewState,
@@ -357,8 +357,8 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
 
     const source = this.getModelSource(filterOwner);
 
-    let spatialFiltersResolution = options.spatialFiltersResolution;
-    if (spatialFilter && !spatialFiltersResolution) {
+    let spatialFiltersResolution: number | undefined;
+    if (spatialFilter && source.spatialDataType !== 'geo') {
       spatialFiltersResolution = getSpatialFiltersResolution({
         source,
         viewState,
@@ -411,8 +411,8 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     const {columns, sortBy, sortDirection, offset = 0, limit = 10} = params;
     const source = this.getModelSource(filterOwner);
 
-    let spatialFiltersResolution = options.spatialFiltersResolution;
-    if (spatialFilter && !spatialFiltersResolution) {
+    let spatialFiltersResolution: number | undefined;
+    if (spatialFilter && source.spatialDataType !== 'geo') {
       spatialFiltersResolution = getSpatialFiltersResolution({
         source,
         viewState,
@@ -480,8 +480,8 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
 
     const source = this.getModelSource(filterOwner);
 
-    let spatialFiltersResolution = options.spatialFiltersResolution;
-    if (spatialFilter && !spatialFiltersResolution) {
+    let spatialFiltersResolution: number | undefined;
+    if (spatialFilter && source.spatialDataType !== 'geo') {
       spatialFiltersResolution = getSpatialFiltersResolution({
         source,
         viewState,
