@@ -1,4 +1,4 @@
-import {TileResolution} from '../sources/types';
+import {SpatialFilterPolyfillMode, TileResolution} from '../sources/types';
 import {
   GroupDateType,
   SortColumnType,
@@ -10,11 +10,19 @@ import {
  * WIDGET API REQUESTS
  */
 
+export interface ViewState {
+  zoom: number;
+  latitude: number;
+  longitude: number;
+}
+
 /** Common options for {@link WidgetBaseSource} requests. */
 interface BaseRequestOptions {
   spatialFilter?: SpatialFilter;
+  spatialFiltersMode?: SpatialFilterPolyfillMode;
   abortController?: AbortController;
   filterOwner?: string;
+  viewState?: ViewState;
 }
 
 /** Options for {@link WidgetBaseSource#getCategories}. */
