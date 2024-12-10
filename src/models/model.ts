@@ -95,7 +95,7 @@ export function executeModel(props: {
     client: clientId,
     source: data,
     params,
-    queryParameters: source.queryParameters,
+    queryParameters: source.queryParameters || '',
     filters,
     filtersLogicalOperator,
   };
