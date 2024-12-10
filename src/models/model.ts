@@ -147,14 +147,11 @@ function objectToURLSearchParams(object: Record<string, unknown>) {
   for (const key in object) {
     if (isPureObject(object[key])) {
       params.append(key, JSON.stringify(object[key]));
-    }
-    else if (Array.isArray(object[key])) {
+    } else if (Array.isArray(object[key])) {
       params.append(key, JSON.stringify(object[key]));
-    }
-    else if (object[key] === null) {
+    } else if (object[key] === null) {
       params.append(key, 'null');
-    }
-    else if (object[key] !== undefined) {
+    } else if (object[key] !== undefined) {
       params.append(key, String(object[key]));
     }
   }
