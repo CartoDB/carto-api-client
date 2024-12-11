@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Not released
+
+- add cache control mechanism for sources and query APIs
+
 ## 0.4
 
 ### 0.4.0

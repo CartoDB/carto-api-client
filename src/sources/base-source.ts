@@ -45,7 +45,7 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
     }
   }
   const baseUrl = buildSourceUrl(mergedOptions);
-  const {clientId, maxLengthURL, format} = mergedOptions;
+  const {clientId, maxLengthURL, format, localCache} = mergedOptions;
   const headers = {
     Authorization: `Bearer ${options.accessToken}`,
     ...options.headers,
@@ -65,6 +65,7 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
       headers,
       errorContext,
       maxLengthURL,
+      localCache,
     });
 
   const dataUrl = mapInstantiation[format].url[0];
@@ -82,6 +83,7 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
       headers,
       errorContext,
       maxLengthURL,
+      localCache,
     });
     if (accessToken) {
       json.accessToken = accessToken;
@@ -94,5 +96,6 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
     headers,
     errorContext,
     maxLengthURL,
+    localCache,
   });
 }

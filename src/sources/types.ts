@@ -47,6 +47,27 @@ export type SourceOptionalOptions = {
    * @default {@link DEFAULT_MAX_LENGTH_URL}
    */
   maxLengthURL?: number;
+
+  /**
+   * By default, local in-memory caching is enabled.
+   */
+  localCache?: LocalCacheOptions;
+};
+
+export type LocalCacheOptions = {
+  /**
+   * Map that stores requests and their responses.
+   */
+  cache?: Map<string, Promise<unknown>>;
+
+  /**
+   * Cache control
+   *  * `no-cache`: If present, the source will always fetch from original source.
+   *  * `no-store`: If present, source will not store result in cache (for later reuse).
+   *
+   * See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control#directives
+   */
+  cacheControl?: ('no-cache' | 'no-store')[];
 };
 
 export type SourceOptions = SourceRequiredOptions &
