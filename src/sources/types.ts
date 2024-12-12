@@ -74,7 +74,7 @@ export type SourceOptionalOptions = {
    * - 4: 4096x4096
    */
   tileResolution?: TileResolution;
-  
+
   /**
    * By default, local in-memory caching is enabled.
    */
