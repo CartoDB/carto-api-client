@@ -29,6 +29,7 @@ import {
   DEFAULT_TILE_RESOLUTION,
 } from '../constants-internal.js';
 import {getSpatialFiltersResolution} from '../spatial-index.js';
+import { AggregationOptions } from '../sources/types.js';
 
 export interface WidgetBaseSourceProps extends Omit<SourceOptions, 'filters'> {
   apiVersion?: ApiVersion;
@@ -80,6 +81,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       filtersLogicalOperator: props.filtersLogicalOperator,
       spatialDataType: props.spatialDataType,
       spatialDataColumn: props.spatialDataColumn,
+      dataResolution: (props as Partial<AggregationOptions>).dataResolution,
     };
   }
 
