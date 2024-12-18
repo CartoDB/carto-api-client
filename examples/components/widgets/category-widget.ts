@@ -57,6 +57,7 @@ export class CategoryWidget extends BaseWidget {
         spatialFilter: this.getSpatialFilterOrViewState(),
         operation,
         column,
+        viewState: this.viewState ?? undefined,
       });
     },
     args: () =>

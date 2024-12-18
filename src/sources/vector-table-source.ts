@@ -22,6 +22,7 @@ export type VectorTableSourceOptions = SourceOptions &
   TableSourceOptions &
   FilterOptions &
   ColumnsOption;
+
 type UrlParameters = {
   columns?: string;
   filters?: Record<string, unknown>;
@@ -58,7 +59,10 @@ export const vectorTableSource = async function (
   return baseSource<UrlParameters>('table', options, urlParameters).then(
     (result) => ({
       ...(result as TilejsonResult),
-      widgetSource: new WidgetTableSource(options),
+      widgetSource: new WidgetTableSource({
+        ...options,
+        spatialDataType: 'geo',
+      }),
     })
   );
 };

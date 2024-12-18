@@ -7,9 +7,10 @@ import {
   SpatialFilter,
 } from '../types.js';
 import {$TODO} from '../types-internal.js';
-import {assert} from '../utils.js';
+import {assert, isPureObject} from '../utils.js';
 import {ModelRequestOptions, makeCall} from './common.js';
 import {ApiVersion} from '../constants.js';
+import {SpatialDataType, SpatialFilterPolyfillMode} from '../sources/types.js';
 
 /** @internalRemarks Source: @carto/react-api */
 const AVAILABLE_MODELS = [
@@ -35,9 +36,14 @@ export interface ModelSource {
   data: string;
   filters?: Record<string, Filter>;
   filtersLogicalOperator?: FilterLogicalOperator;
-  geoColumn?: string;
   spatialFilter?: SpatialFilter;
   queryParameters?: QueryParameters;
+  spatialDataColumn?: string;
+  spatialDataType?: SpatialDataType;
+  spatialFiltersResolution?: number;
+  spatialFiltersMode?: SpatialFilterPolyfillMode;
+  /** original resolution of the spatial index data as stored in the DW */
+  dataResolution?: number;
 }
 
 const {V3} = ApiVersion;
@@ -79,50 +85,51 @@ export function executeModel(props: {
     data,
     filters,
     filtersLogicalOperator = 'and',
-    geoColumn = DEFAULT_GEO_COLUMN,
+    spatialDataType = 'geo',
+    spatialFiltersMode = 'intersects',
+    spatialFiltersResolution = 0,
   } = source;
 
-  const queryParameters = source.queryParameters
-    ? JSON.stringify(source.queryParameters)
-    : '';
-
-  const queryParams: Record<string, string> = {
+  const queryParams: Record<string, unknown> = {
     type,
     client: clientId,
     source: data,
-    params: JSON.stringify(params),
-    queryParameters,
-    filters: JSON.stringify(filters),
+    params,
+    queryParameters: source.queryParameters || '',
+    filters,
     filtersLogicalOperator,
   };
 
+  const spatialDataColumn = source.spatialDataColumn || DEFAULT_GEO_COLUMN;
+
   // Picking Model API requires 'spatialDataColumn'.
   if (model === 'pick') {
-    queryParams.spatialDataColumn = geoColumn;
+    queryParams.spatialDataColumn = spatialDataColumn;
   }
 
-  // API supports multiple filters, we apply it only to geoColumn
+  // API supports multiple filters, we apply it only to spatialDataColumn
   const spatialFilters = source.spatialFilter
-    ? {[geoColumn]: source.spatialFilter}
+    ? {[spatialDataColumn]: source.spatialFilter}
     : undefined;
 
   if (spatialFilters) {
-    queryParams.spatialFilters = JSON.stringify(spatialFilters);
+    queryParams.spatialFilters = spatialFilters;
+    queryParams.spatialDataColumn = spatialDataColumn;
+    queryParams.spatialDataType = spatialDataType;
+  }
+
+  if (spatialDataType !== 'geo') {
+    if (spatialFiltersResolution > 0) {
+      queryParams.spatialFiltersResolution = spatialFiltersResolution;
+    }
+    queryParams.spatialFiltersMode = spatialFiltersMode;
   }
 
   const urlWithSearchParams =
-    url + '?' + new URLSearchParams(queryParams).toString();
+    url + '?' + objectToURLSearchParams(queryParams).toString();
   const isGet = urlWithSearchParams.length <= REQUEST_GET_MAX_URL_LENGTH;
   if (isGet) {
     url = urlWithSearchParams;
-  } else {
-    // undo the JSON.stringify, @TODO find a better pattern
-    queryParams.params = params as $TODO;
-    queryParams.filters = filters as $TODO;
-    queryParams.queryParameters = source.queryParameters as $TODO;
-    if (spatialFilters) {
-      queryParams.spatialFilters = spatialFilters as $TODO;
-    }
   }
   return makeCall({
     url,
@@ -133,4 +140,20 @@ export function executeModel(props: {
       ...(!isGet && {body: JSON.stringify(queryParams)}),
     },
   });
+}
+
+function objectToURLSearchParams(object: Record<string, unknown>) {
+  const params = new URLSearchParams();
+  for (const key in object) {
+    if (isPureObject(object[key])) {
+      params.append(key, JSON.stringify(object[key]));
+    } else if (Array.isArray(object[key])) {
+      params.append(key, JSON.stringify(object[key]));
+    } else if (object[key] === null) {
+      params.append(key, 'null');
+    } else if (object[key] !== undefined) {
+      params.append(key, String(object[key]));
+    }
+  }
+  return params;
 }
