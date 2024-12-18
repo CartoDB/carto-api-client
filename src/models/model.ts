@@ -113,7 +113,7 @@ export function executeModel(props: {
     : undefined;
 
   if (spatialFilters) {
-    queryParams.spatialFilters = spatialFilters; // JSON.stringify(spatialFilters);
+    queryParams.spatialFilters = spatialFilters;
     queryParams.spatialDataColumn = spatialDataColumn;
     queryParams.spatialDataType = spatialDataType;
   }
