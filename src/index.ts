@@ -18,3 +18,9 @@ export {
 } from './api/index.js';
 
 export {_getHexagonResolution} from './spatial-index.js';
+
+// For unit testing only.
+export * from './filters/index.js';
+export * from './operations/index.js';
+export * from './utils/makeIntervalComplete.js';
+export * from './utils/transformToTileCoords.js';
