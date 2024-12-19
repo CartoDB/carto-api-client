@@ -29,9 +29,11 @@ type UrlParameters = {
   filters?: Record<string, unknown>;
 };
 
+export type H3TableSourceResponse = TilejsonResult & WidgetTableSourceResult;
+
 export const h3TableSource = async function (
   options: H3TableSourceOptions
-): Promise<TilejsonResult & WidgetTableSourceResult> {
+): Promise<H3TableSourceResponse> {
   const {
     aggregationExp,
     aggregationResLevel = DEFAULT_AGGREGATION_RES_LEVEL_H3,
