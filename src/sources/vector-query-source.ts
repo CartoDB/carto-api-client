@@ -33,9 +33,12 @@ type UrlParameters = {
   queryParameters?: Record<string, unknown> | unknown[];
 };
 
+export type VectorQuerySourceResponse = TilejsonResult &
+  WidgetQuerySourceResult;
+
 export const vectorQuerySource = async function (
   options: VectorQuerySourceOptions
-): Promise<TilejsonResult & WidgetQuerySourceResult> {
+): Promise<VectorQuerySourceResponse> {
   const {
     columns,
     filters,

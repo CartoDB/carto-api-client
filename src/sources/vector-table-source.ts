@@ -31,9 +31,12 @@ type UrlParameters = {
   name: string;
 };
 
+export type VectorTableSourceResponse = TilejsonResult &
+  WidgetTableSourceResult;
+
 export const vectorTableSource = async function (
   options: VectorTableSourceOptions
-): Promise<TilejsonResult & WidgetTableSourceResult> {
+): Promise<VectorTableSourceResponse> {
   const {
     columns,
     filters,

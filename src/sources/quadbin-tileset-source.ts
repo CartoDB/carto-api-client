@@ -12,9 +12,11 @@ import type {
 export type QuadbinTilesetSourceOptions = SourceOptions & TilesetSourceOptions;
 type UrlParameters = {name: string};
 
+export type QuadbinTilesetSourceResponse = TilejsonResult;
+
 export const quadbinTilesetSource = async function (
   options: QuadbinTilesetSourceOptions
-): Promise<TilejsonResult> {
+): Promise<QuadbinTilesetSourceResponse> {
   const {tableName} = options;
   const urlParameters: UrlParameters = {name: tableName};
 
@@ -22,5 +24,5 @@ export const quadbinTilesetSource = async function (
     'tileset',
     options,
     urlParameters
-  ) as Promise<TilejsonResult>;
+  ) as Promise<QuadbinTilesetSourceResponse>;
 };
