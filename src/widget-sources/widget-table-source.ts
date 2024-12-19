@@ -3,7 +3,10 @@ import {
   QuadbinTableSourceOptions,
   VectorTableSourceOptions,
 } from '../sources/index.js';
-import {WidgetBaseSource, WidgetBaseSourceProps} from './widget-base-source.js';
+import {
+  WidgetRemoteSource,
+  WidgetRemoteSourceProps,
+} from './widget-remote-source.js';
 import {ModelSource} from '../models/model.js';
 
 type LayerTableSourceOptions =
@@ -35,8 +38,8 @@ export type WidgetTableSourceResult = {widgetSource: WidgetTableSource};
  * const { widgetSource } = await data;
  * ```
  */
-export class WidgetTableSource extends WidgetBaseSource<
-  LayerTableSourceOptions & WidgetBaseSourceProps
+export class WidgetTableSource extends WidgetRemoteSource<
+  LayerTableSourceOptions & WidgetRemoteSourceProps
 > {
   protected override getModelSource(owner: string): ModelSource {
     return {

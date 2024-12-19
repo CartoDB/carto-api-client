@@ -78,13 +78,15 @@ export class FormulaWidget extends BaseWidget {
       pending: () =>
         html`<h3>${this.header}</h3>
           <figure>
-            <div class="scorecard">&hellip;</div>
+            <div class="scorecard">…</div>
             <figcaption>${this.caption}</figcaption>
           </figure>`,
       complete: (taskResult) => html`
         <h3>${this.header}</h3>
         <figure>
-          <div class="scorecard">${taskResult.toLocaleString()}</div>
+          <div class="scorecard">
+            ${taskResult ? taskResult.toLocaleString() : '…'}
+          </div>
           <figcaption>${this.caption}</figcaption>
         </figure>
       `,
