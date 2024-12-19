@@ -7,6 +7,16 @@ import {
 } from '../types';
 
 /******************************************************************************
+ * LOCAL COMPUTATIONS
+ */
+
+export interface LocalWidgetSource<T> {
+  onTileLoad: (tile: T) => void;
+  onTileUnload: (tile: T) => void;
+  destroy: () => void;
+}
+
+/******************************************************************************
  * WIDGET API REQUESTS
  */
 

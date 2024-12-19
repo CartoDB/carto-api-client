@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
+import {
+  WidgetRasterSource,
+  WidgetRasterSourceResult,
+} from '../widget-sources/index.js';
 import {baseSource} from './base-source';
 import type {
   FilterOptions,
@@ -18,17 +22,20 @@ type UrlParameters = {
   filters?: Record<string, unknown>;
 };
 
+export type RasterSourceResponse = TilejsonResult & WidgetRasterSourceResult;
+
 export const rasterSource = async function (
   options: RasterSourceOptions
-): Promise<TilejsonResult> {
+): Promise<RasterSourceResponse> {
   const {tableName, filters} = options;
   const urlParameters: UrlParameters = {name: tableName};
   if (filters) {
     urlParameters.filters = filters;
   }
-  return baseSource<UrlParameters>(
-    'raster',
-    options,
-    urlParameters
-  ) as Promise<TilejsonResult>;
+  return baseSource<UrlParameters>('raster', options, urlParameters).then(
+    (result) => ({
+      ...(result as TilejsonResult),
+      widgetSource: new WidgetRasterSource(options),
+    })
+  );
 };

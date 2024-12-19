@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>Examples / Raster Widgets</title>
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <main id="app">
+      <header>
+        <h1>Raster Widgets</h1>
+        <a href="../">← Back</a>
+      </header>
+      <section id="view">
+        <div id="map"></div>
+        <canvas id="deck-canvas"></canvas>
+      </section>
+      <section id="rail">
+        <formula-widget
+          id="formula"
+          header="Total"
+          operation="count"
+        ></formula-widget>
+      </section>
+      <footer id="footer"></footer>
+    </main>
+    <script type="module" src="./raster-widgets.ts"></script>
+  </body>
+</html>
