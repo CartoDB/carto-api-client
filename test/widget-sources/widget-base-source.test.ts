@@ -235,9 +235,24 @@ test('getFeatures', async () => {
   });
 
   const expectedRows = [
-    {_carto_feature_id: 'a', name: 'Veggie Mart', revenue: 1200},
-    {_carto_feature_id: 'b', name: 'EZ Drive Thru', revenue: 400},
-    {_carto_feature_id: 'c', name: "Buddy's Convenience", revenue: 800},
+    {
+      _carto_feature_id: 'a',
+      name: 'Veggie Mart',
+      revenue: 1200,
+      CaseSensitive: 1,
+    },
+    {
+      _carto_feature_id: 'b',
+      name: 'EZ Drive Thru',
+      revenue: 400,
+      CaseSensitive: 2,
+    },
+    {
+      _carto_feature_id: 'c',
+      name: "Buddy's Convenience",
+      revenue: 800,
+      CaseSensitive: 3,
+    },
   ];
 
   const mockFetch = vi
@@ -248,7 +263,7 @@ test('getFeatures', async () => {
   vi.stubGlobal('fetch', mockFetch);
 
   const actualFeatures = await widgetSource.getFeatures({
-    columns: ['_carto_feature_id', 'name', 'revenue'],
+    columns: ['_carto_feature_id', 'name', 'revenue', 'CaseSensitive'],
     featureIds: ['a', 'b', 'c'],
     dataType: 'points',
   });
@@ -261,7 +276,7 @@ test('getFeatures', async () => {
     type: 'test',
     source: 'test-data',
     params: JSON.stringify({
-      columns: ['_carto_feature_id', 'name', 'revenue'],
+      columns: ['_carto_feature_id', 'name', 'revenue', 'CaseSensitive'],
       dataType: 'points',
       featureIds: ['a', 'b', 'c'],
       limit: 1000,
