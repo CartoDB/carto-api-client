@@ -31,3 +31,28 @@ export enum ApiVersion {
 
 /** @internalRemarks Source: @carto/constants, @deck.gl/carto */
 export const DEFAULT_API_BASE_URL = 'https://gcp-us-east1.api.carto.com';
+
+/** @internalRemarks Source: @carto/react-core */
+export enum TileFormat {
+  MVT = 'mvt',
+  JSON = 'json',
+  GEOJSON = 'geojson',
+  BINARY = 'binary',
+}
+
+/** @internalRemarks Source: @carto/react-core */
+export enum SpatialIndex {
+  H3 = 'h3',
+  S2 = 's2',
+  QUADBIN = 'quadbin',
+}
+
+/** @internalRemarks Source: @carto/react-core */
+export enum Provider {
+  BIGQUERY = 'bigquery',
+  REDSHIFT = 'redshift',
+  POSTGRES = 'postgres',
+  SNOWFLAKE = 'snowflake',
+  DATABRICKS = 'databricks',
+  DATABRICKS_REST = 'databricksRest',
+}

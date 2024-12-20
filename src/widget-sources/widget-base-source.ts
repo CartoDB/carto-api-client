@@ -169,7 +169,11 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     return executeModel({
       model: 'formula',
       source: {...this.getModelSource(filterOwner), spatialFilter},
-      params: {column: column ?? '*', operation, operationExp},
+      params: {
+        column: column ?? '*',
+        operation: operation ?? 'count',
+        operationExp,
+      },
       opts: {abortController},
     }).then((res: FormulaModelResponse) => normalizeObjectKeys(res.rows[0]));
   }

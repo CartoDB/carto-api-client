@@ -1,5 +1,8 @@
-import {Filter} from './types.js';
-import {FilterType} from './constants.js';
+import {Filter, SpatialFilter, Tile} from './types.js';
+import {FilterType, TileFormat} from './constants.js';
+import {tileFeatures} from './filters/tileFeatures.js';
+import {Feature} from 'geojson';
+import {DEFAULT_GEO_COLUMN} from './constants-internal.js';
 
 const FILTER_TYPES = new Set(Object.values(FilterType));
 const isFilterType = (type: string): type is FilterType =>
