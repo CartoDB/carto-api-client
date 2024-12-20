@@ -7,16 +7,6 @@ import {
 } from '../types';
 
 /******************************************************************************
- * LOCAL COMPUTATIONS
- */
-
-export interface LocalWidgetSource<T> {
-  onTileLoad: (tile: T) => void;
-  onTileUnload: (tile: T) => void;
-  destroy: () => void;
-}
-
-/******************************************************************************
  * WIDGET API REQUESTS
  */
 
@@ -89,8 +79,9 @@ export interface FeaturesRequestOptions extends BaseRequestOptions {
 /** Options for {@link WidgetBaseSource#getFormula}. */
 export interface FormulaRequestOptions extends BaseRequestOptions {
   column: string;
-  operation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
+  operation?: 'count' | 'avg' | 'min' | 'max' | 'sum' | 'custom';
   operationExp?: string;
+  joinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
 }
 
 /** Options for {@link WidgetBaseSource#getHistogram}. */
@@ -148,7 +139,7 @@ export interface TimeSeriesRequestOptions extends BaseRequestOptions {
 export type FeaturesResponse = {rows: Record<string, unknown>[]};
 
 /** Response from {@link WidgetBaseSource#getFormula}. */
-export type FormulaResponse = {value: number};
+export type FormulaResponse = {value: number | null};
 
 /** Response from {@link WidgetBaseSource#getCategories}. */
 export type CategoryResponse = {name: string; value: number}[];
