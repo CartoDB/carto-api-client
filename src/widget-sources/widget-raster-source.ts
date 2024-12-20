@@ -1,30 +1,12 @@
 import {RasterSourceOptions} from '../sources/index.js';
 import {WidgetBaseSource, WidgetBaseSourceProps} from './widget-base-source.js';
 import {ModelSource} from '../models/model.js';
-import {
-  FormulaRequestOptions,
-  FormulaResponse,
-  LocalWidgetSource,
-} from './types.js';
+import {FormulaRequestOptions, FormulaResponse} from './types.js';
+import {Raster} from '../types.js';
 
 type LayerRasterSourceOptions = Omit<RasterSourceOptions, 'filters'>;
 
 export type WidgetRasterSourceResult = {widgetSource: WidgetRasterSource};
-
-type NumericProps = Record<
-  string,
-  {value: number[] | Float32Array | Float64Array}
->;
-type Properties = Record<string, string | number | boolean | null>;
-
-type Raster = {
-  /** Raster tiles are square, with 'blockSize' width and height in pixels. */
-  blockSize: number;
-  cells: {
-    numericProps: NumericProps;
-    properties: Properties[];
-  };
-};
 
 /**
  * Source for Widget API requests on a data source defined by a raster.
@@ -47,10 +29,9 @@ type Raster = {
  * const { widgetSource } = await data;
  * ```
  */
-export class WidgetRasterSource
-  extends WidgetBaseSource<LayerRasterSourceOptions & WidgetBaseSourceProps>
-  implements LocalWidgetSource<Raster>
-{
+export class WidgetRasterSource extends WidgetBaseSource<
+  LayerRasterSourceOptions & WidgetBaseSourceProps
+> {
   protected override getModelSource(owner: string): ModelSource {
     return {
       ...super._getModelSource(owner),
@@ -63,18 +44,10 @@ export class WidgetRasterSource
    * LOCAL SYNC
    */
 
-  tiles = new Set<Raster>();
+  _rasters: Raster[] = [];
 
-  onTileLoad(tile: Raster) {
-    this.tiles.add(tile);
-  }
-
-  onTileUnload(tile: Raster) {
-    this.tiles.delete(tile);
-  }
-
-  destroy() {
-    this.tiles.clear();
+  loadRasters(rasters: Raster[]) {
+    this._rasters = rasters;
   }
 
   /****************************************************************************
@@ -86,6 +59,10 @@ export class WidgetRasterSource
    * for 'headline' or 'scorecard' figures such as counts and sums.
    */
   async getFormula(options: FormulaRequestOptions): Promise<FormulaResponse> {
+    // TODO: would really like to know what tiles are _pending_, not just what
+    // tiles have fully loaded... otherwise the first request just ... finishes,
+    // and the source can't push a response to the widget.
+    console.log('getFormula', this._rasters);
     return {value: 123};
   }
 }

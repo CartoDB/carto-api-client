@@ -1,7 +1,13 @@
 import maplibregl from 'maplibre-gl';
 import {Deck} from '@deck.gl/core';
 import {colorBins, RasterTileLayer} from '@deck.gl/carto';
-import {rasterSource, Filter, TilejsonResult} from '@carto/api-client';
+import {
+  rasterSource,
+  tilesToFeatures,
+  Filter,
+  TilejsonResult,
+  WidgetRasterSource,
+} from '@carto/api-client';
 import '../components/index.js';
 import type {Widget, FilterEvent} from '../components/index.js';
 
@@ -9,7 +15,7 @@ import type {Widget, FilterEvent} from '../components/index.js';
  * REACTIVE STATE
  */
 
-let data: Promise<TilejsonResult>;
+let data: TilejsonResult & {widgetSource: WidgetRasterSource};
 let viewState = {latitude: 40.7128, longitude: -74.006, zoom: 5};
 let filters: Record<string, Filter> = {};
 
@@ -57,6 +63,8 @@ async function updateSources() {
     filters,
   });
 
+  document.querySelector('#footer')!.innerHTML = data.attribution;
+
   updateLayers();
   updateWidgets();
 }
@@ -70,14 +78,15 @@ function updateLayers() {
       domain: [15, 18, 22, 25, 28, 30, 35],
       colors: 'Temps',
     }),
-    onTileLoad: data.widgetSource.onTileLoad,
-    onTileUnload: data.widgetSource.onTileUnload,
+    onViewportLoad: (tiles) => {
+      data.widgetSource.loadFeatures(tilesToFeatures({tiles})); // TODO: More props.
+      // TODO: Force widget refresh, somehow... need a new WidgetTilesetSource instance?
+      // TODO: Maybe this is an argument for re-creating the class, or similar, rather
+      // than tying its lifecycle to the source/tilejson?
+    },
   });
 
   deck.setProps({layers: [layer]});
-  data.then(({attribution}) => {
-    document.querySelector('#footer')!.innerHTML = attribution;
-  });
 }
 
 function updateWidgets() {
