@@ -3,8 +3,18 @@ import bboxPolygon from '@turf/bbox-polygon';
 import union from '@turf/union';
 import {getType} from '@turf/invariant';
 import {polygon, multiPolygon, feature, featureCollection} from '@turf/helpers';
-import type {BBox, Geometry, MultiPolygon, Polygon, Position} from 'geojson';
-import {SpatialFilter} from './types';
+import type {
+  BBox,
+  Feature,
+  Geometry,
+  MultiPolygon,
+  Polygon,
+  Position,
+} from 'geojson';
+import {SpatialFilter, Tile} from './types';
+import {tileFeatures} from './filters/tileFeatures';
+import {DEFAULT_GEO_COLUMN} from './constants-internal';
+import {TileFormat} from './constants';
 
 /**
  * Returns a {@link SpatialFilter} for a given viewport, typically obtained
@@ -34,6 +44,32 @@ export function createPolygonSpatialFilter(
   spatialFilter: Polygon | MultiPolygon
 ): SpatialFilter | undefined {
   return (spatialFilter && _normalizeGeometry(spatialFilter)) || undefined;
+}
+
+/** TODO: Documentation */
+export function tilesToFeatures({
+  tiles,
+  spatialFilter,
+  uniqueIdProperty,
+  spatialDataColumn = DEFAULT_GEO_COLUMN,
+  options,
+}: {
+  tiles: Tile[];
+  spatialFilter?: SpatialFilter;
+  uniqueIdProperty?: string;
+  spatialDataColumn?: string;
+  options?: Record<string, unknown>; // TODO(types): Define this?
+}): Feature[] {
+  // TODO(perf): Do we want to filter here? Better to filter at query time?
+  return tileFeatures({
+    tiles,
+    options,
+    uniqueIdProperty,
+    geometryToIntersect: spatialFilter,
+    tileFormat: TileFormat.BINARY,
+    geoColumName: spatialDataColumn, // TODO: WidgetSource has this ... must user provide it?
+    spatialIndex: undefined, // TODO: Determine from own properties.
+  }) as Feature[]; // TODO(types)
 }
 
 /**

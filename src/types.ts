@@ -11,6 +11,33 @@ export type Format = 'json' | 'geojson' | 'tilejson';
 /** @internalRemarks Source: @carto/constants, @deck.gl/carto */
 export type MapType = 'boundary' | 'query' | 'table' | 'tileset' | 'raster';
 
+/** @internalRemarks Source: @carto/react-core */
+export type Viewport = [number, number, number, number];
+
+/** TODO: Documentation. */
+export type Tile = {
+  index: {x: number; y: number; z: number};
+  id: string;
+  content: unknown;
+  zoom: number;
+  boundingBox: [min: number[], max: number[]];
+};
+
+type NumericProps = Record<
+  string,
+  {value: number[] | Float32Array | Float64Array}
+>;
+type Properties = Record<string, string | number | boolean | null>;
+
+/** TODO: Documentation. */
+export type Raster = {
+  blockSize: number;
+  cells: {
+    numericProps: NumericProps;
+    properties: Properties[];
+  };
+};
+
 /******************************************************************************
  * AGGREGATION
  */
