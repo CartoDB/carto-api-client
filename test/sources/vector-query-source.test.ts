@@ -40,6 +40,7 @@ describe('vectorQuerySource', () => {
       columns: ['a', 'b'],
       spatialDataColumn: 'mygeom',
       queryParameters: {type: 'Supermarket', minRevenue: 1000000},
+      aggregationExp: 'SUM(revenue)',
     });
 
     expect(vi.mocked(fetch)).toHaveBeenCalledTimes(2);
@@ -51,6 +52,7 @@ describe('vectorQuerySource', () => {
     expect(initURL).toMatch(/columns=a%2Cb/);
     expect(initURL).toMatch(/spatialDataColumn=mygeom/);
     expect(initURL).toMatch(/spatialDataType=geo/);
+    expect(initURL).toMatch(/aggregationExp=SUM%28revenue%29/);
     expect(initURL).toMatch(
       /queryParameters=%7B%22type%22%3A%22Supermarket%22%2C%22minRevenue%22%3A1000000%7D/
     );
@@ -64,6 +66,20 @@ describe('vectorQuerySource', () => {
       'https://xyz.com/{z}/{x}/{y}?formatTiles=binary',
     ]);
     expect(tilejson.accessToken).toBe('<token>');
+  });
+
+  test('when aggregationExp is not provided', async () => {
+    await vectorQuerySource({
+      connectionName: 'carto_dw',
+      accessToken: '<token>',
+      sqlQuery: 'SELECT * FROM a.b.vector_table',
+      columns: ['a', 'b'],
+      spatialDataColumn: 'mygeom',
+      queryParameters: {type: 'Supermarket', minRevenue: 1000000},
+    });
+
+    const [[initURL]] = vi.mocked(fetch).mock.calls;
+    expect(initURL).not.toContain('aggregationExp');
   });
 
   test('widgetSource', async () => {

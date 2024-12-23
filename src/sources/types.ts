@@ -149,6 +149,15 @@ export type QuerySourceOptions = {
    *     ```
    */
   queryParameters?: QueryParameters;
+
+  /**
+   * Comma separated expressions that, in case of containing any, the source will be aggregated by geometry automatically.
+   *
+   * Example:
+   *
+   *     1 as value, avg(rev) as average_revenue
+   */
+  aggregationExp?: string;
 };
 
 export type TableSourceOptions = {
@@ -178,6 +187,15 @@ export type TableSourceOptions = {
    * - 4: 4096x4096
    */
   tileResolution?: TileResolution;
+
+  /**
+   * Comma separated expressions that, in case of containing any, the source will be aggregated by geometry automatically.
+   *
+   * Example:
+   *
+   *     1 as value, avg(rev) as average_revenue
+   */
+  aggregationExp?: string;
 };
 
 export type TilesetSourceOptions = {
