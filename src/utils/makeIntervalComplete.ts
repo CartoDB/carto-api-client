@@ -1,7 +1,9 @@
-type IntervalValue = number | null | undefined;
+import {FilterInterval, FilterIntervalComplete} from '../types';
 
-export function makeIntervalComplete(values: [IntervalValue, IntervalValue][]) {
-  return values.map((val) => {
+export function makeIntervalComplete(
+  intervals: FilterInterval[]
+): FilterIntervalComplete[] {
+  return intervals.map((val) => {
     if (val[0] === undefined || val[0] === null) {
       return [Number.MIN_SAFE_INTEGER, val[1]];
     }
@@ -11,5 +13,5 @@ export function makeIntervalComplete(values: [IntervalValue, IntervalValue][]) {
     }
 
     return val;
-  });
+  }) as FilterIntervalComplete[];
 }

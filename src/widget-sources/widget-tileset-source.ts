@@ -6,8 +6,13 @@ import {InvalidColumnError} from '../utils.js';
 import {Feature} from 'geojson';
 import {applyFilters} from '../filters/Filter.js';
 import {TileFormat} from '../constants.js';
-import {FilterLogicalOperator, Filters, SpatialFilter, Tile} from '../types.js';
+import {SpatialFilter, Tile} from '../types.js';
 import {aggregationFunctions} from '../operations/aggregation.js';
+import {
+  TileFeatureExtractOptions,
+  tileFeatures,
+} from '../filters/tileFeatures.js';
+import {DEFAULT_GEO_COLUMN} from '../constants-internal.js';
 
 type LayerTilesetSourceOptions = Omit<TilesetSourceOptions, 'filters'>;
 
@@ -51,8 +56,26 @@ export class WidgetTilesetSource extends WidgetBaseSource<
 
   private _features: Feature[] = [];
 
-  loadFeatures(features: Feature[]) {
-    this._features = features;
+  loadTiles({
+    tiles,
+    spatialFilter,
+    uniqueIdProperty,
+    options,
+  }: {
+    tiles: Tile[];
+    spatialFilter: SpatialFilter;
+    uniqueIdProperty?: string;
+    options?: TileFeatureExtractOptions;
+  }) {
+    this._features = tileFeatures({
+      tiles,
+      options,
+      spatialFilter,
+      uniqueIdProperty, // TODO(api): Should this be a source/constructor property?
+      tileFormat: TileFormat.BINARY, // TODO(api): Should this be a source/constructor property?
+      spatialDataColumn: this.props.geoColumn,
+      spatialIndex: undefined, // TODO: Determine from own properties.
+    }) as Feature[];
   }
 
   /****************************************************************************
@@ -85,7 +108,12 @@ export class WidgetTilesetSource extends WidgetBaseSource<
 
       if (filteredFeatures.length !== 0 || isCount) {
         result = {
-          value: targetOperation(filteredFeatures, column, joinOperation),
+          value: targetOperation(
+            // TODO(types): Better types available?
+            filteredFeatures as unknown as Record<string, unknown>[],
+            column,
+            joinOperation
+          ),
         };
       }
     }

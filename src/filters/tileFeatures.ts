@@ -1,48 +1,50 @@
-import {MultiPolygon, Polygon} from 'geojson';
-import {Tile} from '../types';
-import tileFeaturesGeometries from './tileFeaturesGeometries';
-import tileFeaturesSpatialIndex from './tileFeaturesSpatialIndex';
+import {SpatialFilter, SpatialIndexTile, Tile} from '../types';
+import {tileFeaturesGeometries} from './tileFeaturesGeometries';
+import {tileFeaturesSpatialIndex} from './tileFeaturesSpatialIndex';
 import {SpatialIndex, TileFormat} from '../constants';
+import {DEFAULT_GEO_COLUMN} from '../constants-internal';
+
+export type TileFeatureOptions = {
+  tiles?: Tile[];
+  spatialFilter?: SpatialFilter;
+  uniqueIdProperty?: string;
+  tileFormat: TileFormat;
+  spatialDataColumn?: string;
+  spatialIndex?: SpatialIndex;
+  options?: TileFeatureExtractOptions;
+};
+
+export type TileFeatureExtractOptions = {
+  storeGeometry?: boolean;
+};
 
 export function tileFeatures({
   tiles,
-  geometryToIntersect,
+  spatialFilter,
   uniqueIdProperty,
   tileFormat,
-  geoColumName,
+  spatialDataColumn = DEFAULT_GEO_COLUMN,
   spatialIndex,
-  options,
-}: {
-  tiles?: Tile; // TODO: add proper deck.gl type
-  geometryToIntersect?: Polygon | MultiPolygon;
-  // TODO(design)
-  // viewport?: Viewport;
-  // geometry?: Polygon | MultiPolygon;
-  uniqueIdProperty?: string;
-  tileFormat: TileFormat;
-  geoColumName?: string;
-  spatialIndex?: SpatialIndex;
-  options?: {storeGeometry: boolean};
-}): unknown[] {
-  // TODO(design)
-  // const geometryToIntersect = getGeometryToIntersect(viewport, geometry);
-
-  // if (!geometryToIntersect) {
-  //   return [];
-  // }
+  options = {},
+}: TileFeatureOptions): unknown[] {
+  // TODO(api): SpatialFilter should either be a required parameter, or
+  // omitting it should be valid (no filtering).
+  if (!spatialFilter) {
+    return [];
+  }
 
   if (spatialIndex) {
     return tileFeaturesSpatialIndex({
-      tiles,
-      geometryToIntersect,
-      geoColumName, // TODO(cleanup): Spelling.
+      tiles: tiles as SpatialIndexTile[],
+      spatialFilter,
+      spatialDataColumn,
       spatialIndex,
     });
   }
   return tileFeaturesGeometries({
     tiles,
     tileFormat,
-    geometryToIntersect,
+    spatialFilter,
     uniqueIdProperty,
     options,
   });

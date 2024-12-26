@@ -3,7 +3,6 @@ import {Deck} from '@deck.gl/core';
 import {colorBins, RasterTileLayer} from '@deck.gl/carto';
 import {
   rasterSource,
-  tilesToFeatures,
   Filter,
   TilejsonResult,
   WidgetRasterSource,
@@ -79,8 +78,12 @@ function updateLayers() {
       colors: 'Temps',
     }),
     onViewportLoad: (tiles) => {
-      data.widgetSource.loadFeatures(tilesToFeatures({tiles})); // TODO: More props.
+      data.widgetSource.loadTiles({tiles}); // TODO: More props.
       // TODO: Force widget refresh, somehow... need a new WidgetTilesetSource instance?
+
+      // TODO: Or can we wait for tiles to load, awaiting in getFormula until then?
+      // ...does viewstate change imply that an onViewportLoad event is coming?
+
       // TODO: Maybe this is an argument for re-creating the class, or similar, rather
       // than tying its lifecycle to the source/tilejson?
     },

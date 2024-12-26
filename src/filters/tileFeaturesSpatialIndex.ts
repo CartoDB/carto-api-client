@@ -1,34 +1,35 @@
 import {SpatialIndex} from '../constants.js';
 import {getResolution as quadbinGetResolution, geometryToCells} from 'quadbin';
-
-// TODO(design): Are we using web workers in API client? What to do about this?
-// h3-js has a known problem that does not allow us to use it in a web-worker. To solve
-// it we're overwriting the node_module package after install it (check postinstall script in the package.json and the patches/h3-js+3.7.2.patch file)
-// To know more about the h3-js issue check https://github.com/uber/h3-js/issues/117
-import {h3GetResolution, polyfill} from 'h3-js';
 import bboxClip from '@turf/bbox-clip';
-import {MultiPolygon, Polygon} from 'geojson';
+import {SpatialFilter, SpatialIndexTile} from '../types.js';
+import {BBox, Feature} from 'geojson';
+// @ts-expect-error TODO(cleanup): What's happening here?
+import {h3GetResolution, polyfill} from 'h3-js';
 
-export default function tileFeaturesSpatialIndex({
-  tiles,
-  geometryToIntersect,
-  geoColumName,
-  spatialIndex,
-}: {
-  tiles: any;
-  geometryToIntersect: Polygon | MultiPolygon;
-  geoColumName: string;
+export type TileFeaturesSpatialIndexOptions = {
+  tiles: SpatialIndexTile[];
+  spatialFilter: SpatialFilter;
+  spatialDataColumn: string;
   spatialIndex: SpatialIndex;
-}) {
+};
+
+export function tileFeaturesSpatialIndex({
+  tiles,
+  spatialFilter,
+  spatialDataColumn,
+  spatialIndex,
+}: TileFeaturesSpatialIndexOptions) {
   const map = new Map();
   const resolution = getResolution(tiles, spatialIndex);
-  const spatialIndexIDName = geoColumName ? geoColumName : spatialIndex;
+  const spatialIndexIDName = spatialDataColumn
+    ? spatialDataColumn
+    : spatialIndex;
 
   if (!resolution) {
     return [];
   }
-  const cells = getCellsCoverGeometry(
-    geometryToIntersect,
+  const cells: bigint[] = getCellsCoverGeometry(
+    spatialFilter,
     spatialIndex,
     resolution
   );
@@ -36,19 +37,17 @@ export default function tileFeaturesSpatialIndex({
   if (!cells?.length) {
     return [];
   }
-  // We transform cells to object to improve the performace
-  const cellsDictionary = cells.reduce((prev, current) => {
-    prev[current] = {};
-    return prev;
-  }, {});
+
+  // We transform cells to Set to improve the performace
+  const cellsSet = new Set(cells.map((c) => c.toString()));
 
   for (const tile of tiles) {
     if (tile.isVisible === false || !tile.data) {
       continue;
     }
 
-    tile.data.forEach((d) => {
-      if (d.id in cellsDictionary) {
+    tile.data.forEach((d: Feature) => {
+      if (cellsSet.has(d.id as string)) {
         map.set(d.id, {...d.properties, [spatialIndexIDName]: d.id});
       }
     });
@@ -56,7 +55,7 @@ export default function tileFeaturesSpatialIndex({
   return Array.from(map.values());
 }
 
-function getResolution(tiles, spatialIndex) {
+function getResolution(tiles: SpatialIndexTile[], spatialIndex: SpatialIndex) {
   const data = tiles.find((tile) => tile.data?.length)?.data;
 
   if (!data) {
@@ -72,10 +71,14 @@ function getResolution(tiles, spatialIndex) {
   }
 }
 
-const bboxWest = [-180, -90, 0, 90];
-const bboxEast = [0, -90, 180, 90];
+const bboxWest: BBox = [-180, -90, 0, 90];
+const bboxEast: BBox = [0, -90, 180, 90];
 
-function getCellsCoverGeometry(geometry, spatialIndex, resolution) {
+function getCellsCoverGeometry(
+  geometry: SpatialFilter,
+  spatialIndex: SpatialIndex,
+  resolution: bigint
+) {
   if (spatialIndex === SpatialIndex.QUADBIN) {
     return geometryToCells(geometry, resolution);
   }
@@ -85,13 +88,11 @@ function getCellsCoverGeometry(geometry, spatialIndex, resolution) {
     // so we clip the geometry to be sure that none of them is greater than 180 degrees
     // https://github.com/uber/h3-js/issues/24#issuecomment-431893796
     return polyfill(
-      // @ts-ignore
       bboxClip(geometry, bboxWest).geometry.coordinates,
       resolution,
       true
     ).concat(
       polyfill(
-        // @ts-ignore
         bboxClip(geometry, bboxEast).geometry.coordinates,
         resolution,
         true
