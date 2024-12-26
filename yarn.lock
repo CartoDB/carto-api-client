@@ -1480,6 +1480,7 @@ __metadata:
     "@webcomponents/webcomponentsjs": "npm:^2.8.0"
     concurrently: "npm:^8.2.2"
     echarts: "npm:^5.5.0"
+    h3-js: "npm:4.1.0"
     lit: "npm:^3.1.4"
     lit-analyzer: "npm:^1.2.1"
     maplibre-gl: "npm:^4.6.0"
@@ -5725,7 +5726,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"h3-js@npm:^4.1.0":
+"h3-js@npm:4.1.0, h3-js@npm:^4.1.0":
   version: 4.1.0
   resolution: "h3-js@npm:4.1.0"
   checksum: 10c0/58adb7c7a19ff6e6959ef97a60b383bb06c560ffd12826ce603470b25bb34bb26b9bedee6e406591b97017fb888a6194b4043d16abd0d100e6cb51d449e9c3d1

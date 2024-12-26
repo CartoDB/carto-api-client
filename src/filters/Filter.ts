@@ -1,5 +1,7 @@
 import {filterFunctions} from './FilterTypes';
-import {FilterLogicalOperator} from '../types';
+import {Filter, FilterLogicalOperator, Filters} from '../types';
+import {Feature} from 'geojson';
+import {FilterType} from '../constants';
 
 const LOGICAL_OPERATOR_METHODS: Record<
   FilterLogicalOperator,
@@ -10,15 +12,15 @@ const LOGICAL_OPERATOR_METHODS: Record<
 };
 
 function passesFilter(
-  columns,
-  filters,
-  feature,
+  columns: string[],
+  filters: Filters,
+  feature: Record<string, unknown>, // TODO(types)
   filtersLogicalOperator: FilterLogicalOperator
-) {
+): boolean {
   const method = LOGICAL_OPERATOR_METHODS[filtersLogicalOperator];
   return columns[method]((column) => {
     const columnFilters = filters[column];
-    const columnFilterTypes = Object.keys(columnFilters);
+    const columnFilterTypes = Object.keys(columnFilters) as FilterType[];
 
     if (!feature || feature[column] === null || feature[column] === undefined) {
       return false;
@@ -32,9 +34,10 @@ function passesFilter(
       }
 
       return filterFunction(
-        columnFilters[filter].values,
+        columnFilters[filter]!.values,
         feature[column],
-        columnFilters[filter].params
+        // TODO(types): Better types available?
+        (columnFilters[filter] as any).params
       );
     });
   });
@@ -44,6 +47,10 @@ export function buildFeatureFilter({
   filters = {},
   type = 'boolean',
   filtersLogicalOperator = 'and',
+}: {
+  filters?: Filters;
+  type?: string; // TODO
+  filtersLogicalOperator?: FilterLogicalOperator;
 }) {
   const columns = Object.keys(filters);
 
@@ -51,12 +58,13 @@ export function buildFeatureFilter({
     return () => (type === 'number' ? 1 : true);
   }
 
-  return (feature) => {
+  return (feature: Record<string, unknown> | Feature) => {
+    // TODO(types)
     const f = feature.properties || feature;
     const featurePassesFilter = passesFilter(
       columns,
       filters,
-      f,
+      f as Record<string, unknown>, // TODO(types)
       filtersLogicalOperator
     );
 
@@ -67,31 +75,46 @@ export function buildFeatureFilter({
 }
 
 // Apply certain filters to a collection of features
-export function applyFilters(features, filters, filtersLogicalOperator) {
+export function applyFilters(
+  features: Feature[],
+  filters: Filters,
+  filtersLogicalOperator: FilterLogicalOperator
+) {
   return Object.keys(filters).length
     ? features.filter(buildFeatureFilter({filters, filtersLogicalOperator}))
     : features;
 }
 
 // Binary
-export function buildBinaryFeatureFilter({filters = {}}) {
+export function buildBinaryFeatureFilter({filters = {}}: {filters: Filters}) {
   const columns = Object.keys(filters);
 
   if (!columns.length) {
     return () => 1;
   }
 
-  return (featureIdIdx, binaryData) =>
+  return (featureIdIdx: string, binaryData: unknown) =>
     passesFilterUsingBinary(columns, filters, featureIdIdx, binaryData);
 }
 
-function getValueFromNumericProps(featureIdIdx, binaryData, {column}) {
-  return binaryData.numericProps[column]?.value[featureIdIdx];
+function getValueFromNumericProps(
+  featureIdIdx: string,
+  binaryData: unknown,
+  {column}: {column: string}
+) {
+  // TODO(types): What is this type?
+  return (binaryData as any).numericProps[column]?.value[featureIdIdx];
 }
 
-function getValueFromProperties(featureIdIdx, binaryData, {column}) {
-  const propertyIdx = binaryData.featureIds.value[featureIdIdx];
-  return binaryData.properties[propertyIdx]?.[column];
+function getValueFromProperties(
+  featureIdIdx: string,
+  binaryData: unknown,
+  {column}: {column: string}
+) {
+  // TODO(types): What is this type?
+  const propertyIdx = (binaryData as any).featureIds.value[featureIdIdx];
+  // TODO(types): What is this type?
+  return (binaryData as any).properties[propertyIdx]?.[column];
 }
 
 const GET_VALUE_BY_BINARY_PROP = {
@@ -99,25 +122,35 @@ const GET_VALUE_BY_BINARY_PROP = {
   numericProps: getValueFromNumericProps,
 };
 
-function getBinaryPropertyByFilterValues(filterValues) {
+function getBinaryPropertyByFilterValues(filterValues: unknown[]) {
   return typeof filterValues.flat()[0] === 'string'
     ? 'properties'
     : 'numericProps';
 }
 
-function getFeatureValue(featureIdIdx, binaryData, filter) {
+function getFeatureValue(
+  featureIdIdx: string,
+  binaryData: any,
+  filter: {type: FilterType; column: string; values: unknown[]} // TODO(types): What is this?
+) {
   const {column, values} = filter;
   const binaryProp = getBinaryPropertyByFilterValues(values);
   const getFeatureValueFn = GET_VALUE_BY_BINARY_PROP[binaryProp];
   return getFeatureValueFn(featureIdIdx, binaryData, {column});
 }
 
-function passesFilterUsingBinary(columns, filters, featureIdIdx, binaryData) {
+// TODO(types): Types for binaryData?
+function passesFilterUsingBinary(
+  columns: string[],
+  filters: Filters,
+  featureIdIdx: string,
+  binaryData: any
+) {
   return columns.every((column) => {
     const columnFilters = filters[column];
 
     return Object.entries(columnFilters).every(([type, {values}]) => {
-      const filterFn = filterFunctions[type];
+      const filterFn = filterFunctions[type as FilterType];
       if (!filterFn) {
         throw new Error(`"${type}" filter is not implemented.`);
       }
@@ -125,8 +158,8 @@ function passesFilterUsingBinary(columns, filters, featureIdIdx, binaryData) {
       if (!values) return 0;
 
       const featureValue = getFeatureValue(featureIdIdx, binaryData, {
+        type: type as FilterType,
         column,
-        type,
         values,
       });
 

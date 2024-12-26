@@ -1,52 +1,84 @@
 import {FilterType} from '../constants';
-import {makeIntervalComplete} from '../utils/makeIntervalComplete';
+import {FilterInterval} from '../types';
+import {makeIntervalComplete} from '../utils/makeIntervalComplete.js';
 
-export const filterFunctions: Record<
-  FilterType,
-  (
-    filterValues: unknown[],
-    featureValue: unknown,
-    params?: Record<string, unknown>
-  ) => boolean
-> = {
-  [FilterType.IN](filterValues, featureValue) {
-    return filterValues.includes(featureValue);
-  },
-  [FilterType.BETWEEN]: between,
-  [FilterType.TIME](filterValues, featureValue) {
-    const featureValueAsTimestamp = new Date(featureValue).getTime();
-    if (isFinite(featureValueAsTimestamp)) {
-      return between(filterValues, featureValueAsTimestamp);
-    } else {
-      throw new Error(`Column used to filter by time isn't well formatted.`);
-    }
-  },
-  [FilterType.CLOSED_OPEN]: closedOpen,
-  [FilterType.STRING_SEARCH]: stringSearch,
+export type FilterFunction = (
+  filterValues: unknown[],
+  featureValue: unknown,
+  params?: Record<string, unknown>
+) => boolean;
+
+export const filterFunctions: Record<FilterType, FilterFunction> = {
+  [FilterType.IN]: filterIn,
+  [FilterType.BETWEEN]: filterBetween,
+  [FilterType.TIME]: filterTime,
+  [FilterType.CLOSED_OPEN]: filterClosedOpen,
+  [FilterType.STRING_SEARCH]: filterStringSearch,
 };
 
+function filterIn(filterValues: unknown[], featureValue: unknown): boolean {
+  return filterValues.includes(featureValue);
+}
+
 // FilterTypes.BETWEEN
-function between(filterValues, featureValue) {
-  const checkRange = (range) => {
+function filterBetween(
+  filterValues: unknown[],
+  featureValue: unknown
+): boolean {
+  const checkRange = (range: [number, number]) => {
     const [lowerBound, upperBound] = range;
-    return featureValue >= lowerBound && featureValue <= upperBound;
+    return (
+      (featureValue as number) >= lowerBound &&
+      (featureValue as number) <= upperBound
+    );
   };
 
-  return makeIntervalComplete(filterValues).some(checkRange);
+  return makeIntervalComplete(filterValues as FilterInterval[]).some(
+    checkRange
+  );
+}
+
+function filterTime(filterValues: unknown[], featureValue: unknown) {
+  const featureValueAsTimestamp = new Date(featureValue as number).getTime();
+  if (isFinite(featureValueAsTimestamp)) {
+    return filterBetween(filterValues, featureValueAsTimestamp);
+  } else {
+    throw new Error(`Column used to filter by time isn't well formatted.`);
+  }
 }
 
 // FilterTypes.CLOSED_OPEN
-function closedOpen(filterValues, featureValue) {
-  const checkRange = (range) => {
+function filterClosedOpen(
+  filterValues: unknown[],
+  featureValue: unknown
+): boolean {
+  const checkRange = (range: [number, number]) => {
     const [lowerBound, upperBound] = range;
-    return featureValue >= lowerBound && featureValue < upperBound;
+    return (
+      (featureValue as number) >= lowerBound &&
+      (featureValue as number) < upperBound
+    );
   };
 
-  return makeIntervalComplete(filterValues).some(checkRange);
+  return makeIntervalComplete(filterValues as [number, number][]).some(
+    checkRange
+  );
 }
 
+type StringSearchOptions = {
+  useRegExp?: boolean;
+  mustStart?: boolean;
+  mustEnd?: boolean;
+  caseSensitive?: boolean;
+  keepSpecialCharacters?: boolean;
+};
+
 // FilterTypes.STRING_SEARCH
-function stringSearch(filterValues, featureValue, params = {}) {
+function filterStringSearch(
+  filterValues: unknown[],
+  featureValue: unknown,
+  params: StringSearchOptions = {}
+): boolean {
   const normalizedFeatureValue = normalize(featureValue, params);
   const stringRegExp = params.useRegExp
     ? filterValues
@@ -70,11 +102,11 @@ function stringSearch(filterValues, featureValue, params = {}) {
 const specialCharRegExp = /[.*+?^${}()|[\]\\]/g;
 const normalizeRegExp = /\p{Diacritic}/gu;
 
-function escapeRegExp(value) {
+function escapeRegExp(value: string) {
   return value.replace(specialCharRegExp, '\\$&');
 }
 
-function normalize(data, params) {
+function normalize(data: unknown, params: StringSearchOptions) {
   let normalizedData = String(data);
   if (!params.keepSpecialCharacters)
     normalizedData = normalizedData
