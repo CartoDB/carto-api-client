@@ -3,8 +3,7 @@ import {getResolution as quadbinGetResolution, geometryToCells} from 'quadbin';
 import bboxClip from '@turf/bbox-clip';
 import {SpatialFilter, SpatialIndexTile} from '../types.js';
 import {BBox, Feature} from 'geojson';
-// @ts-expect-error TODO(cleanup): What's happening here?
-import {h3GetResolution, polyfill} from 'h3-js';
+import {getResolution as h3GetResolution, polygonToCells} from 'h3-js';
 
 export type TileFeaturesSpatialIndexOptions = {
   tiles: SpatialIndexTile[];
@@ -28,7 +27,7 @@ export function tileFeaturesSpatialIndex({
   if (!resolution) {
     return [];
   }
-  const cells: bigint[] = getCellsCoverGeometry(
+  const cells = getCellsCoverGeometry(
     spatialFilter,
     spatialIndex,
     resolution
@@ -55,7 +54,7 @@ export function tileFeaturesSpatialIndex({
   return Array.from(map.values());
 }
 
-function getResolution(tiles: SpatialIndexTile[], spatialIndex: SpatialIndex) {
+function getResolution(tiles: SpatialIndexTile[], spatialIndex: SpatialIndex): number | undefined {
   const data = tiles.find((tile) => tile.data?.length)?.data;
 
   if (!data) {
@@ -77,9 +76,10 @@ const bboxEast: BBox = [0, -90, 180, 90];
 function getCellsCoverGeometry(
   geometry: SpatialFilter,
   spatialIndex: SpatialIndex,
-  resolution: bigint
+  resolution: number
 ) {
   if (spatialIndex === SpatialIndex.QUADBIN) {
+    // @ts-expect-error TODO: We're pretty loose with number/bigint types in this file.
     return geometryToCells(geometry, resolution);
   }
 
@@ -87,13 +87,13 @@ function getCellsCoverGeometry(
     // The current H3 polyfill algorithm can't deal with polygon segments of greater than 180 degrees longitude
     // so we clip the geometry to be sure that none of them is greater than 180 degrees
     // https://github.com/uber/h3-js/issues/24#issuecomment-431893796
-    return polyfill(
-      bboxClip(geometry, bboxWest).geometry.coordinates,
+    return polygonToCells(
+      bboxClip(geometry, bboxWest).geometry.coordinates as number[][] | number[][][],
       resolution,
       true
     ).concat(
-      polyfill(
-        bboxClip(geometry, bboxEast).geometry.coordinates,
+      polygonToCells(
+        bboxClip(geometry, bboxEast).geometry.coordinates as number[][] | number[][][],
         resolution,
         true
       )

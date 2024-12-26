@@ -5,9 +5,18 @@ import intersect from '@turf/intersect';
 import {transformToTileCoords} from '../utils/transformToTileCoords.js';
 import {transformTileCoordsToWGS84} from '../utils/transformTileCoordsToWGS84.js';
 import {TileFormat} from '../constants.js';
-import {Geometry, LineString, Point, Polygon, Position} from 'geojson';
+import {
+  Feature,
+  Geometry,
+  LineString,
+  MultiPolygon,
+  Point,
+  Polygon,
+  Position,
+} from 'geojson';
 import {BBox, SpatialFilter} from '../types.js';
 import {TileFeatureExtractOptions} from './tileFeatures.js';
+import {featureCollection} from '@turf/helpers';
 
 export const FEATURE_GEOM_PROPERTY = '__geomValue';
 
@@ -85,9 +94,16 @@ export function tileFeaturesGeometries({
       bbox.north,
     ]);
     const tileIsFullyVisible = booleanWithin(bboxToGeom, spatialFilter);
+
     // Clip the geometry to intersect with the tile
-    // @ts-expect-error Unclear if turf types are correct here.
-    const clippedGeometryToIntersect = intersect(bboxToGeom, spatialFilter);
+    const spatialFilterFeature: Feature<Polygon | MultiPolygon> = {
+      type: 'Feature',
+      geometry: spatialFilter,
+      properties: {},
+    };
+    const clippedGeometryToIntersect = intersect(
+      featureCollection([bboxToGeom, spatialFilterFeature])
+    );
 
     if (!clippedGeometryToIntersect) {
       continue;
