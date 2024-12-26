@@ -39,6 +39,7 @@ describe('vectorTableSource', () => {
       tableName: 'a.b.vector_table',
       columns: ['a', 'b'],
       spatialDataColumn: 'mygeom',
+      aggregationExp: 'SUM(revenue)',
     });
 
     expect(vi.mocked(fetch)).toHaveBeenCalledTimes(2);
@@ -50,7 +51,7 @@ describe('vectorTableSource', () => {
     expect(initURL).toMatch(/columns=a%2Cb/);
     expect(initURL).toMatch(/spatialDataColumn=mygeom/);
     expect(initURL).toMatch(/spatialDataType=geo/);
-
+    expect(initURL).toMatch(/aggregationExp=SUM%28revenue%29/);
     expect(tilesetURL).toMatch(
       /^https:\/\/xyz\.com\/\?format\=tilejson\&cache\=/
     );
@@ -60,6 +61,19 @@ describe('vectorTableSource', () => {
       'https://xyz.com/{z}/{x}/{y}?formatTiles=binary',
     ]);
     expect(tilejson.accessToken).toBe('<token>');
+  });
+
+  test('when aggregationExp is not provided', async () => {
+    await vectorTableSource({
+      connectionName: 'carto_dw',
+      accessToken: '<token>',
+      tableName: 'a.b.vector_table',
+      columns: ['a', 'b'],
+      spatialDataColumn: 'mygeom',
+    });
+
+    const [[initURL]] = vi.mocked(fetch).mock.calls;
+    expect(initURL).not.toContain('aggregationExp');
   });
 
   test('widgetSource', async () => {

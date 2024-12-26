@@ -22,6 +22,7 @@ export type VectorTableSourceOptions = SourceOptions &
   TableSourceOptions &
   FilterOptions &
   ColumnsOption;
+
 type UrlParameters = {
   columns?: string;
   filters?: Record<string, unknown>;
@@ -29,6 +30,7 @@ type UrlParameters = {
   spatialDataColumn?: string;
   tileResolution?: string;
   name: string;
+  aggregationExp?: string;
 };
 
 export type VectorTableSourceResponse = TilejsonResult &
@@ -43,6 +45,7 @@ export const vectorTableSource = async function (
     spatialDataColumn = 'geom',
     tableName,
     tileResolution = DEFAULT_TILE_RESOLUTION,
+    aggregationExp,
   } = options;
 
   const urlParameters: UrlParameters = {
@@ -57,6 +60,9 @@ export const vectorTableSource = async function (
   }
   if (filters) {
     urlParameters.filters = filters;
+  }
+  if (aggregationExp) {
+    urlParameters.aggregationExp = aggregationExp;
   }
   return baseSource<UrlParameters>('table', options, urlParameters).then(
     (result) => ({
