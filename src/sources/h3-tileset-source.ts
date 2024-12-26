@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
+import {
+  WidgetTilesetSource,
+  WidgetTilesetSourceResult,
+} from '../widget-sources';
 import {baseSource} from './base-source';
 import type {
   SourceOptions,
@@ -12,7 +16,8 @@ import type {
 export type H3TilesetSourceOptions = SourceOptions & TilesetSourceOptions;
 type UrlParameters = {name: string};
 
-export type H3TilesetSourceResponse = TilejsonResult;
+export type H3TilesetSourceResponse = TilejsonResult &
+  WidgetTilesetSourceResult;
 
 export const h3TilesetSource = async function (
   options: H3TilesetSourceOptions
@@ -20,9 +25,10 @@ export const h3TilesetSource = async function (
   const {tableName} = options;
   const urlParameters: UrlParameters = {name: tableName};
 
-  return baseSource<UrlParameters>(
-    'tileset',
-    options,
-    urlParameters
+  return baseSource<UrlParameters>('tileset', options, urlParameters).then(
+    (result) => ({
+      ...(result as TilejsonResult),
+      widgetSource: new WidgetTilesetSource(options),
+    })
   ) as Promise<H3TilesetSourceResponse>;
 };
