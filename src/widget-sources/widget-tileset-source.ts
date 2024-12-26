@@ -12,7 +12,6 @@ import {
   TileFeatureExtractOptions,
   tileFeatures,
 } from '../filters/tileFeatures.js';
-import {DEFAULT_GEO_COLUMN} from '../constants-internal.js';
 
 type LayerTilesetSourceOptions = Omit<TilesetSourceOptions, 'filters'>;
 
@@ -72,9 +71,9 @@ export class WidgetTilesetSource extends WidgetBaseSource<
       options,
       spatialFilter,
       uniqueIdProperty, // TODO(api): Should this be a source/constructor property?
-      tileFormat: TileFormat.BINARY, // TODO(api): Should this be a source/constructor property?
+      tileFormat: TileFormat.MVT, // TODO(api): Should this be a source/constructor property?
       spatialDataColumn: this.props.geoColumn,
-      spatialIndex: undefined, // TODO: Determine from own properties.
+      spatialIndex: undefined, // TODO(api): Could determine from internal properties?
     }) as Feature[];
   }
 
@@ -91,22 +90,19 @@ export class WidgetTilesetSource extends WidgetBaseSource<
     let result: FormulaResponse = {value: null};
 
     if (this._features) {
-      const targetOperation = aggregationFunctions[operation];
-      const isCount = operation === 'count';
-
       if (operation === 'custom') {
         throw new Error('Custom aggregation not supported for tilesets');
       }
 
-      // If the operation isn't count, we need to assert the column
-      // If the operation is count, the column can be undefined
-      if (!isCount || (isCount && column)) {
+      // Column is required except when operation is 'count'.
+      if (column || operation !== 'count') {
         this.assertColumn(column);
       }
 
       const filteredFeatures = this._getFilteredFeatures();
 
-      if (filteredFeatures.length !== 0 || isCount) {
+      if (filteredFeatures.length !== 0 || operation === 'count') {
+        const targetOperation = aggregationFunctions[operation];
         result = {
           value: targetOperation(
             // TODO(types): Better types available?
