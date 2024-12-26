@@ -1,5 +1,5 @@
 import type {FilterType} from './constants.js';
-import type {Polygon, MultiPolygon} from 'geojson';
+import type {Polygon, MultiPolygon, Feature} from 'geojson';
 
 /******************************************************************************
  * MAPS AND TILES
@@ -11,8 +11,13 @@ export type Format = 'json' | 'geojson' | 'tilejson';
 /** @internalRemarks Source: @carto/constants, @deck.gl/carto */
 export type MapType = 'boundary' | 'query' | 'table' | 'tileset' | 'raster';
 
+// TODO(types): Can we remove Viewport or BBox, for internal consistency?
+
 /** @internalRemarks Source: @carto/react-core */
 export type Viewport = [number, number, number, number];
+
+/** @internalRemarks Source: @deck.gl/geo-layers */
+export type BBox = {west: number; east: number; north: number; south: number};
 
 /** TODO: Documentation. */
 export type Tile = {
@@ -21,6 +26,13 @@ export type Tile = {
   content: unknown;
   zoom: number;
   boundingBox: [min: number[], max: number[]];
+  isVisible: boolean;
+  data?: unknown;
+};
+
+/** TODO: Documentation. */
+export type SpatialIndexTile = Tile & {
+  data?: (Feature & {id: bigint})[];
 };
 
 type NumericProps = Record<
@@ -81,6 +93,14 @@ export interface Filter {
 
 /** @internalRemarks Source: @carto/react-core */
 export type FilterLogicalOperator = 'and' | 'or';
+
+/**
+ * Type for minimum or maximum value of an interval. Values 'null' and
+ * 'undefined' are intentionally allowed, and represent an unbounded value.
+ */
+export type FilterIntervalExtremum = number | null | undefined;
+export type FilterInterval = [FilterIntervalExtremum, FilterIntervalExtremum];
+export type FilterIntervalComplete = [number, number];
 
 /******************************************************************************
  * GROUPING
