@@ -1,7 +1,12 @@
 import {TilesetSourceOptions} from '../sources/index.js';
 import {WidgetBaseSource, WidgetBaseSourceProps} from './widget-base-source.js';
 import {ModelSource} from '../models/model.js';
-import {FormulaRequestOptions, FormulaResponse} from './types.js';
+import {
+  FeaturesRequestOptions,
+  FeaturesResponse,
+  FormulaRequestOptions,
+  FormulaResponse,
+} from './types.js';
 import {InvalidColumnError} from '../utils.js';
 import {Feature} from 'geojson';
 import {applyFilters} from '../filters/Filter.js';
@@ -49,10 +54,6 @@ export class WidgetTilesetSource extends WidgetBaseSource<
     };
   }
 
-  /****************************************************************************
-   * LOCAL SYNC
-   */
-
   private _features: Feature[] = [];
 
   loadTiles({
@@ -77,11 +78,12 @@ export class WidgetTilesetSource extends WidgetBaseSource<
     }) as Feature[];
   }
 
-  /****************************************************************************
-   * FORMULA
-   */
+  async getFeatures(
+    options: FeaturesRequestOptions
+  ): Promise<FeaturesResponse> {
+    throw new Error('getFeatures not supported for tilesets');
+  }
 
-  // async getFormula(options: FormulaRequestOptions): Promise<FormulaResponse>
   async getFormula({
     column = '*',
     operation = 'count',
@@ -96,7 +98,7 @@ export class WidgetTilesetSource extends WidgetBaseSource<
 
       // Column is required except when operation is 'count'.
       if (column || operation !== 'count') {
-        this.assertColumn(column);
+        assertColumn(this._features, column);
       }
 
       const filteredFeatures = this._getFilteredFeatures();
@@ -116,10 +118,6 @@ export class WidgetTilesetSource extends WidgetBaseSource<
 
     return result;
   }
-
-  /****************************************************************************
-   * HISTOGRAM
-   */
 
   // // TODO: API
   // getHistogram({
@@ -151,10 +149,6 @@ export class WidgetTilesetSource extends WidgetBaseSource<
 
   //   return result;
   // }
-
-  /****************************************************************************
-   * CATEGORIES
-   */
 
   // // TODO: API
   // getCategories({
@@ -189,10 +183,6 @@ export class WidgetTilesetSource extends WidgetBaseSource<
   //   return result;
   // }
 
-  /****************************************************************************
-   * SCATTERPLOT
-   */
-
   // // TODO: API
   // getScatterPlot({
   //   filters,
@@ -222,10 +212,6 @@ export class WidgetTilesetSource extends WidgetBaseSource<
 
   //   return result;
   // }
-
-  /****************************************************************************
-   * TIMESERIES
-   */
 
   // // TODO: API
   // getTimeSeries({
@@ -262,10 +248,6 @@ export class WidgetTilesetSource extends WidgetBaseSource<
   //   return result;
   // }
 
-  /****************************************************************************
-   * RANGE
-   */
-
   // // TODO: API
   // getRange({filters, filtersLogicalOperator, column}) {
   //   let result = null;
@@ -298,28 +280,27 @@ export class WidgetTilesetSource extends WidgetBaseSource<
       this.props.filtersLogicalOperator || 'and'
     );
   }
+}
 
-  // TODO: private
-  assertColumn(...columnArgs: string[] | string[][]) {
-    // This check can only be done if there're features
-    if (this._features.length) {
-      // Due to the multiple column shape, we normalise it as an array with normalizeColumns
-      const columns = Array.from(
-        new Set(columnArgs.map(normalizeColumns).flat())
-      );
+function assertColumn(
+  features: Feature[],
+  ...columnArgs: string[] | string[][]
+) {
+  // TODO(cleanup): Can drop support for multiple column shapes here?
 
-      const featureKeys = Object.keys(this._features[0]);
+  // Due to the multiple column shape, we normalise it as an array with normalizeColumns
+  const columns = Array.from(new Set(columnArgs.map(normalizeColumns).flat()));
 
-      const invalidColumns = columns.filter(
-        (column) => !featureKeys.includes(column)
-      );
+  const featureKeys = Object.keys(features[0]);
 
-      if (invalidColumns.length) {
-        throw new InvalidColumnError(
-          `Missing column(s): ${invalidColumns.join(', ')}`
-        );
-      }
-    }
+  const invalidColumns = columns.filter(
+    (column) => !featureKeys.includes(column)
+  );
+
+  if (invalidColumns.length) {
+    throw new InvalidColumnError(
+      `Missing column(s): ${invalidColumns.join(', ')}`
+    );
   }
 }
 
