@@ -151,7 +151,7 @@ export type QuerySourceOptions = {
   queryParameters?: QueryParameters;
 
   /**
-   * Comma separated expressions that, in case of containing any, the source will be aggregated by geometry automatically.
+   * Comma-separated aggregation expressions. If assigned on a vector source, source is grouped by geometry and then aggregated.
    *
    * Example:
    *
@@ -189,7 +189,7 @@ export type TableSourceOptions = {
   tileResolution?: TileResolution;
 
   /**
-   * Comma separated expressions that, in case of containing any, the source will be aggregated by geometry automatically.
+   * Comma-separated aggregation expressions. If assigned on a vector source, source is grouped by geometry and then aggregated.
    *
    * Example:
    *
