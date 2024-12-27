@@ -21,6 +21,40 @@
           header="Total"
           operation="count"
         ></formula-widget>
+
+        <category-widget
+          id="category"
+          header="Store type"
+          operation="count"
+          column="storetype"
+        ></category-widget>
+
+        <pie-widget
+          id="pie"
+          header="Store type"
+          operation="count"
+          column="storetype"
+        ></pie-widget>
+
+        <table-widget
+          id="table"
+          header="Store type"
+          columns='["storetype","revenue"]'
+        ></table-widget>
+
+        <scatter-widget
+          id="scatter"
+          header="Size vs. Revenue"
+          xAxisColumn="size_m2"
+          yAxisColumn="revenue"
+        ></scatter-widget>
+
+        <histogram-widget
+          id="histogram"
+          header="Revenue"
+          column="revenue"
+          ticks="[1250000, 1500000, 1750000]"
+        ></histogram-widget>
       </section>
       <footer id="footer"></footer>
     </main>
