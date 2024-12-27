@@ -1,10 +1,10 @@
-import { AggregationTypes } from './constants/AggregationTypes';
-import { GroupByFeature } from '../types';
+import {AggregationType} from '../types';
+import {GroupByFeature} from './types';
 
 export function groupValuesByColumn(args: {
   data: Record<string, unknown>[];
   valuesColumns?: string[];
-  joinOperation?: AggregationTypes;
+  joinOperation?: AggregationType;
   keysColumn?: string;
-  operation?: AggregationTypes;
+  operation?: AggregationType;
 }): GroupByFeature;

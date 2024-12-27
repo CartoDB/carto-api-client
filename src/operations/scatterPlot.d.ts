@@ -1,10 +1,10 @@
-import { AggregationTypes } from './constants/AggregationTypes';
-import { ScatterPlotFeature } from '../types';
+// TODO(types): Check what ScatterPlotFeature is.
+import {AggregationType, ScatterPlotFeature} from '../types';
 
 export function scatterPlot(args: {
   data: Record<string, unknown>[];
   xAxisColumns: string[];
-  xAxisJoinOperation?: AggregationTypes;
+  xAxisJoinOperation?: AggregationType;
   yAxisColumns: string[];
-  yAxisJoinOperation?: AggregationTypes;
+  yAxisJoinOperation?: AggregationType;
 }): ScatterPlotFeature;
