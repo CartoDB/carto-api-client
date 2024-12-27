@@ -31,6 +31,8 @@ export interface CategoryRequestOptions extends BaseRequestOptions {
   column: string;
   operation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
   operationColumn?: string;
+  /** Local only. */
+  joinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
 }
 
 /**
@@ -89,6 +91,8 @@ export interface HistogramRequestOptions extends BaseRequestOptions {
   column: string;
   ticks: number[];
   operation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
+  /** Local only. */
+  joinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
 }
 
 /** Options for {@link WidgetBaseSource#getRange}. */
