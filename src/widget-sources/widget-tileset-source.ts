@@ -2,10 +2,22 @@ import {TilesetSourceOptions} from '../sources/index.js';
 import {WidgetBaseSource, WidgetBaseSourceProps} from './widget-base-source.js';
 import {ModelSource} from '../models/model.js';
 import {
+  CategoryRequestOptions,
+  CategoryResponse,
   FeaturesRequestOptions,
   FeaturesResponse,
   FormulaRequestOptions,
   FormulaResponse,
+  HistogramRequestOptions,
+  HistogramResponse,
+  RangeRequestOptions,
+  RangeResponse,
+  ScatterRequestOptions,
+  ScatterResponse,
+  TableRequestOptions,
+  TableResponse,
+  TimeSeriesRequestOptions,
+  TimeSeriesResponse,
 } from './types.js';
 import {InvalidColumnError} from '../utils.js';
 import {Feature} from 'geojson';
@@ -17,6 +29,11 @@ import {
   TileFeatureExtractOptions,
   tileFeatures,
 } from '../filters/tileFeatures.js';
+import {groupValuesByDateColumn} from '../operations/groupByDate.js';
+import {scatterPlot} from '../operations/scatterPlot.js';
+import {groupValuesByColumn} from '../operations/groupBy.js';
+import {histogram} from '../operations/histogram.js';
+import {applySorting} from '../operations/applySorting.js';
 
 type LayerTilesetSourceOptions = Omit<TilesetSourceOptions, 'filters'>;
 
@@ -78,7 +95,7 @@ export class WidgetTilesetSource extends WidgetBaseSource<
     }) as Feature[];
   }
 
-  async getFeatures(
+  override async getFeatures(
     options: FeaturesRequestOptions
   ): Promise<FeaturesResponse> {
     throw new Error('getFeatures not supported for tilesets');
@@ -89,196 +106,217 @@ export class WidgetTilesetSource extends WidgetBaseSource<
     operation = 'count',
     joinOperation,
   }: FormulaRequestOptions): Promise<FormulaResponse> {
-    let result: FormulaResponse = {value: null};
-
-    if (this._features) {
-      if (operation === 'custom') {
-        throw new Error('Custom aggregation not supported for tilesets');
-      }
-
-      // Column is required except when operation is 'count'.
-      if (column || operation !== 'count') {
-        assertColumn(this._features, column);
-      }
-
-      const filteredFeatures = this._getFilteredFeatures();
-
-      if (filteredFeatures.length !== 0 || operation === 'count') {
-        const targetOperation = aggregationFunctions[operation];
-        result = {
-          value: targetOperation(
-            // TODO(types): Better types available?
-            filteredFeatures as unknown as Record<string, unknown>[],
-            column,
-            joinOperation
-          ),
-        };
-      }
+    if (operation === 'custom') {
+      throw new Error('Custom aggregation not supported for tilesets');
     }
 
-    return result;
+    if (!this._features.length) {
+      return {value: null};
+    }
+
+    // Column is required except when operation is 'count'.
+    if (column || operation !== 'count') {
+      assertColumn(this._features, column);
+    }
+
+    const filteredFeatures = this._getFilteredFeatures();
+
+    if (filteredFeatures.length === 0 && operation !== 'count') {
+      return {value: null};
+    }
+
+    const targetOperation = aggregationFunctions[operation];
+    return {
+      value: targetOperation(
+        // TODO(types): Better types available?
+        filteredFeatures as unknown as Record<string, unknown>[],
+        column,
+        joinOperation
+      ),
+    };
   }
 
-  // // TODO: API
-  // getHistogram({
-  //   filters,
-  //   filtersLogicalOperator,
-  //   operation,
-  //   column,
-  //   ticks,
-  //   joinOperation,
-  // }) {
-  //   let result = null;
+  override async getHistogram({
+    operation,
+    column,
+    ticks,
+    joinOperation,
+  }: HistogramRequestOptions): Promise<HistogramResponse> {
+    if (!this._features.length) {
+      return [];
+    }
 
-  //   if (currentFeatures) {
-  //     const filteredFeatures = getFilteredFeatures(
-  //       filters,
-  //       filtersLogicalOperator
-  //     );
+    const filteredFeatures = this._getFilteredFeatures();
 
-  //     assertColumn(column);
+    assertColumn(this._features, column);
 
-  //     result = histogram({
-  //       data: filteredFeatures,
-  //       valuesColumns: normalizeColumns(column),
-  //       joinOperation,
-  //       ticks,
-  //       operation,
+    return histogram({
+      data: filteredFeatures,
+      valuesColumns: normalizeColumns(column),
+      joinOperation,
+      ticks,
+      operation,
+    });
+  }
+
+  override async getCategories({
+    column,
+    operation,
+    operationColumn,
+    joinOperation,
+  }: CategoryRequestOptions): Promise<CategoryResponse> {
+    if (!this._features.length) {
+      return [];
+    }
+
+    const filteredFeatures = this._getFilteredFeatures();
+
+    // TODO(api): Are 'column' and 'operationColumn' required only for tilesets?
+    assertColumn(this._features, column as string, operationColumn as string);
+
+    const groups = groupValuesByColumn({
+      data: filteredFeatures,
+      valuesColumns: normalizeColumns(operationColumn as string),
+      joinOperation,
+      keysColumn: column,
+      operation,
+    });
+
+    return groups || [];
+  }
+
+  override async getScatter({
+    xAxisColumn,
+    yAxisColumn,
+    xAxisJoinOperation,
+    yAxisJoinOperation,
+  }: ScatterRequestOptions): Promise<ScatterResponse> {
+    if (!this._features.length) {
+      return [];
+    }
+
+    const filteredFeatures = this._getFilteredFeatures();
+
+    assertColumn(this._features, xAxisColumn, yAxisColumn);
+
+    return scatterPlot({
+      data: filteredFeatures,
+      xAxisColumns: normalizeColumns(xAxisColumn),
+      xAxisJoinOperation,
+      yAxisColumns: normalizeColumns(yAxisColumn),
+      yAxisJoinOperation,
+    });
+  }
+
+  // TODO(impl): Implement.
+  // override async getTable({
+  //   searchFilterColumn,
+  //   searchFilterText,
+  //   sortBy,
+  //   sortByDirection = 'asc',
+  //   sortByColumnType,
+  //   offset,
+  //   limit
+  //   // page and rowsPerPage are optional and only used for pagination
+  //   page = undefined,
+  //   rowsPerPage = undefined,
+  // }: TableRequestOptions): Promise<TableResponse> {
+  //   const {filterOwner, spatialFilter, abortController, ...params} = options;
+  //   const {columns, sortBy, sortDirection, offset = 0, limit = 10} = params;
+
+  //   if (!this._features.length) {
+  //     return { rows: [], totalCount, 0, hasData: false };
+  //   }
+
+  //     let filteredFeatures = this._getFilteredFeatures();
+
+  //     if (searchFilterColumn && searchFilterText) {
+  //       filteredFeatures = filteredFeatures.filter(
+  //         (row) =>
+  //           row[searchFilterColumn] &&
+  //           String(row[searchFilterColumn])
+  //             .toLowerCase()
+  //             .includes(String(searchFilterText).toLowerCase())
+  //       );
+  //     }
+
+  //     // TODO(types): Are in/out really Features here? Or just dicts?
+  //     let rows = applySorting(filteredFeatures, {
+  //       sortBy,
+  //       sortByDirection,
+  //       sortByColumnType,
   //     });
-  //   }
+  //     const totalCount = rows.length;
+  //   const hasData = true;
 
-  //   return result;
-  // }
-
-  // // TODO: API
-  // getCategories({
-  //   filters,
-  //   filtersLogicalOperator,
-  //   operation,
-  //   column,
-  //   operationColumn,
-  //   joinOperation,
-  // }) {
-  //   let result = null;
-
-  //   if (currentFeatures) {
-  //     const filteredFeatures = getFilteredFeatures(
-  //       filters,
-  //       filtersLogicalOperator
+  //   if (page !== undefined && rowsPerPage !== undefined) {
+  //     rows = rows.slice(
+  //       Math.min(rowsPerPage * Math.max(0, page), totalCount),
+  //       Math.min(rowsPerPage * Math.max(1, page + 1), totalCount)
   //     );
-
-  //     assertColumn(column, operationColumn);
-
-  //     const groups = groupValuesByColumn({
-  //       data: filteredFeatures,
-  //       valuesColumns: normalizeColumns(operationColumn),
-  //       joinOperation,
-  //       keysColumn: column,
-  //       operation,
-  //     });
-
-  //     result = groups || [];
   //   }
 
-  //   return result;
+  //   return {rows, totalCount, hasData};
   // }
 
-  // // TODO: API
-  // getScatterPlot({
-  //   filters,
-  //   filtersLogicalOperator,
-  //   xAxisColumn,
-  //   yAxisColumn,
-  //   xAxisJoinOperation,
-  //   yAxisJoinOperation,
-  // }) {
-  //   let result = [];
-  //   if (currentFeatures) {
-  //     const filteredFeatures = getFilteredFeatures(
-  //       filters,
-  //       filtersLogicalOperator
-  //     );
+  override async getTimeSeries({
+    column,
+    stepSize,
+    operation,
+    operationColumn,
+    joinOperation,
+  }: TimeSeriesRequestOptions): Promise<TimeSeriesResponse> {
+    if (!this._features.length) {
+      // TODO(api): Is this at all the same response shape as the API returns?
+      return [] as unknown as TimeSeriesResponse;
+    }
 
-  //     assertColumn(xAxisColumn, yAxisColumn);
+    const filteredFeatures = this._getFilteredFeatures();
 
-  //     result = scatterPlot({
-  //       data: filteredFeatures,
-  //       xAxisColumns: normalizeColumns(xAxisColumn),
-  //       xAxisJoinOperation,
-  //       yAxisColumns: normalizeColumns(yAxisColumn),
-  //       yAxisJoinOperation,
-  //     });
-  //   }
+    // TODO(api): Are 'column' and 'operationColumn' required only for tilesets?
+    assertColumn(this._features, operationColumn as string, column as string);
 
-  //   return result;
-  // }
+    const groups = groupValuesByDateColumn({
+      data: filteredFeatures,
+      valuesColumns: normalizeColumns(operationColumn as string),
+      keysColumn: column,
+      groupType: stepSize,
+      operation,
+      joinOperation,
+    });
 
-  // // TODO: API
-  // getTimeSeries({
-  //   filters,
-  //   filtersLogicalOperator,
-  //   column,
-  //   stepSize,
-  //   operation,
-  //   operationColumn,
-  //   joinOperation,
-  // }) {
-  //   let result = [];
+    // @ts-expect-error TODO(api): Is this at all the same response shape as the API returns?
+    return groups || [];
+  }
 
-  //   if (currentFeatures) {
-  //     const filteredFeatures = getFilteredFeatures(
-  //       filters,
-  //       filtersLogicalOperator
-  //     );
+  override async getRange({
+    column,
+  }: RangeRequestOptions): Promise<RangeResponse> {
+    // TODO(api): Previously this case returned 'null' ... what do we prefer?
+    if (!this._features.length) {
+      return {min: -Infinity, max: Infinity};
+    }
 
-  //     assertColumn(operationColumn, column);
+    assertColumn(this._features, column);
 
-  //     const groups = groupValuesByDateColumn({
-  //       data: filteredFeatures,
-  //       valuesColumns: normalizeColumns(operationColumn),
-  //       keysColumn: column,
-  //       groupType: stepSize,
-  //       operation,
-  //       joinOperation,
-  //     });
-
-  //     result = groups || [];
-  //   }
-
-  //   return result;
-  // }
-
-  // // TODO: API
-  // getRange({filters, filtersLogicalOperator, column}) {
-  //   let result = null;
-
-  //   if (currentFeatures) {
-  //     const filteredFeatures = getFilteredFeatures(
-  //       filters,
-  //       filtersLogicalOperator
-  //     );
-
-  //     assertColumn(column);
-
-  //     result = {
-  //       min: aggregationFunctions.min(filteredFeatures, column),
-  //       max: aggregationFunctions.max(filteredFeatures, column),
-  //     };
-  //   }
-
-  //   return result;
-  // }
+    const filteredFeatures = this._getFilteredFeatures();
+    return {
+      min: aggregationFunctions.min(filteredFeatures, column),
+      max: aggregationFunctions.max(filteredFeatures, column),
+    };
+  }
 
   /****************************************************************************
    * INTERNAL
    */
 
-  private _getFilteredFeatures() {
+  // TODO(types): Better return type available?
+  private _getFilteredFeatures(): Record<string, unknown>[] {
     return applyFilters(
       this._features,
       this.props.filters || {},
       this.props.filtersLogicalOperator || 'and'
-    );
+    ) as unknown as Record<string, unknown>[];
   }
 }
 
