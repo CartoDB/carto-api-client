@@ -4,6 +4,10 @@
 
 ## 0.4
 
+### 0.4.3
+
+- feat: Add support for`aggregationExp` parameter to `vectorQuerySource` and `vectorTableSource`
+
 ### 0.4.2
 
 - fix: Fix incorrect column name lowercasing in Picking Model API
