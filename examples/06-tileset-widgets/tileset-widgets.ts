@@ -52,7 +52,7 @@ const widgets: Widget[] = [
   bindWidget('#histogram'),
   bindWidget('#pie'),
   bindWidget('#scatter'),
-  // bindWidget('#table'),
+  bindWidget('#table'),
 ];
 
 updateSources();
