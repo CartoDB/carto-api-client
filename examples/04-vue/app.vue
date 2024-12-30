@@ -127,6 +127,7 @@ onUnmounted(() => {
     <table-widget
       header="Store type"
       :columns="['storetype', 'revenue']"
+      sortBy="revenue"
       :data="data"
       :viewState="viewState"
     ></table-widget>

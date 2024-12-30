@@ -19,7 +19,7 @@ import {
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
 } from './types.js';
-import {InvalidColumnError} from '../utils.js';
+import {InvalidColumnError, getApplicableFilters} from '../utils.js';
 import {Feature} from 'geojson';
 import {applyFilters} from '../filters/Filter.js';
 import {TileFormat} from '../constants.js';
@@ -102,9 +102,11 @@ export class WidgetTilesetSource extends WidgetBaseSource<
   }
 
   async getFormula({
+    // TODO(cleanup): Defaults should be shared among sources.
     column = '*',
     operation = 'count',
     joinOperation,
+    filterOwner,
   }: FormulaRequestOptions): Promise<FormulaResponse> {
     if (operation === 'custom') {
       throw new Error('Custom aggregation not supported for tilesets');
@@ -119,7 +121,7 @@ export class WidgetTilesetSource extends WidgetBaseSource<
       assertColumn(this._features, column);
     }
 
-    const filteredFeatures = this._getFilteredFeatures();
+    const filteredFeatures = this._getFilteredFeatures(filterOwner);
 
     if (filteredFeatures.length === 0 && operation !== 'count') {
       return {value: null};
@@ -138,15 +140,16 @@ export class WidgetTilesetSource extends WidgetBaseSource<
 
   override async getHistogram({
     operation,
-    column,
     ticks,
+    column,
     joinOperation,
+    filterOwner,
   }: HistogramRequestOptions): Promise<HistogramResponse> {
     if (!this._features.length) {
       return [];
     }
 
-    const filteredFeatures = this._getFilteredFeatures();
+    const filteredFeatures = this._getFilteredFeatures(filterOwner);
 
     assertColumn(this._features, column);
 
@@ -164,19 +167,21 @@ export class WidgetTilesetSource extends WidgetBaseSource<
     operation,
     operationColumn,
     joinOperation,
+    filterOwner,
   }: CategoryRequestOptions): Promise<CategoryResponse> {
     if (!this._features.length) {
       return [];
     }
 
-    const filteredFeatures = this._getFilteredFeatures();
+    const filteredFeatures = this._getFilteredFeatures(filterOwner);
 
     // TODO(api): Are 'column' and 'operationColumn' required only for tilesets?
     assertColumn(this._features, column as string, operationColumn as string);
 
     const groups = groupValuesByColumn({
       data: filteredFeatures,
-      valuesColumns: normalizeColumns(operationColumn as string),
+      // TODO(cleanup): Defaults should be shared among sources.
+      valuesColumns: normalizeColumns(operationColumn || column),
       joinOperation,
       keysColumn: column,
       operation,
@@ -190,12 +195,13 @@ export class WidgetTilesetSource extends WidgetBaseSource<
     yAxisColumn,
     xAxisJoinOperation,
     yAxisJoinOperation,
+    filterOwner,
   }: ScatterRequestOptions): Promise<ScatterResponse> {
     if (!this._features.length) {
       return [];
     }
 
-    const filteredFeatures = this._getFilteredFeatures();
+    const filteredFeatures = this._getFilteredFeatures(filterOwner);
 
     assertColumn(this._features, xAxisColumn, yAxisColumn);
 
@@ -208,56 +214,68 @@ export class WidgetTilesetSource extends WidgetBaseSource<
     });
   }
 
-  // TODO(impl): Implement.
-  // override async getTable({
-  //   searchFilterColumn,
-  //   searchFilterText,
-  //   sortBy,
-  //   sortByDirection = 'asc',
-  //   sortByColumnType,
-  //   offset,
-  //   limit
-  //   // page and rowsPerPage are optional and only used for pagination
-  //   page = undefined,
-  //   rowsPerPage = undefined,
-  // }: TableRequestOptions): Promise<TableResponse> {
-  //   const {filterOwner, spatialFilter, abortController, ...params} = options;
-  //   const {columns, sortBy, sortDirection, offset = 0, limit = 10} = params;
+  // TODO(bug): Different results compared to API! Needs sort?
+  override async getTable(
+    options: TableRequestOptions
+  ): Promise<TableResponse> {
+    const {filterOwner, spatialFilter, abortController, ...params} = options;
+    const {
+      columns,
+      searchFilterColumn,
+      searchFilterText,
+      sortBy,
+      sortDirection,
+      sortByColumnType,
+      offset = 0,
+      limit = 10,
+    } = params;
 
-  //   if (!this._features.length) {
-  //     return { rows: [], totalCount, 0, hasData: false };
-  //   }
+    if (!this._features.length) {
+      return {rows: [], totalCount: 0};
+    }
 
-  //     let filteredFeatures = this._getFilteredFeatures();
+    // Filter.
+    let filteredFeatures = this._getFilteredFeatures(filterOwner);
 
-  //     if (searchFilterColumn && searchFilterText) {
-  //       filteredFeatures = filteredFeatures.filter(
-  //         (row) =>
-  //           row[searchFilterColumn] &&
-  //           String(row[searchFilterColumn])
-  //             .toLowerCase()
-  //             .includes(String(searchFilterText).toLowerCase())
-  //       );
-  //     }
+    // Search.
+    // TODO(design): Could we get the same behavior by passing filters?
+    if (searchFilterColumn && searchFilterText) {
+      filteredFeatures = filteredFeatures.filter(
+        (row) =>
+          row[searchFilterColumn] &&
+          String(row[searchFilterColumn])
+            .toLowerCase()
+            .includes(String(searchFilterText).toLowerCase())
+      );
+    }
 
-  //     // TODO(types): Are in/out really Features here? Or just dicts?
-  //     let rows = applySorting(filteredFeatures, {
-  //       sortBy,
-  //       sortByDirection,
-  //       sortByColumnType,
-  //     });
-  //     const totalCount = rows.length;
-  //   const hasData = true;
+    // Sort.
+    // TODO(types): Mismatch in feature vs. record types.
+    let rows = applySorting(filteredFeatures as any, {
+      sortBy,
+      sortByDirection: sortDirection,
+      sortByColumnType,
+    }) as unknown as Record<string, unknown>[];
+    const totalCount = rows.length;
 
-  //   if (page !== undefined && rowsPerPage !== undefined) {
-  //     rows = rows.slice(
-  //       Math.min(rowsPerPage * Math.max(0, page), totalCount),
-  //       Math.min(rowsPerPage * Math.max(1, page + 1), totalCount)
-  //     );
-  //   }
+    // Offset and limit.
+    rows = rows.slice(
+      Math.min(offset, totalCount),
+      Math.min(offset + limit, totalCount)
+    );
 
-  //   return {rows, totalCount, hasData};
-  // }
+    // Select columns.
+    rows = rows.map((srcRow: Record<string, unknown>) => {
+      const dstRow = {} as Record<string, unknown>;
+      for (const column of columns) {
+        dstRow[column] = srcRow[column];
+      }
+      return dstRow;
+    });
+
+    // TODO(types): Mismatch in feature vs. record types.
+    return {rows, totalCount} as unknown as TableResponse;
+  }
 
   override async getTimeSeries({
     column,
@@ -265,20 +283,22 @@ export class WidgetTilesetSource extends WidgetBaseSource<
     operation,
     operationColumn,
     joinOperation,
+    filterOwner,
   }: TimeSeriesRequestOptions): Promise<TimeSeriesResponse> {
     if (!this._features.length) {
       // TODO(api): Is this at all the same response shape as the API returns?
       return [] as unknown as TimeSeriesResponse;
     }
 
-    const filteredFeatures = this._getFilteredFeatures();
+    const filteredFeatures = this._getFilteredFeatures(filterOwner);
 
     // TODO(api): Are 'column' and 'operationColumn' required only for tilesets?
-    assertColumn(this._features, operationColumn as string, column as string);
+    assertColumn(this._features, column as string, operationColumn as string);
 
     const groups = groupValuesByDateColumn({
       data: filteredFeatures,
-      valuesColumns: normalizeColumns(operationColumn as string),
+      // TODO(cleanup): Defaults should be shared among sources.
+      valuesColumns: normalizeColumns(operationColumn || column),
       keysColumn: column,
       groupType: stepSize,
       operation,
@@ -291,6 +311,7 @@ export class WidgetTilesetSource extends WidgetBaseSource<
 
   override async getRange({
     column,
+    filterOwner,
   }: RangeRequestOptions): Promise<RangeResponse> {
     // TODO(api): Previously this case returned 'null' ... what do we prefer?
     if (!this._features.length) {
@@ -299,7 +320,7 @@ export class WidgetTilesetSource extends WidgetBaseSource<
 
     assertColumn(this._features, column);
 
-    const filteredFeatures = this._getFilteredFeatures();
+    const filteredFeatures = this._getFilteredFeatures(filterOwner);
     return {
       min: aggregationFunctions.min(filteredFeatures, column),
       max: aggregationFunctions.max(filteredFeatures, column),
@@ -311,10 +332,12 @@ export class WidgetTilesetSource extends WidgetBaseSource<
    */
 
   // TODO(types): Better return type available?
-  private _getFilteredFeatures(): Record<string, unknown>[] {
+  private _getFilteredFeatures(
+    filterOwner: string | undefined
+  ): Record<string, unknown>[] {
     return applyFilters(
       this._features,
-      this.props.filters || {},
+      getApplicableFilters(filterOwner, this.props.filters),
       this.props.filtersLogicalOperator || 'and'
     ) as unknown as Record<string, unknown>[];
   }
