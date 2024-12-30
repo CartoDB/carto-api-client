@@ -116,6 +116,10 @@ export interface TableRequestOptions extends BaseRequestOptions {
   sortByColumnType?: SortColumnType;
   offset?: number;
   limit?: number;
+  /** Local only. */
+  searchFilterColumn?: string;
+  /** Local only. */
+  searchFilterText?: string;
 }
 
 /** Options for {@link WidgetBaseSource#getTimeSeries}. */

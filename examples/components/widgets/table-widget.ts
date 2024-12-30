@@ -57,7 +57,7 @@ export class TableWidget extends BaseWidget {
   private _task = new Task(this, {
     task: async ([data, columns, sortBy, sortDirection, limit], {signal}) => {
       if (!data) {
-        return {hasData: false, rows: [], totalCount: -1};
+        return {rows: [], totalCount: 0};
       }
 
       await sleep(DEBOUNCE_TIME_MS);
