@@ -1,8 +1,9 @@
 import {AggregationType} from '../types';
+import {FeatureData} from '../types-internal';
 
 // TODO: Is this correct?
 type AggregationFunction = (
-  features: Record<string, unknown>[],
+  features: FeatureData[],
   column: string,
   joinOperation?: AggregationType
 ) => number;
@@ -10,7 +11,7 @@ type AggregationFunction = (
 export const aggregationFunctions: Record<AggregationType, AggregationFunction>;
 
 export function aggregate(
-  feature: Record<string, unknown>,
+  feature: FeatureData,
   keys?: string[],
   joinOperation?: AggregationType
 ): unknown;

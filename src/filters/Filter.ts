@@ -1,7 +1,8 @@
 import {filterFunctions} from './FilterTypes';
-import {Filter, FilterLogicalOperator, Filters} from '../types';
+import {FilterLogicalOperator, Filters} from '../types';
 import {Feature} from 'geojson';
 import {FilterType} from '../constants';
+import {FeatureData} from '../types-internal';
 
 const LOGICAL_OPERATOR_METHODS: Record<
   FilterLogicalOperator,
@@ -14,7 +15,7 @@ const LOGICAL_OPERATOR_METHODS: Record<
 function passesFilter(
   columns: string[],
   filters: Filters,
-  feature: Record<string, unknown>, // TODO(types)
+  feature: FeatureData,
   filtersLogicalOperator: FilterLogicalOperator
 ): boolean {
   const method = LOGICAL_OPERATOR_METHODS[filtersLogicalOperator];
@@ -76,7 +77,7 @@ export function buildFeatureFilter({
 
 // Apply certain filters to a collection of features
 export function applyFilters(
-  features: Feature[],
+  features: FeatureData[],
   filters: Filters,
   filtersLogicalOperator: FilterLogicalOperator
 ) {

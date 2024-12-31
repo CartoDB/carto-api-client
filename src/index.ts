@@ -16,3 +16,5 @@ export {
   query,
   requestWithParameters,
 } from './api/index.js';
+
+export {applySorting} from './operations/applySorting.js';
