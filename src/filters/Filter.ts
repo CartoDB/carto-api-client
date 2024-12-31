@@ -94,12 +94,12 @@ export function buildBinaryFeatureFilter({filters = {}}: {filters: Filters}) {
     return () => 1;
   }
 
-  return (featureIdIdx: string, binaryData: unknown) =>
+  return (featureIdIdx: number, binaryData: unknown) =>
     passesFilterUsingBinary(columns, filters, featureIdIdx, binaryData);
 }
 
 function getValueFromNumericProps(
-  featureIdIdx: string,
+  featureIdIdx: number,
   binaryData: unknown,
   {column}: {column: string}
 ) {
@@ -108,7 +108,7 @@ function getValueFromNumericProps(
 }
 
 function getValueFromProperties(
-  featureIdIdx: string,
+  featureIdIdx: number,
   binaryData: unknown,
   {column}: {column: string}
 ) {
@@ -130,7 +130,7 @@ function getBinaryPropertyByFilterValues(filterValues: unknown[]) {
 }
 
 function getFeatureValue(
-  featureIdIdx: string,
+  featureIdIdx: number,
   binaryData: any,
   filter: {type: FilterType; column: string; values: unknown[]} // TODO(types): What is this?
 ) {
@@ -144,7 +144,7 @@ function getFeatureValue(
 function passesFilterUsingBinary(
   columns: string[],
   filters: Filters,
-  featureIdIdx: string,
+  featureIdIdx: number,
   binaryData: any
 ) {
   return columns.every((column) => {

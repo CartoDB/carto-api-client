@@ -10,7 +10,7 @@ export type TileFeatures = {
   tiles?: Tile[];
   spatialFilter?: SpatialFilter;
   uniqueIdProperty?: string;
-  tileFormat: TileFormat;
+  tileFormat?: TileFormat;
   spatialDataColumn?: string;
   spatialIndex?: SpatialIndex;
   options?: TileFeatureExtractOptions;

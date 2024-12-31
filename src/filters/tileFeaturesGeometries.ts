@@ -73,7 +73,7 @@ export function tileFeaturesGeometries({
   options,
 }: {
   tiles: any;
-  tileFormat: TileFormat;
+  tileFormat?: TileFormat;
   spatialFilter: SpatialFilter;
   uniqueIdProperty?: string;
   options?: {storeGeometry?: boolean};
@@ -174,7 +174,7 @@ function processTileFeatureProperties({
   endIndex: number;
   type: TileGeometryType;
   bbox: BBox;
-  tileFormat: TileFormat;
+  tileFormat?: TileFormat;
   uniqueIdProperty?: string;
   storeGeometry: boolean;
   geometryIntersection?: Geometry;
@@ -238,7 +238,7 @@ function addIntersectedFeaturesInTile({
   geometryIntersection: Geometry;
   type: TileGeometryType;
   bbox: BBox;
-  tileFormat: TileFormat;
+  tileFormat?: TileFormat;
   uniqueIdProperty?: string;
   options?: TileFeatureExtractOptions;
 }) {
@@ -375,7 +375,7 @@ function calculateFeatures({
   data: TileData;
   type: TileGeometryType;
   bbox: BBox;
-  tileFormat: TileFormat;
+  tileFormat?: TileFormat;
   uniqueIdProperty?: string;
   options?: TileFeatureExtractOptions;
 }) {
@@ -420,7 +420,7 @@ function addAllFeaturesInTile({
   data: TileData;
   type: TileGeometryType;
   bbox: BBox;
-  tileFormat: TileFormat;
+  tileFormat?: TileFormat;
   uniqueIdProperty?: string;
   options?: TileFeatureExtractOptions;
 }) {
