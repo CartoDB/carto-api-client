@@ -20,7 +20,6 @@ import {
   TimeSeriesResponse,
 } from './types.js';
 import {InvalidColumnError, getApplicableFilters} from '../utils.js';
-import {Feature} from 'geojson';
 import {applyFilters} from '../filters/Filter.js';
 import {TileFormat} from '../constants.js';
 import {SpatialFilter, Tile} from '../types.js';
@@ -34,6 +33,9 @@ import {scatterPlot} from '../operations/scatterPlot.js';
 import {groupValuesByColumn} from '../operations/groupBy.js';
 import {histogram} from '../operations/histogram.js';
 import {applySorting} from '../operations/applySorting.js';
+import {FeatureData} from '../types-internal.js';
+import {FeatureCollection} from 'geojson';
+import {geojsonFeatures} from '../filters/geosjonFeatures.js';
 
 type LayerTilesetSourceOptions = Omit<TilesetSourceOptions, 'filters'>;
 
@@ -71,7 +73,7 @@ export class WidgetTilesetSource extends WidgetBaseSource<
     };
   }
 
-  private _features: Feature[] = [];
+  private _features: FeatureData[] = [];
 
   loadTiles({
     tiles,
@@ -92,7 +94,23 @@ export class WidgetTilesetSource extends WidgetBaseSource<
       tileFormat: TileFormat.MVT, // TODO(api): Should this be a source/constructor property?
       spatialDataColumn: this.props.geoColumn,
       spatialIndex: undefined, // TODO(api): Could determine from internal properties?
-    }) as Feature[];
+    });
+  }
+
+  loadGeoJSON({
+    geojson,
+    spatialFilter,
+    uniqueIdProperty,
+  }: {
+    geojson: FeatureCollection;
+    spatialFilter: SpatialFilter;
+    uniqueIdProperty?: string;
+  }) {
+    this._features = geojsonFeatures({
+      geojson,
+      spatialFilter,
+      uniqueIdProperty,
+    });
   }
 
   override async getFeatures(
@@ -117,7 +135,7 @@ export class WidgetTilesetSource extends WidgetBaseSource<
     }
 
     // Column is required except when operation is 'count'.
-    if (column || operation !== 'count') {
+    if ((column && column !== '*') || operation !== 'count') {
       assertColumn(this._features, column);
     }
 
@@ -130,8 +148,7 @@ export class WidgetTilesetSource extends WidgetBaseSource<
     const targetOperation = aggregationFunctions[operation];
     return {
       value: targetOperation(
-        // TODO(types): Better types available?
-        filteredFeatures as unknown as Record<string, unknown>[],
+        filteredFeatures as FeatureData[],
         column,
         joinOperation
       ),
@@ -250,12 +267,11 @@ export class WidgetTilesetSource extends WidgetBaseSource<
     }
 
     // Sort.
-    // TODO(types): Mismatch in feature vs. record types.
-    let rows = applySorting(filteredFeatures as any, {
+    let rows = applySorting(filteredFeatures, {
       sortBy,
       sortByDirection: sortDirection,
       sortByColumnType,
-    }) as unknown as Record<string, unknown>[];
+    });
     const totalCount = rows.length;
 
     // Offset and limit.
@@ -265,16 +281,15 @@ export class WidgetTilesetSource extends WidgetBaseSource<
     );
 
     // Select columns.
-    rows = rows.map((srcRow: Record<string, unknown>) => {
-      const dstRow = {} as Record<string, unknown>;
+    rows = rows.map((srcRow: FeatureData) => {
+      const dstRow: FeatureData = {};
       for (const column of columns) {
         dstRow[column] = srcRow[column];
       }
       return dstRow;
     });
 
-    // TODO(types): Mismatch in feature vs. record types.
-    return {rows, totalCount} as unknown as TableResponse;
+    return {rows, totalCount} as TableResponse;
   }
 
   override async getTimeSeries({
@@ -344,7 +359,7 @@ export class WidgetTilesetSource extends WidgetBaseSource<
 }
 
 function assertColumn(
-  features: Feature[],
+  features: FeatureData[],
   ...columnArgs: string[] | string[][]
 ) {
   // TODO(cleanup): Can drop support for multiple column shapes here?

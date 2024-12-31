@@ -51,3 +51,5 @@ export {
   vectorTableSource,
   vectorTilesetSource,
 } from './sources/index.js';
+
+export {applySorting} from './operations/applySorting.js';

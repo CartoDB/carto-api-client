@@ -4,6 +4,7 @@ import bboxClip from '@turf/bbox-clip';
 import {SpatialFilter, SpatialIndexTile} from '../types.js';
 import {BBox, Feature} from 'geojson';
 import {getResolution as h3GetResolution, polygonToCells} from 'h3-js';
+import {FeatureData} from '../types-internal.js';
 
 export type TileFeaturesSpatialIndexOptions = {
   tiles: SpatialIndexTile[];
@@ -17,7 +18,7 @@ export function tileFeaturesSpatialIndex({
   spatialFilter,
   spatialDataColumn,
   spatialIndex,
-}: TileFeaturesSpatialIndexOptions) {
+}: TileFeaturesSpatialIndexOptions): FeatureData[] {
   const map = new Map();
   const resolution = getResolution(tiles, spatialIndex);
   const spatialIndexIDName = spatialDataColumn
@@ -27,11 +28,7 @@ export function tileFeaturesSpatialIndex({
   if (!resolution) {
     return [];
   }
-  const cells = getCellsCoverGeometry(
-    spatialFilter,
-    spatialIndex,
-    resolution
-  );
+  const cells = getCellsCoverGeometry(spatialFilter, spatialIndex, resolution);
 
   if (!cells?.length) {
     return [];
@@ -54,7 +51,10 @@ export function tileFeaturesSpatialIndex({
   return Array.from(map.values());
 }
 
-function getResolution(tiles: SpatialIndexTile[], spatialIndex: SpatialIndex): number | undefined {
+function getResolution(
+  tiles: SpatialIndexTile[],
+  spatialIndex: SpatialIndex
+): number | undefined {
   const data = tiles.find((tile) => tile.data?.length)?.data;
 
   if (!data) {
@@ -88,12 +88,16 @@ function getCellsCoverGeometry(
     // so we clip the geometry to be sure that none of them is greater than 180 degrees
     // https://github.com/uber/h3-js/issues/24#issuecomment-431893796
     return polygonToCells(
-      bboxClip(geometry, bboxWest).geometry.coordinates as number[][] | number[][][],
+      bboxClip(geometry, bboxWest).geometry.coordinates as
+        | number[][]
+        | number[][][],
       resolution,
       true
     ).concat(
       polygonToCells(
-        bboxClip(geometry, bboxEast).geometry.coordinates as number[][] | number[][][],
+        bboxClip(geometry, bboxEast).geometry.coordinates as
+          | number[][]
+          | number[][][],
         resolution,
         true
       )
