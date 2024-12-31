@@ -17,6 +17,7 @@ import {
 import {BBox, SpatialFilter} from '../types.js';
 import {TileFeatureExtractOptions} from './tileFeatures.js';
 import {featureCollection} from '@turf/helpers';
+import {FeatureData} from '../types-internal.js';
 
 export const FEATURE_GEOM_PROPERTY = '__geomValue';
 
@@ -76,7 +77,7 @@ export function tileFeaturesGeometries({
   spatialFilter: SpatialFilter;
   uniqueIdProperty?: string;
   options?: {storeGeometry?: boolean};
-}): unknown[] {
+}): FeatureData[] {
   const map = new Map();
 
   for (const tile of tiles) {
