@@ -157,7 +157,8 @@ export class WidgetTilesetSource extends WidgetBaseSource<
   }
 
   override async getHistogram({
-    operation,
+    // TODO(cleanup): Defaults should be shared among sources.
+    operation = 'count',
     ticks,
     column,
     joinOperation,
@@ -182,7 +183,8 @@ export class WidgetTilesetSource extends WidgetBaseSource<
 
   override async getCategories({
     column,
-    operation,
+    // TODO(cleanup): Defaults should be shared among sources.
+    operation = 'count',
     operationColumn,
     joinOperation,
     filterOwner,
