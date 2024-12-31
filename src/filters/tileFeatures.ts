@@ -5,7 +5,8 @@ import {SpatialIndex, TileFormat} from '../constants';
 import {DEFAULT_GEO_COLUMN} from '../constants-internal';
 import {FeatureData} from '../types-internal';
 
-export type TileFeatureOptions = {
+/** @internalRemarks Source: @carto/react-core */
+export type TileFeatures = {
   tiles?: Tile[];
   spatialFilter?: SpatialFilter;
   uniqueIdProperty?: string;
@@ -15,10 +16,12 @@ export type TileFeatureOptions = {
   options?: TileFeatureExtractOptions;
 };
 
+/** @internalRemarks Source: @carto/react-core */
 export type TileFeatureExtractOptions = {
   storeGeometry?: boolean;
 };
 
+/** @internalRemarks Source: @carto/react-core */
 export function tileFeatures({
   tiles,
   spatialFilter,
@@ -27,7 +30,7 @@ export function tileFeatures({
   spatialDataColumn = DEFAULT_GEO_COLUMN,
   spatialIndex,
   options = {},
-}: TileFeatureOptions): FeatureData[] {
+}: TileFeatures): FeatureData[] {
   // TODO(api): SpatialFilter should either be a required parameter, or
   // omitting it should be valid (no filtering).
   if (!spatialFilter) {

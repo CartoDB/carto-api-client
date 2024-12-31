@@ -1,12 +1,27 @@
 import {aggregationFunctions, aggregate} from './aggregation.js';
+import {AggregationType} from '../types';
+import {FeatureData} from '../types-internal';
 
+/** @internalRemarks Source: @carto/react-core */
+export type GroupByFeature = {
+  name: string;
+  value: number;
+}[];
+
+/** @internalRemarks Source: @carto/react-core */
 export function groupValuesByColumn({
   data,
   valuesColumns,
   joinOperation,
   keysColumn,
   operation,
-}) {
+}: {
+  data: FeatureData[];
+  valuesColumns?: string[];
+  joinOperation?: AggregationType;
+  keysColumn: string;
+  operation: AggregationType;
+}): GroupByFeature | null {
   if (Array.isArray(data) && data.length === 0) {
     return null;
   }
@@ -30,7 +45,8 @@ export function groupValuesByColumn({
     return accumulator;
   }, new Map()); // We use a map to be able to maintain the type in the key value
 
-  const targetOperation = aggregationFunctions[operation];
+  const targetOperation =
+    aggregationFunctions[operation as Exclude<AggregationType, 'custom'>];
 
   if (targetOperation) {
     return Array.from(groups).map(([name, value]) => ({

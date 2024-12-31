@@ -1,7 +1,7 @@
 import {AggregationType, GroupDateType} from '../types.js';
 import {getUTCMonday} from '../utils/dateUtils.js';
 import {aggregate, aggregationFunctions} from './aggregation.js';
-import {GroupByFeature} from './types.js';
+import {GroupByFeature} from './groupBy.js';
 
 const GROUP_KEY_FN_MAPPING: Record<GroupDateType, (date: Date) => number> = {
   year: (date: Date) => Date.UTC(date.getUTCFullYear()),
@@ -35,6 +35,7 @@ const GROUP_KEY_FN_MAPPING: Record<GroupDateType, (date: Date) => number> = {
     ),
 };
 
+/** @internalRemarks Source: @carto/react-core */
 export function groupValuesByDateColumn({
   data,
   valuesColumns,
@@ -87,8 +88,8 @@ export function groupValuesByDateColumn({
     return acc;
   }, new Map());
 
-  // @ts-expect-error TODO(cleanup)
-  const targetOperation = aggregationFunctions[operation];
+  const targetOperation =
+    aggregationFunctions[operation as Exclude<AggregationType, 'custom'>];
 
   if (targetOperation) {
     return [...groups.entries()]

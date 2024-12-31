@@ -1,8 +1,8 @@
-import {Feature} from 'geojson';
 import {firstBy} from 'thenby';
 import {SortDirection} from '../types';
 import {FeatureData} from '../types-internal';
 
+// TODO(cleanup): Could this be simplified?
 type SortColumns = string | string[] | object[];
 
 interface SortOptions {
@@ -19,6 +19,7 @@ interface SortOptions {
  * @param [sortOptions.sortByDirection] - Direction by the columns will be sorted
  * @param [sortOptions.sortByColumnType] - Column type
  * @internal
+ * @internalRemarks Source: @carto/react-core
  */
 export function applySorting(
   features: FeatureData[],
