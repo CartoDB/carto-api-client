@@ -797,7 +797,7 @@ describe('viewport features with binary mode', () => {
     ];
 
     test.skip('transformToTileCoords should only be called if format is mvt', () => {
-      // TODO(test): Cannot spy on functions in bundled builds, need to refactor this test.
+      // TODO: Cannot spy on functions in bundled builds, need to refactor this test.
       const transformToTileCoordsSpy = vi.fn();
 
       tileFeatures({
@@ -825,7 +825,7 @@ describe('viewport features with binary mode', () => {
     });
 
     test.skip('transformTileCoordsToWGS84 should only be called if format is mvt and storeGeometry option is true', () => {
-      // TODO(test): Cannot spy on functions in bundled builds, need to refactor this test.
+      // TODO: Cannot spy on functions in bundled builds, need to refactor this test.
       const transformTileCoordsToWGS84Spy = vi.fn();
 
       tileFeatures({
