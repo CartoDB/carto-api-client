@@ -125,7 +125,7 @@ export interface TableRequestOptions extends BaseRequestOptions {
 /** Options for {@link WidgetBaseSource#getTimeSeries}. */
 export interface TimeSeriesRequestOptions extends BaseRequestOptions {
   column: string;
-  stepSize?: GroupDateType;
+  stepSize: GroupDateType;
   stepMultiplier?: number;
   operation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
   operationColumn?: string;

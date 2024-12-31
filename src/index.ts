@@ -2,7 +2,6 @@ export * from './client.js';
 export * from './constants.js';
 export * from './filters.js';
 export * from './geo.js';
-export * from './operations/index.js';
 export * from './sources/index.js';
 export * from './widget-sources/index.js';
 export * from './types.js';
@@ -18,4 +17,8 @@ export {
   requestWithParameters,
 } from './api/index.js';
 
-export {applySorting} from './operations/applySorting.js';
+// For unit testing only.
+export * from './filters/index.js';
+export * from './operations/index.js';
+export * from './utils/makeIntervalComplete.js';
+export * from './utils/transformToTileCoords.js';
