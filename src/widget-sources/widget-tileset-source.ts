@@ -234,7 +234,6 @@ export class WidgetTilesetSource extends WidgetBaseSource<
     });
   }
 
-  // TODO(bug): Different results compared to API! Needs sort?
   override async getTable(
     options: TableRequestOptions
   ): Promise<TableResponse> {
@@ -349,15 +348,12 @@ export class WidgetTilesetSource extends WidgetBaseSource<
    * INTERNAL
    */
 
-  // TODO(types): Better return type available?
-  private _getFilteredFeatures(
-    filterOwner: string | undefined
-  ): Record<string, unknown>[] {
+  private _getFilteredFeatures(filterOwner: string | undefined): FeatureData[] {
     return applyFilters(
       this._features,
       getApplicableFilters(filterOwner, this.props.filters),
       this.props.filtersLogicalOperator || 'and'
-    ) as unknown as Record<string, unknown>[];
+    );
   }
 }
 
