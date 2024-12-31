@@ -50,7 +50,7 @@ export type {
 } from './h3-tileset-source';
 
 export {rasterSource} from './raster-source';
-export type {RasterSourceOptions, RasterSourceResponse} from './raster-source';
+export type {RasterSourceOptions} from './raster-source';
 
 export {quadbinQuerySource} from './quadbin-query-source';
 export type {
