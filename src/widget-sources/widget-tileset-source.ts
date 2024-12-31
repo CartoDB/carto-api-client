@@ -45,18 +45,19 @@ export type WidgetTilesetSourceResult = {widgetSource: WidgetTilesetSource};
  * Source for Widget API requests on a data source defined by a tileset.
  *
  * Generally not intended to be constructed directly. Instead, call
- * {@link rasterSource}, which can be shared with map layers. Sources contain a
- * `widgetSource` property, for use by widget implementations.
+ * {@link vectorTilesetSource}, {@link h3TilesetSource}, or {@link quadbinTilesetSource},
+ * which can be shared with map layers. Sources contain a `widgetSource`
+ * property, for use by widget implementations.
  *
  * Example:
  *
  * ```javascript
- * import { rasterSource } from '@carto/api-client';
+ * import { vectorTilesetSource } from '@carto/api-client';
  *
- * const data = rasterSource({
+ * const data = vectorTilesetSource({
  *   accessToken: '••••',
  *   connectionName: 'carto_dw',
- *   tableName: 'carto-demo-data.demo_rasters.my_raster_source'
+ *   tableName: 'carto-demo-data.demo_rasters.my_tileset_source'
  * });
  *
  * const { widgetSource } = await data;
