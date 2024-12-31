@@ -46,16 +46,15 @@ export function groupValuesByDateColumn({
 }: {
   data: Record<string, unknown>[];
   valuesColumns?: string[];
-  joinOperation?: AggregationType;
-  keysColumn?: string;
-  groupType?: GroupDateType;
-  operation?: AggregationType;
+  joinOperation?: Exclude<AggregationType, 'custom'>;
+  keysColumn: string;
+  groupType: GroupDateType;
+  operation?: Exclude<AggregationType, 'custom'>;
 }): GroupByFeature | null {
   if (Array.isArray(data) && data.length === 0) {
     return null;
   }
 
-  // @ts-expect-error TODO(cleanup)
   const groupKeyFn = GROUP_KEY_FN_MAPPING[groupType];
 
   if (!groupKeyFn) {
@@ -63,9 +62,8 @@ export function groupValuesByDateColumn({
   }
 
   const groups = data.reduce((acc, item) => {
-    // @ts-expect-error TODO(cleanup)
     const value = item[keysColumn];
-    const formattedValue = new Date(value);
+    const formattedValue = new Date(value as number);
     const groupKey = groupKeyFn(formattedValue);
 
     if (!isNaN(groupKey)) {
@@ -91,14 +89,10 @@ export function groupValuesByDateColumn({
   const targetOperation =
     aggregationFunctions[operation as Exclude<AggregationType, 'custom'>];
 
-  if (targetOperation) {
-    return [...groups.entries()]
-      .map(([name, value]) => ({
-        name,
-        value: targetOperation(value),
-      }))
-      .sort((a, b) => a.name - b.name);
-  }
-
-  return [];
+  return [...groups.entries()]
+    .map(([name, value]) => ({
+      name,
+      value: targetOperation(value),
+    }))
+    .sort((a, b) => a.name - b.name);
 }
