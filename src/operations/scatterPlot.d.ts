@@ -1,8 +1,9 @@
 // TODO(types): Check what ScatterPlotFeature is.
 import {AggregationType, ScatterPlotFeature} from '../types';
+import {FeatureData} from '../types-internal';
 
 export function scatterPlot(args: {
-  data: Record<string, unknown>[];
+  data: FeatureData[];
   xAxisColumns: string[];
   xAxisJoinOperation?: AggregationType;
   yAxisColumns: string[];

@@ -25,6 +25,7 @@ export type Tile = {
   id: string;
   content: unknown;
   zoom: number;
+  bbox: BBox;
   boundingBox: [min: number[], max: number[]];
   isVisible: boolean;
   data?: unknown;

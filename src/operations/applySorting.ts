@@ -1,6 +1,7 @@
 import {Feature} from 'geojson';
 import {firstBy} from 'thenby';
 import {SortDirection} from '../types';
+import {FeatureData} from '../types-internal';
 
 type SortColumns = string | string[] | object[];
 
@@ -17,15 +18,16 @@ interface SortOptions {
  * @param [sortOptions.sortBy] - One or more columns to sort by
  * @param [sortOptions.sortByDirection] - Direction by the columns will be sorted
  * @param [sortOptions.sortByColumnType] - Column type
+ * @internal
  */
 export function applySorting(
-  features: Feature[],
+  features: FeatureData[],
   {
     sortBy,
     sortByDirection = 'asc',
     sortByColumnType = 'string',
   }: SortOptions = {}
-): Feature[] {
+): FeatureData[] {
   // If sortBy is undefined, pass all features
   if (sortBy === undefined) {
     return features;
