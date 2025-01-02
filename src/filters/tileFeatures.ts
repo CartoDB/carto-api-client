@@ -31,8 +31,8 @@ export function tileFeatures({
   spatialIndex,
   options = {},
 }: TileFeatures): FeatureData[] {
-  // TODO(api): SpatialFilter should either be a required parameter, or
-  // omitting it should be valid (no filtering).
+  // TODO(cleanup): Is an empty response the expected result when spatialFilter
+  // is omitted? Why not make the parameter required, or return the full input?
   if (!spatialFilter) {
     return [];
   }

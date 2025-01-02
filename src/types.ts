@@ -89,7 +89,11 @@ export interface Filter {
   /** [a, b) a is included, b is not. */
   [FilterType.CLOSED_OPEN]?: {owner?: string; values: number[][]};
   [FilterType.TIME]?: {owner?: string; values: number[][]};
-  [FilterType.STRING_SEARCH]?: {owner?: string; values: string[]};
+  [FilterType.STRING_SEARCH]?: {
+    owner?: string;
+    values: string[];
+    params?: StringSearchOptions;
+  };
 }
 
 /** @internalRemarks Source: @carto/react-core */
@@ -102,6 +106,14 @@ export type FilterLogicalOperator = 'and' | 'or';
 export type FilterIntervalExtremum = number | null | undefined;
 export type FilterInterval = [FilterIntervalExtremum, FilterIntervalExtremum];
 export type FilterIntervalComplete = [number, number];
+
+export type StringSearchOptions = {
+  useRegExp?: boolean;
+  mustStart?: boolean;
+  mustEnd?: boolean;
+  caseSensitive?: boolean;
+  keepSpecialCharacters?: boolean;
+};
 
 /******************************************************************************
  * GROUPING

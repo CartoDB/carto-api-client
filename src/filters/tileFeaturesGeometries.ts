@@ -18,47 +18,16 @@ import {BBox, SpatialFilter} from '../types.js';
 import {TileFeatureExtractOptions} from './tileFeatures.js';
 import {featureCollection} from '@turf/helpers';
 import {FeatureData} from '../types-internal.js';
+import {
+  TileAccessor,
+  TileData,
+  TileGeometryType,
+  TileMap,
+  TileTypedArrayConstructor,
+} from './types.js';
 
 export const FEATURE_GEOM_PROPERTY = '__geomValue';
 
-type TileTypedArray =
-  | Float32Array
-  | Uint32Array
-  | Uint16Array
-  | Uint8Array
-  | Int32Array
-  | Int16Array
-  | Int8Array;
-
-type TileTypedArrayConstructor =
-  | Float32ArrayConstructor
-  | Uint32ArrayConstructor
-  | Uint16ArrayConstructor
-  | Uint8ArrayConstructor
-  | Int32ArrayConstructor
-  | Int16ArrayConstructor
-  | Int8ArrayConstructor;
-
-// TODO(types): What is this actually?
-type TileMap = Map<unknown, unknown>;
-
-type TileAccessor = {value: TileTypedArray; size: number};
-
-type TileGeometryType = 'Point' | 'LineString' | 'Polygon';
-
-// TODO(types): What is this actually? Is it external?
-type TileData = {
-  properties: Record<string, unknown>;
-  numericProps?: Record<string, TileAccessor>;
-  fields?: Record<string, Record<string, unknown>>;
-  featureIds: TileAccessor;
-  positions: TileAccessor;
-  primitivePolygonIndices?: TileAccessor;
-  pathIndices?: TileAccessor;
-  pointIndices?: TileAccessor;
-};
-
-// TODO(types): What is this actually? Is it only internal?
 type TileDataInternal = {
   uniqueId: string | number | undefined;
   properties: any;
