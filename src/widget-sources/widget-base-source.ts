@@ -16,8 +16,9 @@ import {
   TableResponse,
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
+  ViewState,
 } from './types.js';
-import {FilterLogicalOperator, Filter} from '../types.js';
+import {FilterLogicalOperator, Filter, SpatialFilter} from '../types.js';
 import {getApplicableFilters, normalizeObjectKeys} from '../utils.js';
 import {getClient} from '../client.js';
 import {ModelSource} from '../models/model.js';
@@ -81,6 +82,25 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     };
   }
 
+  protected _getSpatialFiltersResolution(
+    source: Omit<ModelSource, 'type' | 'data'>,
+    spatialFilter?: SpatialFilter,
+    referenceViewState?: ViewState
+  ): number | undefined {
+    // spatialFiltersResolution applies only to spatial index sources.
+    if (!spatialFilter || source.spatialDataType === 'geo') {
+      return;
+    }
+
+    if (!referenceViewState) {
+      throw new Error(
+        'Missing required option, "spatialIndexReferenceViewState".'
+      );
+    }
+
+    return getSpatialFiltersResolution(source, referenceViewState);
+  }
+
   /****************************************************************************
    * CATEGORIES
    */
@@ -102,14 +122,11 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     } = options;
     const {column, operation, operationColumn} = params;
     const source = this.getModelSource(filterOwner);
-
-    let spatialFiltersResolution: number | undefined;
-    if (spatialFilter && source.spatialDataType !== 'geo') {
-      spatialFiltersResolution = getSpatialFiltersResolution({
-        source,
-        viewState: spatialIndexReferenceViewState,
-      });
-    }
+    const spatialFiltersResolution = this._getSpatialFiltersResolution(
+      source,
+      spatialFilter,
+      spatialIndexReferenceViewState
+    );
 
     type CategoriesModelResponse = {rows: {name: string; value: number}[]};
 
@@ -155,14 +172,11 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     } = options;
     const {columns, dataType, featureIds, z, limit, tileResolution} = params;
     const source = this.getModelSource(filterOwner);
-
-    let spatialFiltersResolution: number | undefined;
-    if (spatialFilter && source.spatialDataType !== 'geo') {
-      spatialFiltersResolution = getSpatialFiltersResolution({
-        source,
-        viewState: spatialIndexReferenceViewState,
-      });
-    }
+    const spatialFiltersResolution = this._getSpatialFiltersResolution(
+      source,
+      spatialFilter,
+      spatialIndexReferenceViewState
+    );
 
     type FeaturesModelResponse = {rows: Record<string, unknown>[]};
 
@@ -207,14 +221,11 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     } = options;
     const {column, operation} = params;
     const source = this.getModelSource(filterOwner);
-
-    let spatialFiltersResolution: number | undefined;
-    if (spatialFilter && source.spatialDataType !== 'geo') {
-      spatialFiltersResolution = getSpatialFiltersResolution({
-        source,
-        viewState: spatialIndexReferenceViewState,
-      });
-    }
+    const spatialFiltersResolution = this._getSpatialFiltersResolution(
+      source,
+      spatialFilter,
+      spatialIndexReferenceViewState
+    );
 
     type FormulaModelResponse = {rows: {value: number}[]};
 
@@ -252,14 +263,11 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     } = options;
     const {column, operation, ticks} = params;
     const source = this.getModelSource(filterOwner);
-
-    let spatialFiltersResolution: number | undefined;
-    if (spatialFilter && source.spatialDataType !== 'geo') {
-      spatialFiltersResolution = getSpatialFiltersResolution({
-        source,
-        viewState: spatialIndexReferenceViewState,
-      });
-    }
+    const spatialFiltersResolution = this._getSpatialFiltersResolution(
+      source,
+      spatialFilter,
+      spatialIndexReferenceViewState
+    );
 
     type HistogramModelResponse = {rows: {tick: number; value: number}[]};
 
@@ -308,14 +316,11 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     } = options;
     const {column} = params;
     const source = this.getModelSource(filterOwner);
-
-    let spatialFiltersResolution: number | undefined;
-    if (spatialFilter && source.spatialDataType !== 'geo') {
-      spatialFiltersResolution = getSpatialFiltersResolution({
-        source,
-        viewState: spatialIndexReferenceViewState,
-      });
-    }
+    const spatialFiltersResolution = this._getSpatialFiltersResolution(
+      source,
+      spatialFilter,
+      spatialIndexReferenceViewState
+    );
 
     type RangeModelResponse = {rows: {min: number; max: number}[]};
 
@@ -353,14 +358,11 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       params;
 
     const source = this.getModelSource(filterOwner);
-
-    let spatialFiltersResolution: number | undefined;
-    if (spatialFilter && source.spatialDataType !== 'geo') {
-      spatialFiltersResolution = getSpatialFiltersResolution({
-        source,
-        viewState: spatialIndexReferenceViewState,
-      });
-    }
+    const spatialFiltersResolution = this._getSpatialFiltersResolution(
+      source,
+      spatialFilter,
+      spatialIndexReferenceViewState
+    );
 
     // Make sure this is sync with the same constant in cloud-native/maps-api
     const HARD_LIMIT = 500;
@@ -407,14 +409,11 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     } = options;
     const {columns, sortBy, sortDirection, offset = 0, limit = 10} = params;
     const source = this.getModelSource(filterOwner);
-
-    let spatialFiltersResolution: number | undefined;
-    if (spatialFilter && source.spatialDataType !== 'geo') {
-      spatialFiltersResolution = getSpatialFiltersResolution({
-        source,
-        viewState: spatialIndexReferenceViewState,
-      });
-    }
+    const spatialFiltersResolution = this._getSpatialFiltersResolution(
+      source,
+      spatialFilter,
+      spatialIndexReferenceViewState
+    );
 
     type TableModelResponse = {
       rows: Record<string, number | string>[];
@@ -476,14 +475,11 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     } = params;
 
     const source = this.getModelSource(filterOwner);
-
-    let spatialFiltersResolution: number | undefined;
-    if (spatialFilter && source.spatialDataType !== 'geo') {
-      spatialFiltersResolution = getSpatialFiltersResolution({
-        source,
-        viewState: spatialIndexReferenceViewState,
-      });
-    }
+    const spatialFiltersResolution = this._getSpatialFiltersResolution(
+      source,
+      spatialFilter,
+      spatialIndexReferenceViewState
+    );
 
     type TimeSeriesModelResponse = {
       rows: {name: string; value: number}[];

@@ -10,18 +10,10 @@ import type {ViewState} from './widget-sources';
 const DEFAULT_TILE_SIZE = 512;
 const QUADBIN_ZOOM_MAX_OFFSET = 4;
 
-export function getSpatialFiltersResolution({
-  source,
-  viewState,
-}: {
-  source: Partial<ModelSource & AggregationOptions>;
-  viewState?: ViewState;
-}) {
-  assert(
-    viewState,
-    'viewState prop is required to compute automatic spatialFiltersResolution when using spatialFilter with spatial indexes. Either pass a `spatialFiltersResolution` prop or a `viewState` prop to avoid this error'
-  );
-
+export function getSpatialFiltersResolution(
+  source: Partial<ModelSource & AggregationOptions>,
+  viewState: ViewState
+): number | undefined {
   const dataResolution = source.dataResolution ?? Number.MAX_VALUE;
 
   const aggregationResLevel =
