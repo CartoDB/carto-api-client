@@ -18,9 +18,11 @@ type UrlParameters = {
   filters?: Record<string, unknown>;
 };
 
+export type RasterSourceResponse = TilejsonResult;
+
 export const rasterSource = async function (
   options: RasterSourceOptions
-): Promise<TilejsonResult> {
+): Promise<RasterSourceResponse> {
   const {tableName, filters} = options;
   const urlParameters: UrlParameters = {name: tableName};
   if (filters) {
@@ -30,5 +32,5 @@ export const rasterSource = async function (
     'raster',
     options,
     urlParameters
-  ) as Promise<TilejsonResult>;
+  ) as Promise<RasterSourceResponse>;
 };

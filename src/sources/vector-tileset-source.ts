@@ -12,9 +12,11 @@ import type {
 export type VectorTilesetSourceOptions = SourceOptions & TilesetSourceOptions;
 type UrlParameters = {name: string};
 
+export type VectorTilesetSourceResponse = TilejsonResult;
+
 export const vectorTilesetSource = async function (
   options: VectorTilesetSourceOptions
-): Promise<TilejsonResult> {
+): Promise<VectorTilesetSourceResponse> {
   const {tableName} = options;
   const urlParameters: UrlParameters = {name: tableName};
 
@@ -22,5 +24,5 @@ export const vectorTilesetSource = async function (
     'tileset',
     options,
     urlParameters
-  ) as Promise<TilejsonResult>;
+  ) as Promise<VectorTilesetSourceResponse>;
 };

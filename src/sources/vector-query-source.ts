@@ -31,11 +31,15 @@ type UrlParameters = {
   tileResolution?: string;
   q: string;
   queryParameters?: Record<string, unknown> | unknown[];
+  aggregationExp?: string;
 };
+
+export type VectorQuerySourceResponse = TilejsonResult &
+  WidgetQuerySourceResult;
 
 export const vectorQuerySource = async function (
   options: VectorQuerySourceOptions
-): Promise<TilejsonResult & WidgetQuerySourceResult> {
+): Promise<VectorQuerySourceResponse> {
   const {
     columns,
     filters,
@@ -43,6 +47,7 @@ export const vectorQuerySource = async function (
     sqlQuery,
     tileResolution = DEFAULT_TILE_RESOLUTION,
     queryParameters,
+    aggregationExp,
   } = options;
 
   const urlParameters: UrlParameters = {
@@ -60,6 +65,9 @@ export const vectorQuerySource = async function (
   }
   if (queryParameters) {
     urlParameters.queryParameters = queryParameters;
+  }
+  if (aggregationExp) {
+    urlParameters.aggregationExp = aggregationExp;
   }
   return baseSource<UrlParameters>('query', options, urlParameters).then(
     (result) => ({

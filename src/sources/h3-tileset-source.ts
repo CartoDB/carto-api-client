@@ -12,9 +12,11 @@ import type {
 export type H3TilesetSourceOptions = SourceOptions & TilesetSourceOptions;
 type UrlParameters = {name: string};
 
+export type H3TilesetSourceResponse = TilejsonResult;
+
 export const h3TilesetSource = async function (
   options: H3TilesetSourceOptions
-): Promise<TilejsonResult> {
+): Promise<H3TilesetSourceResponse> {
   const {tableName} = options;
   const urlParameters: UrlParameters = {name: tableName};
 
@@ -22,5 +24,5 @@ export const h3TilesetSource = async function (
     'tileset',
     options,
     urlParameters
-  ) as Promise<TilejsonResult>;
+  ) as Promise<H3TilesetSourceResponse>;
 };

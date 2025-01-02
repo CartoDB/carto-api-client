@@ -30,9 +30,12 @@ type UrlParameters = {
   filters?: Record<string, unknown>;
 };
 
+export type QuadbinQuerySourceResponse = TilejsonResult &
+  WidgetQuerySourceResult;
+
 export const quadbinQuerySource = async function (
   options: QuadbinQuerySourceOptions
-): Promise<TilejsonResult & WidgetQuerySourceResult> {
+): Promise<QuadbinQuerySourceResponse> {
   const {
     aggregationExp,
     aggregationResLevel = DEFAULT_AGGREGATION_RES_LEVEL_QUADBIN,

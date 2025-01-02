@@ -187,9 +187,8 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
         tileResolution: tileResolution || DEFAULT_TILE_RESOLUTION,
       },
       opts: {abortController},
-    }).then((res: FeaturesModelResponse) => ({
-      rows: normalizeObjectKeys(res.rows),
-    }));
+      // Avoid `normalizeObjectKeys()`, which changes column names.
+    }).then(({rows}: FeaturesModelResponse) => ({rows}));
   }
 
   /****************************************************************************
