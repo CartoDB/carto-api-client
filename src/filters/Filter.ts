@@ -3,7 +3,7 @@ import {Filter, FilterLogicalOperator, Filters} from '../types';
 import {Feature} from 'geojson';
 import {FilterType} from '../constants';
 import {FeatureData} from '../types-internal';
-import {TileData} from './types';
+import {BinaryFeature} from '@loaders.gl/schema';
 
 const LOGICAL_OPERATOR_METHODS: Record<
   FilterLogicalOperator,
@@ -93,13 +93,13 @@ export function buildBinaryFeatureFilter({filters = {}}: {filters: Filters}) {
     return () => 1;
   }
 
-  return (featureIdIdx: number, binaryData: TileData) =>
+  return (featureIdIdx: number, binaryData: BinaryFeature) =>
     passesFilterUsingBinary(columns, filters, featureIdIdx, binaryData);
 }
 
 function getValueFromNumericProps(
   featureIdIdx: number,
-  binaryData: TileData,
+  binaryData: BinaryFeature,
   {column}: {column: string}
 ) {
   return binaryData.numericProps?.[column]?.value[featureIdIdx];
@@ -107,7 +107,7 @@ function getValueFromNumericProps(
 
 function getValueFromProperties(
   featureIdIdx: number,
-  binaryData: TileData,
+  binaryData: BinaryFeature,
   {column}: {column: string}
 ) {
   const propertyIdx = binaryData.featureIds.value[featureIdIdx];
@@ -142,7 +142,7 @@ function passesFilterUsingBinary(
   columns: string[],
   filters: Filters,
   featureIdIdx: number,
-  binaryData: TileData
+  binaryData: BinaryFeature
 ) {
   return columns.every((column) => {
     const columnFilters = filters[column];
