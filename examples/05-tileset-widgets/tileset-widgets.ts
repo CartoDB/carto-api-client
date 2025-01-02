@@ -85,15 +85,7 @@ function updateLayers() {
       const viewport = new WebMercatorViewport(viewState);
       const spatialFilter = createViewportSpatialFilter(viewport.getBounds())!;
       data.widgetSource.loadTiles({tiles, spatialFilter});
-      updateWidgets(); // TODO: OK?
-
-      // TODO: Force widget refresh, somehow... need a new WidgetTilesetSource instance?
-
-      // TODO: Or can we wait for tiles to load, awaiting in getFormula until then?
-      // ...does viewstate change imply that an onViewportLoad event is coming?
-
-      // TODO: Maybe this is an argument for re-creating the class, or similar, rather
-      // than tying its lifecycle to the source/tilejson?
+      updateWidgets();
     },
   });
 
@@ -102,7 +94,7 @@ function updateLayers() {
 
 function updateWidgets() {
   for (const widget of widgets) {
-    widget.data = Promise.resolve(data); // TODO: Awkward to resolve, may force re-fetch.
+    widget.data = Promise.resolve(data);
     widget.viewState = viewState;
   }
 }
