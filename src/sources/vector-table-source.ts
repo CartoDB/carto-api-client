@@ -3,7 +3,10 @@
 // Copyright (c) vis.gl contributors
 
 /* eslint-disable camelcase */
-import {DEFAULT_TILE_RESOLUTION} from '../constants-internal.js';
+import {
+  DEFAULT_GEO_COLUMN,
+  DEFAULT_TILE_RESOLUTION,
+} from '../constants-internal.js';
 import {
   WidgetTableSource,
   WidgetTableSourceResult,
@@ -42,7 +45,7 @@ export const vectorTableSource = async function (
   const {
     columns,
     filters,
-    spatialDataColumn = 'geom',
+    spatialDataColumn = DEFAULT_GEO_COLUMN,
     tableName,
     tileResolution = DEFAULT_TILE_RESOLUTION,
     aggregationExp,
@@ -69,6 +72,7 @@ export const vectorTableSource = async function (
       ...(result as TilejsonResult),
       widgetSource: new WidgetTableSource({
         ...options,
+        spatialDataColumn,
         spatialDataType: 'geo',
       }),
     })
