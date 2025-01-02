@@ -1,8 +1,9 @@
 import {filterFunctions} from './FilterTypes';
-import {FilterLogicalOperator, Filters} from '../types';
+import {Filter, FilterLogicalOperator, Filters} from '../types';
 import {Feature} from 'geojson';
 import {FilterType} from '../constants';
 import {FeatureData} from '../types-internal';
+import {TileData} from './types';
 
 const LOGICAL_OPERATOR_METHODS: Record<
   FilterLogicalOperator,
@@ -37,8 +38,7 @@ function passesFilter(
       return filterFunction(
         columnFilters[filter]!.values,
         feature[column],
-        // TODO(types): Better types available?
-        (columnFilters[filter] as any).params
+        (columnFilters[filter] as Filter[FilterType.STRING_SEARCH])!.params
       );
     });
   });
@@ -50,7 +50,7 @@ export function buildFeatureFilter({
   filtersLogicalOperator = 'and',
 }: {
   filters?: Filters;
-  type?: string; // TODO
+  type?: 'number' | 'boolean';
   filtersLogicalOperator?: FilterLogicalOperator;
 }) {
   const columns = Object.keys(filters);
@@ -59,13 +59,12 @@ export function buildFeatureFilter({
     return () => (type === 'number' ? 1 : true);
   }
 
-  return (feature: Record<string, unknown> | Feature) => {
-    // TODO(types)
+  return (feature: Feature | FeatureData) => {
     const f = feature.properties || feature;
     const featurePassesFilter = passesFilter(
       columns,
       filters,
-      f as Record<string, unknown>, // TODO(types)
+      f as FeatureData,
       filtersLogicalOperator
     );
 
@@ -94,28 +93,27 @@ export function buildBinaryFeatureFilter({filters = {}}: {filters: Filters}) {
     return () => 1;
   }
 
-  return (featureIdIdx: number, binaryData: unknown) =>
+  return (featureIdIdx: number, binaryData: TileData) =>
     passesFilterUsingBinary(columns, filters, featureIdIdx, binaryData);
 }
 
 function getValueFromNumericProps(
   featureIdIdx: number,
-  binaryData: unknown,
+  binaryData: TileData,
   {column}: {column: string}
 ) {
-  // TODO(types): What is this type?
-  return (binaryData as any).numericProps[column]?.value[featureIdIdx];
+  return binaryData.numericProps?.[column]?.value[featureIdIdx];
 }
 
 function getValueFromProperties(
   featureIdIdx: number,
-  binaryData: unknown,
+  binaryData: TileData,
   {column}: {column: string}
 ) {
-  // TODO(types): What is this type?
-  const propertyIdx = (binaryData as any).featureIds.value[featureIdIdx];
-  // TODO(types): What is this type?
-  return (binaryData as any).properties[propertyIdx]?.[column];
+  const propertyIdx = binaryData.featureIds.value[featureIdIdx];
+  return (binaryData.properties[propertyIdx] as Record<string, unknown>)?.[
+    column
+  ];
 }
 
 const GET_VALUE_BY_BINARY_PROP = {
@@ -132,7 +130,7 @@ function getBinaryPropertyByFilterValues(filterValues: unknown[]) {
 function getFeatureValue(
   featureIdIdx: number,
   binaryData: any,
-  filter: {type: FilterType; column: string; values: unknown[]} // TODO(types): What is this?
+  filter: {type: FilterType; column: string; values: unknown[]}
 ) {
   const {column, values} = filter;
   const binaryProp = getBinaryPropertyByFilterValues(values);
@@ -140,12 +138,11 @@ function getFeatureValue(
   return getFeatureValueFn(featureIdIdx, binaryData, {column});
 }
 
-// TODO(types): Types for binaryData?
 function passesFilterUsingBinary(
   columns: string[],
   filters: Filters,
   featureIdIdx: number,
-  binaryData: any
+  binaryData: TileData
 ) {
   return columns.every((column) => {
     const columnFilters = filters[column];
