@@ -4,9 +4,9 @@ import {
   tileFeatures,
   createViewportSpatialFilter,
   Viewport,
+  Tile,
   TileFormat,
   FEATURE_GEOM_PROPERTY,
-  Tile,
 } from '@carto/api-client';
 import {
   Feature,
@@ -59,7 +59,7 @@ describe('viewport features with binary mode', () => {
       const mockedTiles = [{isVisible: false, data: [{}]}];
 
       const properties = tileFeatures({
-        tiles: mockedTiles as Tile[],
+        tiles: mockedTiles as unknown as Tile[],
         spatialFilter,
       });
       expect(properties).toEqual([]);

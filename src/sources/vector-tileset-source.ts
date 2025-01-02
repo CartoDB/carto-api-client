@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
+import {getTileFormat} from '../utils/getTileFormat';
 import {
   WidgetTilesetSource,
   WidgetTilesetSourceResult,
@@ -28,7 +29,10 @@ export const vectorTilesetSource = async function (
   return baseSource<UrlParameters>('tileset', options, urlParameters).then(
     (result) => ({
       ...(result as TilejsonResult),
-      widgetSource: new WidgetTilesetSource(options),
+      widgetSource: new WidgetTilesetSource({
+        ...options,
+        tileFormat: getTileFormat(result as TilejsonResult),
+      }),
     })
   ) as Promise<VectorTilesetSourceResponse>;
 };

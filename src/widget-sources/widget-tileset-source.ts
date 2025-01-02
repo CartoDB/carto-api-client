@@ -20,7 +20,7 @@ import {
   TimeSeriesResponse,
 } from './types.js';
 import {InvalidColumnError, getApplicableFilters} from '../utils.js';
-import {TileFormat} from '../constants.js';
+import {SpatialIndex, TileFormat} from '../constants.js';
 import {SpatialFilter, Tile} from '../types.js';
 import {
   TileFeatureExtractOptions,
@@ -42,6 +42,12 @@ import {FeatureCollection} from 'geojson';
 type LayerTilesetSourceOptions = Omit<TilesetSourceOptions, 'filters'>;
 
 export type WidgetTilesetSourceResult = {widgetSource: WidgetTilesetSource};
+
+export type WidgetTilesetSourceOptions = LayerTilesetSourceOptions &
+  WidgetBaseSourceProps & {
+    tileFormat: TileFormat;
+    spatialIndex?: SpatialIndex;
+  };
 
 /**
  * Source for Widget API requests on a data source defined by a tileset.
@@ -65,9 +71,7 @@ export type WidgetTilesetSourceResult = {widgetSource: WidgetTilesetSource};
  * const { widgetSource } = await data;
  * ```
  */
-export class WidgetTilesetSource extends WidgetBaseSource<
-  LayerTilesetSourceOptions & WidgetBaseSourceProps
-> {
+export class WidgetTilesetSource extends WidgetBaseSource<WidgetTilesetSourceOptions> {
   protected override getModelSource(owner: string): ModelSource {
     return {
       ...super._getModelSource(owner),
@@ -86,6 +90,9 @@ export class WidgetTilesetSource extends WidgetBaseSource<
   }: {
     tiles: Tile[];
     spatialFilter: SpatialFilter;
+    // TODO(cleanup): As an optional property, 'uniqueIdProperty' will be easy to forget.
+    // Would it be better to configure it on the source function, rather than separately
+    // on the layer and in 'loadTiles()'?
     uniqueIdProperty?: string;
     options?: TileFeatureExtractOptions;
   }) {
@@ -93,10 +100,10 @@ export class WidgetTilesetSource extends WidgetBaseSource<
       tiles,
       options,
       spatialFilter,
-      uniqueIdProperty, // TODO(api): Should this be a source/constructor property?
-      tileFormat: TileFormat.MVT, // TODO(api): Should this be a source/constructor property?
+      uniqueIdProperty,
+      tileFormat: this.props.tileFormat,
       spatialDataColumn: this.props.geoColumn,
-      spatialIndex: undefined, // TODO(api): Could determine from internal properties?
+      spatialIndex: this.props.spatialIndex,
     });
   }
 
