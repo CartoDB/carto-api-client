@@ -49,6 +49,9 @@ export type WidgetTilesetSourceOptions = LayerTilesetSourceOptions &
     spatialIndex?: SpatialIndex;
   };
 
+// TODO(cleanup): Put implementations in WidgetLocalSource and WidgetRemoteSource,
+// let the tileset, table, query, and raster sources inherit from those.
+
 /**
  * Source for Widget API requests on a data source defined by a tileset.
  *
