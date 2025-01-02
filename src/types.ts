@@ -1,6 +1,6 @@
 import type {FilterType} from './constants.js';
 import type {Polygon, MultiPolygon, Feature} from 'geojson';
-import {BinaryFeatureCollection} from '@loaders.gl/schema';
+import type {BinaryFeature, BinaryFeatureCollection} from '@loaders.gl/schema';
 
 /******************************************************************************
  * MAPS AND TILES
@@ -23,6 +23,7 @@ export type Viewport = [number, number, number, number];
  * required for local widget calculations. Deeper dependencies on deck.gl
  * APIs should be minimized within this library: @deck.gl/carto depends
  * on the API client, not the other way around.
+ * @internalRemarks Source: @deck.gl/geo-layers
  */
 export type Tile = {
   index: {x: number; y: number; z: number};
@@ -39,17 +40,12 @@ export type SpatialIndexTile = Tile & {
   data?: (Feature & {id: bigint})[];
 };
 
-type NumericProps = Record<
-  string,
-  {value: number[] | Float32Array | Float64Array}
->;
-type Properties = Record<string, string | number | boolean | null>;
-
+/** @internalRemarks Source: @deck.gl/carto */
 export type Raster = {
   blockSize: number;
   cells: {
-    numericProps: NumericProps;
-    properties: Properties[];
+    numericProps: BinaryFeature['numericProps'];
+    properties: BinaryFeature['properties'];
   };
 };
 
