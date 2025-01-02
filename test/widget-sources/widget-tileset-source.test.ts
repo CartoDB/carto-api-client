@@ -1,5 +1,6 @@
 import {describe, it, expect, beforeEach} from 'vitest';
 import {
+  TileFormat,
   WidgetTilesetSource,
   createViewportSpatialFilter,
 } from '@carto/api-client';
@@ -15,6 +16,8 @@ beforeEach(() => {
     connectionName: 'test-connection',
     tableName: 'test-table',
     accessToken: '••••',
+    tileFormat: TileFormat.BINARY,
+    spatialDataType: 'geo',
   });
 
   source.loadGeoJSON({
