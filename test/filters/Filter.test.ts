@@ -4,6 +4,7 @@ import {
   buildBinaryFeatureFilter,
   buildFeatureFilter,
   FilterLogicalOperator,
+  TileData,
 } from '@carto/api-client';
 
 const filters = {
@@ -50,19 +51,19 @@ const makeObjectWithValueInColumn = (value = 1, column = 'column1') => ({
 
 describe('Filters', () => {
   test('should return 1 if no filters present', () => {
-    const params = {filters: {}, type: 'number'};
+    const params = {filters: {}, type: 'number' as const};
     const feature = makeFeatureWithValueInColumn();
     expect(buildFeatureFilter(params)(feature)).toBe(1);
   });
 
   test('should return true if no filters present', () => {
-    const params = {filters: {}, type: 'boolean'};
+    const params = {filters: {}, type: 'boolean' as const};
     const feature = makeFeatureWithValueInColumn();
     expect(buildFeatureFilter(params)(feature)).toBe(true);
   });
 
   describe('feature passes filter - boolean type', () => {
-    const params = {filters, type: 'boolean'};
+    const params = {filters, type: 'boolean' as const};
 
     describe('should return false if feature column value is falsy', () => {
       const columnValues = [0, null, undefined, false, ''];
@@ -91,7 +92,7 @@ describe('Filters', () => {
             pow: {},
           },
         },
-        type: 'boolean',
+        type: 'boolean' as const,
       };
 
       test('with geojson feature', () => {
@@ -141,14 +142,14 @@ describe('Filters', () => {
   });
 
   describe('feature passes filter - number type', () => {
-    const params = {filters, type: 'number'};
+    const params = {filters, type: 'number' as const};
 
     describe('should return 0 if feature column value is null or undefined', () => {
       const nullOrUndefinedAreNotValid = {
         filters: {
           column1: {between: {owner: 'widgetId1', values: [[-1, 1]]}},
         },
-        type: 'number',
+        type: 'number' as const,
       };
 
       const notIncludedFeatures = [
@@ -189,7 +190,7 @@ describe('Filters', () => {
         filters: {
           column1: {between: {owner: 'widgetId1', values: [[-1, 1]]}},
         },
-        type: 'number',
+        type: 'number' as const,
       };
 
       test(`ZERO - with geojson feature`, () => {
@@ -270,7 +271,7 @@ describe('Filters', () => {
         filters: {
           column1: {closed_open: {owner: 'widgetId1', values: [[10, 20]]}},
         },
-        type: 'number',
+        type: 'number' as const,
       };
 
       test(`left endpoint is ALWAYS included - with geojson feature`, () => {
@@ -358,7 +359,8 @@ describe('Filters', () => {
       const filterFn = buildBinaryFeatureFilter({filters: filterForBinaryData});
 
       const filterRes = POINTS_BINARY_DATA.featureIds.value.map(
-        (_, idx) => filterFn(idx, POINTS_BINARY_DATA) as number
+        (_, idx) =>
+          filterFn(idx, POINTS_BINARY_DATA as unknown as TileData) as number
       );
 
       expect(filterRes[0]).toBe(1);
@@ -377,7 +379,8 @@ describe('Filters', () => {
       const filterFn = buildBinaryFeatureFilter({filters: filterForBinaryData});
 
       const filterRes = POLYGONS_BINARY_DATA.featureIds.value.map(
-        (_, idx) => filterFn(idx, POLYGONS_BINARY_DATA) as number
+        (_, idx) =>
+          filterFn(idx, POLYGONS_BINARY_DATA as unknown as TileData) as number
       );
 
       expect(filterRes[0]).toBe(1);
@@ -397,9 +400,9 @@ describe('Filters', () => {
         filters: filterForBinaryData,
       } as any);
 
-      expect(() => filterFn(0, POLYGONS_BINARY_DATA)).toThrow(
-        '"pow" filter is not implemented'
-      );
+      expect(() =>
+        filterFn(0, POLYGONS_BINARY_DATA as unknown as TileData)
+      ).toThrow('"pow" filter is not implemented');
     });
 
     test('should returns always 0 when values is nullish', () => {
@@ -414,7 +417,8 @@ describe('Filters', () => {
       const filterFn = buildBinaryFeatureFilter({filters: filterForBinaryData});
 
       const filterRes = POLYGONS_BINARY_DATA.featureIds.value.map(
-        (_, idx) => filterFn(idx, POLYGONS_BINARY_DATA) as number
+        (_, idx) =>
+          filterFn(idx, POLYGONS_BINARY_DATA as unknown as TileData) as number
       );
 
       expect(filterRes.every((el) => el === 0)).toBe(true);
