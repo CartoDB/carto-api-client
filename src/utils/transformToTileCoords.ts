@@ -1,6 +1,5 @@
 import {lngLatToWorld} from '@math.gl/web-mercator';
-import {GeoJsonGeometryTypes, Geometry, Position} from 'geojson';
-import {BBox} from '../types';
+import {BBox, GeoJsonGeometryTypes, Geometry, Position} from 'geojson';
 
 type TransformFn = (coordinates: any[], bbox: Position[]) => any[];
 
@@ -20,16 +19,16 @@ const TRANSFORM_FN: Record<
  * Transform WGS84 coordinates to tile coords.
  * It's the inverse of deck.gl coordinate-transform (https://github.com/visgl/deck.gl/blob/master/modules/geo-layers/src/mvt-layer/coordinate-transform.js)
  *
- * @param {object} geometry - any valid geojson geometry
- * @param {{ west: number, east: number, north: number, south: number }} bbox - tile bbox as used in deck.gl
- * @returns {GeoJSON}
+ * @param geometry - any valid geojson geometry
+ * @param bbox - geojson bbox
  */
 export function transformToTileCoords<T extends Geometry>(
   geometry: T,
   bbox: BBox
-) {
-  const nw = projectFlat([bbox.west, bbox.north]);
-  const se = projectFlat([bbox.east, bbox.south]);
+): T {
+  const [west, south, east, north] = bbox;
+  const nw = projectFlat([west, north]);
+  const se = projectFlat([east, south]);
   const projectedBbox = [nw, se];
 
   if (geometry.type === 'GeometryCollection') {

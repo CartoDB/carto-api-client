@@ -1,5 +1,6 @@
 import type {FilterType} from './constants.js';
 import type {Polygon, MultiPolygon, Feature} from 'geojson';
+import type {TileData} from './filters/index.js';
 
 /******************************************************************************
  * MAPS AND TILES
@@ -13,11 +14,12 @@ export type MapType = 'boundary' | 'query' | 'table' | 'tileset' | 'raster';
 
 // TODO(types): Can we remove Viewport or BBox, for internal consistency?
 
-/** @internalRemarks Source: @carto/react-core */
+/**
+ * Identical to GeoJSON 'BBox' type, but semantically represents a viewport.
+ * Order of values is "west", "south", "east", "north".
+ * @internalRemarks Source: @carto/react-core
+ */
 export type Viewport = [number, number, number, number];
-
-/** @internalRemarks Source: @deck.gl/geo-layers */
-export type BBox = {west: number; east: number; north: number; south: number};
 
 /** TODO: Documentation. */
 export type Tile = {
@@ -25,10 +27,13 @@ export type Tile = {
   id: string;
   content: unknown;
   zoom: number;
-  bbox: BBox;
-  boundingBox: [min: number[], max: number[]];
+  bbox: {west: number; east: number; north: number; south: number};
   isVisible: boolean;
-  data?: unknown;
+  data?: {
+    points: TileData;
+    lines: TileData;
+    polygons: TileData;
+  };
 };
 
 /** TODO: Documentation. */

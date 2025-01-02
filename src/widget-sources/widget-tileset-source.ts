@@ -1,6 +1,6 @@
 import {TilesetSourceOptions} from '../sources/index.js';
 import {WidgetBaseSource, WidgetBaseSourceProps} from './widget-base-source.js';
-import {ModelSource} from '../models/model.js';
+import type {ModelSource} from '../models/index.js';
 import {
   CategoryRequestOptions,
   CategoryResponse,
@@ -20,22 +20,24 @@ import {
   TimeSeriesResponse,
 } from './types.js';
 import {InvalidColumnError, getApplicableFilters} from '../utils.js';
-import {applyFilters} from '../filters/Filter.js';
 import {TileFormat} from '../constants.js';
 import {SpatialFilter, Tile} from '../types.js';
-import {aggregationFunctions} from '../operations/aggregation.js';
 import {
   TileFeatureExtractOptions,
+  applyFilters,
+  geojsonFeatures,
   tileFeatures,
-} from '../filters/tileFeatures.js';
-import {groupValuesByDateColumn} from '../operations/groupByDate.js';
-import {scatterPlot} from '../operations/scatterPlot.js';
-import {groupValuesByColumn} from '../operations/groupBy.js';
-import {histogram} from '../operations/histogram.js';
-import {applySorting} from '../operations/applySorting.js';
+} from '../filters/index.js';
+import {
+  aggregationFunctions,
+  applySorting,
+  groupValuesByColumn,
+  groupValuesByDateColumn,
+  histogram,
+  scatterPlot,
+} from '../operations/index.js';
 import {FeatureData} from '../types-internal.js';
 import {FeatureCollection} from 'geojson';
-import {geojsonFeatures} from '../filters/geosjonFeatures.js';
 
 type LayerTilesetSourceOptions = Omit<TilesetSourceOptions, 'filters'>;
 
