@@ -20,9 +20,9 @@ export interface ViewState {
 interface BaseRequestOptions {
   spatialFilter?: SpatialFilter;
   spatialFiltersMode?: SpatialFilterPolyfillMode;
+  spatialIndexReferenceViewState?: ViewState;
   abortController?: AbortController;
   filterOwner?: string;
-  viewState?: ViewState;
 }
 
 /** Options for {@link WidgetBaseSource#getCategories}. */

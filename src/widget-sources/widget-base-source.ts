@@ -16,18 +16,14 @@ import {
   TableResponse,
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
-  ViewState,
 } from './types.js';
 import {FilterLogicalOperator, Filter} from '../types.js';
-import {assert, getApplicableFilters, normalizeObjectKeys} from '../utils.js';
+import {getApplicableFilters, normalizeObjectKeys} from '../utils.js';
 import {getClient} from '../client.js';
 import {ModelSource} from '../models/model.js';
 import {SourceOptions} from '../sources/index.js';
 import {ApiVersion, DEFAULT_API_BASE_URL} from '../constants.js';
-import {
-  DEFAULT_GEO_COLUMN,
-  DEFAULT_TILE_RESOLUTION,
-} from '../constants-internal.js';
+import {DEFAULT_TILE_RESOLUTION} from '../constants-internal.js';
 import {getSpatialFiltersResolution} from '../spatial-index.js';
 import {AggregationOptions} from '../sources/types.js';
 
@@ -100,8 +96,8 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
+      spatialIndexReferenceViewState,
       abortController,
-      viewState,
       ...params
     } = options;
     const {column, operation, operationColumn} = params;
@@ -111,7 +107,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     if (spatialFilter && source.spatialDataType !== 'geo') {
       spatialFiltersResolution = getSpatialFiltersResolution({
         source,
-        viewState,
+        viewState: spatialIndexReferenceViewState,
       });
     }
 
@@ -153,8 +149,8 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
+      spatialIndexReferenceViewState,
       abortController,
-      viewState,
       ...params
     } = options;
     const {columns, dataType, featureIds, z, limit, tileResolution} = params;
@@ -164,7 +160,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     if (spatialFilter && source.spatialDataType !== 'geo') {
       spatialFiltersResolution = getSpatialFiltersResolution({
         source,
-        viewState,
+        viewState: spatialIndexReferenceViewState,
       });
     }
 
@@ -204,9 +200,9 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
+      spatialIndexReferenceViewState,
       abortController,
       operationExp,
-      viewState,
       ...params
     } = options;
     const {column, operation} = params;
@@ -216,7 +212,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     if (spatialFilter && source.spatialDataType !== 'geo') {
       spatialFiltersResolution = getSpatialFiltersResolution({
         source,
-        viewState,
+        viewState: spatialIndexReferenceViewState,
       });
     }
 
@@ -250,8 +246,8 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
+      spatialIndexReferenceViewState,
       abortController,
-      viewState,
       ...params
     } = options;
     const {column, operation, ticks} = params;
@@ -261,7 +257,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     if (spatialFilter && source.spatialDataType !== 'geo') {
       spatialFiltersResolution = getSpatialFiltersResolution({
         source,
-        viewState,
+        viewState: spatialIndexReferenceViewState,
       });
     }
 
@@ -306,8 +302,8 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
+      spatialIndexReferenceViewState,
       abortController,
-      viewState,
       ...params
     } = options;
     const {column} = params;
@@ -317,7 +313,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     if (spatialFilter && source.spatialDataType !== 'geo') {
       spatialFiltersResolution = getSpatialFiltersResolution({
         source,
-        viewState,
+        viewState: spatialIndexReferenceViewState,
       });
     }
 
@@ -349,8 +345,8 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
+      spatialIndexReferenceViewState,
       abortController,
-      viewState,
       ...params
     } = options;
     const {xAxisColumn, xAxisJoinOperation, yAxisColumn, yAxisJoinOperation} =
@@ -362,7 +358,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     if (spatialFilter && source.spatialDataType !== 'geo') {
       spatialFiltersResolution = getSpatialFiltersResolution({
         source,
-        viewState,
+        viewState: spatialIndexReferenceViewState,
       });
     }
 
@@ -405,8 +401,8 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
+      spatialIndexReferenceViewState,
       abortController,
-      viewState,
       ...params
     } = options;
     const {columns, sortBy, sortDirection, offset = 0, limit = 10} = params;
@@ -416,7 +412,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     if (spatialFilter && source.spatialDataType !== 'geo') {
       spatialFiltersResolution = getSpatialFiltersResolution({
         source,
-        viewState,
+        viewState: spatialIndexReferenceViewState,
       });
     }
 
@@ -464,7 +460,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
       abortController,
       spatialFilter,
       spatialFiltersMode,
-      viewState,
+      spatialIndexReferenceViewState,
       ...params
     } = options;
     const {
@@ -485,7 +481,7 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
     if (spatialFilter && source.spatialDataType !== 'geo') {
       spatialFiltersResolution = getSpatialFiltersResolution({
         source,
-        viewState,
+        viewState: spatialIndexReferenceViewState,
       });
     }
 
