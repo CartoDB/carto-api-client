@@ -4,3 +4,4 @@ export * from './geosjonFeatures.js';
 export * from './tileFeatures.js';
 export * from './tileFeaturesGeometries.js';
 export * from './tileFeaturesSpatialIndex.js';
+export * from './types.js';
