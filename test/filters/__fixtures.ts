@@ -56,7 +56,7 @@ export const POINTS_BINARY_DATA = {
       0.66796875,
       0.269775390625
     ),
-    size: 2
+    size: 2,
   },
   globalFeatureIds: {
     value: Uint16Array.of(
@@ -88,7 +88,7 @@ export const POINTS_BINARY_DATA = {
       25,
       26
     ),
-    size: 1
+    size: 1,
   },
   featureIds: {
     value: Uint16Array.of(
@@ -120,7 +120,7 @@ export const POINTS_BINARY_DATA = {
       25,
       26
     ),
-    size: 1
+    size: 1,
   },
   numericProps: {
     cartodb_id: {
@@ -153,7 +153,7 @@ export const POINTS_BINARY_DATA = {
         14142,
         14144
       ),
-      size: 1
+      size: 1,
     },
     revenue: {
       value: Float32Array.of(
@@ -185,7 +185,7 @@ export const POINTS_BINARY_DATA = {
         1585361,
         1429850
       ),
-      size: 1
+      size: 1,
     },
     size_m: {
       value: Float32Array.of(
@@ -217,8 +217,8 @@ export const POINTS_BINARY_DATA = {
         924,
         562
       ),
-      size: 1
-    }
+      size: 1,
+    },
   },
   properties: [
     {
@@ -226,202 +226,202 @@ export const POINTS_BINARY_DATA = {
       zip: '99504',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '1268',
       zip: '99507',
       storetype: 'Discount Store',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11949',
       zip: '99501-3105',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11950',
       zip: '99577-7797',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11951',
       zip: '99654-8105',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11952',
       zip: '99504-2306',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11953',
       zip: '99603-7702',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11954',
       zip: '99611-7812',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11955',
       zip: '99504',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11956',
       zip: '99515',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '1782',
       zip: '99654',
       storetype: 'Hypermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11957',
       zip: '99515-3566',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11958',
       zip: '99615-6036',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11959',
       zip: '99705-6053',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '1783',
       zip: '99503',
       storetype: 'Hypermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '1784',
       zip: '99515',
       storetype: 'Hypermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11960',
       zip: '99515-1211',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11961',
       zip: '99645-6522',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11962',
       zip: '99669',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11963',
       zip: '99701-4092',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11964',
       zip: '99709-3551',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11965',
       zip: '99835-7105',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11966',
       zip: '99801-8036',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11944',
       zip: '99503-4141',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11945',
       zip: '99503-1133',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11946',
       zip: '99503-3713',
       storetype: 'Supermarket',
       state: 'AK',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       store_id: '11947',
       zip: '99517',
       storetype: 'Supermarket',
       state: 'AKA',
-      layerName: 'default'
-    }
+      layerName: 'default',
+    },
   ],
-  fields: []
+  fields: [],
 };
 
 export const POLYGONS_BINARY_DATA = {
   polygonIndices: {
     value: Uint16Array.of(0, 5, 10),
-    size: 1
+    size: 1,
   },
   primitivePolygonIndices: {
     value: Uint16Array.of(0, 5, 10),
-    size: 1
+    size: 1,
   },
   positions: {
     value: Float32Array.of(
@@ -446,35 +446,35 @@ export const POLYGONS_BINARY_DATA = {
       0.75244140625,
       0.990478515625
     ),
-    size: 2
+    size: 2,
   },
   triangles: {
     value: Uint32Array.of(3, 0, 1, 1, 2, 3, 8, 5, 6, 6, 7, 8),
-    size: 1
+    size: 1,
   },
   globalFeatureIds: {
     value: Uint16Array.of(0, 0, 0, 0, 0, 1, 1, 1, 1, 1),
-    size: 1
+    size: 1,
   },
   featureIds: {
     value: Uint16Array.of(0, 0, 0, 0, 0, 1, 1, 1, 1, 1),
-    size: 1
+    size: 1,
   },
   numericProps: {
     cartodb_id: {
       value: Float32Array.of(78, 78, 78, 78, 78, 76, 76, 76, 76, 76),
-      size: 1
-    }
+      size: 1,
+    },
   },
   properties: [
     {
       name: 'North Dakota',
-      layerName: 'default'
+      layerName: 'default',
     },
     {
       name: 'Montana',
-      layerName: 'default'
-    }
+      layerName: 'default',
+    },
   ],
-  fields: []
+  fields: [],
 };
