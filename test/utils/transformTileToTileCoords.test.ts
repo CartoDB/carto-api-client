@@ -1,6 +1,6 @@
 import {describe, expect, test} from 'vitest';
 import {transformToTileCoords} from '@carto/api-client';
-import {Polygon} from 'geojson';
+import {BBox, Polygon} from 'geojson';
 
 const GEOMETRY_AS_WGS84: Polygon = {
   type: 'Polygon',
@@ -18,14 +18,9 @@ const GEOMETRY_AS_WGS84: Polygon = {
   ],
 };
 
-const TILE_2_3_3_BBOX = {
-  west: -90,
-  north: 40.97989806962013,
-  east: -45,
-  south: 0,
-};
+const TILE_2_3_3_BBOX: BBox = [-90, 0, -45, 40.97989806962013];
 
-const GEOMETRY_AS_TILE_COORDS = {
+const GEOMETRY_AS_TILE_COORDS: Polygon = {
   type: 'Polygon',
   coordinates: [
     [
