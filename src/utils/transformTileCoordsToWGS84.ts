@@ -1,7 +1,6 @@
 import {lerp} from '@math.gl/core';
 import {lngLatToWorld, worldToLngLat} from '@math.gl/web-mercator';
-import {GeoJsonGeometryTypes, Geometry, Position} from 'geojson';
-import {BBox} from '../types';
+import {BBox, GeoJsonGeometryTypes, Geometry, Position} from 'geojson';
 
 type TransformFn = (coordinates: any[], bbox: Position[]) => any[];
 
@@ -21,14 +20,15 @@ const TRANSFORM_FN: Record<
  * Transform tile coords to WGS84 coordinates.
  *
  * @param geometry - any valid geojson geometry
- * @param bbox - tile bbox as used in deck.gl
+ * @param bbox - geojson bbox
  */
 export function transformTileCoordsToWGS84<T extends Geometry>(
   geometry: T,
   bbox: BBox
 ): T {
-  const nw = lngLatToWorld([bbox.west, bbox.north]);
-  const se = lngLatToWorld([bbox.east, bbox.south]);
+  const [west, south, east, north] = bbox;
+  const nw = lngLatToWorld([west, north]);
+  const se = lngLatToWorld([east, south]);
   const projectedBbox = [nw, se];
 
   if (geometry.type === 'GeometryCollection') {

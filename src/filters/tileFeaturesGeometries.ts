@@ -6,6 +6,7 @@ import {transformToTileCoords} from '../utils/transformToTileCoords.js';
 import {transformTileCoordsToWGS84} from '../utils/transformTileCoordsToWGS84.js';
 import {TileFormat} from '../constants.js';
 import {
+  BBox,
   Feature,
   Geometry,
   LineString,
@@ -14,7 +15,7 @@ import {
   Polygon,
   Position,
 } from 'geojson';
-import {BBox, SpatialFilter} from '../types.js';
+import {SpatialFilter, Tile} from '../types.js';
 import {TileFeatureExtractOptions} from './tileFeatures.js';
 import {featureCollection} from '@turf/helpers';
 import {FeatureData} from '../types-internal.js';
@@ -41,7 +42,7 @@ export function tileFeaturesGeometries({
   uniqueIdProperty,
   options,
 }: {
-  tiles: any;
+  tiles: Tile[];
   tileFormat?: TileFormat;
   spatialFilter: SpatialFilter;
   uniqueIdProperty?: string;
@@ -56,13 +57,13 @@ export function tileFeaturesGeometries({
       continue;
     }
 
-    const {bbox} = tile;
-    const bboxToGeom = bboxPolygon([
-      bbox.west,
-      bbox.south,
-      bbox.east,
-      bbox.north,
-    ]);
+    const bbox = [
+      tile.bbox.west,
+      tile.bbox.south,
+      tile.bbox.east,
+      tile.bbox.north,
+    ] as BBox;
+    const bboxToGeom = bboxPolygon(bbox);
     const tileIsFullyVisible = booleanWithin(bboxToGeom, spatialFilter);
 
     // Clip the geometry to intersect with the tile

@@ -7,7 +7,7 @@ import {FeatureData} from '../types-internal';
 
 /** @internalRemarks Source: @carto/react-core */
 export type TileFeatures = {
-  tiles?: Tile[];
+  tiles: Tile[];
   spatialFilter?: SpatialFilter;
   uniqueIdProperty?: string;
   tileFormat?: TileFormat;
