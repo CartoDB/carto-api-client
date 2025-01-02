@@ -20,14 +20,16 @@ import {TileFeatureExtractOptions} from './tileFeatures.js';
 import {featureCollection} from '@turf/helpers';
 import {FeatureData} from '../types-internal.js';
 import {
-  TileAccessor,
-  TileData,
-  TileGeometryType,
-  TileMap,
-  TileTypedArrayConstructor,
-} from './types.js';
+  BinaryAttribute,
+  BinaryFeature,
+  BinaryGeometryType,
+  BinaryPointFeature,
+  TypedArrayConstructor,
+} from '@loaders.gl/schema';
 
 export const FEATURE_GEOM_PROPERTY = '__geomValue';
+
+type TileMap = Map<unknown, unknown>;
 
 type TileDataInternal = {
   uniqueId: string | number | undefined;
@@ -87,13 +89,13 @@ export function tileFeaturesGeometries({
         ? transformToTileCoords(clippedGeometryToIntersect.geometry, bbox)
         : clippedGeometryToIntersect.geometry;
 
-    createIndicesForPoints(tile.data.points);
+    createIndicesForPoints(tile.data.points!);
 
     calculateFeatures({
       map,
       tileIsFullyVisible,
       geometryIntersection: transformedGeometryToIntersect,
-      data: tile.data.points,
+      data: tile.data.points!,
       type: 'Point',
       bbox,
       tileFormat,
@@ -104,7 +106,7 @@ export function tileFeaturesGeometries({
       map,
       tileIsFullyVisible,
       geometryIntersection: transformedGeometryToIntersect,
-      data: tile.data.lines,
+      data: tile.data.lines!,
       type: 'LineString',
       bbox,
       tileFormat,
@@ -115,7 +117,7 @@ export function tileFeaturesGeometries({
       map,
       tileIsFullyVisible,
       geometryIntersection: transformedGeometryToIntersect,
-      data: tile.data.polygons,
+      data: tile.data.polygons!,
       type: 'Polygon',
       bbox,
       tileFormat,
@@ -139,10 +141,10 @@ function processTileFeatureProperties({
   geometryIntersection,
 }: {
   map: TileMap;
-  data: TileData;
+  data: BinaryFeature;
   startIndex: number;
   endIndex: number;
-  type: TileGeometryType;
+  type: BinaryGeometryType;
   bbox: BBox;
   tileFormat?: TileFormat;
   uniqueIdProperty?: string;
@@ -204,9 +206,9 @@ function addIntersectedFeaturesInTile({
   options,
 }: {
   map: TileMap;
-  data: TileData;
+  data: BinaryFeature;
   geometryIntersection: Geometry;
-  type: TileGeometryType;
+  type: BinaryGeometryType;
   bbox: BBox;
   tileFormat?: TileFormat;
   uniqueIdProperty?: string;
@@ -233,22 +235,34 @@ function addIntersectedFeaturesInTile({
   }
 }
 
-function getIndices(data: TileData) {
-  const indices = (data.primitivePolygonIndices ||
-    data.pathIndices ||
-    data.pointIndices) as TileAccessor;
+function getIndices(data: BinaryFeature) {
+  let indices: BinaryAttribute;
+  switch (data.type) {
+    case 'Point':
+      // @ts-expect-error Missing or changed types?
+      indices = data.pointIndices;
+      break;
+    case 'LineString':
+      indices = data.pathIndices;
+      break;
+    case 'Polygon':
+      indices = data.primitivePolygonIndices;
+      break;
+    default:
+      throw new Error(`Unexpected type, "${(data as BinaryFeature).type}"`);
+  }
   return indices.value;
 }
 
-function getFeatureId(data: TileData, startIndex: number) {
+function getFeatureId(data: BinaryFeature, startIndex: number) {
   return data.featureIds.value[startIndex];
 }
 
-function getPropertiesFromTile(data: TileData, startIndex: number) {
+function getPropertiesFromTile(data: BinaryFeature, startIndex: number) {
   const featureId = getFeatureId(data, startIndex);
   const {properties, numericProps, fields} = data;
   const result: TileDataInternal = {
-    uniqueId: fields?.[featureId]?.id as TileDataInternal['uniqueId'],
+    uniqueId: (fields?.[featureId] as {id: string | number})?.id,
     properties: properties[featureId],
     numericProps: {},
   };
@@ -296,7 +310,7 @@ function getValueFromTileProps(
 
 function getFeatureByType(
   coordinates: Position[],
-  type: TileGeometryType
+  type: BinaryGeometryType
 ): Polygon | LineString | Point {
   switch (type) {
     case 'Polygon':
@@ -313,7 +327,7 @@ function getFeatureByType(
 function getRingCoordinatesFor(
   startIndex: number,
   endIndex: number,
-  positions: TileAccessor
+  positions: BinaryAttribute
 ) {
   const ringCoordinates = [];
 
@@ -342,8 +356,8 @@ function calculateFeatures({
   map: TileMap;
   tileIsFullyVisible: boolean;
   geometryIntersection: SpatialFilter;
-  data: TileData;
-  type: TileGeometryType;
+  data: BinaryFeature;
+  type: BinaryGeometryType;
   bbox: BBox;
   tileFormat?: TileFormat;
   uniqueIdProperty?: string;
@@ -387,8 +401,8 @@ function addAllFeaturesInTile({
   options,
 }: {
   map: TileMap;
-  data: TileData;
-  type: TileGeometryType;
+  data: BinaryFeature;
+  type: BinaryGeometryType;
   bbox: BBox;
   tileFormat?: TileFormat;
   uniqueIdProperty?: string;
@@ -413,15 +427,18 @@ function addAllFeaturesInTile({
   }
 }
 
-function createIndicesForPoints(data: TileData) {
+function createIndicesForPoints(data: BinaryPointFeature) {
   const featureIds = data.featureIds.value;
   const lastFeatureId = featureIds[featureIds.length - 1];
-  const PointIndicesArray = featureIds.constructor as TileTypedArrayConstructor;
+  const PointIndicesArray = featureIds.constructor as TypedArrayConstructor;
 
-  data.pointIndices = {
+  const pointIndices: BinaryAttribute = {
     value: new PointIndicesArray(featureIds.length + 1),
     size: 1,
   };
-  data.pointIndices.value.set(featureIds);
-  data.pointIndices.value.set([lastFeatureId + 1], featureIds.length);
+  pointIndices.value.set(featureIds);
+  pointIndices.value.set([lastFeatureId + 1], featureIds.length);
+
+  // @ts-expect-error Missing or changed types?
+  data.pointIndices = pointIndices;
 }

@@ -1459,6 +1459,7 @@ __metadata:
     "@lit/react": "npm:^1.0.5"
     "@lit/task": "npm:^1.0.1"
     "@loaders.gl/core": "npm:^4.2.3"
+    "@loaders.gl/schema": "npm:^4.3.3"
     "@luma.gl/core": "npm:^9.0.27"
     "@luma.gl/engine": "npm:^9.0.27"
     "@sveltejs/vite-plugin-svelte": "npm:^3.1.2"
@@ -2130,6 +2131,17 @@ __metadata:
   peerDependencies:
     "@loaders.gl/core": ^4.0.0
   checksum: 10c0/6bf51f2ca484e62c2ec1e8af5cb89fce18a044c3468560f2a5551ea3e03fb6b4a100c917d1081144d274bb3fceb8482339e8b42f1c2900c7d52745049c3421b8
+  languageName: node
+  linkType: hard
+
+"@loaders.gl/schema@npm:^4.3.3":
+  version: 4.3.3
+  resolution: "@loaders.gl/schema@npm:4.3.3"
+  dependencies:
+    "@types/geojson": "npm:^7946.0.7"
+  peerDependencies:
+    "@loaders.gl/core": ^4.3.0
+  checksum: 10c0/abc83524fd03f0964a8964e4338667ef9a5de367301cbc73587564b764b7e33e6777f6b61ce8939300fac973f63eca3ccca5353da6384a53504428aedd37d918
   languageName: node
   linkType: hard
 

@@ -1,6 +1,6 @@
 import type {FilterType} from './constants.js';
 import type {Polygon, MultiPolygon, Feature} from 'geojson';
-import type {TileData} from './filters/index.js';
+import {BinaryFeatureCollection} from '@loaders.gl/schema';
 
 /******************************************************************************
  * MAPS AND TILES
@@ -12,16 +12,18 @@ export type Format = 'json' | 'geojson' | 'tilejson';
 /** @internalRemarks Source: @carto/constants, @deck.gl/carto */
 export type MapType = 'boundary' | 'query' | 'table' | 'tileset' | 'raster';
 
-// TODO(types): Can we remove Viewport or BBox, for internal consistency?
-
 /**
- * Identical to GeoJSON 'BBox' type, but semantically represents a viewport.
+ * Alias for GeoJSON 'BBox' type, semantically representing a viewport.
  * Order of values is "west", "south", "east", "north".
- * @internalRemarks Source: @carto/react-core
  */
 export type Viewport = [number, number, number, number];
 
-/** TODO: Documentation. */
+/**
+ * Subset of deck.gl's Tile2DHeader type, containing only the properties
+ * required for local widget calculations. Deeper dependencies on deck.gl
+ * APIs should be minimized within this library: @deck.gl/carto depends
+ * on the API client, not the other way around.
+ */
 export type Tile = {
   index: {x: number; y: number; z: number};
   id: string;
@@ -29,14 +31,10 @@ export type Tile = {
   zoom: number;
   bbox: {west: number; east: number; north: number; south: number};
   isVisible: boolean;
-  data?: {
-    points: TileData;
-    lines: TileData;
-    polygons: TileData;
-  };
+  data?: BinaryFeatureCollection;
 };
 
-/** TODO: Documentation. */
+/** Subset of deck.gl's Tile2DHeader type, for spatial indexes. */
 export type SpatialIndexTile = Tile & {
   data?: (Feature & {id: bigint})[];
 };
@@ -47,7 +45,6 @@ type NumericProps = Record<
 >;
 type Properties = Record<string, string | number | boolean | null>;
 
-/** TODO: Documentation. */
 export type Raster = {
   blockSize: number;
   cells: {
