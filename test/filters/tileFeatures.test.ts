@@ -30,6 +30,8 @@ describe('viewport features with binary mode', () => {
 
       const properties = tileFeatures({
         tiles: mockedTiles as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
       });
       expect(properties).toEqual([]);
@@ -40,6 +42,8 @@ describe('viewport features with binary mode', () => {
 
       const properties = tileFeatures({
         tiles: mockedTiles as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
       });
       expect(properties).toEqual([]);
@@ -50,6 +54,8 @@ describe('viewport features with binary mode', () => {
 
       const properties = tileFeatures({
         tiles: mockedTiles as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
       });
       expect(properties).toEqual([]);
@@ -60,6 +66,8 @@ describe('viewport features with binary mode', () => {
 
       const properties = tileFeatures({
         tiles: mockedTiles as unknown as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
       });
       expect(properties).toEqual([]);
@@ -91,6 +99,8 @@ describe('viewport features with binary mode', () => {
 
       let properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
       });
@@ -105,6 +115,8 @@ describe('viewport features with binary mode', () => {
 
       properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
         options: {storeGeometry: true},
@@ -144,6 +156,8 @@ describe('viewport features with binary mode', () => {
 
       let properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
       });
@@ -158,6 +172,8 @@ describe('viewport features with binary mode', () => {
 
       properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
         options: {storeGeometry: true},
@@ -198,6 +214,8 @@ describe('viewport features with binary mode', () => {
 
       let properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
       });
@@ -211,6 +229,8 @@ describe('viewport features with binary mode', () => {
 
       properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
         options: {storeGeometry: true},
@@ -252,6 +272,8 @@ describe('viewport features with binary mode', () => {
 
       let properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
       });
@@ -265,6 +287,8 @@ describe('viewport features with binary mode', () => {
 
       properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
         options: {storeGeometry: true},
@@ -305,6 +329,8 @@ describe('viewport features with binary mode', () => {
 
       let properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
       });
@@ -313,6 +339,8 @@ describe('viewport features with binary mode', () => {
 
       properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
         options: {storeGeometry: true},
@@ -349,6 +377,8 @@ describe('viewport features with binary mode', () => {
 
       let properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
       });
@@ -357,6 +387,8 @@ describe('viewport features with binary mode', () => {
 
       properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
         options: {storeGeometry: true},
@@ -395,6 +427,8 @@ describe('viewport features with binary mode', () => {
 
       let properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
       });
@@ -403,6 +437,8 @@ describe('viewport features with binary mode', () => {
 
       properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
         options: {storeGeometry: true},
@@ -442,6 +478,8 @@ describe('viewport features with binary mode', () => {
 
       let properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
       });
@@ -450,6 +488,8 @@ describe('viewport features with binary mode', () => {
 
       properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
         options: {storeGeometry: true},
@@ -489,6 +529,8 @@ describe('viewport features with binary mode', () => {
 
       let properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
       });
@@ -497,6 +539,8 @@ describe('viewport features with binary mode', () => {
 
       properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
         options: {storeGeometry: true},
@@ -554,6 +598,8 @@ describe('viewport features with binary mode', () => {
 
         let properties = tileFeatures({
           tiles: mockedTiles as Tile[],
+          tileFormat: TileFormat.BINARY,
+          spatialDataType: 'geo',
           spatialFilter,
           uniqueIdProperty: undefined,
         });
@@ -567,6 +613,8 @@ describe('viewport features with binary mode', () => {
 
         properties = tileFeatures({
           tiles: mockedTiles as Tile[],
+          tileFormat: TileFormat.BINARY,
+          spatialDataType: 'geo',
           spatialFilter,
           uniqueIdProperty: undefined,
           options: {storeGeometry: true},
@@ -604,6 +652,8 @@ describe('viewport features with binary mode', () => {
 
         let properties = tileFeatures({
           tiles: mockedTile as Tile[],
+          tileFormat: TileFormat.BINARY,
+          spatialDataType: 'geo',
           spatialFilter,
           uniqueIdProperty: undefined,
         });
@@ -616,6 +666,8 @@ describe('viewport features with binary mode', () => {
 
         properties = tileFeatures({
           tiles: mockedTile as Tile[],
+          tileFormat: TileFormat.BINARY,
+          spatialDataType: 'geo',
           spatialFilter,
           uniqueIdProperty: undefined,
           options: {storeGeometry: true},
@@ -653,6 +705,8 @@ describe('viewport features with binary mode', () => {
 
         let properties = tileFeatures({
           tiles: mockedTile as Tile[],
+          tileFormat: TileFormat.BINARY,
+          spatialDataType: 'geo',
           spatialFilter,
           uniqueIdProperty: undefined,
         });
@@ -665,6 +719,8 @@ describe('viewport features with binary mode', () => {
 
         properties = tileFeatures({
           tiles: mockedTile as Tile[],
+          tileFormat: TileFormat.BINARY,
+          spatialDataType: 'geo',
           spatialFilter,
           uniqueIdProperty: undefined,
           options: {storeGeometry: true},
@@ -701,6 +757,8 @@ describe('viewport features with binary mode', () => {
 
         let properties = tileFeatures({
           tiles: mockedTile as Tile[],
+          tileFormat: TileFormat.MVT,
+          spatialDataType: 'geo',
           spatialFilter,
           uniqueIdProperty: undefined,
         });
@@ -713,6 +771,8 @@ describe('viewport features with binary mode', () => {
 
         properties = tileFeatures({
           tiles: mockedTile as Tile[],
+          tileFormat: TileFormat.BINARY,
+          spatialDataType: 'geo',
           spatialFilter,
           uniqueIdProperty: undefined,
           options: {storeGeometry: true},
@@ -751,6 +811,8 @@ describe('viewport features with binary mode', () => {
 
       let properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'user_id',
       });
@@ -764,6 +826,8 @@ describe('viewport features with binary mode', () => {
 
       properties = tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'user_id',
         options: {storeGeometry: true},
@@ -802,22 +866,25 @@ describe('viewport features with binary mode', () => {
 
       tileFeatures({
         tiles: mockedTile as Tile[],
-        spatialFilter,
         tileFormat: TileFormat.GEOJSON,
+        spatialDataType: 'geo',
+        spatialFilter,
       });
       expect(transformToTileCoordsSpy).toHaveBeenCalledTimes(0);
 
       tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.GEOJSON,
+        spatialDataType: 'geo',
         spatialFilter,
-        tileFormat: TileFormat.BINARY,
       });
       expect(transformToTileCoordsSpy).toHaveBeenCalledTimes(0);
 
       tileFeatures({
         tiles: mockedTile as Tile[],
+        tileFormat: TileFormat.GEOJSON,
+        spatialDataType: 'geo',
         spatialFilter,
-        tileFormat: TileFormat.MVT,
       });
       expect(transformToTileCoordsSpy).toHaveBeenCalledTimes(1);
 
@@ -830,31 +897,35 @@ describe('viewport features with binary mode', () => {
 
       tileFeatures({
         tiles: mockedTile as Tile[],
-        spatialFilter,
         tileFormat: TileFormat.GEOJSON,
+        spatialDataType: 'geo',
+        spatialFilter,
         options: {storeGeometry: true},
       });
       expect(transformTileCoordsToWGS84Spy).toHaveBeenCalledTimes(0);
 
       tileFeatures({
         tiles: mockedTile as Tile[],
-        spatialFilter,
         tileFormat: TileFormat.BINARY,
+        spatialDataType: 'geo',
+        spatialFilter,
         options: {storeGeometry: true},
       });
       expect(transformTileCoordsToWGS84Spy).toHaveBeenCalledTimes(0);
 
       tileFeatures({
         tiles: mockedTile as Tile[],
-        spatialFilter,
         tileFormat: TileFormat.MVT,
+        spatialDataType: 'geo',
+        spatialFilter,
       });
       expect(transformTileCoordsToWGS84Spy).toHaveBeenCalledTimes(0);
 
       tileFeatures({
         tiles: mockedTile as Tile[],
-        spatialFilter,
         tileFormat: TileFormat.MVT,
+        spatialDataType: 'geo',
+        spatialFilter,
         options: {storeGeometry: true},
       });
       expect(transformTileCoordsToWGS84Spy).toHaveBeenCalled();

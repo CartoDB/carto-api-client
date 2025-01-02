@@ -5,21 +5,23 @@ import {SpatialFilter, SpatialIndexTile} from '../types.js';
 import {BBox, Feature} from 'geojson';
 import {getResolution as h3GetResolution, polygonToCells} from 'h3-js';
 import {FeatureData} from '../types-internal.js';
+import {SpatialDataType} from '../sources/types.js';
 
 export type TileFeaturesSpatialIndexOptions = {
   tiles: SpatialIndexTile[];
   spatialFilter: SpatialFilter;
   spatialDataColumn: string;
-  spatialIndex: SpatialIndex;
+  spatialDataType: SpatialDataType;
 };
 
 export function tileFeaturesSpatialIndex({
   tiles,
   spatialFilter,
   spatialDataColumn,
-  spatialIndex,
+  spatialDataType,
 }: TileFeaturesSpatialIndexOptions): FeatureData[] {
   const map = new Map();
+  const spatialIndex = getSpatialIndex(spatialDataType);
   const resolution = getResolution(tiles, spatialIndex);
   const spatialIndexIDName = spatialDataColumn
     ? spatialDataColumn
@@ -102,5 +104,16 @@ function getCellsCoverGeometry(
         true
       )
     );
+  }
+}
+
+function getSpatialIndex(spatialDataType: SpatialDataType): SpatialIndex {
+  switch (spatialDataType) {
+    case 'h3':
+      return SpatialIndex.H3;
+    case 'quadbin':
+      return SpatialIndex.QUADBIN;
+    default:
+      throw new Error('Unexpected spatial data type');
   }
 }

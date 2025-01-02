@@ -4,15 +4,16 @@ import {tileFeaturesSpatialIndex} from './tileFeaturesSpatialIndex';
 import {SpatialIndex, TileFormat} from '../constants';
 import {DEFAULT_GEO_COLUMN} from '../constants-internal';
 import {FeatureData} from '../types-internal';
+import {SpatialDataType} from '../sources/types';
 
 /** @internalRemarks Source: @carto/react-core */
 export type TileFeatures = {
   tiles: Tile[];
+  tileFormat: TileFormat;
+  spatialDataType: SpatialDataType;
+  spatialDataColumn?: string;
   spatialFilter?: SpatialFilter;
   uniqueIdProperty?: string;
-  tileFormat?: TileFormat;
-  spatialDataColumn?: string;
-  spatialIndex?: SpatialIndex;
   options?: TileFeatureExtractOptions;
 };
 
@@ -28,7 +29,7 @@ export function tileFeatures({
   uniqueIdProperty,
   tileFormat,
   spatialDataColumn = DEFAULT_GEO_COLUMN,
-  spatialIndex,
+  spatialDataType,
   options = {},
 }: TileFeatures): FeatureData[] {
   // TODO(cleanup): Is an empty response the expected result when spatialFilter
@@ -37,12 +38,12 @@ export function tileFeatures({
     return [];
   }
 
-  if (spatialIndex) {
+  if (spatialDataType !== 'geo') {
     return tileFeaturesSpatialIndex({
       tiles: tiles as SpatialIndexTile[],
       spatialFilter,
       spatialDataColumn,
-      spatialIndex,
+      spatialDataType,
     });
   }
   return tileFeaturesGeometries({
