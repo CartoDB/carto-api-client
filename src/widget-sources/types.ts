@@ -20,6 +20,7 @@ export interface ViewState {
 interface BaseRequestOptions {
   spatialFilter?: SpatialFilter;
   spatialFiltersMode?: SpatialFilterPolyfillMode;
+  /** Required for table- and query-based spatial index sources (H3, Quadbin). */
   spatialIndexReferenceViewState?: ViewState;
   abortController?: AbortController;
   filterOwner?: string;

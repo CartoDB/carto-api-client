@@ -65,7 +65,7 @@ export class ScatterWidget extends BaseWidget {
         xAxisJoinOperation,
         yAxisColumn,
         yAxisJoinOperation,
-        viewState: this.viewState ?? undefined,
+        spatialIndexReferenceViewState: this.viewState ?? undefined,
       });
     },
     args: () =>

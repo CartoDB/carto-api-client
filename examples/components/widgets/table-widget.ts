@@ -69,7 +69,7 @@ export class TableWidget extends BaseWidget {
         ...(sortBy && {sortBy, sortDirection}),
         limit,
         spatialFilter: this.getSpatialFilterOrViewState(),
-        viewState: this.viewState ?? undefined,
+        spatialIndexReferenceViewState: this.viewState ?? undefined,
       });
     },
     args: () =>

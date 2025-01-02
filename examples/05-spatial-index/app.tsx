@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Map} from 'react-map-gl/maplibre';
 import DeckGL from '@deck.gl/react';
-import { h3TableSource, Filters } from '@carto/api-client';
+import {h3TableSource, Filters} from '@carto/api-client';
 import {
   CategoryWidget,
   FormulaWidget,
@@ -17,7 +17,11 @@ import {FilterEvent} from '../components/types.js';
 const MAP_VIEW = new MapView({repeat: true});
 const MAP_STYLE =
   'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json';
-const INITIAL_VIEW_STATE = {latitude: 37.3753636, longitude: -5.9962577, zoom: 6};
+const INITIAL_VIEW_STATE = {
+  latitude: 37.3753636,
+  longitude: -5.9962577,
+  zoom: 6,
+};
 
 export function App(): JSX.Element {
   const [viewState, setViewState] = useState({...INITIAL_VIEW_STATE});
@@ -33,7 +37,7 @@ export function App(): JSX.Element {
         'carto-demo-data.demo_tables.derived_spatialfeatures_esp_h3res8_v1_yearly_v2',
       filters,
       aggregationExp: 'sum(population) as population',
-    })
+    });
   }, [filters]);
 
   // Update layers.
@@ -55,7 +59,7 @@ export function App(): JSX.Element {
   return (
     <>
       <header>
-        <h1>React</h1>
+        <h1>Spatial Index</h1>
         <a href="../">← Back</a>
       </header>
       <section id="view">
@@ -98,7 +102,7 @@ export function App(): JSX.Element {
           viewState={viewState}
           header="Pop. Distribution"
           columns={['population', 'male', 'female']}
-          sortBy='population'
+          sortBy="population"
         ></TableWidget>
         <ScatterWidget
           data={data}
