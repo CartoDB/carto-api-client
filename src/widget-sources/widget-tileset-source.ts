@@ -20,7 +20,7 @@ import {
   TimeSeriesResponse,
 } from './types.js';
 import {InvalidColumnError, getApplicableFilters} from '../utils.js';
-import {SpatialIndex, TileFormat} from '../constants.js';
+import {TileFormat} from '../constants.js';
 import {SpatialFilter, Tile} from '../types.js';
 import {
   TileFeatureExtractOptions,
@@ -38,6 +38,7 @@ import {
 } from '../operations/index.js';
 import {FeatureData} from '../types-internal.js';
 import {FeatureCollection} from 'geojson';
+import {SpatialDataType} from '../sources/types.js';
 
 type LayerTilesetSourceOptions = Omit<TilesetSourceOptions, 'filters'>;
 
@@ -46,7 +47,7 @@ export type WidgetTilesetSourceResult = {widgetSource: WidgetTilesetSource};
 export type WidgetTilesetSourceOptions = LayerTilesetSourceOptions &
   WidgetBaseSourceProps & {
     tileFormat: TileFormat;
-    spatialIndex?: SpatialIndex;
+    spatialDataType: SpatialDataType;
   };
 
 // TODO(cleanup): Put implementations in WidgetLocalSource and WidgetRemoteSource,
@@ -105,8 +106,8 @@ export class WidgetTilesetSource extends WidgetBaseSource<WidgetTilesetSourceOpt
       spatialFilter,
       uniqueIdProperty,
       tileFormat: this.props.tileFormat,
-      spatialDataColumn: this.props.geoColumn,
-      spatialIndex: this.props.spatialIndex,
+      spatialDataColumn: this.props.spatialDataColumn,
+      spatialDataType: this.props.spatialDataType,
     });
   }
 
