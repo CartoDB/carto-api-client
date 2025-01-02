@@ -79,7 +79,7 @@ function getCellsCoverGeometry(
   resolution: number
 ) {
   if (spatialIndex === SpatialIndex.QUADBIN) {
-    // @ts-expect-error TODO: We're pretty loose with number/bigint types in this file.
+    // @ts-expect-error TODO: Probably ought to be stricter about number vs. bigint types in this file.
     return geometryToCells(geometry, resolution);
   }
 
