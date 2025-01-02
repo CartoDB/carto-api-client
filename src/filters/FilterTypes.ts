@@ -1,5 +1,5 @@
 import {FilterType} from '../constants';
-import {FilterInterval} from '../types';
+import {FilterInterval, StringSearchOptions} from '../types';
 import {makeIntervalComplete} from '../utils/makeIntervalComplete.js';
 
 export type FilterFunction = (
@@ -64,14 +64,6 @@ function filterClosedOpen(
     checkRange
   );
 }
-
-type StringSearchOptions = {
-  useRegExp?: boolean;
-  mustStart?: boolean;
-  mustEnd?: boolean;
-  caseSensitive?: boolean;
-  keepSpecialCharacters?: boolean;
-};
 
 // FilterTypes.STRING_SEARCH
 function filterStringSearch(

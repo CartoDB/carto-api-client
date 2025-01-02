@@ -60,12 +60,10 @@ function createSortFn({
     sortBy,
     sortByDirection,
     sortByColumnType,
-  });
+  }) as Parameters<typeof firstBy>[];
 
-  // @ts-expect-error TODO(cleanup)
   let sortFn = firstBy(...firstSortOption);
   for (let sortOptions of othersSortOptions) {
-    // @ts-expect-error TODO(cleanup)
     sortFn = sortFn.thenBy(...sortOptions);
   }
 
