@@ -49,6 +49,33 @@ export type SourceOptionalOptions = {
   maxLengthURL?: number;
 
   /**
+   * The column name and the type of geospatial support.
+   *
+   * If not present, defaults to `'geom'` for generic queries, `'quadbin'` for Quadbin sources and `'h3'` for H3 sources.
+   */
+  spatialDataColumn?: string;
+
+  /**
+   * The type of geospatial support. Defaults to `'geo'`.
+   */
+  spatialDataType?: SpatialDataType;
+
+  /**
+   * Relative resolution of a tile. Higher values increase density and data size. At `tileResolution = 1`, tile geometry is
+   * quantized to a 1024x1024 grid. Increasing or decreasing the resolution will increase or decrease the dimensions of
+   * the quantization grid proportionately.
+   *
+   * Supported `tileResolution` values, with corresponding grid sizes:
+   *
+   * - 0.25: 256x256
+   * - 0.5: 512x512
+   * - 1: 1024x1024
+   * - 2: 2048x2048
+   * - 4: 4096x4096
+   */
+  tileResolution?: TileResolution;
+
+  /**
    * By default, local in-memory caching is enabled.
    */
   localCache?: LocalCacheOptions;
@@ -89,6 +116,11 @@ export type AggregationOptions = {
    * @default 6 for quadbin and 4 for h3 sources
    */
   aggregationResLevel?: number;
+
+  /**
+   * Original resolution of the spatial index data as stored in the DW
+   */
+  dataResolution?: number;
 };
 
 export type FilterOptions = {
@@ -99,30 +131,8 @@ export type FilterOptions = {
 };
 
 export type QuerySourceOptions = {
-  /**
-   * The column name and the type of geospatial support.
-   *
-   * If not present, defaults to `'geom'` for generic queries, `'quadbin'` for Quadbin sources and `'h3'` for H3 sources.
-   */
-  spatialDataColumn?: string;
-
-  /** SQL query. */
+  /** Full SQL query with query paremeter placeholders (if any). */
   sqlQuery: string;
-
-  /**
-   * Relative resolution of a tile. Higher values increase density and data size. At `tileResolution = 1`, tile geometry is
-   * quantized to a 1024x1024 grid. Increasing or decreasing the resolution will increase or decrease the dimensions of
-   * the quantization grid proportionately.
-   *
-   * Supported `tileResolution` values, with corresponding grid sizes:
-   *
-   * - 0.25: 256x256
-   * - 0.5: 512x512
-   * - 1: 1024x1024
-   * - 2: 2048x2048
-   * - 4: 4096x4096
-   */
-  tileResolution?: TileResolution;
 
   /**
    * Values for named or positional paramteres in the query.
@@ -167,28 +177,6 @@ export type TableSourceOptions = {
   tableName: string;
 
   /**
-   * The column name and the type of geospatial support.
-   *
-   * If not present, defaults to `'geom'` for generic tables, `'quadbin'` for Quadbin sources and `'h3'` for H3 sources.
-   */
-  spatialDataColumn?: string;
-
-  /**
-   * Relative resolution of a tile. Higher values increase density and data size. At `tileResolution = 1`, tile geometry is
-   * quantized to a 1024x1024 grid. Increasing or decreasing the resolution will increase or decrease the dimensions of
-   * the quantization grid proportionately.
-   *
-   * Supported `tileResolution` values, with corresponding grid sizes:
-   *
-   * - 0.25: 256x256
-   * - 0.5: 512x512
-   * - 1: 1024x1024
-   * - 2: 2048x2048
-   * - 4: 4096x4096
-   */
-  tileResolution?: TileResolution;
-
-  /**
    * Comma-separated aggregation expressions. If assigned on a vector source, source is grouped by geometry and then aggregated.
    *
    * Example:
@@ -215,6 +203,14 @@ export type ColumnsOption = {
 };
 
 export type SpatialDataType = 'geo' | 'h3' | 'quadbin';
+
+/**
+ * Strategy used for covering spatial filter geometry with spatial indexes.
+ * See https://docs.carto.com/data-and-analysis/analytics-toolbox-for-bigquery/sql-reference/quadbin#quadbin_polyfill_mode
+ * or https://docs.carto.com/data-and-analysis/analytics-toolbox-for-bigquery/sql-reference/h3#h3_polyfill_mode for more information.
+ * @internalRemarks Source: cloud-native maps-api
+ * */
+export type SpatialFilterPolyfillMode = 'center' | 'intersects' | 'contains';
 
 export type TilejsonMapInstantiation = MapInstantiation & {
   tilejson: {url: string[]};

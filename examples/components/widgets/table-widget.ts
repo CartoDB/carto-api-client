@@ -69,6 +69,7 @@ export class TableWidget extends BaseWidget {
         ...(sortBy && {sortBy, sortDirection}),
         limit,
         spatialFilter: this.getSpatialFilterOrViewState(),
+        spatialIndexReferenceViewState: this.viewState ?? undefined,
       });
     },
     args: () =>
@@ -136,11 +137,14 @@ function renderTableRow(row: unknown[]) {
   </tr>`;
 }
 
-const _numberFormatter = new Intl.NumberFormat();
+const _numberFormatter = new Intl.NumberFormat('en-US', {
+  maximumFractionDigits: 2,
+  notation: 'compact',
+});
 function renderTableCell(value: unknown) {
   let formattedValue: string;
   if (typeof value === 'number') {
-    return _numberFormatter.format(value);
+    formattedValue = _numberFormatter.format(value);
   } else {
     formattedValue = String(value);
   }

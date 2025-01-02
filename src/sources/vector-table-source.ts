@@ -67,7 +67,10 @@ export const vectorTableSource = async function (
   return baseSource<UrlParameters>('table', options, urlParameters).then(
     (result) => ({
       ...(result as TilejsonResult),
-      widgetSource: new WidgetTableSource(options),
+      widgetSource: new WidgetTableSource({
+        ...options,
+        spatialDataType: 'geo',
+      }),
     })
   );
 };

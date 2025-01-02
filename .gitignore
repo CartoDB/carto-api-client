@@ -11,3 +11,4 @@ custom-elements.json
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+.env

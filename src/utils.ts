@@ -57,7 +57,7 @@ export function normalizeObjectKeys<T, R extends Row<T>>(el: R): R {
 }
 
 /** @internalRemarks Source: @carto/react-core */
-export function assert(condition: unknown, message: string) {
+export function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
     throw new Error(message);
   }

@@ -57,7 +57,12 @@ export const h3TableSource = async function (
   return baseSource<UrlParameters>('table', options, urlParameters).then(
     (result) => ({
       ...(result as TilejsonResult),
-      widgetSource: new WidgetTableSource(options),
+      widgetSource: new WidgetTableSource({
+        ...options,
+        // NOTE: passing redundant spatialDataColumn here to apply the default value 'h3'
+        spatialDataColumn,
+        spatialDataType: 'h3',
+      }),
     })
   );
 };
