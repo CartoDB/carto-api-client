@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
+import {DEFAULT_GEO_COLUMN} from '../constants-internal';
 import {getTileFormat} from '../utils/getTileFormat';
 import {
   WidgetTilesetSource,
@@ -23,7 +24,7 @@ export type VectorTilesetSourceResponse = TilejsonResult &
 export const vectorTilesetSource = async function (
   options: VectorTilesetSourceOptions
 ): Promise<VectorTilesetSourceResponse> {
-  const {tableName} = options;
+  const {tableName, spatialDataColumn = DEFAULT_GEO_COLUMN} = options;
   const urlParameters: UrlParameters = {name: tableName};
 
   return baseSource<UrlParameters>('tileset', options, urlParameters).then(
@@ -32,6 +33,8 @@ export const vectorTilesetSource = async function (
       widgetSource: new WidgetTilesetSource({
         ...options,
         tileFormat: getTileFormat(result as TilejsonResult),
+        spatialDataColumn,
+        spatialDataType: 'geo',
       }),
     })
   ) as Promise<VectorTilesetSourceResponse>;
