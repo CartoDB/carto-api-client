@@ -153,7 +153,7 @@ export type FormulaResponse = {value: number | null};
 export type CategoryResponse = {name: string; value: number}[];
 
 /** Response from {@link WidgetBaseSource#getRange}. */
-export type RangeResponse = {min: number; max: number};
+export type RangeResponse = {min: number; max: number} | null;
 
 /** Response from {@link WidgetBaseSource#getTable}. */
 export type TableResponse = {
@@ -167,7 +167,7 @@ export type ScatterResponse = [number, number][];
 /** Response from {@link WidgetBaseSource#getTimeSeries}. */
 export type TimeSeriesResponse = {
   rows: {name: string; value: number}[];
-  categories: string[];
+  categories?: string[];
 };
 
 /** Response from {@link WidgetBaseSource#getHistogram}. */

@@ -210,7 +210,6 @@ export class WidgetTilesetSource extends WidgetBaseSource<WidgetTilesetSourceOpt
 
     const filteredFeatures = this._getFilteredFeatures(filterOwner);
 
-    // TODO(api): Are 'column' and 'operationColumn' required only for tilesets?
     assertColumn(this._features, column as string, operationColumn as string);
 
     const groups = groupValuesByColumn({
@@ -271,7 +270,7 @@ export class WidgetTilesetSource extends WidgetBaseSource<WidgetTilesetSourceOpt
     let filteredFeatures = this._getFilteredFeatures(filterOwner);
 
     // Search.
-    // TODO(design): Could we get the same behavior by passing filters?
+    // TODO: Could we get the same behavior by applying filters in loadTiles()?
     if (searchFilterColumn && searchFilterText) {
       filteredFeatures = filteredFeatures.filter(
         (row) =>
@@ -317,35 +316,34 @@ export class WidgetTilesetSource extends WidgetBaseSource<WidgetTilesetSourceOpt
     filterOwner,
   }: TimeSeriesRequestOptions): Promise<TimeSeriesResponse> {
     if (!this._features.length) {
-      // TODO(api): Is this at all the same response shape as the API returns?
-      return [] as unknown as TimeSeriesResponse;
+      return {rows: []};
     }
 
     const filteredFeatures = this._getFilteredFeatures(filterOwner);
 
-    // TODO(api): Are 'column' and 'operationColumn' required only for tilesets?
     assertColumn(this._features, column as string, operationColumn as string);
 
-    const groups = groupValuesByDateColumn({
-      data: filteredFeatures,
-      valuesColumns: normalizeColumns(operationColumn || column),
-      keysColumn: column,
-      groupType: stepSize,
-      operation,
-      joinOperation,
-    });
+    const rows =
+      groupValuesByDateColumn({
+        data: filteredFeatures,
+        valuesColumns: normalizeColumns(operationColumn || column),
+        keysColumn: column,
+        groupType: stepSize,
+        operation,
+        joinOperation,
+      }) || [];
 
-    // @ts-expect-error TODO(api): Is this at all the same response shape as the API returns?
-    return groups || [];
+    return {rows};
   }
 
   override async getRange({
     column,
     filterOwner,
   }: RangeRequestOptions): Promise<RangeResponse> {
-    // TODO(api): Previously this case returned 'null' ... what do we prefer?
     if (!this._features.length) {
-      return {min: -Infinity, max: Infinity};
+      // TODO: Is this the only nullable response in the Widgets API? If so,
+      // can we do something more consistent?
+      return null;
     }
 
     assertColumn(this._features, column);
