@@ -4,6 +4,10 @@
 
 ## 0.4
 
+### 0.4.4
+
+- feat: Add support for spatial index types (H3, quadbin) in Widget APIs
+
 ### 0.4.3
 
 - feat: Add support for`aggregationExp` parameter to `vectorQuerySource` and `vectorTableSource`
