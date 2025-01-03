@@ -28,6 +28,7 @@ export const rasterSource = async function (
   if (filters) {
     urlParameters.filters = filters;
   }
+
   return baseSource<UrlParameters>(
     'raster',
     options,

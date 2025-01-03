@@ -111,6 +111,7 @@
   <table-widget
     header="Store type"
     columns={['storetype', 'revenue']}
+    sortBy="revenue"
     {data}
     {viewState}
   ></table-widget>

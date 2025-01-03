@@ -98,6 +98,7 @@ export function App(): JSX.Element {
           viewState={viewState}
           header="Store type"
           columns={['storetype', 'revenue']}
+          sortBy="revenue"
         ></TableWidget>
 
         <ScatterWidget

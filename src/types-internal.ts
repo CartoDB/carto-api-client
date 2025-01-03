@@ -60,3 +60,9 @@ type MapInstantiationFormats = Record<
     error?: any;
   }
 >;
+
+/******************************************************************************
+ * LOCAL CALCULATIONS
+ */
+
+export type FeatureData = Record<string, unknown>;

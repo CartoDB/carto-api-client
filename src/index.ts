@@ -16,3 +16,9 @@ export {
   query,
   requestWithParameters,
 } from './api/index.js';
+
+// For unit testing only.
+export * from './filters/index.js';
+export * from './operations/index.js';
+export * from './utils/makeIntervalComplete.js';
+export * from './utils/transformToTileCoords.js';

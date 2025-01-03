@@ -1,5 +1,6 @@
 import type {FilterType} from './constants.js';
-import type {Polygon, MultiPolygon} from 'geojson';
+import type {Polygon, MultiPolygon, Feature} from 'geojson';
+import type {BinaryFeature, BinaryFeatureCollection} from '@loaders.gl/schema';
 
 /******************************************************************************
  * MAPS AND TILES
@@ -10,6 +11,43 @@ export type Format = 'json' | 'geojson' | 'tilejson';
 
 /** @internalRemarks Source: @carto/constants, @deck.gl/carto */
 export type MapType = 'boundary' | 'query' | 'table' | 'tileset' | 'raster';
+
+/**
+ * Alias for GeoJSON 'BBox' type, semantically representing a viewport.
+ * Order of values is "west", "south", "east", "north".
+ */
+export type Viewport = [number, number, number, number];
+
+/**
+ * Subset of deck.gl's Tile2DHeader type, containing only the properties
+ * required for local widget calculations. Deeper dependencies on deck.gl
+ * APIs should be minimized within this library: @deck.gl/carto depends
+ * on the API client, not the other way around.
+ * @internalRemarks Source: @deck.gl/geo-layers
+ */
+export type Tile = {
+  index: {x: number; y: number; z: number};
+  id: string;
+  content: unknown;
+  zoom: number;
+  bbox: {west: number; east: number; north: number; south: number};
+  isVisible: boolean;
+  data?: BinaryFeatureCollection;
+};
+
+/** Subset of deck.gl's Tile2DHeader type, for spatial indexes. */
+export type SpatialIndexTile = Tile & {
+  data?: (Feature & {id: bigint})[];
+};
+
+/** @internalRemarks Source: @deck.gl/carto */
+export type Raster = {
+  blockSize: number;
+  cells: {
+    numericProps: BinaryFeature['numericProps'];
+    properties: BinaryFeature['properties'];
+  };
+};
 
 /******************************************************************************
  * AGGREGATION
@@ -49,11 +87,31 @@ export interface Filter {
   /** [a, b) a is included, b is not. */
   [FilterType.CLOSED_OPEN]?: {owner?: string; values: number[][]};
   [FilterType.TIME]?: {owner?: string; values: number[][]};
-  [FilterType.STRING_SEARCH]?: {owner?: string; values: string[]};
+  [FilterType.STRING_SEARCH]?: {
+    owner?: string;
+    values: string[];
+    params?: StringSearchOptions;
+  };
 }
 
 /** @internalRemarks Source: @carto/react-core */
 export type FilterLogicalOperator = 'and' | 'or';
+
+/**
+ * Type for minimum or maximum value of an interval. Values 'null' and
+ * 'undefined' are intentionally allowed, and represent an unbounded value.
+ */
+export type FilterIntervalExtremum = number | null | undefined;
+export type FilterInterval = [FilterIntervalExtremum, FilterIntervalExtremum];
+export type FilterIntervalComplete = [number, number];
+
+export type StringSearchOptions = {
+  useRegExp?: boolean;
+  mustStart?: boolean;
+  mustEnd?: boolean;
+  caseSensitive?: boolean;
+  keepSpecialCharacters?: boolean;
+};
 
 /******************************************************************************
  * GROUPING
