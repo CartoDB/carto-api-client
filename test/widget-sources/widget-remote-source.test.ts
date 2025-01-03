@@ -1,8 +1,8 @@
 import {afterEach, expect, test, vi} from 'vitest';
 import {
   FilterType,
-  WidgetBaseSource,
-  WidgetBaseSourceProps,
+  WidgetRemoteSource,
+  WidgetRemoteSourceProps,
 } from '@carto/api-client';
 
 const createMockResponse = (data: unknown) => ({
@@ -10,14 +10,14 @@ const createMockResponse = (data: unknown) => ({
   json: () => new Promise((resolve) => resolve(data)),
 });
 
-class WidgetTestSource extends WidgetBaseSource<WidgetBaseSourceProps> {
+class WidgetTestSource extends WidgetRemoteSource<WidgetRemoteSourceProps> {
   protected override getModelSource(owner: string) {
     return {
       ...super._getModelSource(owner),
       type: 'test',
       data: 'test-data',
     } as unknown as ReturnType<
-      WidgetBaseSource<WidgetBaseSourceProps>['getModelSource']
+      WidgetRemoteSource<WidgetRemoteSourceProps>['getModelSource']
     >;
   }
 }
@@ -27,7 +27,7 @@ afterEach(() => {
 });
 
 test('exports', () => {
-  expect(WidgetBaseSource).toBeDefined();
+  expect(WidgetRemoteSource).toBeDefined();
 });
 
 test('constructor', () => {
