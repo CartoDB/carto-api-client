@@ -3,7 +3,10 @@ import {
   QuadbinQuerySourceOptions,
   VectorQuerySourceOptions,
 } from '../sources/index.js';
-import {WidgetBaseSource, WidgetBaseSourceProps} from './widget-base-source.js';
+import {
+  WidgetRemoteSource,
+  WidgetRemoteSourceProps,
+} from './widget-remote-source.js';
 import {ModelSource} from '../models/model.js';
 
 type LayerQuerySourceOptions =
@@ -35,8 +38,8 @@ export type WidgetQuerySourceResult = {widgetSource: WidgetQuerySource};
  * const { widgetSource } = await data;
  * ```
  */
-export class WidgetQuerySource extends WidgetBaseSource<
-  LayerQuerySourceOptions & WidgetBaseSourceProps
+export class WidgetQuerySource extends WidgetRemoteSource<
+  LayerQuerySourceOptions & WidgetRemoteSourceProps
 > {
   protected override getModelSource(owner: string): ModelSource {
     return {
