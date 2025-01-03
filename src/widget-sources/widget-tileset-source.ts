@@ -53,6 +53,11 @@ export type WidgetTilesetSourceOptions = LayerTilesetSourceOptions &
 // TODO(cleanup): Put implementations in WidgetLocalSource and WidgetRemoteSource,
 // let the tileset, table, query, and raster sources inherit from those.
 
+// TODO(cleanup): Parameter defaults in source functions and widget API calls are
+// currently duplicated and possibly inconsistent. Consider consolidating and
+// operating on Required<T> objects. See:
+// https://github.com/CartoDB/carto-api-client/issues/39
+
 /**
  * Source for Widget API requests on a data source defined by a tileset.
  *
@@ -134,7 +139,6 @@ export class WidgetTilesetSource extends WidgetBaseSource<WidgetTilesetSourceOpt
   }
 
   async getFormula({
-    // TODO(cleanup): Defaults should be shared among sources.
     column = '*',
     operation = 'count',
     joinOperation,
@@ -170,7 +174,6 @@ export class WidgetTilesetSource extends WidgetBaseSource<WidgetTilesetSourceOpt
   }
 
   override async getHistogram({
-    // TODO(cleanup): Defaults should be shared among sources.
     operation = 'count',
     ticks,
     column,
@@ -196,7 +199,6 @@ export class WidgetTilesetSource extends WidgetBaseSource<WidgetTilesetSourceOpt
 
   override async getCategories({
     column,
-    // TODO(cleanup): Defaults should be shared among sources.
     operation = 'count',
     operationColumn,
     joinOperation,
@@ -213,7 +215,6 @@ export class WidgetTilesetSource extends WidgetBaseSource<WidgetTilesetSourceOpt
 
     const groups = groupValuesByColumn({
       data: filteredFeatures,
-      // TODO(cleanup): Defaults should be shared among sources.
       valuesColumns: normalizeColumns(operationColumn || column),
       joinOperation,
       keysColumn: column,
@@ -327,7 +328,6 @@ export class WidgetTilesetSource extends WidgetBaseSource<WidgetTilesetSourceOpt
 
     const groups = groupValuesByDateColumn({
       data: filteredFeatures,
-      // TODO(cleanup): Defaults should be shared among sources.
       valuesColumns: normalizeColumns(operationColumn || column),
       keysColumn: column,
       groupType: stepSize,
