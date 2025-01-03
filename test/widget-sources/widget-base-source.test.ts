@@ -536,6 +536,7 @@ test('getTimeSeries', async () => {
 
   const actualTimeSeries = await widgetSource.getTimeSeries({
     column: 'date',
+    stepSize: 'month',
     operation: 'count',
     operationColumn: 'purchases',
   });
@@ -549,6 +550,7 @@ test('getTimeSeries', async () => {
     source: 'test-data',
     params: JSON.stringify({
       column: 'date',
+      stepSize: 'month',
       operationColumn: 'purchases',
       operation: 'count',
     }),
