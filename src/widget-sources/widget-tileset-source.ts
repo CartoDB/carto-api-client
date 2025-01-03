@@ -1,8 +1,4 @@
 import {TilesetSourceOptions} from '../sources/index.js';
-import {
-  WidgetRemoteSource,
-  WidgetRemoteSourceProps,
-} from './widget-remote-source.js';
 import type {ModelSource} from '../models/index.js';
 import {
   CategoryRequestOptions,
@@ -42,24 +38,20 @@ import {
 import {FeatureData} from '../types-internal.js';
 import {FeatureCollection} from 'geojson';
 import {SpatialDataType} from '../sources/types.js';
-
-type LayerTilesetSourceOptions = Omit<TilesetSourceOptions, 'filters'>;
-
-export type WidgetTilesetSourceResult = {widgetSource: WidgetTilesetSource};
-
-export type WidgetTilesetSourceOptions = LayerTilesetSourceOptions &
-  WidgetRemoteSourceProps & {
-    tileFormat: TileFormat;
-    spatialDataType: SpatialDataType;
-  };
-
-// TODO(cleanup): Put implementations in WidgetLocalSource and WidgetRemoteSource,
-// let the tileset, table, query, and raster sources inherit from those.
+import {WidgetSource, WidgetSourceProps} from './widget-source.js';
 
 // TODO(cleanup): Parameter defaults in source functions and widget API calls are
 // currently duplicated and possibly inconsistent. Consider consolidating and
 // operating on Required<T> objects. See:
 // https://github.com/CartoDB/carto-api-client/issues/39
+
+export type WidgetTilesetSourceProps = WidgetSourceProps &
+  Omit<TilesetSourceOptions, 'filters'> & {
+    tileFormat: TileFormat;
+    spatialDataType: SpatialDataType;
+  };
+
+export type WidgetTilesetSourceResult = {widgetSource: WidgetTilesetSource};
 
 /**
  * Source for Widget API requests on a data source defined by a tileset.
@@ -83,7 +75,9 @@ export type WidgetTilesetSourceOptions = LayerTilesetSourceOptions &
  * const { widgetSource } = await data;
  * ```
  */
-export class WidgetTilesetSource extends WidgetRemoteSource<WidgetTilesetSourceOptions> {
+export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> {
+  private _features: FeatureData[] = [];
+
   protected override getModelSource(owner: string): ModelSource {
     return {
       ...super._getModelSource(owner),
@@ -92,8 +86,7 @@ export class WidgetTilesetSource extends WidgetRemoteSource<WidgetTilesetSourceO
     };
   }
 
-  private _features: FeatureData[] = [];
-
+  /** Loads features as a list of tiles (typically provided by deck.gl). */
   loadTiles({
     tiles,
     spatialFilter,
@@ -119,6 +112,7 @@ export class WidgetTilesetSource extends WidgetRemoteSource<WidgetTilesetSourceO
     });
   }
 
+  /** Loads features as GeoJSON (used for testing). */
   loadGeoJSON({
     geojson,
     spatialFilter,
