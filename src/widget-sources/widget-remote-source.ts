@@ -28,23 +28,26 @@ import {DEFAULT_TILE_RESOLUTION} from '../constants-internal.js';
 import {getSpatialFiltersResolution} from '../spatial-index.js';
 import {AggregationOptions} from '../sources/types.js';
 
-export interface WidgetBaseSourceProps extends Omit<SourceOptions, 'filters'> {
+export interface WidgetRemoteSourceProps
+  extends Omit<SourceOptions, 'filters'> {
   apiVersion?: ApiVersion;
   filters?: Record<string, Filter>;
   filtersLogicalOperator?: FilterLogicalOperator;
 }
 
-export type WidgetSource = WidgetBaseSource<WidgetBaseSourceProps>;
+export type WidgetSource = WidgetRemoteSource<WidgetRemoteSourceProps>;
 
 /**
  * Source for Widget API requests on a data source defined by a SQL query.
  *
  * Abstract class. Use {@link WidgetQuerySource} or {@link WidgetTableSource}.
  */
-export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
+export abstract class WidgetRemoteSource<
+  Props extends WidgetRemoteSourceProps
+> {
   readonly props: Props;
 
-  static defaultProps: Partial<WidgetBaseSourceProps> = {
+  static defaultProps: Partial<WidgetRemoteSourceProps> = {
     apiVersion: ApiVersion.V3,
     apiBaseUrl: DEFAULT_API_BASE_URL,
     clientId: getClient(),
@@ -53,12 +56,12 @@ export abstract class WidgetBaseSource<Props extends WidgetBaseSourceProps> {
   };
 
   constructor(props: Props) {
-    this.props = {...WidgetBaseSource.defaultProps, ...props};
+    this.props = {...WidgetRemoteSource.defaultProps, ...props};
   }
 
   /**
-   * Subclasses of {@link WidgetBaseSource} must implement this method, calling
-   * {@link WidgetBaseSource.prototype._getModelSource} for common source
+   * Subclasses of {@link WidgetRemoteSource} must implement this method, calling
+   * {@link WidgetRemoteSource.prototype._getModelSource} for common source
    * properties, and adding additional required properties including 'type' and
    * 'data'.
    */

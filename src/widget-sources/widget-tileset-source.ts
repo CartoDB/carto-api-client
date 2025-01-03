@@ -1,5 +1,8 @@
 import {TilesetSourceOptions} from '../sources/index.js';
-import {WidgetBaseSource, WidgetBaseSourceProps} from './widget-base-source.js';
+import {
+  WidgetRemoteSource,
+  WidgetRemoteSourceProps,
+} from './widget-remote-source.js';
 import type {ModelSource} from '../models/index.js';
 import {
   CategoryRequestOptions,
@@ -45,7 +48,7 @@ type LayerTilesetSourceOptions = Omit<TilesetSourceOptions, 'filters'>;
 export type WidgetTilesetSourceResult = {widgetSource: WidgetTilesetSource};
 
 export type WidgetTilesetSourceOptions = LayerTilesetSourceOptions &
-  WidgetBaseSourceProps & {
+  WidgetRemoteSourceProps & {
     tileFormat: TileFormat;
     spatialDataType: SpatialDataType;
   };
@@ -80,11 +83,11 @@ export type WidgetTilesetSourceOptions = LayerTilesetSourceOptions &
  * const { widgetSource } = await data;
  * ```
  */
-export class WidgetTilesetSource extends WidgetBaseSource<WidgetTilesetSourceOptions> {
+export class WidgetTilesetSource extends WidgetRemoteSource<WidgetTilesetSourceOptions> {
   protected override getModelSource(owner: string): ModelSource {
     return {
       ...super._getModelSource(owner),
-      type: 'raster',
+      type: 'tileset',
       data: this.props.tableName,
     };
   }

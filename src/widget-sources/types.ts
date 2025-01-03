@@ -5,6 +5,7 @@ import {
   SortDirection,
   SpatialFilter,
 } from '../types';
+import type {WidgetRemoteSource} from './widget-remote-source';
 
 /******************************************************************************
  * WIDGET API REQUESTS
@@ -16,7 +17,7 @@ export interface ViewState {
   longitude: number;
 }
 
-/** Common options for {@link WidgetBaseSource} requests. */
+/** Common options for {@link WidgetRemoteSource} requests. */
 interface BaseRequestOptions {
   spatialFilter?: SpatialFilter;
   spatialFiltersMode?: SpatialFilterPolyfillMode;
@@ -26,7 +27,7 @@ interface BaseRequestOptions {
   filterOwner?: string;
 }
 
-/** Options for {@link WidgetBaseSource#getCategories}. */
+/** Options for {@link WidgetRemoteSource#getCategories}. */
 export interface CategoryRequestOptions extends BaseRequestOptions {
   column: string;
   operation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
@@ -36,7 +37,7 @@ export interface CategoryRequestOptions extends BaseRequestOptions {
 }
 
 /**
- * Options for {@link WidgetBaseSource#getFeatures}.
+ * Options for {@link WidgetRemoteSource#getFeatures}.
  * @experimental
  * @internal
  */
@@ -78,7 +79,7 @@ export interface FeaturesRequestOptions extends BaseRequestOptions {
   tileResolution?: TileResolution;
 }
 
-/** Options for {@link WidgetBaseSource#getFormula}. */
+/** Options for {@link WidgetRemoteSource#getFormula}. */
 export interface FormulaRequestOptions extends BaseRequestOptions {
   column: string;
   operation?: 'count' | 'avg' | 'min' | 'max' | 'sum' | 'custom';
@@ -86,7 +87,7 @@ export interface FormulaRequestOptions extends BaseRequestOptions {
   joinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
 }
 
-/** Options for {@link WidgetBaseSource#getHistogram}. */
+/** Options for {@link WidgetRemoteSource#getHistogram}. */
 export interface HistogramRequestOptions extends BaseRequestOptions {
   column: string;
   ticks: number[];
@@ -95,12 +96,12 @@ export interface HistogramRequestOptions extends BaseRequestOptions {
   joinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
 }
 
-/** Options for {@link WidgetBaseSource#getRange}. */
+/** Options for {@link WidgetRemoteSource#getRange}. */
 export interface RangeRequestOptions extends BaseRequestOptions {
   column: string;
 }
 
-/** Options for {@link WidgetBaseSource#getScatter}. */
+/** Options for {@link WidgetRemoteSource#getScatter}. */
 export interface ScatterRequestOptions extends BaseRequestOptions {
   xAxisColumn: string;
   xAxisJoinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
@@ -108,7 +109,7 @@ export interface ScatterRequestOptions extends BaseRequestOptions {
   yAxisJoinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
 }
 
-/** Options for {@link WidgetBaseSource#getTable}. */
+/** Options for {@link WidgetRemoteSource#getTable}. */
 export interface TableRequestOptions extends BaseRequestOptions {
   columns: string[];
   sortBy?: string;
@@ -122,7 +123,7 @@ export interface TableRequestOptions extends BaseRequestOptions {
   searchFilterText?: string;
 }
 
-/** Options for {@link WidgetBaseSource#getTimeSeries}. */
+/** Options for {@link WidgetRemoteSource#getTimeSeries}. */
 export interface TimeSeriesRequestOptions extends BaseRequestOptions {
   column: string;
   stepSize: GroupDateType;
@@ -140,35 +141,35 @@ export interface TimeSeriesRequestOptions extends BaseRequestOptions {
  */
 
 /**
- * Response from {@link WidgetBaseSource#getFeatures}.
+ * Response from {@link WidgetRemoteSource#getFeatures}.
  * @experimental
  * @internal
  */
 export type FeaturesResponse = {rows: Record<string, unknown>[]};
 
-/** Response from {@link WidgetBaseSource#getFormula}. */
+/** Response from {@link WidgetRemoteSource#getFormula}. */
 export type FormulaResponse = {value: number | null};
 
-/** Response from {@link WidgetBaseSource#getCategories}. */
+/** Response from {@link WidgetRemoteSource#getCategories}. */
 export type CategoryResponse = {name: string; value: number}[];
 
-/** Response from {@link WidgetBaseSource#getRange}. */
+/** Response from {@link WidgetRemoteSource#getRange}. */
 export type RangeResponse = {min: number; max: number} | null;
 
-/** Response from {@link WidgetBaseSource#getTable}. */
+/** Response from {@link WidgetRemoteSource#getTable}. */
 export type TableResponse = {
   totalCount: number;
   rows: Record<string, number | string>[];
 };
 
-/** Response from {@link WidgetBaseSource#getScatter}. */
+/** Response from {@link WidgetRemoteSource#getScatter}. */
 export type ScatterResponse = [number, number][];
 
-/** Response from {@link WidgetBaseSource#getTimeSeries}. */
+/** Response from {@link WidgetRemoteSource#getTimeSeries}. */
 export type TimeSeriesResponse = {
   rows: {name: string; value: number}[];
   categories?: string[];
 };
 
-/** Response from {@link WidgetBaseSource#getHistogram}. */
+/** Response from {@link WidgetRemoteSource#getHistogram}. */
 export type HistogramResponse = number[];
