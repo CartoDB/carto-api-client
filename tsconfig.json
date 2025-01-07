@@ -12,6 +12,7 @@
     "lib": ["es2022", "DOM", "DOM.Iterable"],
     "types": ["vite/client"],
     "jsx": "react",
-    "strict": true
+    "strict": true,
+    "isolatedModules": true
   }
 }

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-import {MapType} from '../types';
+import type {MapType} from '../types';
 
 export type APIRequestType =
   | 'Map data'

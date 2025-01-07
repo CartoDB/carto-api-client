@@ -6,7 +6,6 @@ import {
   QueryParameters,
   SpatialFilter,
 } from '../types.js';
-import {$TODO} from '../types-internal.js';
 import {assert, isPureObject} from '../utils.js';
 import {ModelRequestOptions, makeCall} from './common.js';
 import {ApiVersion} from '../constants.js';

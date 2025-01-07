@@ -1478,6 +1478,7 @@ __metadata:
     microbundle: "npm:^0.15.1"
     prettier: "npm:^3.4.2"
     rimraf: "npm:^3.0.2"
+    rollup-plugin-typescript2: "npm:^0.36.0"
     semver: "npm:^7.6.3"
     typescript: "npm:~5.3.3"
     vite: "npm:^5.2.10"
@@ -8172,6 +8173,22 @@ __metadata:
     rollup: ">=1.26.3"
     typescript: ">=2.4.0"
   checksum: 10c0/b638621497201003cedee0eea8f4bb5c4e7dba2eab18a6535ee2c826df650ad3dde7bb791243a436c8f588a8437e259c5f7258b053f94b630db6b4f66f0d589f
+  languageName: node
+  linkType: hard
+
+"rollup-plugin-typescript2@npm:^0.36.0":
+  version: 0.36.0
+  resolution: "rollup-plugin-typescript2@npm:0.36.0"
+  dependencies:
+    "@rollup/pluginutils": "npm:^4.1.2"
+    find-cache-dir: "npm:^3.3.2"
+    fs-extra: "npm:^10.0.0"
+    semver: "npm:^7.5.4"
+    tslib: "npm:^2.6.2"
+  peerDependencies:
+    rollup: ">=1.26.3"
+    typescript: ">=2.4.0"
+  checksum: 10c0/3c8d17cd852ded36eaad2759caf170f90e091d8f86ff7b016d1823bc8b507b8f689156bcccda348fc88471681dc79cc9eb13ddb09a4dfcf0d07ac9a249e2d79b
   languageName: node
   linkType: hard
 

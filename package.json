@@ -20,7 +20,7 @@
     ".": {
       "types": "./build/index.d.ts",
       "require": "./build/api-client.cjs",
-      "default": "./build/api-client.modern.js"
+      "default": "./build/api-client.js"
     }
   },
   "browserslist": [
@@ -29,8 +29,8 @@
     "node >= 18"
   ],
   "scripts": {
-    "build": "microbundle --format cjs,modern --no-compress --define __CARTO_API_CLIENT_VERSION=$npm_package_version",
-    "build:watch": "microbundle watch --format cjs,modern --no-compress --define __CARTO_API_CLIENT_VERSION=$npm_package_version",
+    "build": "vite build",
+    "build:watch": "vite build --watch",
     "dev": "concurrently \"yarn build:watch\" \"vite --config examples/vite.config.ts --open\"",
     "test": "vitest run --typecheck",
     "test:watch": "vitest watch --typecheck",
@@ -84,6 +84,7 @@
     "microbundle": "^0.15.1",
     "prettier": "^3.4.2",
     "rimraf": "^3.0.2",
+    "rollup-plugin-typescript2": "^0.36.0",
     "semver": "^7.6.3",
     "typescript": "~5.3.3",
     "vite": "^5.2.10",
