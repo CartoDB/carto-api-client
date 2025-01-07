@@ -8252,8 +8252,8 @@ __metadata:
   linkType: hard
 
 "react-map-gl@npm:^7.1.7":
-  version: 7.1.7
-  resolution: "react-map-gl@npm:7.1.7"
+  version: 7.1.8
+  resolution: "react-map-gl@npm:7.1.8"
   dependencies:
     "@maplibre/maplibre-gl-style-spec": "npm:^19.2.1"
     "@types/mapbox-gl": "npm:>=1.0.0"
@@ -8267,7 +8267,7 @@ __metadata:
       optional: true
     maplibre-gl:
       optional: true
-  checksum: 10c0/bd289f2f466a905d1ef23459c49deb9b71d51aa569f59e098e64fe984c5b8c04cce589ebf59642e09142a61077bd995ae4ad1641318a15640a63ffaf28c148b8
+  checksum: 10c0/0b97bb4d15ee567c8b1d540c50523d508a6ec52d399049865a937e451da677ea445bea86a0d2512d49d35d0d92c783f9818743742faab3927b8e84fd3f150412
   languageName: node
   linkType: hard
 
