@@ -2,13 +2,13 @@
 <html lang="en-US">
   <head>
     <meta charset="utf-8" />
-    <title>Examples / Pure JS</title>
+    <title>Examples / Spatial Index</title>
     <link rel="stylesheet" href="../style.css" />
   </head>
   <body>
     <main id="app">
       <header>
-        <h1>Pure JS</h1>
+        <h1>Spatial Index</h1>
         <a href="../">← Back</a>
       </header>
       <section id="view">
@@ -18,46 +18,42 @@
       <section id="rail">
         <formula-widget
           id="formula"
-          header="Total"
+          header="Total population"
           operation="count"
         ></formula-widget>
-
         <category-widget
           id="category"
-          header="Store type"
+          header="Urbanity"
           operation="count"
-          column="storetype"
+          column="urbanity"
         ></category-widget>
-
         <pie-widget
           id="pie"
-          header="Store type"
+          header="Urbanity"
           operation="count"
-          column="storetype"
+          column="urbanity"
         ></pie-widget>
-
         <table-widget
           id="table"
-          header="Store type"
-          columns='["storetype","revenue"]'
+          header="Pop. Distribution"
+          columns='["population", "male", "female"]'
+          sortBy="population"
         ></table-widget>
-
         <scatter-widget
           id="scatter"
-          header="Size vs. Revenue"
-          xAxisColumn="size_m2"
-          yAxisColumn="revenue"
+          header="Education vs. Healthcare"
+          xAxisColumn="education"
+          yAxisColumn="healthcare"
         ></scatter-widget>
-
         <histogram-widget
           id="histogram"
-          header="Revenue"
-          column="revenue"
-          ticks="[1250000, 1500000, 1750000]"
+          header="Population distribution"
+          column="population"
+          ticks="[100, 500, 1000, 5000]"
         ></histogram-widget>
       </section>
       <footer id="footer"></footer>
     </main>
-    <script type="module" src="./pure-js.ts"></script>
+    <script type="module" src="./app.ts"></script>
   </body>
 </html>
