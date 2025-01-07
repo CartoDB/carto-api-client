@@ -1479,7 +1479,7 @@ __metadata:
     echarts: "npm:^5.5.0"
     lit: "npm:^3.1.4"
     lit-analyzer: "npm:^1.2.1"
-    maplibre-gl: "npm:^4.6.0"
+    maplibre-gl: "npm:^5.0.0"
     microbundle: "npm:^0.15.1"
     prettier: "npm:^2.6.2"
     react: "npm:^18.3.1"
@@ -2393,23 +2393,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@maplibre/maplibre-gl-style-spec@npm:^20.3.1":
-  version: 20.3.1
-  resolution: "@maplibre/maplibre-gl-style-spec@npm:20.3.1"
+"@maplibre/maplibre-gl-style-spec@npm:^22.0.1":
+  version: 22.0.1
+  resolution: "@maplibre/maplibre-gl-style-spec@npm:22.0.1"
   dependencies:
     "@mapbox/jsonlint-lines-primitives": "npm:~2.0.2"
     "@mapbox/unitbezier": "npm:^0.0.1"
     json-stringify-pretty-compact: "npm:^4.0.0"
     minimist: "npm:^1.2.8"
-    quickselect: "npm:^2.0.0"
+    quickselect: "npm:^3.0.0"
     rw: "npm:^1.3.3"
-    sort-object: "npm:^3.0.3"
     tinyqueue: "npm:^3.0.0"
   bin:
     gl-style-format: dist/gl-style-format.mjs
     gl-style-migrate: dist/gl-style-migrate.mjs
     gl-style-validate: dist/gl-style-validate.mjs
-  checksum: 10c0/94bdb9da4e435e1e0727d803cab513b284dba7851540fdf5b90cca39c4c1ed386be198ba5928325e2a22b95d503735337ca48ae23fc1b54308831e03c41b84f3
+  checksum: 10c0/8fb42ed6236fe22b7d38bc748e7308f44649d973405fe6f2f9f5960b8eec3a6585443f65397b9460d5d20f4850f8a3db61c8b51d0f0ab8099b2c562568cfa1ef
   languageName: node
   linkType: hard
 
@@ -3038,6 +3037,13 @@ __metadata:
   version: 7946.0.14
   resolution: "@types/geojson@npm:7946.0.14"
   checksum: 10c0/54f3997708fa2970c03eeb31f7e4540a0eb6387b15e9f8a60513a1409c23cafec8d618525404573468b59c6fecbfd053724b3327f7fca416729c26271d799f55
+  languageName: node
+  linkType: hard
+
+"@types/geojson@npm:^7946.0.15":
+  version: 7946.0.15
+  resolution: "@types/geojson@npm:7946.0.15"
+  checksum: 10c0/535d21ceaa01717cfdacc8f3dcbb7bc60a04361f401d80e60be22ce8dea23d669e4d0026c2c3da1168e807ee5ad4c9b2b4913ecd78eb0aabbcf76e92dc69808d
   languageName: node
   linkType: hard
 
@@ -4716,10 +4722,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"earcut@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "earcut@npm:3.0.0"
-  checksum: 10c0/20f3d8492f02452648466d2ce98276c9317c4d6980fc2596b1cb119fc3ef2d034724c5721de2af191331fb43610a27995b0f1b611d3386976b770ae9af7b3bbe
+"earcut@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "earcut@npm:3.0.1"
+  checksum: 10c0/cc1d3ed87a08db1a601b3b836bfb2fe22c8f923dfcfcd7419c64a5d4c270ac6d966d8d1e673cc699f8d69dc32bce84fd6d87136c49431fa35057bd7141627769
   languageName: node
   linkType: hard
 
@@ -6823,9 +6829,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"maplibre-gl@npm:^4.6.0":
-  version: 4.7.1
-  resolution: "maplibre-gl@npm:4.7.1"
+"maplibre-gl@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "maplibre-gl@npm:5.0.0"
   dependencies:
     "@mapbox/geojson-rewind": "npm:^0.5.2"
     "@mapbox/jsonlint-lines-primitives": "npm:^2.0.2"
@@ -6834,14 +6840,14 @@ __metadata:
     "@mapbox/unitbezier": "npm:^0.0.1"
     "@mapbox/vector-tile": "npm:^1.3.1"
     "@mapbox/whoots-js": "npm:^3.1.0"
-    "@maplibre/maplibre-gl-style-spec": "npm:^20.3.1"
-    "@types/geojson": "npm:^7946.0.14"
+    "@maplibre/maplibre-gl-style-spec": "npm:^22.0.1"
+    "@types/geojson": "npm:^7946.0.15"
     "@types/geojson-vt": "npm:3.2.5"
     "@types/mapbox__point-geometry": "npm:^0.1.4"
     "@types/mapbox__vector-tile": "npm:^1.3.4"
     "@types/pbf": "npm:^3.0.5"
     "@types/supercluster": "npm:^7.1.3"
-    earcut: "npm:^3.0.0"
+    earcut: "npm:^3.0.1"
     geojson-vt: "npm:^4.0.2"
     gl-matrix: "npm:^3.4.3"
     global-prefix: "npm:^4.0.0"
@@ -6853,7 +6859,7 @@ __metadata:
     supercluster: "npm:^8.0.1"
     tinyqueue: "npm:^3.0.0"
     vt-pbf: "npm:^3.1.3"
-  checksum: 10c0/dad2da8474af68647f882d5c4ff6df1c9afbe49f6d06c4594e4a55df0a34674f64d347b10b7af2869ac62fe837af6a56caa7617d5602724185e4df674be67b51
+  checksum: 10c0/ce3065685e70b97ca76c567a79d364e1a76095fd5950d048cf0e714de94fee4edd17da627090307b8065fccf64d1aa2c60cc595a605379a8d292a5e3273aecb6
   languageName: node
   linkType: hard
 
@@ -8190,13 +8196,6 @@ __metadata:
   version: 1.2.3
   resolution: "queue-microtask@npm:1.2.3"
   checksum: 10c0/900a93d3cdae3acd7d16f642c29a642aea32c2026446151f0778c62ac089d4b8e6c986811076e1ae180a694cedf077d453a11b58ff0a865629a4f82ab558e102
-  languageName: node
-  linkType: hard
-
-"quickselect@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "quickselect@npm:2.0.0"
-  checksum: 10c0/6c8d591bc73beae4c1996b7b7138233a7dbbbdde29b7b6d822a02d08cd220fd27613f47d6e9635989b12e250d42ef9da3448de1ed12ad962974e207ab3c3562c
   languageName: node
   linkType: hard
 
