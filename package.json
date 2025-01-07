@@ -73,7 +73,7 @@
     "@loaders.gl/core": "^4.2.3",
     "@luma.gl/core": "^9.0.27",
     "@luma.gl/engine": "^9.0.27",
-    "@sveltejs/vite-plugin-svelte": "^3.1.2",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@types/json-schema": "^7.0.15",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
