@@ -49,11 +49,14 @@ export function normalizeObjectKeys<T, R extends Row<T>>(el: R): R {
     return el;
   }
 
-  return Object.entries(el as Record<string, T>).reduce((acc, [key, value]) => {
-    acc[key.toLowerCase()] =
-      typeof value === 'object' && value ? normalizeObjectKeys(value) : value;
-    return acc;
-  }, {} as Record<string, T>) as R;
+  return Object.entries(el as Record<string, T>).reduce(
+    (acc, [key, value]) => {
+      acc[key.toLowerCase()] =
+        typeof value === 'object' && value ? normalizeObjectKeys(value) : value;
+      return acc;
+    },
+    {} as Record<string, T>
+  ) as R;
 }
 
 /** @internalRemarks Source: @carto/react-core */

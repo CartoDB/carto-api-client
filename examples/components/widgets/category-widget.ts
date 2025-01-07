@@ -34,7 +34,7 @@ export class CategoryWidget extends BaseWidget {
 
   protected _chart: echarts.ECharts | null = null;
   protected _chartRef: Ref<HTMLElement> = createRef();
-  protected declare _filterValues: string[];
+  declare protected _filterValues: string[];
 
   constructor() {
     super();
@@ -73,11 +73,13 @@ export class CategoryWidget extends BaseWidget {
   override render() {
     return this._task.render({
       pending: () =>
-        cache(html`<h3>${this.header}</h3>
-          <figure>
-            <div class="chart chart-skeleton"></div>
-            <figcaption>${this.caption}</figcaption>
-          </figure>`),
+        cache(
+          html`<h3>${this.header}</h3>
+            <figure>
+              <div class="chart chart-skeleton"></div>
+              <figcaption>${this.caption}</figcaption>
+            </figure>`
+        ),
       complete: () =>
         cache(html`
           <h3>${this.header}</h3>

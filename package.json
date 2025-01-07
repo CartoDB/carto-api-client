@@ -87,7 +87,7 @@
     "lit-analyzer": "^1.2.1",
     "maplibre-gl": "^5.0.0",
     "microbundle": "^0.15.1",
-    "prettier": "^2.6.2",
+    "prettier": "^3.4.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-map-gl": "^7.1.7",
