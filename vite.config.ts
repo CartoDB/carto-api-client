@@ -13,6 +13,7 @@ export default defineConfig({
     outDir: 'build',
     target: 'esnext',
     minify: false,
+    sourcemap: true,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       fileName: 'api-client',
