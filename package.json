@@ -73,6 +73,7 @@
     "@luma.gl/core": "^9.0.27",
     "@luma.gl/engine": "^9.0.27",
     "@types/json-schema": "^7.0.15",
+    "@types/react": "^18.3.18",
     "@types/semver": "^7.5.8",
     "@vitest/coverage-istanbul": "^1.6.0",
     "@webcomponents/webcomponentsjs": "^2.8.0",
@@ -88,5 +89,8 @@
     "typescript": "~5.3.3",
     "vite": "^5.2.10",
     "vitest": "1.6.0"
+  },
+  "resolutions": {
+    "rollup": "^4.20.0"
   }
 }
