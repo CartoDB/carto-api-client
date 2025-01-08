@@ -75,11 +75,13 @@ export class HistogramWidget extends BaseWidget {
   override render() {
     return this._task.render({
       pending: () =>
-        cache(html`<h3>${this.header}</h3>
-          <figure>
-            <div class="chart chart-skeleton"></div>
-            <figcaption>${this.caption}</figcaption>
-          </figure>`),
+        cache(
+          html`<h3>${this.header}</h3>
+            <figure>
+              <div class="chart chart-skeleton"></div>
+              <figcaption>${this.caption}</figcaption>
+            </figure>`
+        ),
       complete: () =>
         cache(html`
           <h3>${this.header}</h3>
