@@ -37,7 +37,7 @@ export function tileFeaturesSpatialIndex({
   }
 
   // We transform cells to Set to improve the performace
-  const cellsSet = new Set(cells.map((c) => c.toString()));
+  const cellsSet = new Set<bigint | string>(cells);
 
   for (const tile of tiles) {
     if (tile.isVisible === false || !tile.data) {
@@ -45,7 +45,7 @@ export function tileFeaturesSpatialIndex({
     }
 
     tile.data.forEach((d: Feature) => {
-      if (cellsSet.has(d.id as string)) {
+      if (cellsSet.has(d.id as bigint | string)) {
         map.set(d.id, {...d.properties, [spatialIndexIDName]: d.id});
       }
     });
