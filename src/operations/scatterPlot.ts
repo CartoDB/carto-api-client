@@ -21,27 +21,30 @@ export function scatterPlot({
   yAxisColumns: string[];
   yAxisJoinOperation?: AggregationType;
 }): ScatterPlotFeature {
-  return data.reduce((acc, feature) => {
-    const xValue = aggregate(
-      feature,
-      xAxisColumns,
-      xAxisJoinOperation
-    ) as number;
+  return data.reduce(
+    (acc, feature) => {
+      const xValue = aggregate(
+        feature,
+        xAxisColumns,
+        xAxisJoinOperation
+      ) as number;
 
-    const xIsValid = xValue !== null && xValue !== undefined;
+      const xIsValid = xValue !== null && xValue !== undefined;
 
-    const yValue = aggregate(
-      feature,
-      yAxisColumns,
-      yAxisJoinOperation
-    ) as number;
+      const yValue = aggregate(
+        feature,
+        yAxisColumns,
+        yAxisJoinOperation
+      ) as number;
 
-    const yIsValid = yValue !== null && yValue !== undefined;
+      const yIsValid = yValue !== null && yValue !== undefined;
 
-    if (xIsValid && yIsValid) {
-      acc.push([xValue, yValue]);
-    }
+      if (xIsValid && yIsValid) {
+        acc.push([xValue, yValue]);
+      }
 
-    return acc;
-  }, [] as [number, number][]);
+      return acc;
+    },
+    [] as [number, number][]
+  );
 }
