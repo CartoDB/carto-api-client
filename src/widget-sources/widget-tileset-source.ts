@@ -391,6 +391,6 @@ function normalizeColumns(columns: string | string[]): string[] {
   return Array.isArray(columns)
     ? columns
     : typeof columns === 'string'
-    ? [columns]
-    : [];
+      ? [columns]
+      : [];
 }

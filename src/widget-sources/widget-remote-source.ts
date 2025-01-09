@@ -29,7 +29,7 @@ export type WidgetRemoteSourceProps = WidgetSourceProps;
  * Abstract class. Use {@link WidgetQuerySource} or {@link WidgetTableSource}.
  */
 export abstract class WidgetRemoteSource<
-  Props extends WidgetRemoteSourceProps
+  Props extends WidgetRemoteSourceProps,
 > extends WidgetSource<Props> {
   async getCategories(
     options: CategoryRequestOptions

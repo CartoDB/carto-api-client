@@ -149,6 +149,6 @@ function normalizeKeys(keys: unknown): string[] | undefined {
   return Array.isArray(keys)
     ? keys
     : typeof keys === 'string'
-    ? [keys]
-    : undefined;
+      ? [keys]
+      : undefined;
 }
