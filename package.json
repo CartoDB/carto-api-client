@@ -4,7 +4,7 @@
   "repository": "github:CartoDB/carto-api-client",
   "author": "Don McCurdy <donmccurdy@carto.com>",
   "packageManager": "yarn@4.3.1",
-  "version": "0.4.5",
+  "version": "0.5.0-alpha.0",
   "license": "MIT",
   "publishConfig": {
     "access": "public",
@@ -98,5 +98,6 @@
   },
   "resolutions": {
     "rollup": "^4.20.0"
-  }
+  },
+  "stableVersion": "0.4.5"
 }
