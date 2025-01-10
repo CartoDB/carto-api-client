@@ -13,8 +13,10 @@ export type {
   RasterMetadataBand,
   RasterMetadataBandStats,
   SourceOptions,
+  SpatialFilterPolyfillMode,
   TableSourceOptions,
   TilejsonResult,
+  TileResolution,
   TilesetSourceOptions,
   VectorLayer,
 } from './types';
