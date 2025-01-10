@@ -48,10 +48,12 @@ export const vectorTableSource = async function (
     aggregationExp,
   } = options;
 
+  const spatialDataType = 'geo';
+
   const urlParameters: UrlParameters = {
     name: tableName,
     spatialDataColumn,
-    spatialDataType: 'geo',
+    spatialDataType,
     tileResolution: tileResolution.toString(),
   };
 
@@ -64,13 +66,15 @@ export const vectorTableSource = async function (
   if (aggregationExp) {
     urlParameters.aggregationExp = aggregationExp;
   }
+
   return baseSource<UrlParameters>('table', options, urlParameters).then(
     (result) => ({
       ...(result as TilejsonResult),
       widgetSource: new WidgetTableSource({
         ...options,
+        // NOTE: Parameters with default values above must be explicitly passed here.
         spatialDataColumn,
-        spatialDataType: 'geo',
+        spatialDataType,
         tileResolution,
       }),
     })

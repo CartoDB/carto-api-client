@@ -41,11 +41,14 @@ export const h3TableSource = async function (
     tableName,
     filters,
   } = options;
+
+  const spatialDataType = 'h3';
+
   const urlParameters: UrlParameters = {
     aggregationExp,
     name: tableName,
     spatialDataColumn,
-    spatialDataType: 'h3',
+    spatialDataType,
   };
 
   if (aggregationResLevel) {
@@ -54,14 +57,15 @@ export const h3TableSource = async function (
   if (filters) {
     urlParameters.filters = filters;
   }
+
   return baseSource<UrlParameters>('table', options, urlParameters).then(
     (result) => ({
       ...(result as TilejsonResult),
       widgetSource: new WidgetTableSource({
         ...options,
-        // NOTE: passing redundant spatialDataColumn here to apply the default value 'h3'
+        // NOTE: Parameters with default values above must be explicitly passed here.
         spatialDataColumn,
-        spatialDataType: 'h3',
+        spatialDataType,
       }),
     })
   );
