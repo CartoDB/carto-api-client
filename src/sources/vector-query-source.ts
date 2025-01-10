@@ -74,7 +74,9 @@ export const vectorQuerySource = async function (
       ...(result as TilejsonResult),
       widgetSource: new WidgetQuerySource({
         ...options,
+        spatialDataColumn,
         spatialDataType: 'geo',
+        tileResolution,
       }),
     })
   );

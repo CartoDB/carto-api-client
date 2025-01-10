@@ -69,7 +69,9 @@ export const vectorTableSource = async function (
       ...(result as TilejsonResult),
       widgetSource: new WidgetTableSource({
         ...options,
+        spatialDataColumn,
         spatialDataType: 'geo',
+        tileResolution,
       }),
     })
   );
