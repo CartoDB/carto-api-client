@@ -73,7 +73,7 @@
     "@luma.gl/core": "9.0.27",
     "@luma.gl/engine": "9.0.27",
     "@types/json-schema": "^7.0.15",
-    "@types/react": "^18.3.18",
+    "@types/react": "^19.0.6",
     "@types/semver": "^7.5.8",
     "@vitest/coverage-istanbul": "^2.1.8",
     "@webcomponents/webcomponentsjs": "^2.8.0",
