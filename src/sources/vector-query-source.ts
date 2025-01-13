@@ -50,9 +50,11 @@ export const vectorQuerySource = async function (
     aggregationExp,
   } = options;
 
+  const spatialDataType = 'geo';
+
   const urlParameters: UrlParameters = {
     spatialDataColumn,
-    spatialDataType: 'geo',
+    spatialDataType,
     tileResolution: tileResolution.toString(),
     q: sqlQuery,
   };
@@ -69,12 +71,16 @@ export const vectorQuerySource = async function (
   if (aggregationExp) {
     urlParameters.aggregationExp = aggregationExp;
   }
+
   return baseSource<UrlParameters>('query', options, urlParameters).then(
     (result) => ({
       ...(result as TilejsonResult),
       widgetSource: new WidgetQuerySource({
         ...options,
-        spatialDataType: 'geo',
+        // NOTE: Parameters with default values above must be explicitly passed here.
+        spatialDataColumn,
+        spatialDataType,
+        tileResolution,
       }),
     })
   );

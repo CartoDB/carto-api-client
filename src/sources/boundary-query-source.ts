@@ -47,6 +47,7 @@ export const boundaryQuerySource = async function (
   if (queryParameters) {
     urlParameters.queryParameters = queryParameters;
   }
+
   return baseSource<UrlParameters>(
     'boundary',
     options,

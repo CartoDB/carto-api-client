@@ -43,11 +43,13 @@ export const quadbinTableSource = async function (
     filters,
   } = options;
 
+  const spatialDataType = 'quadbin';
+
   const urlParameters: UrlParameters = {
     aggregationExp,
     name: tableName,
     spatialDataColumn,
-    spatialDataType: 'quadbin',
+    spatialDataType,
   };
 
   if (aggregationResLevel) {
@@ -56,14 +58,15 @@ export const quadbinTableSource = async function (
   if (filters) {
     urlParameters.filters = filters;
   }
+
   return baseSource<UrlParameters>('table', options, urlParameters).then(
     (result) => ({
       ...(result as TilejsonResult),
       widgetSource: new WidgetTableSource({
         ...options,
-        // NOTE: passing redundant spatialDataColumn here to apply the default value 'quadbin'
+        // NOTE: Parameters with default values above must be explicitly passed here.
         spatialDataColumn,
-        spatialDataType: 'quadbin',
+        spatialDataType,
       }),
     })
   );

@@ -43,10 +43,13 @@ export const h3QuerySource = async function (
     queryParameters,
     filters,
   } = options;
+
+  const spatialDataType = 'h3';
+
   const urlParameters: UrlParameters = {
     aggregationExp,
     spatialDataColumn,
-    spatialDataType: 'h3',
+    spatialDataType,
     q: sqlQuery,
   };
 
@@ -59,14 +62,15 @@ export const h3QuerySource = async function (
   if (filters) {
     urlParameters.filters = filters;
   }
+
   return baseSource<UrlParameters>('query', options, urlParameters).then(
     (result) => ({
       ...(result as TilejsonResult),
       widgetSource: new WidgetQuerySource({
         ...options,
-        // NOTE: passing redundant spatialDataColumn here to apply the default value 'h3'
+        // NOTE: Parameters with default values above must be explicitly passed here.
         spatialDataColumn,
-        spatialDataType: 'h3',
+        spatialDataType,
       }),
     })
   );
