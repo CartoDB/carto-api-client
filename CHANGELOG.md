@@ -4,6 +4,11 @@
 
 ## 0.4
 
+### 0.4.5
+
+- types: Export TileResolution and SpatialFilterPolyfillMode types (#63)
+- fix: Propagate spatialDataColumn and tileResolution defaults to widget source (#64)
+
 ### 0.4.4
 
 - feat: Add support for spatial index types (H3, quadbin) in Widget APIs
