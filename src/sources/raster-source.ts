@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
+import {getTileFormat} from '../utils/getTileFormat';
+import {WidgetRasterSource, WidgetRasterSourceResult} from '../widget-sources';
 import {baseSource} from './base-source';
 import type {
   FilterOptions,
@@ -18,7 +20,7 @@ type UrlParameters = {
   filters?: Record<string, unknown>;
 };
 
-export type RasterSourceResponse = TilejsonResult;
+export type RasterSourceResponse = TilejsonResult & WidgetRasterSourceResult;
 
 export const rasterSource = async function (
   options: RasterSourceOptions
@@ -29,9 +31,16 @@ export const rasterSource = async function (
     urlParameters.filters = filters;
   }
 
-  return baseSource<UrlParameters>(
-    'raster',
-    options,
-    urlParameters
+  return baseSource<UrlParameters>('raster', options, urlParameters).then(
+    (result) => ({
+      ...(result as TilejsonResult),
+      widgetSource: new WidgetRasterSource({
+        ...options,
+        tileFormat: getTileFormat(result as TilejsonResult),
+        spatialDataColumn: 'quadbin',
+        spatialDataType: 'quadbin',
+        rasterMetadata: (result as TilejsonResult).raster_metadata!,
+      }),
+    })
   ) as Promise<RasterSourceResponse>;
 };

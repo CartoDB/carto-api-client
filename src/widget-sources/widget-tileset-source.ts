@@ -75,9 +75,11 @@ export type WidgetTilesetSourceResult = {widgetSource: WidgetTilesetSource};
  * const { widgetSource } = await data;
  * ```
  */
-export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> {
-  private _tiles: Tile[] = [];
-  private _features: FeatureData[] = [];
+export class WidgetTilesetSource<
+  Props extends WidgetTilesetSourceProps = WidgetTilesetSourceProps,
+> extends WidgetSource<Props> {
+  protected _tiles: Tile[] = [];
+  protected _features: FeatureData[] = [];
 
   protected override getModelSource(owner: string): ModelSource {
     return {
@@ -106,9 +108,6 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
     options,
   }: {
     spatialFilter: SpatialFilter;
-    // TODO(cleanup): As an optional property, 'uniqueIdProperty' will be easy to forget.
-    // Would it be better to configure it on the source function, rather than separately
-    // on the layer and in 'loadTiles()'?
     uniqueIdProperty?: string;
     options?: TileFeatureExtractOptions;
   }) {
@@ -117,9 +116,7 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
       options,
       spatialFilter,
       uniqueIdProperty,
-      tileFormat: this.props.tileFormat,
-      spatialDataColumn: this.props.spatialDataColumn,
-      spatialDataType: this.props.spatialDataType,
+      ...this.props,
     });
   }
 
