@@ -84,13 +84,10 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
     }
 
     this._features = tileFeatures({
-      tiles: this._tiles,
-      tileFormat: this.props.tileFormat,
+      ...this.props,
       ...this._tileFeatureExtractOptions,
-
+      tiles: this._tiles,
       spatialFilter,
-      spatialDataColumn: this.props.spatialDataColumn,
-      spatialDataType: this.props.spatialDataType,
     });
 
     prevInputs.spatialFilter = spatialFilter;
