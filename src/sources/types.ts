@@ -373,7 +373,7 @@ export type RasterMetadataBand = {
   /**
    * Default color mapping for unique values (or if coloprinterp is `palette`)
    */
-  colortable?: Record<string, number[]>;
+  colortable?: Record<string, [number, number, number, number]>;
 
   /**
    * No value representation.

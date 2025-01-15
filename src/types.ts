@@ -40,6 +40,12 @@ export type SpatialIndexTile = Tile & {
   data?: (Feature & {id: bigint})[];
 };
 
+export type RasterTile = Tile & {
+  id: string;
+  index: {q: bigint; i: string};
+  data?: Raster;
+};
+
 /** @privateRemarks Source: @deck.gl/carto */
 export type Raster = {
   blockSize: number;
