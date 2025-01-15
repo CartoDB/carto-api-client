@@ -66,7 +66,8 @@
     "@turf/invariant": "^7.1.0",
     "@turf/union": "^7.1.0",
     "@types/geojson": "^7946.0.15",
-    "h3-js": "4.1.0"
+    "h3-js": "4.1.0",
+    "quadbin": "^0.4.0-alpha.2"
   },
   "devDependencies": {
     "@deck.gl/aggregation-layers": "^9.0.38",
@@ -79,8 +80,9 @@
     "@lit/react": "^1.0.6",
     "@lit/task": "^1.0.1",
     "@loaders.gl/core": "^4.3.3",
-    "@luma.gl/core": "9.0.28",
-    "@luma.gl/engine": "9.0.28",
+    "@luma.gl/core": "~9.0.27",
+    "@luma.gl/engine": "~9.0.27",
+    "@turf/buffer": "^7.2.0",
     "@types/json-schema": "^7.0.15",
     "@types/react": "^18.3.18",
     "@types/semver": "^7.5.8",

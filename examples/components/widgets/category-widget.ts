@@ -3,7 +3,13 @@ import {Task, TaskStatus} from '@lit/task';
 import {Ref, createRef, ref} from 'lit/directives/ref.js';
 import {cache} from 'lit/directives/cache.js';
 import * as echarts from 'echarts';
-import {Filter, FilterType, addFilter, removeFilter} from '@carto/api-client';
+import {
+  CategoryResponse,
+  Filter,
+  FilterType,
+  addFilter,
+  removeFilter,
+} from '@carto/api-client';
 
 import {DEFAULT_PALETTE, DEFAULT_TEXT_STYLE} from './styles.js';
 import {DEBOUNCE_TIME_MS} from '../constants.js';
@@ -25,12 +31,14 @@ export class CategoryWidget extends BaseWidget {
       ...super.properties,
       operation: {type: String},
       column: {type: String},
+      getItemColor: {type: Function, attribute: false},
       _filterValues: {state: true},
     };
   }
 
   declare column: string;
   declare operation: 'count' | 'avg' | 'min' | 'max' | 'sum';
+  declare getItemColor?: (item: string | number) => string;
 
   protected _chart: echarts.ECharts | null = null;
   protected _chartRef: Ref<HTMLElement> = createRef();
@@ -52,13 +60,13 @@ export class CategoryWidget extends BaseWidget {
 
       const {widgetSource} = await data;
 
-      return await widgetSource.getCategories({
+      return (await widgetSource.getCategories({
         filterOwner: this._widgetId,
         spatialFilter: this.getSpatialFilterOrViewState(),
         operation,
         column,
         spatialIndexReferenceViewState: this.viewState ?? undefined,
-      });
+      })) as CategoryResponse;
     },
     args: () =>
       [
@@ -158,10 +166,14 @@ export class CategoryWidget extends BaseWidget {
     categories.sort((a, b) => (a.value > b.value ? -1 : 1));
 
     const data = categories.map(({name, value}, index) => {
-      let color = DEFAULT_PALETTE[index % DEFAULT_PALETTE.length];
+      let color = this.getItemColor
+        ? this.getItemColor(name)
+        : DEFAULT_PALETTE[index % DEFAULT_PALETTE.length];
+
       if (this._filterValues.length > 0) {
         color = this._filterValues.includes(name) ? color : '#cccccc';
       }
+
       return {value, name, itemStyle: {color}};
     });
 

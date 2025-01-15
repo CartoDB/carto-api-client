@@ -4,7 +4,6 @@ import {
 } from './constants-internal';
 import type {ModelSource} from './models/model';
 import type {AggregationOptions} from './sources/types';
-import {assert} from './utils';
 import type {ViewState} from './widget-sources';
 
 const DEFAULT_TILE_SIZE = 512;

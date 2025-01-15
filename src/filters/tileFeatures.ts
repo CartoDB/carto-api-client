@@ -1,10 +1,12 @@
-import {SpatialFilter, SpatialIndexTile, Tile} from '../types';
+import {RasterTile, SpatialFilter, SpatialIndexTile, Tile} from '../types';
 import {tileFeaturesGeometries} from './tileFeaturesGeometries';
 import {tileFeaturesSpatialIndex} from './tileFeaturesSpatialIndex';
-import {SpatialIndex, TileFormat} from '../constants';
+import {TileFormat} from '../constants';
 import {DEFAULT_GEO_COLUMN} from '../constants-internal';
 import {FeatureData} from '../types-internal';
-import {SpatialDataType} from '../sources/types';
+import {RasterMetadata, SpatialDataType} from '../sources/types';
+import {isRasterTile, tileFeaturesRaster} from './tileFeaturesRaster';
+import {assert} from '../utils';
 
 /** @internalRemarks Source: @carto/react-core */
 export type TileFeatures = {
@@ -14,6 +16,7 @@ export type TileFeatures = {
   spatialDataColumn?: string;
   spatialFilter?: SpatialFilter;
   uniqueIdProperty?: string;
+  rasterMetadata?: RasterMetadata;
   options?: TileFeatureExtractOptions;
 };
 
@@ -30,6 +33,7 @@ export function tileFeatures({
   tileFormat,
   spatialDataColumn = DEFAULT_GEO_COLUMN,
   spatialDataType,
+  rasterMetadata,
   options = {},
 }: TileFeatures): FeatureData[] {
   // TODO(cleanup): Is an empty response the expected result when spatialFilter
@@ -38,19 +42,31 @@ export function tileFeatures({
     return [];
   }
 
-  if (spatialDataType !== 'geo') {
-    return tileFeaturesSpatialIndex({
-      tiles: tiles as SpatialIndexTile[],
+  if (spatialDataType === 'geo') {
+    return tileFeaturesGeometries({
+      tiles,
+      tileFormat,
+      spatialFilter,
+      uniqueIdProperty,
+      options,
+    });
+  }
+
+  if (tiles.some(isRasterTile)) {
+    assert(rasterMetadata, 'Missing raster metadata');
+    return tileFeaturesRaster({
+      tiles: tiles as RasterTile[],
       spatialFilter,
       spatialDataColumn,
       spatialDataType,
+      rasterMetadata,
     });
   }
-  return tileFeaturesGeometries({
-    tiles,
-    tileFormat,
+
+  return tileFeaturesSpatialIndex({
+    tiles: tiles as SpatialIndexTile[],
     spatialFilter,
-    uniqueIdProperty,
-    options,
+    spatialDataColumn,
+    spatialDataType,
   });
 }
