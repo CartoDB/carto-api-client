@@ -84,7 +84,8 @@ function updateLayers() {
     onViewportLoad: (tiles) => {
       const viewport = new WebMercatorViewport(viewState);
       const spatialFilter = createViewportSpatialFilter(viewport.getBounds())!;
-      data.widgetSource.loadTiles({tiles, spatialFilter});
+      data.widgetSource.loadTiles(tiles);
+      data.widgetSource.extractTileFeatures({spatialFilter});
       updateWidgets();
     },
   });

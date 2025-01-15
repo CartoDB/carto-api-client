@@ -76,6 +76,7 @@ export type WidgetTilesetSourceResult = {widgetSource: WidgetTilesetSource};
  * ```
  */
 export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> {
+  private _tiles: Tile[] = [];
   private _features: FeatureData[] = [];
 
   protected override getModelSource(owner: string): ModelSource {
@@ -86,14 +87,24 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
     };
   }
 
-  /** Loads features as a list of tiles (typically provided by deck.gl). */
-  loadTiles({
-    tiles,
+  /**
+   * Loads features as a list of tiles (typically provided by deck.gl).
+   * After tiles are loaded, {@link extractTileFeatures} must be called
+   * before computing statistics on the tiles.
+   */
+  loadTiles(tiles: unknown[]) {
+    this._tiles = tiles as Tile[];
+  }
+
+  /**
+   * Extracts feature data from tiles previously loaded with {@link loadTiles}.
+   * Must be called before computing statistics on tiles.
+   */
+  extractTileFeatures({
     spatialFilter,
     uniqueIdProperty,
     options,
   }: {
-    tiles: Tile[];
     spatialFilter: SpatialFilter;
     // TODO(cleanup): As an optional property, 'uniqueIdProperty' will be easy to forget.
     // Would it be better to configure it on the source function, rather than separately
@@ -102,7 +113,7 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
     options?: TileFeatureExtractOptions;
   }) {
     this._features = tileFeatures({
-      tiles,
+      tiles: this._tiles,
       options,
       spatialFilter,
       uniqueIdProperty,
