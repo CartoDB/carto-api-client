@@ -49,12 +49,12 @@ deck.setProps({
 });
 
 const widgets: Widget[] = [
-  bindWidget('#category'),
+  // bindWidget('#category'),
   bindWidget('#formula'),
-  bindWidget('#histogram'),
-  bindWidget('#pie'),
-  bindWidget('#scatter'),
-  bindWidget('#table'),
+  // bindWidget('#histogram'),
+  // bindWidget('#pie'),
+  // bindWidget('#scatter'),
+  // bindWidget('#table'),
 ];
 
 updateSources();
@@ -88,9 +88,9 @@ function updateLayers() {
       console.log({tiles});
       const viewport = new WebMercatorViewport(viewState);
       const spatialFilter = createViewportSpatialFilter(viewport.getBounds())!;
-      // // @ts-expect-error TODO: ???
-      // data.widgetSource.loadTiles({tiles, spatialFilter});
-      // updateWidgets();
+      data.widgetSource.loadTiles(tiles);
+      data.widgetSource.extractTileFeatures({spatialFilter});
+      updateWidgets();
     },
   });
 
