@@ -1458,7 +1458,7 @@ __metadata:
     "@lit/react": "npm:^1.0.6"
     "@lit/task": "npm:^1.0.1"
     "@loaders.gl/core": "npm:^4.3.3"
-    "@luma.gl/core": "npm:9.0.27"
+    "@luma.gl/core": "npm:9.0.28"
     "@luma.gl/engine": "npm:9.0.28"
     "@turf/bbox-clip": "npm:^7.1.0"
     "@turf/bbox-polygon": "npm:^7.1.0"
@@ -2428,7 +2428,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@luma.gl/core@npm:9.0.27, @luma.gl/core@npm:~9.0.27":
+"@luma.gl/core@npm:9.0.28":
+  version: 9.0.28
+  resolution: "@luma.gl/core@npm:9.0.28"
+  dependencies:
+    "@math.gl/types": "npm:^4.0.0"
+    "@probe.gl/env": "npm:^4.0.2"
+    "@probe.gl/log": "npm:^4.0.2"
+    "@probe.gl/stats": "npm:^4.0.2"
+    "@types/offscreencanvas": "npm:^2019.6.4"
+  checksum: 10c0/f72f846bed39fb0824fa650c0436469d352c324a71fe6510d57460af4f669f2e3e829f6a88bd84a709d30b07440889ec30f489b7974010719627a2bd5db298d8
+  languageName: node
+  linkType: hard
+
+"@luma.gl/core@npm:~9.0.27":
   version: 9.0.27
   resolution: "@luma.gl/core@npm:9.0.27"
   dependencies:
