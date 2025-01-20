@@ -1611,8 +1611,8 @@ __metadata:
   linkType: hard
 
 "@deck.gl/layers@npm:^9.0.38":
-  version: 9.0.38
-  resolution: "@deck.gl/layers@npm:9.0.38"
+  version: 9.0.40
+  resolution: "@deck.gl/layers@npm:9.0.40"
   dependencies:
     "@loaders.gl/images": "npm:^4.2.0"
     "@loaders.gl/schema": "npm:^4.2.0"
@@ -1626,7 +1626,7 @@ __metadata:
     "@loaders.gl/core": ^4.2.0
     "@luma.gl/core": ~9.0.0
     "@luma.gl/engine": ~9.0.0
-  checksum: 10c0/d37935d27bff04c1bab5411f6898cb5983c7e508da14ebae01adb930ed55879da93193766bfdf122ac850046400e26753aa59d9734b74054d44d01ae3e96c094
+  checksum: 10c0/4f0fde0598fbd927ad8f4528905547c975a8af94597d663b0a973fd485431b3e7bc0595636b763e37e31fd7c7a25c5d729abf6419d95fe48f74c2e4e6235ec9d
   languageName: node
   linkType: hard
 
