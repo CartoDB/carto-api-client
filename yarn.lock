@@ -3005,13 +3005,13 @@ __metadata:
   linkType: hard
 
 "@turf/bbox-polygon@npm:^7.1.0":
-  version: 7.1.0
-  resolution: "@turf/bbox-polygon@npm:7.1.0"
+  version: 7.2.0
+  resolution: "@turf/bbox-polygon@npm:7.2.0"
   dependencies:
-    "@turf/helpers": "npm:^7.1.0"
+    "@turf/helpers": "npm:^7.2.0"
     "@types/geojson": "npm:^7946.0.10"
-    tslib: "npm:^2.6.2"
-  checksum: 10c0/8615161b4e922e92d2e3b8d7aaba291bc376f8f648417b83df7021d123b3d27dfa3fcb7dbe572bf581a8a856715051e160dd11f786ccce734d1e74941def51ca
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/c0b35639fdefae3fddd6345a44ece35f7d411faf07c274731a2ec6fa2e94bce9be7864d86f7618594161ac12dcf3ae7c7f978225a7baeabe1f82d1211ff99c40
   languageName: node
   linkType: hard
 
