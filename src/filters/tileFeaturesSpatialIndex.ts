@@ -57,10 +57,6 @@ function getResolution(
   tiles: SpatialIndexTile[],
   spatialIndex: SpatialIndex
 ): number | undefined {
-  // TODO: Raster `tile.data` is not an array of features. Is resolution
-  // still meaningful? I think this requires that blockSize is never NPOT.
-  // If it is, then ideally we can share code for H3 and quadbins more, either
-  // by unpacking rasters (ew) or keeping H3 and quadbins in a binary data model.
   const data = tiles.find((tile) => tile.data?.length)?.data;
 
   if (!data) {
