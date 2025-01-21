@@ -44,17 +44,19 @@ deck.setProps({
     viewState = params.viewState;
     const {longitude, latitude, ...rest} = viewState;
     map.jumpTo({center: [longitude, latitude], ...rest});
+    const viewport = new WebMercatorViewport(viewState);
+    const spatialFilter = createViewportSpatialFilter(viewport.getBounds())!;
+    data?.widgetSource.extractTileFeatures({spatialFilter});
     updateWidgets();
   },
 });
 
 const widgets: Widget[] = [
-  // bindWidget('#category'),
   bindWidget('#formula'),
-  // bindWidget('#histogram'),
-  // bindWidget('#pie'),
-  // bindWidget('#scatter'),
-  // bindWidget('#table'),
+  bindWidget('#category'),
+  bindWidget('#pie'),
+  bindWidget('#table'),
+  bindWidget('#histogram'),
 ];
 
 updateSources();
@@ -82,10 +84,9 @@ function updateLayers() {
   const layer = new RasterTileLayer({
     id: 'raster',
     data: data,
-    tileSize: 512,
+    tileSize: 2048,
     getFillColor,
     onViewportLoad: (tiles) => {
-      console.log({tiles});
       const viewport = new WebMercatorViewport(viewState);
       const spatialFilter = createViewportSpatialFilter(viewport.getBounds())!;
       data.widgetSource.loadTiles(tiles);

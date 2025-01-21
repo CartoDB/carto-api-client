@@ -22,40 +22,33 @@
           operation="count"
         ></formula-widget>
 
-        <!-- <category-widget
+        <category-widget
           id="category"
-          header="Store type"
+          header="Band 1"
           operation="count"
-          column="storetype"
+          column="band_1"
         ></category-widget>
 
         <pie-widget
           id="pie"
-          header="Store type"
+          header="Band 1"
           operation="count"
-          column="storetype"
+          column="band_1"
         ></pie-widget>
 
         <table-widget
           id="table"
-          header="Store type"
-          columns='["storetype","revenue"]'
-          sortBy="revenue"
+          header="Pixels"
+          columns='["id","band_1"]'
+          sortBy="band_1"
         ></table-widget>
-
-        <scatter-widget
-          id="scatter"
-          header="Size vs. Revenue"
-          xAxisColumn="size_m2"
-          yAxisColumn="revenue"
-        ></scatter-widget>
 
         <histogram-widget
           id="histogram"
-          header="Revenue"
-          column="revenue"
-          ticks="[1250000, 1500000, 1750000]"
-        ></histogram-widget> -->
+          header="Band 1"
+          column="band_1"
+          ticks="[0, 64, 128, 192, 256]"
+        ></histogram-widget>
       </section>
       <footer id="footer"></footer>
     </main>

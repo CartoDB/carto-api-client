@@ -62,7 +62,8 @@
     "@turf/invariant": "^7.1.0",
     "@turf/union": "^7.1.0",
     "@types/geojson": "^7946.0.15",
-    "h3-js": "4.1.0"
+    "h3-js": "4.1.0",
+    "quadbin": "^0.3.0"
   },
   "devDependencies": {
     "@deck.gl/aggregation-layers": "^9.0.40",
@@ -97,7 +98,8 @@
     "vitest": "2.1.8"
   },
   "resolutions": {
-    "rollup": "^4.20.0"
+    "rollup": "^4.20.0",
+    "quadbin": "portal:/Users/donmccurdy/Projects/quadbin-js"
   },
   "stableVersion": "0.4.5"
 }
