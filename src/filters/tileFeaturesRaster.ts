@@ -47,6 +47,8 @@ export function tileFeaturesRaster({
     quadbinTiles.push({...tile, data: cells});
   }
 
+  // TODO: With viewport covered by Lake Michigan, we still see a lot
+  // of variation in band_1 according to widgets, is something wrong?
   return tileFeaturesSpatialIndex({tiles: quadbinTiles, ...options});
 }
 
