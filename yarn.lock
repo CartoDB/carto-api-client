@@ -2080,11 +2080,11 @@ __metadata:
   linkType: hard
 
 "@lit/task@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "@lit/task@npm:1.0.1"
+  version: 1.0.2
+  resolution: "@lit/task@npm:1.0.2"
   dependencies:
     "@lit/reactive-element": "npm:^1.0.0 || ^2.0.0"
-  checksum: 10c0/44ad2187f0a05dbd6cd9cb9638ae9031102fcf8ba7693fb9420cbb49e5274c57229fc6ddf2d3573d761d3b0bbe1502abd358b53ae9c65394b25a59fe7f6253ab
+  checksum: 10c0/888a1b7fbd522d64028c8592feb236ac7bbd57678a4a82e5934abee9c33fe0567af014d72fb6ca0edf6866d9ef182df7ca15500ba493aafd6c26d2e832f341aa
   languageName: node
   linkType: hard
 
