@@ -30,8 +30,7 @@ export function tileFeaturesRaster({
 
     const cells: {id: bigint; properties: Feature['properties']}[] = [];
 
-    // TODO(DO NOT SUBMIT): Confirm that order of cells returned by 'quadbin-js'
-    // is the same as the order stored in tiles.
+    // Order is row-major, starting from NW and ending at SE.
     for (let i = 0; i < children.length; i++) {
       const id = children[i];
       // TODO(DO NOT SUBMIT): Do we expose per-pixel cell IDs for widget
