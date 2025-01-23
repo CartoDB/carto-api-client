@@ -62,21 +62,23 @@
     "@turf/invariant": "^7.1.0",
     "@turf/union": "^7.1.0",
     "@types/geojson": "^7946.0.15",
-    "h3-js": "4.1.0"
+    "h3-js": "4.1.0",
+    "quadbin": "^0.4.0-alpha.0"
   },
   "devDependencies": {
-    "@deck.gl/aggregation-layers": "^9.0.38",
-    "@deck.gl/carto": "^9.0.38",
-    "@deck.gl/core": "^9.0.38",
-    "@deck.gl/extensions": "^9.0.38",
-    "@deck.gl/geo-layers": "^9.0.38",
-    "@deck.gl/layers": "^9.0.38",
-    "@deck.gl/mesh-layers": "^9.0.38",
+    "@deck.gl/aggregation-layers": "^9.0.40",
+    "@deck.gl/carto": "^9.0.40",
+    "@deck.gl/core": "^9.0.40",
+    "@deck.gl/extensions": "^9.0.40",
+    "@deck.gl/geo-layers": "^9.0.40",
+    "@deck.gl/layers": "^9.0.40",
+    "@deck.gl/mesh-layers": "^9.0.40",
     "@lit/react": "^1.0.6",
     "@lit/task": "^1.0.1",
     "@loaders.gl/core": "^4.3.3",
     "@luma.gl/core": "9.0.27",
     "@luma.gl/engine": "9.0.27",
+    "@turf/buffer": "^7.2.0",
     "@types/json-schema": "^7.0.15",
     "@types/react": "^18.3.18",
     "@types/semver": "^7.5.8",
@@ -97,7 +99,8 @@
     "vitest": "2.1.8"
   },
   "resolutions": {
-    "rollup": "^4.20.0"
+    "rollup": "^4.20.0",
+    "quadbin": "portal:/Users/donmccurdy/Projects/quadbin-js"
   },
   "stableVersion": "0.4.5"
 }

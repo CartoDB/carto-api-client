@@ -1,10 +1,11 @@
-import {SpatialFilter, SpatialIndexTile, Tile} from '../types';
+import {RasterTile, SpatialFilter, SpatialIndexTile, Tile} from '../types';
 import {tileFeaturesGeometries} from './tileFeaturesGeometries';
 import {tileFeaturesSpatialIndex} from './tileFeaturesSpatialIndex';
-import {SpatialIndex, TileFormat} from '../constants';
+import {TileFormat} from '../constants';
 import {DEFAULT_GEO_COLUMN} from '../constants-internal';
 import {FeatureData} from '../types-internal';
 import {SpatialDataType} from '../sources/types';
+import {isRasterTile, tileFeaturesRaster} from './tileFeaturesRaster';
 
 /** @internalRemarks Source: @carto/react-core */
 export type TileFeatures = {
@@ -38,19 +39,29 @@ export function tileFeatures({
     return [];
   }
 
-  if (spatialDataType !== 'geo') {
-    return tileFeaturesSpatialIndex({
-      tiles: tiles as SpatialIndexTile[],
+  if (spatialDataType === 'geo') {
+    return tileFeaturesGeometries({
+      tiles,
+      tileFormat,
+      spatialFilter,
+      uniqueIdProperty,
+      options,
+    });
+  }
+
+  if (tiles.some(isRasterTile)) {
+    return tileFeaturesRaster({
+      tiles: tiles as RasterTile[],
       spatialFilter,
       spatialDataColumn,
       spatialDataType,
     });
   }
-  return tileFeaturesGeometries({
-    tiles,
-    tileFormat,
+
+  return tileFeaturesSpatialIndex({
+    tiles: tiles as SpatialIndexTile[],
     spatialFilter,
-    uniqueIdProperty,
-    options,
+    spatialDataColumn,
+    spatialDataType,
   });
 }

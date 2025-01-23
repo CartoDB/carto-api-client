@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>Examples / Raster</title>
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <main id="app">
+      <header>
+        <h1>Raster</h1>
+        <a href="../">← Back</a>
+      </header>
+      <section id="view">
+        <div id="map"></div>
+        <canvas id="deck-canvas"></canvas>
+      </section>
+      <section id="rail">
+        <formula-widget
+          id="formula"
+          header="Total"
+          operation="count"
+        ></formula-widget>
+
+        <category-widget
+          id="category"
+          header="Band 1"
+          operation="count"
+          column="band_1"
+        ></category-widget>
+
+        <pie-widget
+          id="pie"
+          header="Band 1"
+          operation="count"
+          column="band_1"
+        ></pie-widget>
+
+        <table-widget
+          id="table"
+          header="Pixels"
+          columns='["id","band_1"]'
+          sortBy="band_1"
+        ></table-widget>
+
+        <histogram-widget
+          id="histogram"
+          header="Band 1"
+          column="band_1"
+          ticks="[0, 64, 128, 192, 256]"
+        ></histogram-widget>
+      </section>
+      <footer id="footer"></footer>
+    </main>
+    <script type="module" src="./app.ts"></script>
+  </body>
+</html>
