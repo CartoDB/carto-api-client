@@ -78,6 +78,7 @@
     "@loaders.gl/core": "^4.3.3",
     "@luma.gl/core": "9.0.27",
     "@luma.gl/engine": "9.0.27",
+    "@turf/buffer": "^7.2.0",
     "@types/json-schema": "^7.0.15",
     "@types/react": "^18.3.18",
     "@types/semver": "^7.5.8",
