@@ -63,7 +63,7 @@
     "@turf/union": "^7.1.0",
     "@types/geojson": "^7946.0.15",
     "h3-js": "4.1.0",
-    "quadbin": "^0.3.0"
+    "quadbin": "^0.4.0-alpha.0"
   },
   "devDependencies": {
     "@deck.gl/aggregation-layers": "^9.0.40",
