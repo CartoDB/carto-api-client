@@ -1611,22 +1611,22 @@ __metadata:
   linkType: hard
 
 "@deck.gl/layers@npm:^9.0.38":
-  version: 9.0.38
-  resolution: "@deck.gl/layers@npm:9.0.38"
+  version: 9.1.0
+  resolution: "@deck.gl/layers@npm:9.1.0"
   dependencies:
     "@loaders.gl/images": "npm:^4.2.0"
     "@loaders.gl/schema": "npm:^4.2.0"
     "@mapbox/tiny-sdf": "npm:^2.0.5"
-    "@math.gl/core": "npm:^4.0.0"
-    "@math.gl/polygon": "npm:^4.0.0"
-    "@math.gl/web-mercator": "npm:^4.0.0"
+    "@math.gl/core": "npm:^4.1.0"
+    "@math.gl/polygon": "npm:^4.1.0"
+    "@math.gl/web-mercator": "npm:^4.1.0"
     earcut: "npm:^2.2.4"
   peerDependencies:
-    "@deck.gl/core": ^9.0.0
+    "@deck.gl/core": ^9.1.0
     "@loaders.gl/core": ^4.2.0
-    "@luma.gl/core": ~9.0.0
-    "@luma.gl/engine": ~9.0.0
-  checksum: 10c0/d37935d27bff04c1bab5411f6898cb5983c7e508da14ebae01adb930ed55879da93193766bfdf122ac850046400e26753aa59d9734b74054d44d01ae3e96c094
+    "@luma.gl/core": ^9.1.0
+    "@luma.gl/engine": ^9.1.0
+  checksum: 10c0/b7de3073248f92488760d891cae79b80afcf7026d50783ed9e37a303e4cbcddb054408de040a84737fa480af3f1ff6a6fbd8c593bc80249a45b6fe1776b0cdae
   languageName: node
   linkType: hard
 
@@ -2626,7 +2626,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@math.gl/core@npm:4.1.0, @math.gl/core@npm:^4.0.0, @math.gl/core@npm:^4.0.1":
+"@math.gl/core@npm:4.1.0, @math.gl/core@npm:^4.0.0, @math.gl/core@npm:^4.0.1, @math.gl/core@npm:^4.1.0":
   version: 4.1.0
   resolution: "@math.gl/core@npm:4.1.0"
   dependencies:
@@ -2655,7 +2655,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@math.gl/polygon@npm:^4.0.0":
+"@math.gl/polygon@npm:^4.0.0, @math.gl/polygon@npm:^4.1.0":
   version: 4.1.0
   resolution: "@math.gl/polygon@npm:4.1.0"
   dependencies:
@@ -2678,7 +2678,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@math.gl/web-mercator@npm:^4.0.0":
+"@math.gl/web-mercator@npm:^4.0.0, @math.gl/web-mercator@npm:^4.1.0":
   version: 4.1.0
   resolution: "@math.gl/web-mercator@npm:4.1.0"
   dependencies:
