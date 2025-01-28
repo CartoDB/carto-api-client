@@ -1,7 +1,11 @@
 {
   "name": "@carto/api-client",
   "description": "Client library for CARTO APIs and framework-agnostic CARTO + deck.gl applications",
-  "repository": "github:CartoDB/carto-api-client",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CartoDB/carto-api-client.git"
+  },
+  "homepage": "https://github.com/CartoDB/carto-api-client#readme",
   "author": "Don McCurdy <donmccurdy@carto.com>",
   "packageManager": "yarn@4.3.1",
   "version": "0.4.5",
