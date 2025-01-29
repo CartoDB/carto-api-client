@@ -16,3 +16,5 @@ export {
   query,
   requestWithParameters,
 } from './api/index.js';
+
+export {getHexagonResolution} from './spatial-index.js';
