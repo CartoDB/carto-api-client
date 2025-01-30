@@ -40,7 +40,7 @@ export function getSpatialFiltersResolution(
       : dataResolution;
 
     const hexagonResolution =
-      getHexagonResolution(viewState, tileSize) + aggregationResLevelOffset;
+      _getHexagonResolution(viewState, tileSize) + aggregationResLevelOffset;
 
     return Math.min(hexagonResolution, maxSpatialFiltersResolution);
   }
@@ -88,10 +88,13 @@ const maxH3SpatialFiltersResolutions = [
 // Relative scale factor (0 = no biasing, 2 = a few hexagons cover view)
 const BIAS = 2;
 
-// Resolution conversion function. Takes a WebMercatorViewport and returns
-// a H3 resolution such that the screen space size of the hexagons is
-// similar
-export function getHexagonResolution(
+/**
+ * Resolution conversion function. Takes a WebMercatorViewport and returns
+ * a H3 resolution such that the screen space size of the hexagons is
+ * "similar" to the given tileSize on screen. Intended for use with deck.gl.
+ * @internal
+ */
+export function _getHexagonResolution(
   viewport: {zoom: number; latitude: number},
   tileSize: number
 ): number {
