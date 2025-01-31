@@ -64,7 +64,7 @@ export function tileFeaturesRaster({
 
       for (const band in tile.data.cells.numericProps) {
         const value = tile.data.cells.numericProps[band].value[i];
-        // TODO(cleanup): nodata should not be a number, not a string.
+        // TODO(cleanup): nodata should be a number, not a string.
         if (Number(bandMetadataByName[band].nodata) !== value) {
           cellData[band] = tile.data!.cells.numericProps[band].value[i];
           cellDataExists = true;
