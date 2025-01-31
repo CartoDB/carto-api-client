@@ -7,11 +7,11 @@ import {
   WidgetRasterSource,
   rasterSource,
   createViewportSpatialFilter,
+  RasterTile,
 } from '@carto/api-client';
 import '../components/index.js';
 import type {
   Widget,
-  FilterEvent,
   CategoryWidget,
   HistogramWidget,
 } from '../components/index.js';
@@ -22,11 +22,10 @@ import type {
 
 let data: TilejsonResult & {widgetSource: WidgetRasterSource};
 let viewState = {latitude: 42.728, longitude: -87.731, zoom: 8.75};
-let filters: Record<string, Filter> = {};
 
 const _getFillColor = (value: number): Color => {
   if (value === 0) {
-    return [0, 0, 0, 255];
+    return [0, 0, 0, 0];
   } else if (value < 64) {
     return [255, 0, 0, 255];
   } else if (value < 128) {
@@ -64,10 +63,8 @@ deck.setProps({
     viewState = params.viewState;
     const {longitude, latitude, ...rest} = viewState;
     map.jumpTo({center: [longitude, latitude], ...rest});
-    const viewport = new WebMercatorViewport(viewState);
-    const spatialFilter = createViewportSpatialFilter(viewport.getBounds())!;
-    data?.widgetSource.extractTileFeatures({spatialFilter});
-    updateWidgets();
+
+    updateSpatialFilter();
   },
 });
 
@@ -93,7 +90,6 @@ async function updateSources() {
   document.querySelector('#footer')!.innerHTML = data.attribution;
 
   updateLayers();
-  updateWidgets();
 }
 
 function updateLayers() {
@@ -102,17 +98,24 @@ function updateLayers() {
     data: data,
     tileSize: 1024,
     getFillColor: getFillColorLayer,
-    onViewportLoad: (tiles) => {
-      const viewport = new WebMercatorViewport(viewState);
-      const spatialFilter = createViewportSpatialFilter(viewport.getBounds())!;
-      data.widgetSource.loadTiles(tiles);
-      data.widgetSource.extractTileFeatures({spatialFilter});
-      updateWidgets();
-    },
+    onViewportLoad: updateTiles,
   });
 
   deck.setProps({layers: [layer]});
 }
+
+function updateTiles(tiles: unknown[]) {
+  data.widgetSource.loadTiles(tiles);
+  updateSpatialFilter();
+}
+
+const updateSpatialFilter = debounce(() => {
+  const viewport = new WebMercatorViewport(viewState);
+  const spatialFilter = createViewportSpatialFilter(viewport.getBounds())!;
+  data.widgetSource.extractTileFeatures({spatialFilter});
+
+  updateWidgets();
+}, 200);
 
 function updateWidgets() {
   for (const widget of widgets) {
@@ -128,12 +131,19 @@ function updateWidgets() {
  */
 
 function bindWidget(selector: string): Widget {
-  const widget = document.querySelector<Widget>(selector)!;
+  return document.querySelector<Widget>(selector)!;
+}
 
-  widget.addEventListener('filter', (event) => {
-    filters = (event as FilterEvent).detail.filters;
-    updateSources();
-  });
+/**************************************************************************
+ * UTILS
+ */
 
-  return widget;
+function debounce(callback: Function, ms: number) {
+  let timeoutID: number = -1;
+  return (...args: unknown[]) => {
+    window.clearTimeout(timeoutID);
+    timeoutID = window.setTimeout(() => {
+      callback(...args);
+    }, ms);
+  };
 }
