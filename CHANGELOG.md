@@ -4,6 +4,10 @@
 
 ## 0.4
 
+### 0.4.6
+
+- chore: Add repository and homepage in npm package metadata
+
 ### 0.4.5
 
 - types: Export TileResolution and SpatialFilterPolyfillMode types (#63)
