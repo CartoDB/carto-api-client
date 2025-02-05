@@ -6,4 +6,15 @@ updates:
       interval: 'weekly'
     reviewers:
       - 'CartoDB/frontend-team'
-
+    groups:
+      deck-gl:
+        patterns:
+          - '@deck.gl/*'
+      luma-gl:
+        patterns:
+          - '@luma.gl/*'
+      turf:
+        patterns:
+          - '@turf/*'
+      dev-dependencies:
+        dependency-type: 'development'
