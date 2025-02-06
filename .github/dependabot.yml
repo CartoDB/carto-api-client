@@ -3,9 +3,9 @@ updates:
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
-      interval: 'weekly'
+      interval: 'monthly'
     reviewers:
-      - 'CartoDB/frontend-team'
+      - 'CartoDB/app-dev-builder-team'
     groups:
       deck-gl:
         patterns:
