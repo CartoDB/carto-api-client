@@ -56,12 +56,12 @@
     "LICENSE.md"
   ],
   "dependencies": {
-    "@turf/bbox-clip": "^7.1.0",
-    "@turf/bbox-polygon": "^7.1.0",
-    "@turf/helpers": "^7.1.0",
-    "@turf/invariant": "^7.1.0",
-    "@turf/union": "^7.1.0",
-    "@types/geojson": "^7946.0.15"
+    "@turf/bbox-clip": "^7.2.0",
+    "@turf/bbox-polygon": "^7.2.0",
+    "@turf/helpers": "^7.2.0",
+    "@turf/invariant": "^7.2.0",
+    "@turf/union": "^7.2.0",
+    "@types/geojson": "^7946.0.16"
   },
   "devDependencies": {
     "@deck.gl/aggregation-layers": "~9.1.0",
@@ -71,8 +71,8 @@
     "@deck.gl/geo-layers": "~9.1.0",
     "@deck.gl/layers": "~9.1.0",
     "@deck.gl/mesh-layers": "~9.1.0",
-    "@lit/react": "^1.0.6",
-    "@lit/task": "^1.0.1",
+    "@lit/react": "^1.0.7",
+    "@lit/task": "^1.0.2",
     "@loaders.gl/core": "^4.3.3",
     "@luma.gl/core": "~9.1.0",
     "@luma.gl/engine": "~9.1.0",
@@ -80,20 +80,20 @@
     "@types/json-schema": "^7.0.15",
     "@types/react": "^18.3.18",
     "@types/semver": "^7.5.8",
-    "@vitest/coverage-istanbul": "^3.0.2",
+    "@vitest/coverage-istanbul": "^3.0.5",
     "@webcomponents/webcomponentsjs": "^2.8.0",
     "concurrently": "^9.1.2",
     "echarts": "^5.6.0",
     "lit": "^3.2.1",
     "lit-analyzer": "^2.0.3",
-    "maplibre-gl": "^5.0.0",
+    "maplibre-gl": "^5.1.0",
     "microbundle": "^0.15.1",
     "prettier": "^3.4.2",
     "rimraf": "^6.0.1",
-    "semver": "^7.6.3",
+    "semver": "^7.7.1",
     "typescript": "~5.7.3",
-    "vite": "^6.0.7",
-    "vitest": "2.1.8"
+    "vite": "^6.1.0",
+    "vitest": "3.0.5"
   },
   "resolutions": {
     "rollup": "^4.20.0"
