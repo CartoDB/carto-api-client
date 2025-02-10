@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>Examples / H3 Tileset</title>
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <main id="app">
+      <header>
+        <h1>Tileset</h1>
+        <a href="../">← Back</a>
+      </header>
+      <section id="view">
+        <div id="map"></div>
+        <canvas id="deck-canvas"></canvas>
+      </section>
+      <section id="rail">
+        <formula-widget
+          id="formula"
+          header="Total"
+          operation="count"
+        ></formula-widget>
+
+        <table-widget
+          id="table"
+          header="Store type"
+          columns='["revenue", "size_m2"]'
+          sortBy="revenue"
+        ></table-widget>
+
+        <scatter-widget
+          id="scatter"
+          header="Size vs. Revenue"
+          xAxisColumn="size_m2"
+          yAxisColumn="revenue"
+        ></scatter-widget>
+
+        <histogram-widget
+          id="histogram"
+          header="Revenue"
+          column="revenue"
+          ticks="[1250000, 1500000, 1750000]"
+        ></histogram-widget>
+      </section>
+      <footer id="footer"></footer>
+    </main>
+    <script type="module" src="./app.ts"></script>
+  </body>
+</html>
