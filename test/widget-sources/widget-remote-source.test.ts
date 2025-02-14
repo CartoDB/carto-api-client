@@ -42,6 +42,10 @@ test('constructor', () => {
   });
 });
 
+test('setRequestHeaders', () => {
+  expect(true).toBe(false); // TODO
+});
+
 /******************************************************************************
  * getCategories
  */

@@ -3,6 +3,7 @@ import {InvalidColumnError} from '../utils.js';
 /** @internalRemarks Source: @carto/react-api */
 export interface ModelRequestOptions {
   method: 'GET' | 'POST';
+  headers?: Record<string, string>;
   abortController?: AbortController;
   otherOptions?: Record<string, unknown>;
   body?: string;
@@ -68,6 +69,7 @@ export async function makeCall({
       headers: {
         Authorization: `Bearer ${accessToken}`,
         ...(isPost && {'Content-Type': 'application/json'}),
+        ...opts.headers,
       },
       ...(isPost && {
         method: opts?.method,
