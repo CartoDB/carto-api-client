@@ -1,5 +1,6 @@
 import {SpatialFilterPolyfillMode, TileResolution} from '../sources/types.js';
 import {
+  Filters,
   GroupDateType,
   SortColumnType,
   SortDirection,
@@ -23,6 +24,8 @@ interface BaseRequestOptions {
   /** Required for table- and query-based spatial index sources (H3, Quadbin). */
   spatialIndexReferenceViewState?: ViewState;
   abortController?: AbortController;
+  /** Overrides source filters, if any. */
+  filters?: Filters;
   filterOwner?: string;
 }
 

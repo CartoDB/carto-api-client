@@ -8,6 +8,7 @@ import {
   WidgetRemoteSourceProps,
 } from './widget-remote-source.js';
 import {ModelSource} from '../models/model.js';
+import {Filters} from '../types.js';
 
 type LayerQuerySourceOptions =
   | Omit<VectorQuerySourceOptions, 'filters'>
@@ -41,9 +42,12 @@ export type WidgetQuerySourceResult = {widgetSource: WidgetQuerySource};
 export class WidgetQuerySource extends WidgetRemoteSource<
   LayerQuerySourceOptions & WidgetRemoteSourceProps
 > {
-  protected override getModelSource(owner: string): ModelSource {
+  protected override getModelSource(
+    filters: Filters | undefined,
+    filterOwner?: string
+  ): ModelSource {
     return {
-      ...super._getModelSource(owner),
+      ...super._getModelSource(filters, filterOwner),
       type: 'query',
       data: this.props.sqlQuery,
       queryParameters: this.props.queryParameters,

@@ -17,7 +17,12 @@ import {
   TimeSeriesResponse,
   ViewState,
 } from './types.js';
-import {FilterLogicalOperator, Filter, SpatialFilter} from '../types.js';
+import {
+  FilterLogicalOperator,
+  Filter,
+  SpatialFilter,
+  Filters,
+} from '../types.js';
 import {getApplicableFilters} from '../utils.js';
 import {getClient} from '../client.js';
 import {ModelSource} from '../models/model.js';
@@ -58,10 +63,14 @@ export abstract class WidgetSource<Props extends WidgetSourceProps> {
    * properties, and adding additional required properties including 'type' and
    * 'data'.
    */
-  protected abstract getModelSource(owner: string | undefined): ModelSource;
+  protected abstract getModelSource(
+    filters: Filters | undefined,
+    filterOwner?: string
+  ): ModelSource;
 
   protected _getModelSource(
-    owner?: string
+    filters: Filters | undefined,
+    filterOwner?: string
   ): Omit<ModelSource, 'type' | 'data'> {
     const props = this.props;
     return {
@@ -70,7 +79,7 @@ export abstract class WidgetSource<Props extends WidgetSourceProps> {
       clientId: props.clientId as string,
       accessToken: props.accessToken,
       connectionName: props.connectionName,
-      filters: getApplicableFilters(owner, props.filters),
+      filters: getApplicableFilters(filterOwner, filters || props.filters),
       filtersLogicalOperator: props.filtersLogicalOperator,
       spatialDataType: props.spatialDataType,
       spatialDataColumn: props.spatialDataColumn,

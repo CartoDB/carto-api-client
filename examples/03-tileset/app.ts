@@ -80,10 +80,7 @@ function updateLayers() {
     pointRadiusMinPixels: 4,
     getFillColor: [200, 0, 80],
     onViewportLoad: (tiles) => {
-      const viewport = new WebMercatorViewport(viewState);
-      const spatialFilter = createViewportSpatialFilter(viewport.getBounds())!;
       data.widgetSource.loadTiles(tiles);
-      data.widgetSource.extractTileFeatures({spatialFilter});
       updateWidgets();
     },
   });

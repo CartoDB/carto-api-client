@@ -1,5 +1,6 @@
 import {afterEach, expect, test, vi} from 'vitest';
 import {
+  Filters,
   FilterType,
   WidgetRemoteSource,
   WidgetRemoteSourceProps,
@@ -11,9 +12,9 @@ const createMockResponse = (data: unknown) => ({
 });
 
 class WidgetTestSource extends WidgetRemoteSource<WidgetRemoteSourceProps> {
-  protected override getModelSource(owner: string) {
+  protected override getModelSource(filters: Filters, filterOwner: string) {
     return {
-      ...super._getModelSource(owner),
+      ...super._getModelSource(filters, filterOwner),
       type: 'test',
       data: 'test-data',
     } as unknown as ReturnType<
@@ -155,6 +156,36 @@ test('filters - global', async () => {
     const params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
     return Object.fromEntries(params);
   }
+});
+
+test('filters - override', async () => {
+  // Filters on the datasource may be overridden by filters passed
+  // to widget function calls.
+
+  const widgetSource = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+    filters: {country: {[FilterType.IN]: {values: ['Spain']}}},
+  });
+
+  const mockFetch = vi
+    .fn()
+    .mockResolvedValue(createMockResponse({rows: [{value: 123}]}));
+
+  vi.stubGlobal('fetch', mockFetch);
+
+  await widgetSource.getFormula({
+    column: 'store_name',
+    operation: 'count',
+    filters: {continent: {[FilterType.IN]: {values: ['Europe']}}},
+  });
+
+  const params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
+
+  expect(Object.fromEntries(params)).toMatchObject({
+    filters: JSON.stringify({continent: {in: {values: ['Europe']}}}),
+    filtersLogicalOperator: 'and',
+  });
 });
 
 test('filters - owner', async () => {

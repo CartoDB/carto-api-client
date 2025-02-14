@@ -42,6 +42,7 @@ export abstract class WidgetRemoteSource<
     options: CategoryRequestOptions
   ): Promise<CategoryResponse> {
     const {
+      filters = this.props.filters,
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
@@ -50,7 +51,7 @@ export abstract class WidgetRemoteSource<
       ...params
     } = options;
     const {column, operation, operationColumn} = params;
-    const source = this.getModelSource(filterOwner);
+    const source = this.getModelSource(filters, filterOwner);
     const spatialFiltersResolution = this._getSpatialFiltersResolution(
       source,
       spatialFilter,
@@ -80,6 +81,7 @@ export abstract class WidgetRemoteSource<
     options: FeaturesRequestOptions
   ): Promise<FeaturesResponse> {
     const {
+      filters = this.props.filters,
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
@@ -88,7 +90,7 @@ export abstract class WidgetRemoteSource<
       ...params
     } = options;
     const {columns, dataType, featureIds, z, limit, tileResolution} = params;
-    const source = this.getModelSource(filterOwner);
+    const source = this.getModelSource(filters, filterOwner);
     const spatialFiltersResolution = this._getSpatialFiltersResolution(
       source,
       spatialFilter,
@@ -120,6 +122,7 @@ export abstract class WidgetRemoteSource<
 
   async getFormula(options: FormulaRequestOptions): Promise<FormulaResponse> {
     const {
+      filters = this.props.filters,
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
@@ -129,7 +132,7 @@ export abstract class WidgetRemoteSource<
       ...params
     } = options;
     const {column, operation} = params;
-    const source = this.getModelSource(filterOwner);
+    const source = this.getModelSource(filters, filterOwner);
     const spatialFiltersResolution = this._getSpatialFiltersResolution(
       source,
       spatialFilter,
@@ -159,6 +162,7 @@ export abstract class WidgetRemoteSource<
     options: HistogramRequestOptions
   ): Promise<HistogramResponse> {
     const {
+      filters = this.props.filters,
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
@@ -167,7 +171,7 @@ export abstract class WidgetRemoteSource<
       ...params
     } = options;
     const {column, operation, ticks} = params;
-    const source = this.getModelSource(filterOwner);
+    const source = this.getModelSource(filters, filterOwner);
     const spatialFiltersResolution = this._getSpatialFiltersResolution(
       source,
       spatialFilter,
@@ -203,6 +207,7 @@ export abstract class WidgetRemoteSource<
 
   async getRange(options: RangeRequestOptions): Promise<RangeResponse> {
     const {
+      filters = this.props.filters,
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
@@ -211,7 +216,7 @@ export abstract class WidgetRemoteSource<
       ...params
     } = options;
     const {column} = params;
-    const source = this.getModelSource(filterOwner);
+    const source = this.getModelSource(filters, filterOwner);
     const spatialFiltersResolution = this._getSpatialFiltersResolution(
       source,
       spatialFilter,
@@ -235,6 +240,7 @@ export abstract class WidgetRemoteSource<
 
   async getScatter(options: ScatterRequestOptions): Promise<ScatterResponse> {
     const {
+      filters = this.props.filters,
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
@@ -245,7 +251,7 @@ export abstract class WidgetRemoteSource<
     const {xAxisColumn, xAxisJoinOperation, yAxisColumn, yAxisJoinOperation} =
       params;
 
-    const source = this.getModelSource(filterOwner);
+    const source = this.getModelSource(filters, filterOwner);
     const spatialFiltersResolution = this._getSpatialFiltersResolution(
       source,
       spatialFilter,
@@ -280,6 +286,7 @@ export abstract class WidgetRemoteSource<
 
   async getTable(options: TableRequestOptions): Promise<TableResponse> {
     const {
+      filters = this.props.filters,
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
@@ -288,7 +295,7 @@ export abstract class WidgetRemoteSource<
       ...params
     } = options;
     const {columns, sortBy, sortDirection, offset = 0, limit = 10} = params;
-    const source = this.getModelSource(filterOwner);
+    const source = this.getModelSource(filters, filterOwner);
     const spatialFiltersResolution = this._getSpatialFiltersResolution(
       source,
       spatialFilter,
@@ -327,6 +334,7 @@ export abstract class WidgetRemoteSource<
     options: TimeSeriesRequestOptions
   ): Promise<TimeSeriesResponse> {
     const {
+      filters = this.props.filters,
       filterOwner,
       abortController,
       spatialFilter,
@@ -346,7 +354,7 @@ export abstract class WidgetRemoteSource<
       splitByCategoryValues,
     } = params;
 
-    const source = this.getModelSource(filterOwner);
+    const source = this.getModelSource(filters, filterOwner);
     const spatialFiltersResolution = this._getSpatialFiltersResolution(
       source,
       spatialFilter,

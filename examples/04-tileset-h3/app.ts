@@ -80,10 +80,7 @@ function updateLayers() {
     getFillColor: [200, 0, 80],
     extruded: false,
     onViewportLoad: (tiles) => {
-      const viewport = new WebMercatorViewport(viewState);
-      const spatialFilter = createViewportSpatialFilter(viewport.getBounds())!;
       data.widgetSource.loadTiles(tiles);
-      data.widgetSource.extractTileFeatures({spatialFilter});
       updateWidgets();
     },
   });
