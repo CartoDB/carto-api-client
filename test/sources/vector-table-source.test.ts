@@ -52,9 +52,7 @@ describe('vectorTableSource', () => {
     expect(initURL).toMatch(/spatialDataColumn=mygeom/);
     expect(initURL).toMatch(/spatialDataType=geo/);
     expect(initURL).toMatch(/aggregationExp=SUM%28revenue%29/);
-    expect(tilesetURL).toMatch(
-      /^https:\/\/xyz\.com\/\?format\=tilejson\&cache\=/
-    );
+    expect(tilesetURL).toMatch(/^https:\/\/xyz\.com\/\?format=tilejson&cache=/);
 
     expect(tilejson).toBeTruthy();
     expect(tilejson.tiles).toEqual([

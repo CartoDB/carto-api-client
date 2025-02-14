@@ -121,14 +121,12 @@ function _clean(
   }
 
   if (_isPolygon(geometry)) {
-    const coords = _cleanPolygonCoords((geometry as Polygon).coordinates);
+    const coords = _cleanPolygonCoords(geometry.coordinates);
     return coords ? polygon(coords).geometry : null;
   }
 
   if (_isMultiPolygon(geometry)) {
-    const coords = _cleanMultiPolygonCoords(
-      (geometry as MultiPolygon).coordinates
-    );
+    const coords = _cleanMultiPolygonCoords(geometry.coordinates);
     return coords ? multiPolygon(coords as Position[][][]).geometry : null;
   }
 

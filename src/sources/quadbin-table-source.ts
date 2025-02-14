@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-/* eslint-disable camelcase */
 import {DEFAULT_AGGREGATION_RES_LEVEL_QUADBIN} from '../constants-internal';
 import {WidgetTableSource, WidgetTableSourceResult} from '../widget-sources';
 import {baseSource} from './base-source';

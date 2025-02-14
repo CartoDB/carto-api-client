@@ -37,7 +37,7 @@ describe('aggregation', () => {
 
     describe('by features', () => {
       describe('unique key', () => {
-        Object.entries(RESULTS).forEach(([operation, result], idx) => {
+        Object.entries(RESULTS).forEach(([operation, result]) => {
           test(operation, () => {
             const func = aggregationFunctions[operation];
             expect(func(features, COLUMN)).toEqual(result);

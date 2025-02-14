@@ -80,4 +80,8 @@ export abstract class BaseWidget extends LitElement {
 
     return undefined;
   }
+
+  protected _onError(error: unknown) {
+    console.error(error);
+  }
 }

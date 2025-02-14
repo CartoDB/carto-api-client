@@ -108,10 +108,10 @@ export class ScatterWidget extends BaseWidget {
     if (this._task.status !== TaskStatus.COMPLETE) return;
 
     if (!this._chart || this._chart.getDom() !== this._chartRef.value) {
-      this._chart = echarts.init(this._chartRef.value!, null, {height: 200});
+      this._chart = echarts.init(this._chartRef.value, null, {height: 200});
     }
 
-    this._updateChart();
+    this._updateChart().catch((e) => this._onError(e));
   }
 
   protected async _updateChart() {

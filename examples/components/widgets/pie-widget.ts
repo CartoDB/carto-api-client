@@ -18,8 +18,9 @@ export class PieWidget extends CategoryWidget {
       return;
     }
 
-    const categories = await this._task.taskComplete;
-    categories.sort((a, b) => (a.value > b.value ? -1 : 1));
+    const categories = (await this._task.taskComplete)
+      .slice()
+      .sort((a, b) => (a.value > b.value ? -1 : 1));
 
     const data = categories.map(({name, value}, index) => {
       let color = DEFAULT_PALETTE[index % DEFAULT_PALETTE.length];

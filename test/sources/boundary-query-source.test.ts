@@ -52,9 +52,7 @@ describe('boundaryQuerySource', () => {
     );
     expect(initURL).toMatch(/columns=column1%2Ccolumn2/);
 
-    expect(tilesetURL).toMatch(
-      /^https:\/\/xyz\.com\/\?format\=tilejson\&cache\=/
-    );
+    expect(tilesetURL).toMatch(/^https:\/\/xyz\.com\/\?format=tilejson&cache=/);
 
     expect(tilejson).toBeTruthy();
     expect(tilejson.tiles).toEqual([

@@ -26,7 +26,7 @@ beforeEach(() => {
   });
 });
 
-describe('getFormula', async () => {
+describe('getFormula', () => {
   it('counts features', async () => {
     expect(
       await source.getFormula({

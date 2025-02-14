@@ -42,11 +42,11 @@ export function dealWithApiError({
     case 403:
       throw new Error('Forbidden access to the requested data');
     default:
-      const msg =
+      throw new Error(
         data && data.error && typeof data.error === 'string'
           ? data.error
-          : JSON.stringify(data?.hint || data.error?.[0]);
-      throw new Error(msg);
+          : JSON.stringify(data?.hint || data.error?.[0])
+      );
   }
 }
 
@@ -80,7 +80,7 @@ export async function makeCall({
   } catch (error) {
     if ((error as Error).name === 'AbortError') throw error;
 
-    throw new Error(`Failed request: ${error}`);
+    throw new Error(`Failed request: ${error as Error}`);
   }
 
   if (!response.ok) {

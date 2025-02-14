@@ -46,9 +46,7 @@ describe('rasterSource', () => {
     expect(initURL).toMatch(/v3\/maps\/carto_dw\/raster/);
     expect(initURL).toMatch(/name=a\.b\.raster_table/);
 
-    expect(tilesetURL).toMatch(
-      /^https:\/\/xyz\.com\/\?format\=tilejson\&cache\=/
-    );
+    expect(tilesetURL).toMatch(/^https:\/\/xyz\.com\/\?format=tilejson&cache=/);
 
     expect(tilejson).toBeTruthy();
     expect(tilejson.tiles).toEqual([

@@ -1,9 +1,5 @@
 import {describe, test, expect} from 'vitest';
-import {
-  AggregationType,
-  GroupDateType,
-  groupValuesByDateColumn,
-} from '@carto/api-client';
+import {GroupDateType, groupValuesByDateColumn} from '@carto/api-client';
 
 const REVENUE = 50;
 

@@ -49,11 +49,9 @@ describe('h3QuerySource', () => {
     expect(initURL).toMatch(/spatialDataColumn=h3/);
     expect(initURL).toMatch(/spatialDataType=h3/);
     expect(initURL).toMatch(/q=SELECT\+\*\+FROM\+a\.b\.h3_table/);
-    expect(initURL).toMatch(/client\=CUSTOM_CLIENT/);
+    expect(initURL).toMatch(/client=CUSTOM_CLIENT/);
 
-    expect(tilesetURL).toMatch(
-      /^https:\/\/xyz\.com\/\?format\=tilejson\&cache\=/
-    );
+    expect(tilesetURL).toMatch(/^https:\/\/xyz\.com\/\?format=tilejson&cache=/);
 
     expect(tilejson).toBeTruthy();
     expect(tilejson.tiles).toEqual([

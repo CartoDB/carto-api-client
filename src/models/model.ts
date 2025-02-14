@@ -6,7 +6,6 @@ import {
   QueryParameters,
   SpatialFilter,
 } from '../types.js';
-import {$TODO} from '../types-internal.js';
 import {assert, isPureObject} from '../utils.js';
 import {ModelRequestOptions, makeCall} from './common.js';
 import {ApiVersion} from '../constants.js';
@@ -152,7 +151,7 @@ function objectToURLSearchParams(object: Record<string, unknown>) {
     } else if (object[key] === null) {
       params.append(key, 'null');
     } else if (object[key] !== undefined) {
-      params.append(key, String(object[key]));
+      params.append(key, String(object[key] as unknown));
     }
   }
   return params;

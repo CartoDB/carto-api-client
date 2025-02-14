@@ -50,9 +50,7 @@ describe('quadbinTableSource', () => {
     expect(initURL).toMatch(/spatialDataType=quadbin/);
     expect(initURL).toMatch(/name=a.b.quadbin_table/);
 
-    expect(tilesetURL).toMatch(
-      /^https:\/\/xyz\.com\/\?format\=tilejson\&cache\=/
-    );
+    expect(tilesetURL).toMatch(/^https:\/\/xyz\.com\/\?format=tilejson&cache=/);
 
     expect(tilejson).toBeTruthy();
     expect(tilejson.tiles).toEqual([

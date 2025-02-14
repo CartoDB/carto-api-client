@@ -78,9 +78,13 @@ function updateLayers() {
   });
 
   deck.setProps({layers: [layer]});
-  data.then(({attribution}) => {
-    document.querySelector('#footer')!.innerHTML = attribution;
-  });
+  data
+    .then(({attribution}) => {
+      document.querySelector('#footer')!.innerHTML = attribution;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 }
 
 function updateWidgets() {

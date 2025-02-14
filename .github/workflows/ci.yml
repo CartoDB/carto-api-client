@@ -37,7 +37,9 @@ jobs:
           yarn install
 
       - name: Lint
-        run: yarn lint
+        run: |
+          yarn lint
+          yarn format:check
 
       - name: Build
         run: yarn build

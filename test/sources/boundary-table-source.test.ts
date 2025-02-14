@@ -50,9 +50,7 @@ describe('boundaryTableSource', () => {
     expect(initURL).toMatch(/propertiesTableName=a.b.properties_table/);
     expect(initURL).toMatch(/columns=column1%2Ccolumn2/);
 
-    expect(tilesetURL).toMatch(
-      /^https:\/\/xyz\.com\/\?format\=tilejson\&cache\=/
-    );
+    expect(tilesetURL).toMatch(/^https:\/\/xyz\.com\/\?format=tilejson&cache=/);
 
     expect(tilejson).toBeTruthy();
     expect(tilejson.tiles).toEqual([

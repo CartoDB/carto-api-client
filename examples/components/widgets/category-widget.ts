@@ -19,6 +19,8 @@ const DEFAULT_CATEGORY_GRID = {
   height: 'auto',
 };
 
+type Category = {name: string; value: number};
+
 export class CategoryWidget extends BaseWidget {
   static get properties() {
     return {
@@ -89,7 +91,7 @@ export class CategoryWidget extends BaseWidget {
           </figure>
           <button
             class="clear-btn"
-            @click=${this._clearFilter}
+            @click=${() => this._clearFilter()}
             disabled=${this._filterValues.length > 0 ? nothing : true}
           >
             Clear
@@ -105,13 +107,13 @@ export class CategoryWidget extends BaseWidget {
     if (this._task.status !== TaskStatus.COMPLETE) return;
 
     if (!this._chart || this._chart.getDom() !== this._chartRef.value) {
-      this._chart = echarts.init(this._chartRef.value!, null, {height: 200});
+      this._chart = echarts.init(this._chartRef.value, null, {height: 200});
       this._chart.on('click', ({name}) => this._toggleFilter(name));
     }
 
     // TODO: If another widget overrides this widget's filters, what happens?
 
-    this._updateChart();
+    this._updateChart().catch((e) => this._onError(e));
   }
 
   private _toggleFilter(value: string): void {
@@ -120,12 +122,12 @@ export class CategoryWidget extends BaseWidget {
     } else {
       this._filterValues = [...this._filterValues, value];
     }
-    this._dispatchFilter();
+    this._dispatchFilter().catch((e) => this._onError(e));
   }
 
   private _clearFilter(): void {
     this._filterValues = [];
-    this._dispatchFilter();
+    this._dispatchFilter().catch((e) => this._onError(e));
   }
 
   private async _dispatchFilter(): Promise<void> {
@@ -133,7 +135,7 @@ export class CategoryWidget extends BaseWidget {
 
     const {widgetSource} = await this.data;
     const filters = {...widgetSource.props.filters} as Record<string, Filter>;
-    const column = this.column as string;
+    const column = this.column;
 
     if (this._filterValues.length > 0) {
       addFilter(filters, {
@@ -154,10 +156,11 @@ export class CategoryWidget extends BaseWidget {
       return;
     }
 
-    const categories = await this._task.taskComplete;
-    categories.sort((a, b) => (a.value > b.value ? -1 : 1));
+    const categories = (await this._task.taskComplete)
+      .slice()
+      .sort((a: Category, b: Category) => (a.value > b.value ? -1 : 1));
 
-    const data = categories.map(({name, value}, index) => {
+    const data = categories.map(({name, value}: Category, index: number) => {
       let color = DEFAULT_PALETTE[index % DEFAULT_PALETTE.length];
       if (this._filterValues.length > 0) {
         color = this._filterValues.includes(name) ? color : '#cccccc';
@@ -166,7 +169,7 @@ export class CategoryWidget extends BaseWidget {
     });
 
     this._chart!.setOption({
-      xAxis: {data: data.map(({name}) => name)},
+      xAxis: {data: data.map(({name}: Category) => name)},
       yAxis: {type: 'value'},
       series: [{type: 'bar', name: this.header, data}],
       // Confine tooltip to the chart bounds, so it doesn't clip at sidebar scroll rect.
