@@ -36,13 +36,13 @@ jobs:
           corepack enable
           yarn install
 
+      - name: Build
+        run: yarn build
+
       - name: Lint
         run: |
           yarn lint
           yarn format:check
-
-      - name: Build
-        run: yarn build
 
       - name: Test
         run: yarn test
