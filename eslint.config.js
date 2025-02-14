@@ -2,7 +2,11 @@
 
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
-import {join} from 'node:path';
+import {join, dirname} from 'node:path';
+import {fileURLToPath} from 'node:url';
+
+// TODO: Replace with import.meta.dirname after Node.js v18 EOL, May 2025.
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /** @type {Partial<Record<string, any>>} */
 const PRODUCTION_RULES = {
@@ -42,23 +46,23 @@ export default tseslint.config(
     {
       files: ['src/**/*.ts'],
       rules: PRODUCTION_RULES,
-      tsconfigRootDir: join(import.meta.dirname, 'test'),
+      tsconfigRootDir: join(__dirname, 'test'),
     },
     {
       files: ['test/**/*.ts'],
       rules: DEVELOPMENT_RULES,
-      tsconfigRootDir: join(import.meta.dirname, 'test'),
+      tsconfigRootDir: join(__dirname, 'test'),
     },
     {
       files: ['examples/**/*.ts'],
       ignores: ['examples/components/**'],
       rules: DEVELOPMENT_RULES,
-      tsconfigRootDir: join(import.meta.dirname, 'examples'),
+      tsconfigRootDir: join(__dirname, 'examples'),
     },
     {
       files: ['examples/components/**/*.ts'],
       rules: DEVELOPMENT_RULES,
-      tsconfigRootDir: join(import.meta.dirname, 'examples', 'components'),
+      tsconfigRootDir: join(__dirname, 'examples', 'components'),
     },
   ].map(({tsconfigRootDir, ...config}) => ({
     extends: [
