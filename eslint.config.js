@@ -38,69 +38,34 @@ export default tseslint.config(
       '**/vite.config.ts',
     ],
   },
-
-  // source
-  {
-    files: ['src/**/*.ts'],
+  [
+    {
+      files: ['src/**/*.ts'],
+      rules: PRODUCTION_RULES,
+      tsconfigRootDir: join(import.meta.dirname, 'test'),
+    },
+    {
+      files: ['test/**/*.ts'],
+      rules: DEVELOPMENT_RULES,
+      tsconfigRootDir: join(import.meta.dirname, 'test'),
+    },
+    {
+      files: ['examples/**/*.ts'],
+      ignores: ['examples/components/**'],
+      rules: DEVELOPMENT_RULES,
+      tsconfigRootDir: join(import.meta.dirname, 'examples'),
+    },
+    {
+      files: ['examples/components/**/*.ts'],
+      rules: DEVELOPMENT_RULES,
+      tsconfigRootDir: join(import.meta.dirname, 'examples', 'components'),
+    },
+  ].map(({tsconfigRootDir, ...config}) => ({
     extends: [
       eslint.configs.recommended,
       tseslint.configs.recommendedTypeChecked,
     ],
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-    rules: PRODUCTION_RULES,
-  },
-
-  // tests
-  {
-    files: ['test/**/*.ts'],
-    extends: [
-      eslint.configs.recommended,
-      tseslint.configs.recommendedTypeChecked,
-    ],
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: join(import.meta.dirname, 'test'),
-      },
-    },
-    rules: DEVELOPMENT_RULES,
-  },
-
-  // examples
-  {
-    files: ['examples/**/*.ts'],
-    ignores: ['examples/components/**'],
-    extends: [
-      eslint.configs.recommended,
-      tseslint.configs.recommendedTypeChecked,
-    ],
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: join(import.meta.dirname, 'examples'),
-      },
-    },
-    rules: DEVELOPMENT_RULES,
-  },
-
-  // example components
-  {
-    files: ['examples/components/**/*.ts'],
-    extends: [
-      eslint.configs.recommended,
-      tseslint.configs.recommendedTypeChecked,
-    ],
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: join(import.meta.dirname, 'examples', 'components'),
-      },
-    },
-    rules: DEVELOPMENT_RULES,
-  }
+    languageOptions: {parserOptions: {projectService: true, tsconfigRootDir}},
+    ...config,
+  }))
 );
