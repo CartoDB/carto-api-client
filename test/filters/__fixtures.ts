@@ -1,4 +1,7 @@
-export const POINTS_BINARY_DATA = {
+import {BinaryPointFeature, BinaryPolygonFeature} from '@loaders.gl/schema';
+
+export const POINTS_BINARY_DATA: BinaryPointFeature = {
+  type: 'Point',
   positions: {
     value: Float32Array.of(
       0.672607421875,
@@ -414,7 +417,8 @@ export const POINTS_BINARY_DATA = {
   fields: [],
 };
 
-export const POLYGONS_BINARY_DATA = {
+export const POLYGONS_BINARY_DATA: BinaryPolygonFeature = {
+  type: 'Polygon',
   polygonIndices: {
     value: Uint16Array.of(0, 5, 10),
     size: 1,
