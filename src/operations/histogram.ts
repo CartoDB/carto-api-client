@@ -4,7 +4,7 @@ import {FeatureData} from '../types-internal';
 
 /**
  * Histogram computation.
- * @internalRemarks Source: @carto/react-core
+ * @privateRemarks Source: @carto/react-core
  */
 export function histogram({
   data,

@@ -12,7 +12,7 @@ import {ModelRequestOptions, makeCall} from './common.js';
 import {ApiVersion} from '../constants.js';
 import {SpatialDataType, SpatialFilterPolyfillMode} from '../sources/types.js';
 
-/** @internalRemarks Source: @carto/react-api */
+/** @privateRemarks Source: @carto/react-api */
 const AVAILABLE_MODELS = [
   'category',
   'histogram',
@@ -51,7 +51,7 @@ const REQUEST_GET_MAX_URL_LENGTH = 2048;
 
 /**
  * Execute a SQL model request.
- * @internalRemarks Source: @carto/react-api
+ * @privateRemarks Source: @carto/react-api
  */
 export function executeModel(props: {
   model: Model;

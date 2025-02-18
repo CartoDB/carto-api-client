@@ -15,7 +15,7 @@ export type $IntentionalAny = any;
  */
 
 /**
- * @internalRemarks Source: @deck.gl/carto
+ * @privateRemarks Source: @deck.gl/carto
  * @internal
  */
 export enum SchemaFieldType {
@@ -31,7 +31,7 @@ export enum SchemaFieldType {
 }
 
 /**
- * @internalRemarks Source: @deck.gl/carto
+ * @privateRemarks Source: @deck.gl/carto
  * @internal
  */
 export interface SchemaField {
@@ -40,7 +40,7 @@ export interface SchemaField {
 }
 
 /**
- * @internalRemarks Source: @deck.gl/carto
+ * @privateRemarks Source: @deck.gl/carto
  * @internal
  */
 export interface MapInstantiation extends MapInstantiationFormats {
@@ -50,7 +50,7 @@ export interface MapInstantiation extends MapInstantiationFormats {
 }
 
 /**
- * @internalRemarks Source: @deck.gl/carto
+ * @privateRemarks Source: @deck.gl/carto
  * @internal
  */
 type MapInstantiationFormats = Record<

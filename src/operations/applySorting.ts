@@ -19,7 +19,7 @@ interface SortOptions {
  * @param [sortOptions.sortByDirection] - Direction by the columns will be sorted
  * @param [sortOptions.sortByColumnType] - Column type
  * @internal
- * @internalRemarks Source: @carto/react-core
+ * @privateRemarks Source: @carto/react-core
  */
 export function applySorting(
   features: FeatureData[],

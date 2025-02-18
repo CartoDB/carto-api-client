@@ -6,7 +6,7 @@ export type ScatterPlotFeature = [number, number][];
 
 /**
  * Filters invalid features and formats  data.
- * @internalRemarks Source: @carto/react-core
+ * @privateRemarks Source: @carto/react-core
  */
 export function scatterPlot({
   data,

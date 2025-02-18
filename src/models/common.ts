@@ -1,6 +1,6 @@
 import {InvalidColumnError} from '../utils.js';
 
-/** @internalRemarks Source: @carto/react-api */
+/** @privateRemarks Source: @carto/react-api */
 export interface ModelRequestOptions {
   method: 'GET' | 'POST';
   abortController?: AbortController;
@@ -16,7 +16,7 @@ interface ModelErrorResponse {
 
 /**
  * Return more descriptive error from API
- * @internalRemarks Source: @carto/react-api
+ * @privateRemarks Source: @carto/react-api
  */
 export function dealWithApiError({
   response,
@@ -50,7 +50,7 @@ export function dealWithApiError({
   }
 }
 
-/** @internalRemarks Source: @carto/react-api */
+/** @privateRemarks Source: @carto/react-api */
 export async function makeCall({
   url,
   accessToken,

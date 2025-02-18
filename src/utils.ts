@@ -39,7 +39,7 @@ type Row<T> = Record<string, T> | Record<string, T>[] | T[] | T;
  * Due to each data warehouse having its own behavior with columns,
  * we need to normalize them and transform every key to lowercase.
  *
- * @internalRemarks Source: @carto/react-widgets
+ * @privateRemarks Source: @carto/react-widgets
  * @internal
  */
 export function normalizeObjectKeys<T, R extends Row<T>>(el: R): R {
@@ -59,7 +59,7 @@ export function normalizeObjectKeys<T, R extends Row<T>>(el: R): R {
   ) as R;
 }
 
-/** @internalRemarks Source: @carto/react-core */
+/** @privateRemarks Source: @carto/react-core */
 export function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
     throw new Error(message);
@@ -67,7 +67,7 @@ export function assert(condition: unknown, message: string): asserts condition {
 }
 
 /**
- * @internalRemarks Source: @carto/react-core
+ * @privateRemarks Source: @carto/react-core
  * @internal
  */
 export class InvalidColumnError extends Error {

@@ -6,7 +6,7 @@ import {DEFAULT_GEO_COLUMN} from '../constants-internal';
 import {FeatureData} from '../types-internal';
 import {SpatialDataType} from '../sources/types';
 
-/** @internalRemarks Source: @carto/react-core */
+/** @privateRemarks Source: @carto/react-core */
 export type TileFeatures = {
   tiles: Tile[];
   tileFormat: TileFormat;
@@ -17,12 +17,12 @@ export type TileFeatures = {
   options?: TileFeatureExtractOptions;
 };
 
-/** @internalRemarks Source: @carto/react-core */
+/** @privateRemarks Source: @carto/react-core */
 export type TileFeatureExtractOptions = {
   storeGeometry?: boolean;
 };
 
-/** @internalRemarks Source: @carto/react-core */
+/** @privateRemarks Source: @carto/react-core */
 export function tileFeatures({
   tiles,
   spatialFilter,
