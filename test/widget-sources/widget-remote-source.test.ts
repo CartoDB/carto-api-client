@@ -42,6 +42,33 @@ test('constructor', () => {
   });
 });
 
+test('setRequestHeaders', async () => {
+  const mockResponse = createMockResponse({rows: []});
+  const mockFetch = vi.fn().mockResolvedValue(mockResponse);
+  vi.stubGlobal('fetch', mockFetch);
+
+  const widgetSource = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+  });
+
+  await widgetSource.getFormula({column: 'store_name', operation: 'count'});
+
+  expect(mockFetch).toHaveBeenCalledOnce();
+  expect(mockFetch.mock.lastCall[1].headers).toEqual({
+    Authorization: 'Bearer <token>',
+  });
+
+  widgetSource.setRequestHeaders({'Cache-Control': 'public'});
+  await widgetSource.getFormula({column: 'store_name', operation: 'count'});
+
+  expect(mockFetch).toHaveBeenCalledTimes(2);
+  expect(mockFetch.mock.lastCall[1].headers).toEqual({
+    Authorization: 'Bearer <token>',
+    'Cache-Control': 'public',
+  });
+});
+
 /******************************************************************************
  * getCategories
  */
