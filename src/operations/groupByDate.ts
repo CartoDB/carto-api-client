@@ -35,7 +35,7 @@ const GROUP_KEY_FN_MAPPING: Record<GroupDateType, (date: Date) => number> = {
     ),
 };
 
-/** @internalRemarks Source: @carto/react-core */
+/** @privateRemarks Source: @carto/react-core */
 export function groupValuesByDateColumn({
   data,
   valuesColumns,

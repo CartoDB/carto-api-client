@@ -208,7 +208,7 @@ export type SpatialDataType = 'geo' | 'h3' | 'quadbin';
  * Strategy used for covering spatial filter geometry with spatial indexes.
  * See https://docs.carto.com/data-and-analysis/analytics-toolbox-for-bigquery/sql-reference/quadbin#quadbin_polyfill_mode
  * or https://docs.carto.com/data-and-analysis/analytics-toolbox-for-bigquery/sql-reference/h3#h3_polyfill_mode for more information.
- * @internalRemarks Source: cloud-native maps-api
+ * @privateRemarks Source: cloud-native maps-api
  * */
 export type SpatialFilterPolyfillMode = 'center' | 'intersects' | 'contains';
 

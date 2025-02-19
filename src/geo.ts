@@ -40,7 +40,7 @@ export function createPolygonSpatialFilter(
  * Check if a viewport is large enough to represent a global coverage.
  * In this case the spatial filter parameter for widget calculation is removed.
  *
- * @internalRemarks Source: @carto/react-core
+ * @privateRemarks Source: @carto/react-core
  */
 function _isGlobalViewport(viewport: BBox) {
   const [minx, miny, maxx, maxy] = viewport;
@@ -54,7 +54,7 @@ function _isGlobalViewport(viewport: BBox) {
  *
  * It results in a Polygon or MultiPolygon strictly inside the validity range.
  *
- * @internalRemarks Source: @carto/react-core
+ * @privateRemarks Source: @carto/react-core
  */
 function _normalizeGeometry(
   geometry: Polygon | MultiPolygon
@@ -100,19 +100,19 @@ function _normalizeGeometry(
   return result;
 }
 
-/** @internalRemarks Source: @carto/react-core */
+/** @privateRemarks Source: @carto/react-core */
 function _cleanPolygonCoords(cc: Position[][]) {
   const coords = cc.filter((c) => c.length > 0);
   return coords.length > 0 ? coords : null;
 }
 
-/** @internalRemarks Source: @carto/react-core */
+/** @privateRemarks Source: @carto/react-core */
 function _cleanMultiPolygonCoords(ccc: Position[][][]) {
   const coords = ccc.map(_cleanPolygonCoords).filter((cc) => cc);
   return coords.length > 0 ? coords : null;
 }
 
-/** @internalRemarks Source: @carto/react-core */
+/** @privateRemarks Source: @carto/react-core */
 function _clean(
   geometry: Polygon | MultiPolygon | null
 ): Polygon | MultiPolygon | null {
@@ -133,22 +133,22 @@ function _clean(
   return null;
 }
 
-/** @internalRemarks Source: @carto/react-core */
+/** @privateRemarks Source: @carto/react-core */
 function _txContourCoords(cc: Position[], distance: number) {
   return cc.map((c) => [c[0] + distance, c[1]]);
 }
 
-/** @internalRemarks Source: @carto/react-core */
+/** @privateRemarks Source: @carto/react-core */
 function _txPolygonCoords(ccc: Position[][], distance: number) {
   return ccc.map((cc) => _txContourCoords(cc, distance));
 }
 
-/** @internalRemarks Source: @carto/react-core */
+/** @privateRemarks Source: @carto/react-core */
 function _txMultiPolygonCoords(cccc: Position[][][], distance: number) {
   return cccc.map((ccc) => _txPolygonCoords(ccc, distance));
 }
 
-/** @internalRemarks Source: @carto/react-core */
+/** @privateRemarks Source: @carto/react-core */
 function _tx(geometry: Polygon | MultiPolygon, distance: number) {
   if (geometry && getType(geometry) === 'Polygon') {
     const coords = _txPolygonCoords(

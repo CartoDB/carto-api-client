@@ -1,14 +1,14 @@
 import {AggregationType} from '../types';
 import {FeatureData} from '../types-internal';
 
-/** @internalRemarks Source: @carto/react-core */
+/** @privateRemarks Source: @carto/react-core */
 export type AggregationFunction = (
   values: unknown[] | FeatureData[],
   keys?: string[] | string,
   joinOperation?: AggregationType
 ) => number;
 
-/** @internalRemarks Source: @carto/react-core */
+/** @privateRemarks Source: @carto/react-core */
 export const aggregationFunctions: Record<
   Exclude<AggregationType, 'custom'>,
   AggregationFunction
@@ -20,7 +20,7 @@ export const aggregationFunctions: Record<
   avg: (...args) => applyAggregationFunction(avg, ...args),
 };
 
-/** @internalRemarks Source: @carto/react-core */
+/** @privateRemarks Source: @carto/react-core */
 export function aggregate(
   feature: FeatureData,
   keys?: string[],

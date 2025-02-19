@@ -2,13 +2,13 @@ import {aggregationFunctions, aggregate} from './aggregation.js';
 import {AggregationType} from '../types';
 import {FeatureData} from '../types-internal';
 
-/** @internalRemarks Source: @carto/react-core */
+/** @privateRemarks Source: @carto/react-core */
 export type GroupByFeature = {
   name: string;
   value: number;
 }[];
 
-/** @internalRemarks Source: @carto/react-core */
+/** @privateRemarks Source: @carto/react-core */
 export function groupValuesByColumn({
   data,
   valuesColumns,

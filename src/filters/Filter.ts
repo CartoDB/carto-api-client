@@ -44,7 +44,11 @@ function passesFilter(
   });
 }
 
-export function buildFeatureFilter({
+/**
+ * @internal
+ * @privateRemarks Exported for use in @deck.gl/carto's getDataFilterExtensionProps.
+ */
+export function _buildFeatureFilter({
   filters = {},
   type = 'boolean',
   filtersLogicalOperator = 'and',
@@ -74,18 +78,24 @@ export function buildFeatureFilter({
   };
 }
 
-// Apply certain filters to a collection of features
+/**
+ * Apply certain filters to a collection of features.
+ * @internal
+ */
 export function applyFilters(
   features: FeatureData[],
   filters: Filters,
   filtersLogicalOperator: FilterLogicalOperator
 ) {
   return Object.keys(filters).length
-    ? features.filter(buildFeatureFilter({filters, filtersLogicalOperator}))
+    ? features.filter(_buildFeatureFilter({filters, filtersLogicalOperator}))
     : features;
 }
 
-// Binary
+/**
+ * Binary.
+ * @internal
+ */
 export function buildBinaryFeatureFilter({filters = {}}: {filters: Filters}) {
   const columns = Object.keys(filters);
 

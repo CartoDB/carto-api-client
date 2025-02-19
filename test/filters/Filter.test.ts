@@ -2,9 +2,8 @@ import {describe, expect, test} from 'vitest';
 import {POINTS_BINARY_DATA, POLYGONS_BINARY_DATA} from './__fixtures.js';
 import {
   buildBinaryFeatureFilter,
-  buildFeatureFilter,
+  _buildFeatureFilter,
   FilterLogicalOperator,
-  TileData,
 } from '@carto/api-client';
 
 const filters = {
@@ -53,13 +52,13 @@ describe('Filters', () => {
   test('should return 1 if no filters present', () => {
     const params = {filters: {}, type: 'number' as const};
     const feature = makeFeatureWithValueInColumn();
-    expect(buildFeatureFilter(params)(feature)).toBe(1);
+    expect(_buildFeatureFilter(params)(feature)).toBe(1);
   });
 
   test('should return true if no filters present', () => {
     const params = {filters: {}, type: 'boolean' as const};
     const feature = makeFeatureWithValueInColumn();
-    expect(buildFeatureFilter(params)(feature)).toBe(true);
+    expect(_buildFeatureFilter(params)(feature)).toBe(true);
   });
 
   describe('feature passes filter - boolean type', () => {
@@ -70,7 +69,7 @@ describe('Filters', () => {
       for (const value of columnValues) {
         test(`${value} - with geojson feature`, () => {
           const feature = makeFeatureWithValueInColumn(value as any);
-          const withProps = buildFeatureFilter(params)(feature);
+          const withProps = _buildFeatureFilter(params)(feature);
           expect(withProps).toBe(false);
         });
       }
@@ -78,7 +77,7 @@ describe('Filters', () => {
       for (const value of columnValues) {
         test(`${value} - with geojson feature properties`, () => {
           const obj = makeObjectWithValueInColumn(value as any);
-          const noProps = buildFeatureFilter(params)(obj);
+          const noProps = _buildFeatureFilter(params)(obj);
           expect(noProps).toBe(false);
         });
       }
@@ -96,7 +95,7 @@ describe('Filters', () => {
       };
 
       test('with geojson feature', () => {
-        const filter = buildFeatureFilter(
+        const filter = _buildFeatureFilter(
           paramsWithFilterFunctionNotImplemented as any
         );
         const feature = makeFeatureWithValueInColumn();
@@ -106,7 +105,7 @@ describe('Filters', () => {
       });
 
       test('with geojson feature properties', () => {
-        const filter = buildFeatureFilter(
+        const filter = _buildFeatureFilter(
           paramsWithFilterFunctionNotImplemented as any
         );
         const obj = makeObjectWithValueInColumn();
@@ -123,7 +122,7 @@ describe('Filters', () => {
           column4: 'Alcalá de Guadaíra',
         },
       };
-      const featureIsIncluded = buildFeatureFilter(params)(feature);
+      const featureIsIncluded = _buildFeatureFilter(params)(feature);
       expect(featureIsIncluded).toBe(true);
     });
 
@@ -136,7 +135,7 @@ describe('Filters', () => {
           column4: 'test',
         },
       };
-      const featureIsIncluded = buildFeatureFilter(params)(feature);
+      const featureIsIncluded = _buildFeatureFilter(params)(feature);
       expect(featureIsIncluded).toBe(false);
     });
   });
@@ -167,7 +166,7 @@ describe('Filters', () => {
 
       for (const feature of notIncludedFeatures) {
         test(`${feature.properties.column1} - with geojson feature`, () => {
-          const isFeatureIncluded = buildFeatureFilter(
+          const isFeatureIncluded = _buildFeatureFilter(
             nullOrUndefinedAreNotValid
           )(feature);
           expect(isFeatureIncluded).toBe(0);
@@ -177,7 +176,7 @@ describe('Filters', () => {
       const notIncludedObjects = [{column1: null}, {column1: undefined}];
       for (const obj of notIncludedObjects) {
         test(`${obj.column1} - with geojson feature properties`, () => {
-          const isFeatureIncluded = buildFeatureFilter(
+          const isFeatureIncluded = _buildFeatureFilter(
             nullOrUndefinedAreNotValid
           )(obj);
           expect(isFeatureIncluded).toBe(0);
@@ -195,7 +194,7 @@ describe('Filters', () => {
 
       test(`ZERO - with geojson feature`, () => {
         const feature = makeFeatureWithValueInColumn(0);
-        const isFeatureIncluded = buildFeatureFilter(zeroIsValidForThisFilter)(
+        const isFeatureIncluded = _buildFeatureFilter(zeroIsValidForThisFilter)(
           feature
         );
         expect(isFeatureIncluded).toBe(1);
@@ -203,7 +202,7 @@ describe('Filters', () => {
 
       test(`ZERO - with geojson feature properties`, () => {
         const obj = makeObjectWithValueInColumn(0);
-        const isFeatureIncluded = buildFeatureFilter(zeroIsValidForThisFilter)(
+        const isFeatureIncluded = _buildFeatureFilter(zeroIsValidForThisFilter)(
           obj
         );
         expect(isFeatureIncluded).toBe(1);
@@ -222,7 +221,7 @@ describe('Filters', () => {
       };
 
       test('with geojson feature', () => {
-        const filter = buildFeatureFilter(
+        const filter = _buildFeatureFilter(
           paramsWithFilterFunctionNotImplemented as any
         );
         const feature = makeFeatureWithValueInColumn();
@@ -232,7 +231,7 @@ describe('Filters', () => {
       });
 
       test('with geojson feature properties', () => {
-        const filter = buildFeatureFilter(
+        const filter = _buildFeatureFilter(
           paramsWithFilterFunctionNotImplemented as any
         );
         const obj = makeObjectWithValueInColumn();
@@ -249,7 +248,7 @@ describe('Filters', () => {
           column4: 'Alcalá de Guadaíra',
         },
       };
-      const featureIsIncluded = buildFeatureFilter(params)(feature);
+      const featureIsIncluded = _buildFeatureFilter(params)(feature);
       expect(featureIsIncluded).toBe(1);
     });
 
@@ -262,7 +261,7 @@ describe('Filters', () => {
           column4: 'test',
         },
       };
-      const featureIsIncluded = buildFeatureFilter(params)(feature);
+      const featureIsIncluded = _buildFeatureFilter(params)(feature);
       expect(featureIsIncluded).toBe(0);
     });
 
@@ -276,7 +275,7 @@ describe('Filters', () => {
 
       test(`left endpoint is ALWAYS included - with geojson feature`, () => {
         const feature = makeFeatureWithValueInColumn(10);
-        const isFeatureIncluded = buildFeatureFilter(zeroIsValidForThisFilter)(
+        const isFeatureIncluded = _buildFeatureFilter(zeroIsValidForThisFilter)(
           feature
         );
         expect(isFeatureIncluded).toBe(1);
@@ -284,7 +283,7 @@ describe('Filters', () => {
 
       test(`rigth endpoint is NEVER included - with geojson feature`, () => {
         const feature = makeFeatureWithValueInColumn(20);
-        const isFeatureIncluded = buildFeatureFilter(zeroIsValidForThisFilter)(
+        const isFeatureIncluded = _buildFeatureFilter(zeroIsValidForThisFilter)(
           feature
         );
         expect(isFeatureIncluded).toBe(0);
@@ -292,7 +291,7 @@ describe('Filters', () => {
 
       test(`left endpoint is ALWAYS included - with geojson feature properties`, () => {
         const obj = makeObjectWithValueInColumn(10);
-        const isFeatureIncluded = buildFeatureFilter(zeroIsValidForThisFilter)(
+        const isFeatureIncluded = _buildFeatureFilter(zeroIsValidForThisFilter)(
           obj
         );
         expect(isFeatureIncluded).toBe(1);
@@ -300,7 +299,7 @@ describe('Filters', () => {
 
       test(`rigth endpoint is NEVER included - with geojson feature properties`, () => {
         const obj = makeObjectWithValueInColumn(20);
-        const isFeatureIncluded = buildFeatureFilter(zeroIsValidForThisFilter)(
+        const isFeatureIncluded = _buildFeatureFilter(zeroIsValidForThisFilter)(
           obj
         );
         expect(isFeatureIncluded).toBe(0);
@@ -327,22 +326,22 @@ describe('Filters', () => {
 
     test('should pass if only first column passes', () => {
       const feature = {properties: {column1: 1, column2: null}};
-      const result = buildFeatureFilter(params)(feature);
+      const result = _buildFeatureFilter(params)(feature);
       expect(result).toBe(true);
     });
     test('should pass if only second column passes', () => {
       const feature = {properties: {column1: null, column2: 2}};
-      const result = buildFeatureFilter(params)(feature);
+      const result = _buildFeatureFilter(params)(feature);
       expect(result).toBe(true);
     });
     test('should pass if both columns pass', () => {
       const feature = {properties: {column1: 1, column2: 2}};
-      const result = buildFeatureFilter(params)(feature);
+      const result = _buildFeatureFilter(params)(feature);
       expect(result).toBe(true);
     });
     test('should not pass if none of the columns pass', () => {
       const feature = {properties: {column1: null, column2: null}};
-      const result = buildFeatureFilter(params)(feature);
+      const result = _buildFeatureFilter(params)(feature);
       expect(result).toBe(false);
     });
   });
@@ -359,8 +358,7 @@ describe('Filters', () => {
       const filterFn = buildBinaryFeatureFilter({filters: filterForBinaryData});
 
       const filterRes = POINTS_BINARY_DATA.featureIds.value.map(
-        (_, idx) =>
-          filterFn(idx, POINTS_BINARY_DATA as unknown as TileData) as number
+        (_, idx: number) => filterFn(idx, POINTS_BINARY_DATA) as number
       );
 
       expect(filterRes[0]).toBe(1);
@@ -379,8 +377,7 @@ describe('Filters', () => {
       const filterFn = buildBinaryFeatureFilter({filters: filterForBinaryData});
 
       const filterRes = POLYGONS_BINARY_DATA.featureIds.value.map(
-        (_, idx) =>
-          filterFn(idx, POLYGONS_BINARY_DATA as unknown as TileData) as number
+        (_, idx: number) => filterFn(idx, POLYGONS_BINARY_DATA) as number
       );
 
       expect(filterRes[0]).toBe(1);
@@ -400,9 +397,9 @@ describe('Filters', () => {
         filters: filterForBinaryData,
       } as any);
 
-      expect(() =>
-        filterFn(0, POLYGONS_BINARY_DATA as unknown as TileData)
-      ).toThrow('"pow" filter is not implemented');
+      expect(() => filterFn(0, POLYGONS_BINARY_DATA)).toThrow(
+        '"pow" filter is not implemented'
+      );
     });
 
     test('should returns always 0 when values is nullish', () => {
@@ -417,8 +414,7 @@ describe('Filters', () => {
       const filterFn = buildBinaryFeatureFilter({filters: filterForBinaryData});
 
       const filterRes = POLYGONS_BINARY_DATA.featureIds.value.map(
-        (_, idx) =>
-          filterFn(idx, POLYGONS_BINARY_DATA as unknown as TileData) as number
+        (_, idx: number) => filterFn(idx, POLYGONS_BINARY_DATA) as number
       );
 
       expect(filterRes.every((el) => el === 0)).toBe(true);

@@ -1,6 +1,6 @@
 /**
  * @internal
- * @internalRemarks Source: @carto/react-core, @carto/constants, @deck.gl/carto
+ * @privateRemarks Source: @carto/react-core, @carto/constants, @deck.gl/carto
  */
 let client = 'deck-gl-carto';
 
@@ -8,7 +8,7 @@ let client = 'deck-gl-carto';
  * Returns current client ID, used to categorize API requests. For internal use only.
  *
  * @internal
- * @internalRemarks Source: @carto/react-core
+ * @privateRemarks Source: @carto/react-core
  */
 export function getClient() {
   return client;
@@ -18,7 +18,7 @@ export function getClient() {
  * Sets current client ID, used to categorize API requests. For internal use only.
  *
  * @internal
- * @internalRemarks Source: @carto/react-core
+ * @privateRemarks Source: @carto/react-core
  */
 export function setClient(c: string) {
   client = c;
