@@ -2,15 +2,15 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-import {SOURCE_DEFAULTS} from '../sources/index';
+import {SOURCE_DEFAULTS} from '../sources/index.js';
 import type {
   SourceOptions,
   QuerySourceOptions,
   QueryResult,
-} from '../sources/types';
-import {buildQueryUrl} from './endpoints';
-import {requestWithParameters} from './request-with-parameters';
-import {APIErrorContext} from './carto-api-error';
+} from '../sources/types.js';
+import {buildQueryUrl} from './endpoints.js';
+import {requestWithParameters} from './request-with-parameters.js';
+import {APIErrorContext} from './carto-api-error.js';
 
 export type QueryOptions = SourceOptions & QuerySourceOptions;
 type UrlParameters = {q: string; queryParameters?: string};

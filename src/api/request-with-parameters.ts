@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-import {isPureObject} from '../utils';
-import {CartoAPIError, APIErrorContext} from './carto-api-error';
-import {V3_MINOR_VERSION} from '../constants-internal';
-import {DEFAULT_MAX_LENGTH_URL} from '../constants-internal';
-import {getClient} from '../client';
-import {LocalCacheOptions} from '../sources/types';
+import {isPureObject} from '../utils.js';
+import {CartoAPIError, APIErrorContext} from './carto-api-error.js';
+import {V3_MINOR_VERSION} from '../constants-internal.js';
+import {DEFAULT_MAX_LENGTH_URL} from '../constants-internal.js';
+import {getClient} from '../client.js';
+import {LocalCacheOptions} from '../sources/types.js';
 
 const DEFAULT_HEADERS = {
   Accept: 'application/json',

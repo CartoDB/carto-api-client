@@ -1,6 +1,6 @@
-import {aggregate} from './aggregation';
-import {FeatureData} from '../types-internal';
-import {AggregationType} from '../types';
+import {aggregate} from './aggregation.js';
+import {FeatureData} from '../types-internal.js';
+import {AggregationType} from '../types.js';
 
 export type ScatterPlotFeature = [number, number][];
 

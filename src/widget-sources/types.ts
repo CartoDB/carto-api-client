@@ -1,10 +1,10 @@
-import {SpatialFilterPolyfillMode, TileResolution} from '../sources/types';
+import {SpatialFilterPolyfillMode, TileResolution} from '../sources/types.js';
 import {
   GroupDateType,
   SortColumnType,
   SortDirection,
   SpatialFilter,
-} from '../types';
+} from '../types.js';
 
 /******************************************************************************
  * WIDGET API REQUESTS

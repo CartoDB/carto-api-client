@@ -1,10 +1,10 @@
 import {
   DEFAULT_AGGREGATION_RES_LEVEL_H3,
   DEFAULT_AGGREGATION_RES_LEVEL_QUADBIN,
-} from './constants-internal';
-import type {ModelSource} from './models/model';
-import type {AggregationOptions} from './sources/types';
-import type {ViewState} from './widget-sources';
+} from './constants-internal.js';
+import type {ModelSource} from './models/model.js';
+import type {AggregationOptions} from './sources/types.js';
+import type {ViewState} from './widget-sources/index.js';
 
 const DEFAULT_TILE_SIZE = 512;
 const QUADBIN_ZOOM_MAX_OFFSET = 4;

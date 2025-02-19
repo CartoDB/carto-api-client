@@ -2,17 +2,17 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-import {getTileFormat} from '../utils/getTileFormat';
+import {getTileFormat} from '../utils/getTileFormat.js';
 import {
   WidgetTilesetSource,
   WidgetTilesetSourceResult,
-} from '../widget-sources';
-import {baseSource} from './base-source';
+} from '../widget-sources/index.js';
+import {baseSource} from './base-source.js';
 import type {
   SourceOptions,
   TilejsonResult,
   TilesetSourceOptions,
-} from './types';
+} from './types.js';
 
 export type QuadbinTilesetSourceOptions = SourceOptions & TilesetSourceOptions;
 type UrlParameters = {name: string};

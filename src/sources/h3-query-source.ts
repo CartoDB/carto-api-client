@@ -2,9 +2,12 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-import {DEFAULT_AGGREGATION_RES_LEVEL_H3} from '../constants-internal';
-import {WidgetQuerySource, WidgetQuerySourceResult} from '../widget-sources';
-import {baseSource} from './base-source';
+import {DEFAULT_AGGREGATION_RES_LEVEL_H3} from '../constants-internal.js';
+import {
+  WidgetQuerySource,
+  WidgetQuerySourceResult,
+} from '../widget-sources/index.js';
+import {baseSource} from './base-source.js';
 import type {
   AggregationOptions,
   FilterOptions,
@@ -12,7 +15,7 @@ import type {
   SourceOptions,
   SpatialDataType,
   TilejsonResult,
-} from './types';
+} from './types.js';
 
 export type H3QuerySourceOptions = SourceOptions &
   QuerySourceOptions &

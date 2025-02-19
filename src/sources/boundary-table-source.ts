@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-import {baseSource} from './base-source';
-import type {FilterOptions, SourceOptions, TilejsonResult} from './types';
+import {baseSource} from './base-source.js';
+import type {FilterOptions, SourceOptions, TilejsonResult} from './types.js';
 
 export type BoundaryTableSourceOptions = SourceOptions &
   FilterOptions & {

@@ -1,8 +1,8 @@
-import {filterFunctions} from './FilterTypes';
-import {Filter, FilterLogicalOperator, Filters} from '../types';
+import {filterFunctions} from './FilterTypes.js';
+import {Filter, FilterLogicalOperator, Filters} from '../types.js';
 import {Feature} from 'geojson';
-import {FilterType} from '../constants';
-import {FeatureData} from '../types-internal';
+import {FilterType} from '../constants.js';
+import {FeatureData} from '../types-internal.js';
 import {BinaryFeature} from '@loaders.gl/schema';
 
 const LOGICAL_OPERATOR_METHODS: Record<
