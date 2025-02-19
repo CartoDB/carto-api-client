@@ -251,7 +251,7 @@ describe('requestWithParameters', () => {
     expect(url3.searchParams.get('v')).toBe('3.2'); // param overrides default
   });
 
-  test('maxLengthURL', async (t) => {
+  test('maxLengthURL', async () => {
     const mockFetch = vi.mocked(fetch);
 
     expect(mockFetch).not.toHaveBeenCalled();
@@ -282,6 +282,7 @@ describe('requestWithParameters', () => {
     expect(mockFetch).toHaveBeenCalledTimes(4);
 
     const calls = mockFetch.mock.calls;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const methods = calls.map(([_, {method}]) => method ?? 'GET');
 
     expect(methods).toEqual(['GET', 'POST', 'POST', 'GET']);

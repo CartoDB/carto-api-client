@@ -121,7 +121,7 @@ export function getFilter<T extends FilterType>(
     return null;
   }
 
-  if (!owner || owner === filter[type as FilterType]?.owner) {
+  if (!owner || owner === filter[type]?.owner) {
     return filter[type] || null;
   }
 

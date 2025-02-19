@@ -96,7 +96,7 @@ export class TableWidget extends BaseWidget {
         <h3>${this.header}</h3>
         <figure>
           <table class="table">
-            ${cache(renderTableBody(taskResult))}
+            ${cache(renderTableBody(taskResult as TableResponse))}
           </table>
           <figcaption>${this.caption}</figcaption>
         </figure>

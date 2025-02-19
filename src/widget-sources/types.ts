@@ -5,7 +5,6 @@ import {
   SortDirection,
   SpatialFilter,
 } from '../types';
-import type {WidgetRemoteSource} from './widget-remote-source';
 
 /******************************************************************************
  * WIDGET API REQUESTS

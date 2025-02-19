@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-/* eslint-disable camelcase */
 import {
   DEFAULT_GEO_COLUMN,
   DEFAULT_TILE_RESOLUTION,

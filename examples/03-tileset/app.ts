@@ -2,14 +2,13 @@ import maplibregl from 'maplibre-gl';
 import {Deck, WebMercatorViewport} from '@deck.gl/core';
 import {VectorTileLayer} from '@deck.gl/carto';
 import {
-  Filter,
   TilejsonResult,
   WidgetTilesetSource,
   vectorTilesetSource,
   createViewportSpatialFilter,
 } from '@carto/api-client';
 import '../components/index.js';
-import type {Widget, FilterEvent} from '../components/index.js';
+import type {Widget} from '../components/index.js';
 
 /**************************************************************************
  * REACTIVE STATE
@@ -17,7 +16,6 @@ import type {Widget, FilterEvent} from '../components/index.js';
 
 let data: TilejsonResult & {widgetSource: WidgetTilesetSource};
 let viewState = {latitude: 40.7128, longitude: -74.006, zoom: 12};
-let filters: Record<string, Filter> = {};
 
 /**************************************************************************
  * DECK.GL
@@ -55,7 +53,7 @@ const widgets: Widget[] = [
   bindWidget('#table'),
 ];
 
-updateSources();
+await updateSources();
 
 /**************************************************************************
  * UPDATES
@@ -105,12 +103,5 @@ function updateWidgets() {
  */
 
 function bindWidget(selector: string): Widget {
-  const widget = document.querySelector<Widget>(selector)!;
-
-  widget.addEventListener('filter', (event) => {
-    filters = (event as FilterEvent).detail.filters;
-    updateSources();
-  });
-
-  return widget;
+  return document.querySelector<Widget>(selector)!;
 }

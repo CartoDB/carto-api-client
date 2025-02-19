@@ -63,7 +63,7 @@ function createSortFn({
   }) as Parameters<typeof firstBy>[];
 
   let sortFn = firstBy(...firstSortOption);
-  for (let sortOptions of othersSortOptions) {
+  for (const sortOptions of othersSortOptions) {
     sortFn = sortFn.thenBy(...sortOptions);
   }
 

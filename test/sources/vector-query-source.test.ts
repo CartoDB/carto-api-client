@@ -57,9 +57,7 @@ describe('vectorQuerySource', () => {
       /queryParameters=%7B%22type%22%3A%22Supermarket%22%2C%22minRevenue%22%3A1000000%7D/
     );
 
-    expect(tilesetURL).toMatch(
-      /^https:\/\/xyz\.com\/\?format\=tilejson\&cache\=/
-    );
+    expect(tilesetURL).toMatch(/^https:\/\/xyz\.com\/\?format=tilejson&cache=/);
 
     expect(tilejson).toBeTruthy();
     expect(tilejson.tiles).toEqual([

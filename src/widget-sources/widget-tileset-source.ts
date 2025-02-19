@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/require-await */
 import {TilesetSourceOptions} from '../sources/index.js';
 import type {ModelSource} from '../models/index.js';
 import {
   CategoryRequestOptions,
   CategoryResponse,
-  FeaturesRequestOptions,
   FeaturesResponse,
   FormulaRequestOptions,
   FormulaResponse,
@@ -140,9 +140,7 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
     });
   }
 
-  override async getFeatures(
-    options: FeaturesRequestOptions
-  ): Promise<FeaturesResponse> {
+  override async getFeatures(): Promise<FeaturesResponse> {
     throw new Error('getFeatures not supported for tilesets');
   }
 
@@ -173,11 +171,7 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
 
     const targetOperation = aggregationFunctions[operation];
     return {
-      value: targetOperation(
-        filteredFeatures as FeatureData[],
-        column,
-        joinOperation
-      ),
+      value: targetOperation(filteredFeatures, column, joinOperation),
     };
   }
 
@@ -218,7 +212,7 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
 
     const filteredFeatures = this._getFilteredFeatures(filterOwner);
 
-    assertColumn(this._features, column as string, operationColumn as string);
+    assertColumn(this._features, column, operationColumn as string);
 
     const groups = groupValuesByColumn({
       data: filteredFeatures,
@@ -258,7 +252,7 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
   override async getTable(
     options: TableRequestOptions
   ): Promise<TableResponse> {
-    const {filterOwner, spatialFilter, abortController, ...params} = options;
+    const {filterOwner, ...params} = options;
     const {
       columns,
       searchFilterColumn,
@@ -283,7 +277,7 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
       filteredFeatures = filteredFeatures.filter(
         (row) =>
           row[searchFilterColumn] &&
-          String(row[searchFilterColumn])
+          String(row[searchFilterColumn] as unknown)
             .toLowerCase()
             .includes(String(searchFilterText).toLowerCase())
       );
@@ -329,7 +323,7 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
 
     const filteredFeatures = this._getFilteredFeatures(filterOwner);
 
-    assertColumn(this._features, column as string, operationColumn as string);
+    assertColumn(this._features, column, operationColumn as string);
 
     const rows =
       groupValuesByDateColumn({

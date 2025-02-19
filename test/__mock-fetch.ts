@@ -104,10 +104,10 @@ const createDefaultResponse = (
   });
 };
 
-async function setupMockFetchMapsV3(
+function setupMockFetchMapsV3(
   responseFunc = createDefaultResponse,
   cacheKey = btoa(Math.random().toFixed(4))
-): Promise<MockFetchCall[]> {
+): MockFetchCall[] {
   const calls: MockFetchCall[] = [];
 
   const mockFetch = (url: string, {headers, method, body}) => {
@@ -139,8 +139,7 @@ export async function withMockFetchMapsV3(
   ) => Promise<unknown> = createDefaultResponse
 ): Promise<void> {
   try {
-    const calls = await setupMockFetchMapsV3(responseFunc);
-    await testFunc(calls);
+    await testFunc(setupMockFetchMapsV3(responseFunc));
   } finally {
     teardownMockFetchMaps();
   }

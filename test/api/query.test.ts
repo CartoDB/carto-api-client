@@ -31,7 +31,7 @@ test('query', async () => {
 
   expect(queryCall[0]).toMatch(/v3\/sql\/carto_dw\/query/);
   expect(queryCall[0]).toMatch(/q=SELECT\+\*\+FROM\+a\.b\.h3_table/);
-  expect(queryCall[0]).toMatch(/client\=CUSTOM_CLIENT/);
+  expect(queryCall[0]).toMatch(/client=CUSTOM_CLIENT/);
 
   expect(response).toEqual(QUERY_RESPONSE);
 });

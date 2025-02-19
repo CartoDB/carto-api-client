@@ -19,7 +19,7 @@ describe('FilterTypes', () => {
   describe(FilterType.BETWEEN, () => {
     test('should filter correctly', () => {
       const betweenFilter = filterFunctions[FilterType.BETWEEN];
-      const filterValues = [[, -50], [0, 100], [200, 300], [350]];
+      const filterValues = [[null, -50], [0, 100], [200, 300], [350]];
 
       expect(betweenFilter(filterValues, -100000)).toBe(true);
       expect(betweenFilter(filterValues, -25)).toBe(false);

@@ -46,9 +46,7 @@ describe('h3TilesetSource', () => {
     expect(initURL).toMatch(/v3\/maps\/carto_dw\/tileset/);
     expect(initURL).toMatch(/name=a.b.h3_tileset/);
 
-    expect(tilesetURL).toMatch(
-      /^https:\/\/xyz\.com\/\?format\=tilejson\&cache\=/
-    );
+    expect(tilesetURL).toMatch(/^https:\/\/xyz\.com\/\?format=tilejson&cache=/);
 
     expect(tilejson).toBeTruthy();
     expect(tilejson.tiles).toEqual([
