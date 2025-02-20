@@ -2,6 +2,8 @@
   "extends": "../tsconfig.json",
   "include": ["**/*.ts"],
   "compilerOptions": {
+    "module": "es2022",
+    "moduleResolution": "bundler",
     "plugins": [
       {
         "name": "ts-lit-plugin",

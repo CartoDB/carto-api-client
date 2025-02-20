@@ -1,6 +1,6 @@
-import {aggregate, aggregationFunctions} from './aggregation';
-import {AggregationType} from '../types';
-import {FeatureData} from '../types-internal';
+import {aggregate, aggregationFunctions} from './aggregation.js';
+import {AggregationType} from '../types.js';
+import {FeatureData} from '../types-internal.js';
 
 /**
  * Histogram computation.

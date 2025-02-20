@@ -1,10 +1,10 @@
-import {SpatialFilter, SpatialIndexTile, Tile} from '../types';
-import {tileFeaturesGeometries} from './tileFeaturesGeometries';
-import {tileFeaturesSpatialIndex} from './tileFeaturesSpatialIndex';
-import {TileFormat} from '../constants';
-import {DEFAULT_GEO_COLUMN} from '../constants-internal';
-import {FeatureData} from '../types-internal';
-import {SpatialDataType} from '../sources/types';
+import {SpatialFilter, SpatialIndexTile, Tile} from '../types.js';
+import {tileFeaturesGeometries} from './tileFeaturesGeometries.js';
+import {tileFeaturesSpatialIndex} from './tileFeaturesSpatialIndex.js';
+import {TileFormat} from '../constants.js';
+import {DEFAULT_GEO_COLUMN} from '../constants-internal.js';
+import {FeatureData} from '../types-internal.js';
+import {SpatialDataType} from '../sources/types.js';
 
 /** @privateRemarks Source: @carto/react-core */
 export type TileFeatures = {

@@ -3,8 +3,8 @@
 // Copyright (c) vis.gl contributors
 
 import type {Feature} from 'geojson';
-import {Filters, Format, QueryParameters} from '../types';
-import {MapInstantiation} from '../types-internal';
+import {Filters, Format, QueryParameters} from '../types.js';
+import {MapInstantiation} from '../types-internal.js';
 
 export type SourceRequiredOptions = {
   /** Carto platform access token. */

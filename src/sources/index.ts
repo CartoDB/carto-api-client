@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-export {SOURCE_DEFAULTS} from './base-source';
+export {SOURCE_DEFAULTS} from './base-source.js';
 export type {
   GeojsonResult,
   JsonResult,
@@ -19,73 +19,73 @@ export type {
   TileResolution,
   TilesetSourceOptions,
   VectorLayer,
-} from './types';
+} from './types.js';
 
-export {boundaryQuerySource} from './boundary-query-source';
+export {boundaryQuerySource} from './boundary-query-source.js';
 export type {
   BoundaryQuerySourceOptions,
   BoundaryQuerySourceResponse,
-} from './boundary-query-source';
+} from './boundary-query-source.js';
 
-export {boundaryTableSource} from './boundary-table-source';
+export {boundaryTableSource} from './boundary-table-source.js';
 export type {
   BoundaryTableSourceOptions,
   BoundaryTableSourceResponse,
-} from './boundary-table-source';
+} from './boundary-table-source.js';
 
-export {h3QuerySource} from './h3-query-source';
+export {h3QuerySource} from './h3-query-source.js';
 export type {
   H3QuerySourceOptions,
   H3QuerySourceResponse,
-} from './h3-query-source';
+} from './h3-query-source.js';
 
-export {h3TableSource} from './h3-table-source';
+export {h3TableSource} from './h3-table-source.js';
 export type {
   H3TableSourceOptions,
   H3TableSourceResponse,
-} from './h3-table-source';
+} from './h3-table-source.js';
 
-export {h3TilesetSource} from './h3-tileset-source';
+export {h3TilesetSource} from './h3-tileset-source.js';
 export type {
   H3TilesetSourceOptions,
   H3TilesetSourceResponse,
-} from './h3-tileset-source';
+} from './h3-tileset-source.js';
 
-export {rasterSource} from './raster-source';
-export type {RasterSourceOptions} from './raster-source';
+export {rasterSource} from './raster-source.js';
+export type {RasterSourceOptions} from './raster-source.js';
 
-export {quadbinQuerySource} from './quadbin-query-source';
+export {quadbinQuerySource} from './quadbin-query-source.js';
 export type {
   QuadbinQuerySourceOptions,
   QuadbinQuerySourceResponse,
-} from './quadbin-query-source';
+} from './quadbin-query-source.js';
 
-export {quadbinTableSource} from './quadbin-table-source';
+export {quadbinTableSource} from './quadbin-table-source.js';
 export type {
   QuadbinTableSourceOptions,
   QuadbinTableSourceResponse,
-} from './quadbin-table-source';
+} from './quadbin-table-source.js';
 
-export {quadbinTilesetSource} from './quadbin-tileset-source';
+export {quadbinTilesetSource} from './quadbin-tileset-source.js';
 export type {
   QuadbinTilesetSourceOptions,
   QuadbinTilesetSourceResponse,
-} from './quadbin-tileset-source';
+} from './quadbin-tileset-source.js';
 
-export {vectorQuerySource} from './vector-query-source';
+export {vectorQuerySource} from './vector-query-source.js';
 export type {
   VectorQuerySourceOptions,
   VectorQuerySourceResponse,
-} from './vector-query-source';
+} from './vector-query-source.js';
 
-export {vectorTableSource} from './vector-table-source';
+export {vectorTableSource} from './vector-table-source.js';
 export type {
   VectorTableSourceOptions,
   VectorTableSourceResponse,
-} from './vector-table-source';
+} from './vector-table-source.js';
 
-export {vectorTilesetSource} from './vector-tileset-source';
+export {vectorTilesetSource} from './vector-tileset-source.js';
 export type {
   VectorTilesetSourceOptions,
   VectorTilesetSourceResponse,
-} from './vector-tileset-source';
+} from './vector-tileset-source.js';

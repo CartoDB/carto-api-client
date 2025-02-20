@@ -1,6 +1,6 @@
 import {firstBy} from 'thenby';
-import {SortDirection} from '../types';
-import {FeatureData} from '../types-internal';
+import {SortDirection} from '../types.js';
+import {FeatureData} from '../types-internal.js';
 
 // TODO(cleanup): Could this be simplified?
 type SortColumns = string | string[] | object[];

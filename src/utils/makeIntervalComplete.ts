@@ -1,4 +1,4 @@
-import {FilterInterval, FilterIntervalComplete} from '../types';
+import {FilterInterval, FilterIntervalComplete} from '../types.js';
 
 export function makeIntervalComplete(
   intervals: FilterInterval[]

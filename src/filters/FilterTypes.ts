@@ -1,5 +1,5 @@
-import {FilterType} from '../constants';
-import {FilterInterval, StringSearchOptions} from '../types';
+import {FilterType} from '../constants.js';
+import {FilterInterval, StringSearchOptions} from '../types.js';
 import {makeIntervalComplete} from '../utils/makeIntervalComplete.js';
 
 export type FilterFunction = (

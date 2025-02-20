@@ -1,6 +1,6 @@
 import {aggregationFunctions, aggregate} from './aggregation.js';
-import {AggregationType} from '../types';
-import {FeatureData} from '../types-internal';
+import {AggregationType} from '../types.js';
+import {FeatureData} from '../types-internal.js';
 
 /** @privateRemarks Source: @carto/react-core */
 export type GroupByFeature = {

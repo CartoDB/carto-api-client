@@ -10,7 +10,7 @@ import {
   WidgetTableSource,
   WidgetTableSourceResult,
 } from '../widget-sources/index.js';
-import {baseSource} from './base-source';
+import {baseSource} from './base-source.js';
 import type {
   FilterOptions,
   ColumnsOption,
@@ -18,7 +18,7 @@ import type {
   SpatialDataType,
   TableSourceOptions,
   TilejsonResult,
-} from './types';
+} from './types.js';
 
 export type VectorTableSourceOptions = SourceOptions &
   TableSourceOptions &

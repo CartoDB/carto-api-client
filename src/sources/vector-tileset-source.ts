@@ -2,18 +2,18 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-import {DEFAULT_GEO_COLUMN} from '../constants-internal';
-import {getTileFormat} from '../utils/getTileFormat';
+import {DEFAULT_GEO_COLUMN} from '../constants-internal.js';
+import {getTileFormat} from '../utils/getTileFormat.js';
 import {
   WidgetTilesetSource,
   WidgetTilesetSourceResult,
-} from '../widget-sources';
-import {baseSource} from './base-source';
+} from '../widget-sources/index.js';
+import {baseSource} from './base-source.js';
 import type {
   SourceOptions,
   TilesetSourceOptions,
   TilejsonResult,
-} from './types';
+} from './types.js';
 
 export type VectorTilesetSourceOptions = SourceOptions & TilesetSourceOptions;
 type UrlParameters = {name: string};

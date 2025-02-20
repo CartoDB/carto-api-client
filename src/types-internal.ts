@@ -2,7 +2,7 @@
  * COMMON
  */
 
-import {Format} from './types';
+import {Format} from './types.js';
 
 /** @internal */
 export type $TODO = any;

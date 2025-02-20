@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-import {DEFAULT_API_BASE_URL} from '../constants';
-import {DEFAULT_MAX_LENGTH_URL} from '../constants-internal';
-import {buildSourceUrl} from '../api/endpoints';
-import {requestWithParameters} from '../api/request-with-parameters';
+import {DEFAULT_API_BASE_URL} from '../constants.js';
+import {DEFAULT_MAX_LENGTH_URL} from '../constants-internal.js';
+import {buildSourceUrl} from '../api/endpoints.js';
+import {requestWithParameters} from '../api/request-with-parameters.js';
 import type {
   GeojsonResult,
   JsonResult,
@@ -13,10 +13,10 @@ import type {
   SourceRequiredOptions,
   TilejsonMapInstantiation,
   TilejsonResult,
-} from './types';
-import {MapType} from '../types';
-import {APIErrorContext} from '../api';
-import {getClient} from '../client';
+} from './types.js';
+import {MapType} from '../types.js';
+import {APIErrorContext} from '../api/index.js';
+import {getClient} from '../client.js';
 
 export const SOURCE_DEFAULTS: SourceOptionalOptions = {
   apiBaseUrl: DEFAULT_API_BASE_URL,

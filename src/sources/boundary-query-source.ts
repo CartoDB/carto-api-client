@@ -3,8 +3,8 @@
 // Copyright (c) vis.gl contributors
 
 import {QueryParameters} from '../types.js';
-import {baseSource} from './base-source';
-import type {FilterOptions, SourceOptions, TilejsonResult} from './types';
+import {baseSource} from './base-source.js';
+import type {FilterOptions, SourceOptions, TilejsonResult} from './types.js';
 
 export type BoundaryQuerySourceOptions = SourceOptions &
   FilterOptions & {
