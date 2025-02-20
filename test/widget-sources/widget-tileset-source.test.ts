@@ -33,6 +33,7 @@ describe('getFormula', () => {
         operation: 'count',
         column: undefined,
         joinOperation: undefined,
+        spatialFilter: MOCK_SPATIAL_FILTER,
       })
     ).toEqual({value: 6});
   });
@@ -60,6 +61,7 @@ describe('getFormula', () => {
         column: undefined,
         joinOperation: undefined,
         operation: 'count',
+        spatialFilter: MOCK_SPATIAL_FILTER,
       })
     ).toEqual({
       value: 3,
@@ -75,6 +77,7 @@ describe('getHistogram', () => {
         operation: 'count',
         ticks: [997472.3, 1716077, 2056468.7],
         joinOperation: undefined,
+        spatialFilter: MOCK_SPATIAL_FILTER,
       })
     ).toEqual([0, 4, 2, 0]);
   });
@@ -88,6 +91,7 @@ describe('getTable', () => {
         sortBy: undefined,
         sortDirection: undefined,
         sortByColumnType: undefined,
+        spatialFilter: MOCK_SPATIAL_FILTER,
       })
     ).toEqual({
       totalCount: 6,
@@ -102,6 +106,7 @@ describe('getTable', () => {
         sortBy: 'size_m2',
         sortDirection: 'desc',
         sortByColumnType: 'number',
+        spatialFilter: MOCK_SPATIAL_FILTER,
       })
     ).toEqual({
       totalCount: 6,
@@ -117,6 +122,7 @@ describe('getTable', () => {
         columns: MOCK_COLUMNS,
         searchFilterColumn: 'address',
         searchFilterText: null,
+        spatialFilter: MOCK_SPATIAL_FILTER,
       })
     ).toEqual({
       totalCount: 6,
@@ -130,6 +136,7 @@ describe('getTable', () => {
         columns: MOCK_COLUMNS,
         searchFilterColumn: null,
         searchFilterText: 'any-text',
+        spatialFilter: MOCK_SPATIAL_FILTER,
       })
     ).toEqual({
       totalCount: 6,
@@ -142,6 +149,7 @@ describe('getTable', () => {
       columns: MOCK_COLUMNS,
       searchFilterColumn: 'address',
       searchFilterText: '146 tremont st',
+      spatialFilter: MOCK_SPATIAL_FILTER,
     });
 
     expect(result).toEqual({

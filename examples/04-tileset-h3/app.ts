@@ -1,10 +1,9 @@
 import maplibregl from 'maplibre-gl';
-import {Deck, WebMercatorViewport} from '@deck.gl/core';
+import {Deck} from '@deck.gl/core';
 import {H3TileLayer} from '@deck.gl/carto';
 import {
   TilejsonResult,
   WidgetTilesetSource,
-  createViewportSpatialFilter,
   h3TilesetSource,
 } from '@carto/api-client';
 import '../components/index.js';
@@ -80,10 +79,7 @@ function updateLayers() {
     getFillColor: [200, 0, 80],
     extruded: false,
     onViewportLoad: (tiles) => {
-      const viewport = new WebMercatorViewport(viewState);
-      const spatialFilter = createViewportSpatialFilter(viewport.getBounds())!;
       data.widgetSource.loadTiles(tiles);
-      data.widgetSource.extractTileFeatures({spatialFilter});
       updateWidgets();
     },
   });

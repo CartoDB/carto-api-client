@@ -18,9 +18,9 @@ import {
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
 } from './types.js';
-import {InvalidColumnError, getApplicableFilters} from '../utils.js';
+import {InvalidColumnError, assert, getApplicableFilters} from '../utils.js';
 import {TileFormat} from '../constants.js';
-import {SpatialFilter, Tile} from '../types.js';
+import {Filter, Filters, SpatialFilter, Tile} from '../types.js';
 import {
   TileFeatureExtractOptions,
   applyFilters,
@@ -39,6 +39,7 @@ import {FeatureData} from '../types-internal.js';
 import {FeatureCollection} from 'geojson';
 import {SpatialDataType} from '../sources/types.js';
 import {WidgetSource, WidgetSourceProps} from './widget-source.js';
+import {booleanEqual} from '@turf/boolean-equal';
 
 // TODO(cleanup): Parameter defaults in source functions and widget API calls are
 // currently duplicated and possibly inconsistent. Consider consolidating and
@@ -78,10 +79,16 @@ export type WidgetTilesetSourceResult = {widgetSource: WidgetTilesetSource};
 export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> {
   private _tiles: Tile[] = [];
   private _features: FeatureData[] = [];
+  private _tileFeatureExtractOptions: TileFeatureExtractOptions = {};
+  private _tileFeatureExtractPreviousInputs: {spatialFilter?: SpatialFilter} =
+    {};
 
-  protected override getModelSource(owner: string): ModelSource {
+  protected override getModelSource(
+    filters: Filters | undefined,
+    filterOwner: string
+  ): ModelSource {
     return {
-      ...super._getModelSource(owner),
+      ...super._getModelSource(filters, filterOwner),
       type: 'tileset',
       data: this.props.tableName,
     };
@@ -94,50 +101,58 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
    */
   loadTiles(tiles: unknown[]) {
     this._tiles = tiles as Tile[];
+    this._features.length = 0;
   }
 
-  /**
-   * Extracts feature data from tiles previously loaded with {@link loadTiles}.
-   * Must be called before computing statistics on tiles.
-   */
-  extractTileFeatures({
-    spatialFilter,
-    uniqueIdProperty,
-    options,
-  }: {
-    spatialFilter: SpatialFilter;
-    // TODO(cleanup): As an optional property, 'uniqueIdProperty' will be easy to forget.
-    // Would it be better to configure it on the source function, rather than separately
-    // on the layer and in 'loadTiles()'?
-    uniqueIdProperty?: string;
-    options?: TileFeatureExtractOptions;
-  }) {
+  /** Configures options used to extract features from tiles. */
+  setTileFeatureExtractOptions(options: TileFeatureExtractOptions) {
+    this._tileFeatureExtractOptions = options;
+    this._features.length = 0;
+  }
+
+  protected _extractTileFeatures(spatialFilter: SpatialFilter) {
+    // When spatial filter has not changed, don't redo extraction. If tiles or
+    // tile extract options change, features will have been cleared already.
+    const prevInputs = this._tileFeatureExtractPreviousInputs;
+    if (
+      this._features.length &&
+      prevInputs.spatialFilter &&
+      booleanEqual(prevInputs.spatialFilter, spatialFilter)
+    ) {
+      return;
+    }
+
     this._features = tileFeatures({
       tiles: this._tiles,
-      options,
-      spatialFilter,
-      uniqueIdProperty,
       tileFormat: this.props.tileFormat,
+      ...this._tileFeatureExtractOptions,
+
+      spatialFilter,
       spatialDataColumn: this.props.spatialDataColumn,
       spatialDataType: this.props.spatialDataType,
     });
+
+    prevInputs.spatialFilter = spatialFilter;
   }
 
-  /** Loads features as GeoJSON (used for testing). */
+  /**
+   * Loads features as GeoJSON (used for testing).
+   * @experimental
+   * @internal Not for public use. Spatial filters in other method calls will be ignored.
+   */
   loadGeoJSON({
     geojson,
     spatialFilter,
-    uniqueIdProperty,
   }: {
     geojson: FeatureCollection;
     spatialFilter: SpatialFilter;
-    uniqueIdProperty?: string;
   }) {
     this._features = geojsonFeatures({
       geojson,
       spatialFilter,
-      uniqueIdProperty,
+      ...this._tileFeatureExtractOptions,
     });
+    this._tileFeatureExtractPreviousInputs.spatialFilter = spatialFilter;
   }
 
   override async getFeatures(): Promise<FeaturesResponse> {
@@ -148,14 +163,12 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
     column = '*',
     operation = 'count',
     joinOperation,
+    filters,
     filterOwner,
+    spatialFilter,
   }: FormulaRequestOptions): Promise<FormulaResponse> {
     if (operation === 'custom') {
       throw new Error('Custom aggregation not supported for tilesets');
-    }
-
-    if (!this._features.length) {
-      return {value: null};
     }
 
     // Column is required except when operation is 'count'.
@@ -163,7 +176,11 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
       assertColumn(this._features, column);
     }
 
-    const filteredFeatures = this._getFilteredFeatures(filterOwner);
+    const filteredFeatures = this._getFilteredFeatures(
+      spatialFilter,
+      filters,
+      filterOwner
+    );
 
     if (filteredFeatures.length === 0 && operation !== 'count') {
       return {value: null};
@@ -180,15 +197,21 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
     ticks,
     column,
     joinOperation,
+    filters,
     filterOwner,
+    spatialFilter,
   }: HistogramRequestOptions): Promise<HistogramResponse> {
+    const filteredFeatures = this._getFilteredFeatures(
+      spatialFilter,
+      filters,
+      filterOwner
+    );
+
+    assertColumn(this._features, column);
+
     if (!this._features.length) {
       return [];
     }
-
-    const filteredFeatures = this._getFilteredFeatures(filterOwner);
-
-    assertColumn(this._features, column);
 
     return histogram({
       data: filteredFeatures,
@@ -204,13 +227,19 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
     operation = 'count',
     operationColumn,
     joinOperation,
+    filters,
     filterOwner,
+    spatialFilter,
   }: CategoryRequestOptions): Promise<CategoryResponse> {
-    if (!this._features.length) {
+    const filteredFeatures = this._getFilteredFeatures(
+      spatialFilter,
+      filters,
+      filterOwner
+    );
+
+    if (!filteredFeatures.length) {
       return [];
     }
-
-    const filteredFeatures = this._getFilteredFeatures(filterOwner);
 
     assertColumn(this._features, column, operationColumn as string);
 
@@ -230,13 +259,19 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
     yAxisColumn,
     xAxisJoinOperation,
     yAxisJoinOperation,
+    filters,
     filterOwner,
+    spatialFilter,
   }: ScatterRequestOptions): Promise<ScatterResponse> {
-    if (!this._features.length) {
+    const filteredFeatures = this._getFilteredFeatures(
+      spatialFilter,
+      filters,
+      filterOwner
+    );
+
+    if (!filteredFeatures.length) {
       return [];
     }
-
-    const filteredFeatures = this._getFilteredFeatures(filterOwner);
 
     assertColumn(this._features, xAxisColumn, yAxisColumn);
 
@@ -249,30 +284,31 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
     });
   }
 
-  override async getTable(
-    options: TableRequestOptions
-  ): Promise<TableResponse> {
-    const {filterOwner, ...params} = options;
-    const {
-      columns,
-      searchFilterColumn,
-      searchFilterText,
-      sortBy,
-      sortDirection,
-      sortByColumnType,
-      offset = 0,
-      limit = 10,
-    } = params;
+  override async getTable({
+    columns,
+    searchFilterColumn,
+    searchFilterText,
+    sortBy,
+    sortDirection,
+    sortByColumnType,
+    offset = 0,
+    limit = 10,
+    filters,
+    filterOwner,
+    spatialFilter,
+  }: TableRequestOptions): Promise<TableResponse> {
+    // Filter.
+    let filteredFeatures = this._getFilteredFeatures(
+      spatialFilter,
+      filters,
+      filterOwner
+    );
 
-    if (!this._features.length) {
+    if (!filteredFeatures.length) {
       return {rows: [], totalCount: 0};
     }
 
-    // Filter.
-    let filteredFeatures = this._getFilteredFeatures(filterOwner);
-
     // Search.
-    // TODO: Could we get the same behavior by applying filters in loadTiles()?
     if (searchFilterColumn && searchFilterText) {
       filteredFeatures = filteredFeatures.filter(
         (row) =>
@@ -315,13 +351,19 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
     operation,
     operationColumn,
     joinOperation,
+    filters,
     filterOwner,
+    spatialFilter,
   }: TimeSeriesRequestOptions): Promise<TimeSeriesResponse> {
-    if (!this._features.length) {
+    const filteredFeatures = this._getFilteredFeatures(
+      spatialFilter,
+      filters,
+      filterOwner
+    );
+
+    if (!filteredFeatures.length) {
       return {rows: []};
     }
-
-    const filteredFeatures = this._getFilteredFeatures(filterOwner);
 
     assertColumn(this._features, column, operationColumn as string);
 
@@ -340,17 +382,24 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
 
   override async getRange({
     column,
+    filters,
     filterOwner,
+    spatialFilter,
   }: RangeRequestOptions): Promise<RangeResponse> {
+    assertColumn(this._features, column);
+
+    const filteredFeatures = this._getFilteredFeatures(
+      spatialFilter,
+      filters,
+      filterOwner
+    );
+
     if (!this._features.length) {
       // TODO: Is this the only nullable response in the Widgets API? If so,
       // can we do something more consistent?
       return null;
     }
 
-    assertColumn(this._features, column);
-
-    const filteredFeatures = this._getFilteredFeatures(filterOwner);
     return {
       min: aggregationFunctions.min(filteredFeatures, column),
       max: aggregationFunctions.max(filteredFeatures, column),
@@ -361,10 +410,16 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
    * INTERNAL
    */
 
-  private _getFilteredFeatures(filterOwner: string | undefined): FeatureData[] {
+  private _getFilteredFeatures(
+    spatialFilter?: SpatialFilter,
+    filters?: Record<string, Filter>,
+    filterOwner?: string
+  ): FeatureData[] {
+    assert(spatialFilter, 'spatialFilter required for tilesets');
+    this._extractTileFeatures(spatialFilter);
     return applyFilters(
       this._features,
-      getApplicableFilters(filterOwner, this.props.filters),
+      getApplicableFilters(filterOwner, filters || this.props.filters),
       this.props.filtersLogicalOperator || 'and'
     );
   }

@@ -8,6 +8,7 @@ import {
   WidgetRemoteSourceProps,
 } from './widget-remote-source.js';
 import {ModelSource} from '../models/model.js';
+import {Filters} from '../types.js';
 
 type LayerTableSourceOptions =
   | Omit<VectorTableSourceOptions, 'filters'>
@@ -41,9 +42,12 @@ export type WidgetTableSourceResult = {widgetSource: WidgetTableSource};
 export class WidgetTableSource extends WidgetRemoteSource<
   LayerTableSourceOptions & WidgetRemoteSourceProps
 > {
-  protected override getModelSource(owner: string): ModelSource {
+  protected override getModelSource(
+    filters: Filters | undefined,
+    filterOwner?: string
+  ): ModelSource {
     return {
-      ...super._getModelSource(owner),
+      ...super._getModelSource(filters, filterOwner),
       type: 'table',
       data: this.props.tableName,
     };
