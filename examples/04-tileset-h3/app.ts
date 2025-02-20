@@ -1,10 +1,9 @@
 import maplibregl from 'maplibre-gl';
-import {Deck, WebMercatorViewport} from '@deck.gl/core';
+import {Deck} from '@deck.gl/core';
 import {H3TileLayer} from '@deck.gl/carto';
 import {
   TilejsonResult,
   WidgetTilesetSource,
-  createViewportSpatialFilter,
   h3TilesetSource,
 } from '@carto/api-client';
 import '../components/index.js';
