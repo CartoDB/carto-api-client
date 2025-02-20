@@ -1482,9 +1482,11 @@ __metadata:
     "@turf/boolean-equal": "npm:^7.2.0"
     "@turf/boolean-intersects": "npm:^7.2.0"
     "@turf/boolean-within": "npm:^7.2.0"
+    "@turf/buffer": "npm:^7.2.0"
     "@turf/helpers": "npm:^7.2.0"
     "@turf/intersect": "npm:^7.2.0"
     "@turf/invariant": "npm:^7.2.0"
+    "@turf/random": "npm:^7.2.0"
     "@turf/union": "npm:^7.2.0"
     "@types/geojson": "npm:^7946.0.16"
     "@types/json-schema": "npm:^7.0.15"
@@ -1504,6 +1506,7 @@ __metadata:
     rimraf: "npm:^6.0.1"
     semver: "npm:^7.7.1"
     thenby: "npm:^1.3.4"
+    tinybench: "npm:^3.1.1"
     typescript: "npm:~5.7.3"
     typescript-eslint: "npm:^8.24.0"
     vite: "npm:^6.1.0"
@@ -3098,6 +3101,34 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@turf/buffer@npm:^7.2.0":
+  version: 7.2.0
+  resolution: "@turf/buffer@npm:7.2.0"
+  dependencies:
+    "@turf/bbox": "npm:^7.2.0"
+    "@turf/center": "npm:^7.2.0"
+    "@turf/helpers": "npm:^7.2.0"
+    "@turf/jsts": "npm:^2.7.1"
+    "@turf/meta": "npm:^7.2.0"
+    "@turf/projection": "npm:^7.2.0"
+    "@types/geojson": "npm:^7946.0.10"
+    d3-geo: "npm:1.7.1"
+  checksum: 10c0/4dff5c05f9da4e9317c38c6aa9c8a0e53cd566f497d8f9e1539754fa671f9005e81740b32f20037554274d1c0c687783d3fb7669d069c50071cc5d4068ed4be0
+  languageName: node
+  linkType: hard
+
+"@turf/center@npm:^7.2.0":
+  version: 7.2.0
+  resolution: "@turf/center@npm:7.2.0"
+  dependencies:
+    "@turf/bbox": "npm:^7.2.0"
+    "@turf/helpers": "npm:^7.2.0"
+    "@types/geojson": "npm:^7946.0.10"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/bd05cc871f37fe03022f562afacf28d5880bfb4066eb0c0e8092e96a7699ebdf7b94719a307fd1ac2c69a5b9bc029c7a81dbd7a461b5195ea972ad34e209e4bd
+  languageName: node
+  linkType: hard
+
 "@turf/clean-coords@npm:^7.2.0":
   version: 7.2.0
   resolution: "@turf/clean-coords@npm:7.2.0"
@@ -3116,6 +3147,17 @@ __metadata:
   dependencies:
     "@turf/helpers": "npm:^5.1.5"
   checksum: 10c0/8bb5c9266a458e42fc6f8b13977fea5a1c46f7de20ac5e65090134d8f2d130bd313ef04137d6bef62070876593bcee94119369119ab38eeddddacf18e270d900
+  languageName: node
+  linkType: hard
+
+"@turf/clone@npm:^7.2.0":
+  version: 7.2.0
+  resolution: "@turf/clone@npm:7.2.0"
+  dependencies:
+    "@turf/helpers": "npm:^7.2.0"
+    "@types/geojson": "npm:^7946.0.10"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/755fa244e1b1dcb177f0dd054ae48a3d92abca04ded8432c0a403f29658120451f5bdc97d17e094fd2d4e852a20cab3b9a924fc957ce7e59a241f421dfefb2f0
   languageName: node
   linkType: hard
 
@@ -3169,6 +3211,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@turf/jsts@npm:^2.7.1":
+  version: 2.7.2
+  resolution: "@turf/jsts@npm:2.7.2"
+  dependencies:
+    jsts: "npm:2.7.1"
+  checksum: 10c0/19eab63e7e26a613e7186de170d9f96c32759769a0268acac3da4c5cefc8f9f5a1274f9fc73b0cb85c5d52c9d9516167c98a42d1635e03c3a712e2a784e192c7
+  languageName: node
+  linkType: hard
+
 "@turf/line-intersect@npm:^7.2.0":
   version: 7.2.0
   resolution: "@turf/line-intersect@npm:7.2.0"
@@ -3209,6 +3260,30 @@ __metadata:
     "@types/geojson": "npm:^7946.0.10"
     tslib: "npm:^2.8.1"
   checksum: 10c0/b840b218e631a252655d233b2c569607d4d3e8d3715a1eab7d26394e4acc1f325b736837d2a82e5c4f678600b2ddc32004782ed3825ca5b1027dce12a4e4cde9
+  languageName: node
+  linkType: hard
+
+"@turf/projection@npm:^7.2.0":
+  version: 7.2.0
+  resolution: "@turf/projection@npm:7.2.0"
+  dependencies:
+    "@turf/clone": "npm:^7.2.0"
+    "@turf/helpers": "npm:^7.2.0"
+    "@turf/meta": "npm:^7.2.0"
+    "@types/geojson": "npm:^7946.0.10"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/33893789dc362878e900c476196955e7e23866c70a72d49d1b0705a8a02121f25283580d610bdf627a0909ae016bf3864fac93c51c21a5ecefb7749b2e16221d
+  languageName: node
+  linkType: hard
+
+"@turf/random@npm:^7.2.0":
+  version: 7.2.0
+  resolution: "@turf/random@npm:7.2.0"
+  dependencies:
+    "@turf/helpers": "npm:^7.2.0"
+    "@types/geojson": "npm:^7946.0.10"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/7d483171c8398184465778d3b67528bcaf41665bb3a14f9916e81f7262e836465fedacbd408dd0ec06edb271f3d350e7b605508a0a9a00802fcefefbebc6e4bd
   languageName: node
   linkType: hard
 
@@ -4506,6 +4581,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"d3-array@npm:1":
+  version: 1.2.4
+  resolution: "d3-array@npm:1.2.4"
+  checksum: 10c0/7ac0ae096838e75d06350381442d84b327e3215d470f26c297851675bd25c47a633d35b04bfaa0397c529f42428d19f3f80bead24e1e866832e064cc6af24f3a
+  languageName: node
+  linkType: hard
+
 "d3-array@npm:2 - 3, d3-array@npm:2.10.0 - 3, d3-array@npm:^3.2.0":
   version: 3.2.4
   resolution: "d3-array@npm:3.2.4"
@@ -4526,6 +4608,15 @@ __metadata:
   version: 3.1.0
   resolution: "d3-format@npm:3.1.0"
   checksum: 10c0/049f5c0871ebce9859fc5e2f07f336b3c5bfff52a2540e0bac7e703fce567cd9346f4ad1079dd18d6f1e0eaa0599941c1810898926f10ac21a31fd0a34b4aa75
+  languageName: node
+  linkType: hard
+
+"d3-geo@npm:1.7.1":
+  version: 1.7.1
+  resolution: "d3-geo@npm:1.7.1"
+  dependencies:
+    d3-array: "npm:1"
+  checksum: 10c0/004f858aafb6d23459efc53596dc8a796d21e294e76074da8abaaf95c8796ad2f6b4825b0e9d9afa79eea87e89f851dbb4ba88a6e8f8646c4d278abd28460419
   languageName: node
   linkType: hard
 
@@ -6461,6 +6552,13 @@ __metadata:
     graceful-fs:
       optional: true
   checksum: 10c0/4f95b5e8a5622b1e9e8f33c96b7ef3158122f595998114d1e7f03985649ea99cb3cd99ce1ed1831ae94c8c8543ab45ebd044207612f31a56fd08462140e46865
+  languageName: node
+  linkType: hard
+
+"jsts@npm:2.7.1":
+  version: 2.7.1
+  resolution: "jsts@npm:2.7.1"
+  checksum: 10c0/57752f181eafef7af3f7e0b374ec0a820288bf0c9dc2d3a854643092331431d6f091a26c7a3947634a92cd64990004f4ddd750b0e95d7f8f6711e1d7bdc8237c
   languageName: node
   linkType: hard
 
@@ -9052,6 +9150,13 @@ __metadata:
   version: 2.9.0
   resolution: "tinybench@npm:2.9.0"
   checksum: 10c0/c3500b0f60d2eb8db65250afe750b66d51623057ee88720b7f064894a6cb7eb93360ca824a60a31ab16dab30c7b1f06efe0795b352e37914a9d4bad86386a20c
+  languageName: node
+  linkType: hard
+
+"tinybench@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "tinybench@npm:3.1.1"
+  checksum: 10c0/a2d32e274ede6edf23884291c54ca6deb9d144577c1f5ae176f7e7c66f93268421862e924a47bc07ffa442479272136159ba253983275fd1c08ed026cee41423
   languageName: node
   linkType: hard
 
