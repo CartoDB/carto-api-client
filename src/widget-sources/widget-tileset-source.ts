@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/require-await */
 import {TilesetSourceOptions} from '../sources/index.js';
-import type {ModelSource} from '../models/index.js';
 import {
   CategoryRequestOptions,
   CategoryResponse,
@@ -20,7 +19,7 @@ import {
 } from './types.js';
 import {InvalidColumnError, assert, getApplicableFilters} from '../utils.js';
 import {TileFormat} from '../constants.js';
-import {Filter, Filters, SpatialFilter, Tile} from '../types.js';
+import {Filter, SpatialFilter, Tile} from '../types.js';
 import {
   TileFeatureExtractOptions,
   applyFilters,
@@ -82,17 +81,6 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
   private _tileFeatureExtractOptions: TileFeatureExtractOptions = {};
   private _tileFeatureExtractPreviousInputs: {spatialFilter?: SpatialFilter} =
     {};
-
-  protected override getModelSource(
-    filters: Filters | undefined,
-    filterOwner: string
-  ): ModelSource {
-    return {
-      ...super._getModelSource(filters, filterOwner),
-      type: 'tileset',
-      data: this.props.tableName,
-    };
-  }
 
   /**
    * Loads features as a list of tiles (typically provided by deck.gl).
