@@ -17,19 +17,12 @@ import {
   TimeSeriesResponse,
   ViewState,
 } from './types.js';
-import {
-  FilterLogicalOperator,
-  Filter,
-  SpatialFilter,
-  Filters,
-} from '../types.js';
-import {getApplicableFilters} from '../utils.js';
+import {FilterLogicalOperator, Filter, SpatialFilter} from '../types.js';
 import {getClient} from '../client.js';
 import {ModelSource} from '../models/model.js';
 import {SourceOptions} from '../sources/index.js';
 import {ApiVersion, DEFAULT_API_BASE_URL} from '../constants.js';
 import {getSpatialFiltersResolution} from '../spatial-index.js';
-import {AggregationOptions} from '../sources/types.js';
 
 export interface WidgetSourceProps extends Omit<SourceOptions, 'filters'> {
   apiVersion?: ApiVersion;
@@ -55,36 +48,6 @@ export abstract class WidgetSource<Props extends WidgetSourceProps> {
 
   constructor(props: Props) {
     this.props = {...WidgetSource.defaultProps, ...props};
-  }
-
-  /**
-   * Subclasses of {@link WidgetRemoteSource} must implement this method, calling
-   * {@link WidgetRemoteSource.prototype._getModelSource} for common source
-   * properties, and adding additional required properties including 'type' and
-   * 'data'.
-   */
-  protected abstract getModelSource(
-    filters: Filters | undefined,
-    filterOwner?: string
-  ): ModelSource;
-
-  protected _getModelSource(
-    filters: Filters | undefined,
-    filterOwner?: string
-  ): Omit<ModelSource, 'type' | 'data'> {
-    const props = this.props;
-    return {
-      apiVersion: props.apiVersion as ApiVersion,
-      apiBaseUrl: props.apiBaseUrl as string,
-      clientId: props.clientId as string,
-      accessToken: props.accessToken,
-      connectionName: props.connectionName,
-      filters: getApplicableFilters(filterOwner, filters || props.filters),
-      filtersLogicalOperator: props.filtersLogicalOperator,
-      spatialDataType: props.spatialDataType,
-      spatialDataColumn: props.spatialDataColumn,
-      dataResolution: (props as Partial<AggregationOptions>).dataResolution,
-    };
   }
 
   protected _getSpatialFiltersResolution(
