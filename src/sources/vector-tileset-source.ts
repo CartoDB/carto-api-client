@@ -5,8 +5,8 @@
 import {DEFAULT_GEO_COLUMN} from '../constants-internal.js';
 import {getTileFormat} from '../utils/getTileFormat.js';
 import {
-  WidgetTilesetSource,
   WidgetTilesetSourceResult,
+  WidgetTilesetWorkerSource,
 } from '../widget-sources/index.js';
 import {baseSource} from './base-source.js';
 import type {
@@ -30,7 +30,7 @@ export const vectorTilesetSource = async function (
   return baseSource<UrlParameters>('tileset', options, urlParameters).then(
     (result) => ({
       ...(result as TilejsonResult),
-      widgetSource: new WidgetTilesetSource({
+      widgetSource: new WidgetTilesetWorkerSource({
         ...options,
         tileFormat: getTileFormat(result as TilejsonResult),
         spatialDataColumn,
