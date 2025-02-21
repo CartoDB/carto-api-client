@@ -183,7 +183,7 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
 
   static init() {
     WidgetTilesetWorkerSource.WORKER = new Worker(
-      new URL('../workers/widget-tileset-worker.js', import.meta.url),
+      new URL('@carto/api-client/worker', import.meta.url),
       {
         type: 'module',
         name: 'cartowidgettileset',
