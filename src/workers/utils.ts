@@ -1,7 +1,11 @@
-let _isModuleWorkerSupported: boolean | null = null;
+let _isModuleWorkerSupported: boolean | null =
+  TSUP_FORMAT === 'cjs' ? false : null;
 
 /**
- * Checks whether current environment supports ES Module Workers.
+ * Checks whether current environment supports ES Module Workers, by way of a
+ * two-part check:
+ * (1) If this is a CJS build, return false.
+ * (2) If this is an ESM build, return true if the runtime supports ESM Workers.
  */
 export function isModuleWorkerSupported(): boolean {
   if (_isModuleWorkerSupported !== null) {
