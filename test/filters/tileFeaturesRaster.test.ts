@@ -6,14 +6,7 @@ import {
   RasterMetadata,
   RasterMetadataBandStats,
 } from '@carto/api-client';
-import {
-  cellToBoundary,
-  getCellPolygon,
-  tileToCell,
-  bigIntToHex,
-  cellToChildren,
-  hexToBigInt,
-} from 'quadbin';
+import {cellToBoundary, getCellPolygon, tileToCell, bigIntToHex} from 'quadbin';
 import {buffer} from '@turf/buffer';
 
 test('tileFeaturesRaster', () => {
