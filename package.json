@@ -8,7 +8,7 @@
   "homepage": "https://github.com/CartoDB/carto-api-client#readme",
   "author": "Don McCurdy <donmccurdy@carto.com>",
   "packageManager": "yarn@4.3.1",
-  "version": "0.5.0-alpha.3",
+  "version": "0.5.0-alpha.4",
   "license": "MIT",
   "publishConfig": {
     "access": "public",
@@ -44,7 +44,7 @@
     "format:check": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --check",
     "clean": "rimraf build/*",
     "postversion": "yarn postversion:check && yarn postversion:commit && yarn postversion:push",
-    "postversion:check": "yarn lint && yarn test",
+    "postversion:check": "yarn lint && yarn format:check && yarn test",
     "postversion:commit": "node scripts/postversion-commit.js",
     "postversion:push": "git push && git push --tags",
     "prepublish": "yarn lint && yarn test",
