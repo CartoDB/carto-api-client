@@ -15,15 +15,20 @@
   },
   "type": "module",
   "sideEffects": false,
-  "source": "src/index.ts",
-  "types": "./build/index.d.ts",
-  "main": "./build/api-client.cjs",
-  "module": "./build/api-client.modern.js",
   "exports": {
     ".": {
-      "types": "./build/index.d.ts",
-      "require": "./build/api-client.cjs",
-      "default": "./build/api-client.modern.js"
+      "require": {
+        "types": "./build/api-client.d.cts",
+        "default": "./build/api-client.cjs"
+      },
+      "default": {
+        "types": "./build/api-client.d.ts",
+        "default": "./build/api-client.js"
+      }
+    },
+    "./worker": {
+      "types": "./build/worker.d.ts",
+      "default": "./build/worker.js"
     }
   },
   "browserslist": [
@@ -32,8 +37,8 @@
     "node >= 18"
   ],
   "scripts": {
-    "build": "microbundle --format cjs,modern --no-compress --define __CARTO_API_CLIENT_VERSION=$npm_package_version --workers",
-    "build:watch": "microbundle watch --format cjs,modern --no-compress --define __CARTO_API_CLIENT_VERSION=$npm_package_version --workers",
+    "build": "tsup",
+    "build:watch": "tsup --watch",
     "dev": "concurrently \"yarn build:watch\" \"vite --config examples/vite.config.ts --open\"",
     "test": "vitest run --typecheck",
     "test:watch": "vitest watch --typecheck",
@@ -98,19 +103,16 @@
     "lit": "^3.2.1",
     "lit-analyzer": "^2.0.3",
     "maplibre-gl": "^5.1.0",
-    "microbundle": "^0.15.1",
     "prettier": "^3.4.2",
     "rimraf": "^6.0.1",
     "semver": "^7.7.1",
     "thenby": "^1.3.4",
     "tinybench": "^3.1.1",
+    "tsup": "^8.3.6",
     "typescript": "~5.8.2",
     "typescript-eslint": "^8.24.0",
     "vite": "^6.1.0",
     "vitest": "3.0.7"
-  },
-  "resolutions": {
-    "rollup": "^4.20.0"
   },
   "stableVersion": "0.4.6"
 }
