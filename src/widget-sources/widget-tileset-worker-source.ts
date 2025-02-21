@@ -23,15 +23,6 @@ import {WidgetTilesetSourceProps} from './widget-tileset-source.js';
 import {Method} from '../workers/constants.js';
 import {WorkerRequest, WorkerResponse} from '../workers/types.js';
 
-// TODO: Singleton? Pool shared among datasets? One per dataset?
-const WORKER = new Worker(
-  new URL('../workers/widget-tileset-worker.js', import.meta.url),
-  {
-    type: 'module',
-    name: 'cartowidgettileset',
-  }
-);
-
 /**
  * TODO
  */
@@ -39,7 +30,8 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
   constructor(props: WidgetTilesetSourceProps) {
     super(props);
 
-    WORKER.postMessage({
+    WidgetTilesetWorkerSource.init();
+    WidgetTilesetWorkerSource.WORKER.postMessage({
       tableName: this.props.tableName,
       method: Method.INIT,
       params: [this.props],
@@ -58,7 +50,7 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
       data,
     }));
 
-    WORKER.postMessage({
+    WidgetTilesetWorkerSource.WORKER.postMessage({
       tableName: this.props.tableName,
       method: Method.LOAD_TILES,
       params: [tiles],
@@ -67,7 +59,7 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
 
   /** Configures options used to extract features from tiles. */
   setTileFeatureExtractOptions(options: TileFeatureExtractOptions) {
-    WORKER.postMessage({
+    WidgetTilesetWorkerSource.WORKER.postMessage({
       tableName: this.props.tableName,
       type: Method.SET_TILE_FEATURE_EXTRACT_OPTIONS,
       params: [options],
@@ -86,7 +78,7 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     geojson: FeatureCollection;
     spatialFilter: SpatialFilter;
   }) {
-    WORKER.postMessage({
+    WidgetTilesetWorkerSource.WORKER.postMessage({
       tableName: this.props.tableName,
       method: Method.LOAD_GEOJSON,
       params: [{geojson, spatialFilter}],
@@ -102,7 +94,7 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     abortController,
     ...options
   }: FormulaRequestOptions): Promise<FormulaResponse> {
-    return _executeWorkerMethod(
+    return this._executeWorkerMethod(
       this.props.tableName,
       Method.GET_FORMULA,
       [options],
@@ -114,7 +106,7 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     abortController,
     ...options
   }: HistogramRequestOptions): Promise<HistogramResponse> {
-    return _executeWorkerMethod(
+    return this._executeWorkerMethod(
       this.props.tableName,
       Method.GET_HISTOGRAM,
       [options],
@@ -126,7 +118,7 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     abortController,
     ...options
   }: CategoryRequestOptions): Promise<CategoryResponse> {
-    return _executeWorkerMethod(
+    return this._executeWorkerMethod(
       this.props.tableName,
       Method.GET_CATEGORIES,
       [options],
@@ -138,7 +130,7 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     abortController,
     ...options
   }: ScatterRequestOptions): Promise<ScatterResponse> {
-    return _executeWorkerMethod(
+    return this._executeWorkerMethod(
       this.props.tableName,
       Method.GET_SCATTER,
       [options],
@@ -150,7 +142,7 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     abortController,
     ...options
   }: TableRequestOptions): Promise<TableResponse> {
-    return _executeWorkerMethod(
+    return this._executeWorkerMethod(
       this.props.tableName,
       Method.GET_TABLE,
       [options],
@@ -162,7 +154,7 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     abortController,
     ...options
   }: TimeSeriesRequestOptions): Promise<TimeSeriesResponse> {
-    return _executeWorkerMethod(
+    return this._executeWorkerMethod(
       this.props.tableName,
       Method.GET_TIME_SERIES,
       [options],
@@ -174,61 +166,73 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     abortController,
     ...options
   }: RangeRequestOptions): Promise<RangeResponse> {
-    return _executeWorkerMethod(
+    return this._executeWorkerMethod(
       this.props.tableName,
       Method.GET_RANGE,
       [options],
       abortController?.signal
     );
   }
-}
 
-/****************************************************************************
- * INTERNAL
- */
+  /////////////////////////////////////////////////////////////////////////////
+  // WEB WORKER MANAGEMENT
 
-let nextRequestID = 1;
+  // TODO: Singleton? Pool shared among datasets? One per dataset?
+  protected static WORKER: Worker;
+  protected static _nextRequestID = 1;
 
-function _executeWorkerMethod<T>(
-  tableName: string,
-  method: Method,
-  params: unknown[],
-  signal?: AbortSignal
-): Promise<T> {
-  const worker = WORKER;
-  const requestId = nextRequestID++;
-
-  // TODO: ViewState may contain non-serializable data, which we do not need.
-  // Remove this sanitization after sc-469614 is fixed.
-  const options = params[0] as any;
-  if (options?.spatialIndexReferenceViewState) {
-    const {zoom, latitude, longitude} = options.spatialIndexReferenceViewState;
-    options.spatialIndexReferenceViewState = {zoom, latitude, longitude};
+  static init() {
+    WidgetTilesetWorkerSource.WORKER = new Worker(
+      new URL('../workers/widget-tileset-worker.js', import.meta.url),
+      {
+        type: 'module',
+        name: 'cartowidgettileset',
+      }
+    );
   }
 
-  worker.postMessage({
-    requestId,
-    tableName,
-    method,
-    params,
-  } as WorkerRequest);
+  _executeWorkerMethod<T>(
+    tableName: string,
+    method: Method,
+    params: unknown[],
+    signal?: AbortSignal
+  ): Promise<T> {
+    const worker = WidgetTilesetWorkerSource.WORKER;
+    const requestId = WidgetTilesetWorkerSource._nextRequestID++;
 
-  return new Promise((resolve, reject) => {
-    function listener(e: MessageEvent) {
-      const response = e.data as WorkerResponse;
-      if (response.requestId !== requestId) return;
-
-      worker.removeEventListener('message', listener);
-
-      if (signal?.aborted) {
-        reject(new Error(signal.reason));
-      } else if (response.ok) {
-        resolve(response.result as T);
-      } else {
-        reject(new Error(response.error));
-      }
+    // TODO: ViewState may contain non-serializable data, which we do not need.
+    // Remove this sanitization after sc-469614 is fixed.
+    const options = params[0] as any;
+    if (options?.spatialIndexReferenceViewState) {
+      const {zoom, latitude, longitude} =
+        options.spatialIndexReferenceViewState;
+      options.spatialIndexReferenceViewState = {zoom, latitude, longitude};
     }
 
-    worker.addEventListener('message', listener);
-  });
+    worker.postMessage({
+      requestId,
+      tableName,
+      method,
+      params,
+    } as WorkerRequest);
+
+    return new Promise((resolve, reject) => {
+      function listener(e: MessageEvent) {
+        const response = e.data as WorkerResponse;
+        if (response.requestId !== requestId) return;
+
+        worker.removeEventListener('message', listener);
+
+        if (signal?.aborted) {
+          reject(new Error(signal.reason));
+        } else if (response.ok) {
+          resolve(response.result as T);
+        } else {
+          reject(new Error(response.error));
+        }
+      }
+
+      worker.addEventListener('message', listener);
+    });
+  }
 }
