@@ -47,7 +47,7 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
    * Returns an initialized Worker, to be reused for the lifecycle of this
    * source instance.
    */
-  getWorker() {
+  _getWorker() {
     if (this._worker) {
       return this._worker;
     }
@@ -74,7 +74,7 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     params: unknown[],
     signal?: AbortSignal
   ): Promise<T> {
-    const worker = this.getWorker();
+    const worker = this._getWorker();
     const requestId = this._workerNextRequestId++;
 
     // TODO: ViewState may contain non-serializable data, which we do not need.
@@ -149,7 +149,7 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
       data,
     }));
 
-    this.getWorker().postMessage({
+    this._getWorker().postMessage({
       method: Method.LOAD_TILES,
       params: [tiles],
     } as WorkerRequest);
@@ -157,7 +157,7 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
 
   /** Configures options used to extract features from tiles. */
   setTileFeatureExtractOptions(options: TileFeatureExtractOptions) {
-    this.getWorker().postMessage({
+    this._getWorker().postMessage({
       type: Method.SET_TILE_FEATURE_EXTRACT_OPTIONS,
       params: [options],
     });
@@ -175,7 +175,7 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     geojson: FeatureCollection;
     spatialFilter: SpatialFilter;
   }) {
-    this.getWorker().postMessage({
+    this._getWorker().postMessage({
       method: Method.LOAD_GEOJSON,
       params: [{geojson, spatialFilter}],
     } as WorkerRequest);
