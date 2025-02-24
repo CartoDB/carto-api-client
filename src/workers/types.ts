@@ -2,7 +2,6 @@ import type {Method} from './constants.js';
 
 export type WorkerRequest = {
   requestId?: number;
-  tableName: string; // TODO: Table name is not a unique identifier.
   method: Method;
   params: unknown[];
 };
