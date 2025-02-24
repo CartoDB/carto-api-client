@@ -24,19 +24,118 @@ import {Method} from '../workers/constants.js';
 import {WorkerRequest, WorkerResponse} from '../workers/types.js';
 
 /**
- * TODO
+ * Wrapper for {@link WidgetTilesetSource}, moving calculations to Web Workers.
+ * When supported, use of both classes is identical.
+ *
+ * To use this wrapper, the application and environment must support ESM Web
+ * Workers. For older build systems based on CommonJS, or in environments like
+ * Node.js, it may be necessary to use {@link WidgetTilesetSource} directly,
+ * and to (optionally) create workers manually in the application.
  */
 export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceProps> {
   constructor(props: WidgetTilesetSourceProps) {
     super(props);
+  }
 
-    WidgetTilesetWorkerSource.init();
-    WidgetTilesetWorkerSource.WORKER.postMessage({
-      tableName: this.props.tableName,
+  /////////////////////////////////////////////////////////////////////////////
+  // WEB WORKER MANAGEMENT
+
+  protected _worker: Worker | null = null;
+  protected _workerNextRequestId = 1;
+
+  /**
+   * Returns an initialized Worker, to be reused for the lifecycle of this
+   * source instance.
+   */
+  getWorker() {
+    if (this._worker) {
+      return this._worker;
+    }
+
+    this._worker = new Worker(
+      new URL('@carto/api-client/worker', import.meta.url),
+      {
+        type: 'module',
+        name: 'cartowidgettileset',
+      }
+    );
+
+    this._worker.postMessage({
       method: Method.INIT,
       params: [this.props],
     } as WorkerRequest);
+
+    return this._worker;
   }
+
+  /** Executes a given method on the worker. */
+  _executeWorkerMethod<T>(
+    method: Method,
+    params: unknown[],
+    signal?: AbortSignal
+  ): Promise<T> {
+    const worker = this.getWorker();
+    const requestId = this._workerNextRequestId++;
+
+    // TODO: ViewState may contain non-serializable data, which we do not need.
+    // Remove this sanitization after sc-469614 is fixed.
+    const options = params[0] as any;
+    if (options?.spatialIndexReferenceViewState) {
+      const {zoom, latitude, longitude} =
+        options.spatialIndexReferenceViewState;
+      options.spatialIndexReferenceViewState = {zoom, latitude, longitude};
+    }
+
+    let resolve: ((value: T) => void) | null = null;
+    let reject: ((reason: any) => void) | null = null;
+
+    // If worker sends message to main process, check whether it's a response
+    // to this request, and whether the request can been aborted. Then resolve
+    // or reject the Promise.
+    function onMessage(e: MessageEvent) {
+      const response = e.data as WorkerResponse;
+      if (response.requestId !== requestId) return;
+
+      if (signal?.aborted) {
+        reject!(new Error(signal.reason));
+      } else if (response.ok) {
+        resolve!(response.result as T);
+      } else {
+        reject!(new Error(response.error));
+      }
+    }
+
+    // If request is aborted by user, immediately reject the Promise.
+    function onAbort() {
+      reject!(new Error(signal!.reason));
+    }
+
+    worker.addEventListener('message', onMessage);
+    signal?.addEventListener('abort', onAbort);
+
+    // Send the task to the worker, creating a Promise to resolve/reject later.
+    const promise = new Promise<T>((_resolve, _reject) => {
+      resolve = _resolve;
+      reject = _reject;
+
+      worker.postMessage({
+        requestId,
+        method,
+        params,
+      } as WorkerRequest);
+    });
+
+    // Whether the task completes, fails, or aborts: clean up afterward.
+    void promise.finally(() => {
+      worker.removeEventListener('message', onMessage);
+      signal?.removeEventListener('abort', onAbort);
+    });
+
+    return promise;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // DATA LOADING
 
   /**
    * Loads features as a list of tiles (typically provided by deck.gl).
@@ -50,8 +149,7 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
       data,
     }));
 
-    WidgetTilesetWorkerSource.WORKER.postMessage({
-      tableName: this.props.tableName,
+    this.getWorker().postMessage({
       method: Method.LOAD_TILES,
       params: [tiles],
     } as WorkerRequest);
@@ -59,8 +157,7 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
 
   /** Configures options used to extract features from tiles. */
   setTileFeatureExtractOptions(options: TileFeatureExtractOptions) {
-    WidgetTilesetWorkerSource.WORKER.postMessage({
-      tableName: this.props.tableName,
+    this.getWorker().postMessage({
       type: Method.SET_TILE_FEATURE_EXTRACT_OPTIONS,
       params: [options],
     });
@@ -78,12 +175,14 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     geojson: FeatureCollection;
     spatialFilter: SpatialFilter;
   }) {
-    WidgetTilesetWorkerSource.WORKER.postMessage({
-      tableName: this.props.tableName,
+    this.getWorker().postMessage({
       method: Method.LOAD_GEOJSON,
       params: [{geojson, spatialFilter}],
     } as WorkerRequest);
   }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // WIDGETS API
 
   // eslint-disable-next-line @typescript-eslint/require-await
   override async getFeatures(): Promise<FeaturesResponse> {
@@ -95,7 +194,6 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     ...options
   }: FormulaRequestOptions): Promise<FormulaResponse> {
     return this._executeWorkerMethod(
-      this.props.tableName,
       Method.GET_FORMULA,
       [options],
       abortController?.signal
@@ -107,7 +205,6 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     ...options
   }: HistogramRequestOptions): Promise<HistogramResponse> {
     return this._executeWorkerMethod(
-      this.props.tableName,
       Method.GET_HISTOGRAM,
       [options],
       abortController?.signal
@@ -119,7 +216,6 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     ...options
   }: CategoryRequestOptions): Promise<CategoryResponse> {
     return this._executeWorkerMethod(
-      this.props.tableName,
       Method.GET_CATEGORIES,
       [options],
       abortController?.signal
@@ -131,7 +227,6 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     ...options
   }: ScatterRequestOptions): Promise<ScatterResponse> {
     return this._executeWorkerMethod(
-      this.props.tableName,
       Method.GET_SCATTER,
       [options],
       abortController?.signal
@@ -143,7 +238,6 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     ...options
   }: TableRequestOptions): Promise<TableResponse> {
     return this._executeWorkerMethod(
-      this.props.tableName,
       Method.GET_TABLE,
       [options],
       abortController?.signal
@@ -155,7 +249,6 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     ...options
   }: TimeSeriesRequestOptions): Promise<TimeSeriesResponse> {
     return this._executeWorkerMethod(
-      this.props.tableName,
       Method.GET_TIME_SERIES,
       [options],
       abortController?.signal
@@ -167,72 +260,9 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     ...options
   }: RangeRequestOptions): Promise<RangeResponse> {
     return this._executeWorkerMethod(
-      this.props.tableName,
       Method.GET_RANGE,
       [options],
       abortController?.signal
     );
-  }
-
-  /////////////////////////////////////////////////////////////////////////////
-  // WEB WORKER MANAGEMENT
-
-  // TODO: Singleton? Pool shared among datasets? One per dataset?
-  protected static WORKER: Worker;
-  protected static _nextRequestID = 1;
-
-  static init() {
-    WidgetTilesetWorkerSource.WORKER = new Worker(
-      new URL('@carto/api-client/worker', import.meta.url),
-      {
-        type: 'module',
-        name: 'cartowidgettileset',
-      }
-    );
-  }
-
-  _executeWorkerMethod<T>(
-    tableName: string,
-    method: Method,
-    params: unknown[],
-    signal?: AbortSignal
-  ): Promise<T> {
-    const worker = WidgetTilesetWorkerSource.WORKER;
-    const requestId = WidgetTilesetWorkerSource._nextRequestID++;
-
-    // TODO: ViewState may contain non-serializable data, which we do not need.
-    // Remove this sanitization after sc-469614 is fixed.
-    const options = params[0] as any;
-    if (options?.spatialIndexReferenceViewState) {
-      const {zoom, latitude, longitude} =
-        options.spatialIndexReferenceViewState;
-      options.spatialIndexReferenceViewState = {zoom, latitude, longitude};
-    }
-
-    worker.postMessage({
-      requestId,
-      tableName,
-      method,
-      params,
-    } as WorkerRequest);
-
-    return new Promise((resolve, reject) => {
-      function listener(e: MessageEvent) {
-        const response = e.data as WorkerResponse;
-        if (response.requestId !== requestId) return;
-
-        worker.removeEventListener('message', listener);
-
-        if (signal?.aborted) {
-          reject(new Error(signal.reason));
-        } else if (response.ok) {
-          resolve(response.result as T);
-        } else {
-          reject(new Error(response.error));
-        }
-      }
-
-      worker.addEventListener('message', listener);
-    });
   }
 }

@@ -195,11 +195,11 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
       filterOwner
     );
 
-    assertColumn(this._features, column);
-
     if (!this._features.length) {
       return [];
     }
+
+    assertColumn(this._features, column);
 
     return histogram({
       data: filteredFeatures,
