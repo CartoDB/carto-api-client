@@ -5,22 +5,25 @@ import {
 import {Method} from './constants.js';
 import type {WorkerRequest, WorkerResponse} from './types.js';
 
-// TODO: Cannot rely on tableName as unique ID.
-const SOURCES_BY_NAME = new Map<string, WidgetTilesetSource>();
+/*
+ * Web Worker, compiled as a separate `@carto/api-client/worker` entrypoint.
+ *
+ * Workers are scoped to the lifecycle of a single WidgetTilesetWorkerSource
+ * instance, representing and executing calculations on a single datasource.
+ */
+
+let source: WidgetTilesetSource;
 
 addEventListener('message', (e) => {
-  const {tableName, method, params, requestId} = e.data as WorkerRequest;
+  const {method, params, requestId} = e.data as WorkerRequest;
 
   if (method === Method.INIT) {
-    const props = params[0] as WidgetTilesetSourceProps;
-    SOURCES_BY_NAME.set(tableName, new WidgetTilesetSource(props));
+    source = new WidgetTilesetSource(params[0] as WidgetTilesetSourceProps);
     return;
   }
 
-  const source = SOURCES_BY_NAME.get(tableName);
-
   if (!source) {
-    const error = `Unknown dataset: ${tableName}`;
+    const error = `Cannot execute "${method}" on uninitialized source.`;
     postMessage({ok: false, error, requestId} as WorkerResponse);
     return;
   }
