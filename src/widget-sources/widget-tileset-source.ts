@@ -76,7 +76,9 @@ export type WidgetTilesetSourceResult = {widgetSource: WidgetTilesetSource};
  * const { widgetSource } = await data;
  * ```
  */
-export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> {
+export class WidgetTilesetSource<
+  Props extends WidgetTilesetSourceProps = WidgetTilesetSourceProps,
+> extends WidgetSource<Props> {
   private _tiles: Tile[] = [];
   private _features: FeatureData[] = [];
   private _tileFeatureExtractOptions: TileFeatureExtractOptions = {};
@@ -123,13 +125,10 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
     }
 
     this._features = tileFeatures({
-      tiles: this._tiles,
-      tileFormat: this.props.tileFormat,
+      ...this.props,
       ...this._tileFeatureExtractOptions,
-
+      tiles: this._tiles,
       spatialFilter,
-      spatialDataColumn: this.props.spatialDataColumn,
-      spatialDataType: this.props.spatialDataType,
     });
 
     prevInputs.spatialFilter = spatialFilter;
