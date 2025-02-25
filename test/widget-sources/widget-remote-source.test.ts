@@ -48,7 +48,7 @@ test('setRequestHeaders', async () => {
   const mockFetch = vi.fn().mockResolvedValue(mockResponse);
   vi.stubGlobal('fetch', mockFetch);
 
-  const widgetSource = new WidgetTestSource({
+  let widgetSource = new WidgetTestSource({
     accessToken: '<token>',
     connectionName: 'carto_dw',
   });
@@ -60,7 +60,12 @@ test('setRequestHeaders', async () => {
     Authorization: 'Bearer <token>',
   });
 
-  widgetSource.setRequestHeaders({'Cache-Control': 'public'});
+  widgetSource = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+    headers: {'Cache-Control': 'public'},
+  });
+
   await widgetSource.getFormula({column: 'store_name', operation: 'count'});
 
   expect(mockFetch).toHaveBeenCalledTimes(2);

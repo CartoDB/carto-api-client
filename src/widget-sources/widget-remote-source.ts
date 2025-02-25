@@ -31,13 +31,6 @@ export type WidgetRemoteSourceProps = WidgetSourceProps;
 export abstract class WidgetRemoteSource<
   Props extends WidgetRemoteSourceProps,
 > extends WidgetSource<Props> {
-  protected _headers: Record<string, string> = {};
-
-  /** Assigns HTTP headers to be included on API requests from this source. */
-  setRequestHeaders(headers: Record<string, string>): void {
-    this._headers = headers;
-  }
-
   async getCategories(
     options: CategoryRequestOptions
   ): Promise<CategoryResponse> {
@@ -73,7 +66,7 @@ export abstract class WidgetRemoteSource<
         operation,
         operationColumn: operationColumn || column,
       },
-      opts: {signal, headers: this._headers},
+      opts: {signal, headers: this.props.headers},
     }).then((res: CategoriesModelResponse) => normalizeObjectKeys(res.rows));
   }
 
@@ -115,7 +108,7 @@ export abstract class WidgetRemoteSource<
         limit: limit || 1000,
         tileResolution: tileResolution || DEFAULT_TILE_RESOLUTION,
       },
-      opts: {signal, headers: this._headers},
+      opts: {signal, headers: this.props.headers},
       // Avoid `normalizeObjectKeys()`, which changes column names.
     }).then(({rows}: FeaturesModelResponse) => ({rows}));
   }
@@ -154,7 +147,7 @@ export abstract class WidgetRemoteSource<
         operation: operation ?? 'count',
         operationExp,
       },
-      opts: {signal, headers: this._headers},
+      opts: {signal, headers: this.props.headers},
     }).then((res: FormulaModelResponse) => normalizeObjectKeys(res.rows[0]));
   }
 
@@ -189,7 +182,7 @@ export abstract class WidgetRemoteSource<
         spatialFilter,
       },
       params: {column, operation, ticks},
-      opts: {signal, headers: this._headers},
+      opts: {signal, headers: this.props.headers},
     }).then((res: HistogramModelResponse) => normalizeObjectKeys(res.rows));
 
     if (data.length) {
@@ -234,7 +227,7 @@ export abstract class WidgetRemoteSource<
         spatialFilter,
       },
       params: {column},
-      opts: {signal, headers: this._headers},
+      opts: {signal, headers: this.props.headers},
     }).then((res: RangeModelResponse) => normalizeObjectKeys(res.rows[0]));
   }
 
@@ -278,7 +271,7 @@ export abstract class WidgetRemoteSource<
         yAxisJoinOperation,
         limit: HARD_LIMIT,
       },
-      opts: {signal, headers: this._headers},
+      opts: {signal, headers: this.props.headers},
     })
       .then((res: ScatterModelResponse) => normalizeObjectKeys(res.rows))
       .then((res) => res.map(({x, y}: {x: number; y: number}) => [x, y]));
@@ -322,7 +315,7 @@ export abstract class WidgetRemoteSource<
         limit,
         offset,
       },
-      opts: {signal, headers: this._headers},
+      opts: {signal, headers: this.props.headers},
     }).then((res: TableModelResponse) => ({
       // Avoid `normalizeObjectKeys()`, which changes column names.
       rows: res.rows ?? (res as any).ROWS,
@@ -385,7 +378,7 @@ export abstract class WidgetRemoteSource<
         splitByCategoryLimit,
         splitByCategoryValues,
       },
-      opts: {signal, headers: this._headers},
+      opts: {signal, headers: this.props.headers},
     }).then((res: TimeSeriesModelResponse) => ({
       rows: normalizeObjectKeys(res.rows),
       categories: res.metadata?.categories,
