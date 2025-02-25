@@ -59,6 +59,10 @@ await updateSources();
  */
 
 async function updateSources() {
+  if (data?.widgetSource) {
+    await data.widgetSource.destroy();
+  }
+
   data = await vectorTilesetSource({
     tableName: 'cartodb-on-gcp-frontend-team.donmccurdy.retail_stores_tileset',
     accessToken:

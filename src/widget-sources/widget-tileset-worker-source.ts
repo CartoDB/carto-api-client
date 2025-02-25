@@ -37,6 +37,12 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     super(props);
   }
 
+  destroy() {
+    this._worker?.terminate();
+    this._worker = null;
+    super.destroy();
+  }
+
   /////////////////////////////////////////////////////////////////////////////
   // WEB WORKER MANAGEMENT
 
