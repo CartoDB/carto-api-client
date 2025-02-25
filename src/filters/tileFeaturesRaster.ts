@@ -64,8 +64,9 @@ export function tileFeaturesRaster({
 
       for (const band in tile.data.cells.numericProps) {
         const value = tile.data.cells.numericProps[band].value[i];
-        // TODO(cleanup): nodata should be a number, not a string.
-        if (Number(bandMetadataByName[band].nodata) !== value) {
+        const bandMetadata = bandMetadataByName[band];
+
+        if (isValidBandValue(value, bandMetadata)) {
           cellData[band] = tile.data.cells.numericProps[band].value[i];
           cellDataExists = true;
         }
@@ -108,4 +109,25 @@ function cellToChildrenSorted(parent: bigint, resolution: bigint): bigint[] {
       return tileA.x > tileB.x ? 1 : -1;
     }
   );
+}
+
+/**
+ * Returns true if the given value is valid (not NaN, not 'nodata')
+ * for the given raster band.
+ */
+function isValidBandValue(
+  value: unknown,
+  bandMetadata: RasterMetadataBand
+): value is number {
+  if (Number.isNaN(value)) {
+    return false;
+  }
+
+  // TODO(cleanup): Remove after API is updated to return 'nodata' as a number.
+  const nodata = bandMetadata.nodata;
+  if (typeof nodata === 'string') {
+    return Number(nodata) !== value;
+  }
+
+  return nodata !== value;
 }
