@@ -47,7 +47,7 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
    * Returns an initialized Worker, to be reused for the lifecycle of this
    * source instance.
    */
-  _getWorker() {
+  protected _getWorker() {
     if (this._worker) {
       return this._worker;
     }
@@ -69,7 +69,7 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
   }
 
   /** Executes a given method on the worker. */
-  _executeWorkerMethod<T>(
+  protected _executeWorkerMethod<T>(
     method: Method,
     params: unknown[],
     signal?: AbortSignal
