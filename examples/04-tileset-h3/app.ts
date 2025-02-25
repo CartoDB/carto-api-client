@@ -57,6 +57,10 @@ await updateSources();
  */
 
 async function updateSources() {
+  if (data?.widgetSource) {
+    await data.widgetSource.destroy();
+  }
+
   data = await h3TilesetSource({
     tableName:
       'cartodb-on-gcp-frontend-team.donmccurdy.retail_stores_tileset_h3',

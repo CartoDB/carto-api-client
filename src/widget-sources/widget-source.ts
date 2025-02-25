@@ -50,6 +50,17 @@ export abstract class WidgetSource<Props extends WidgetSourceProps> {
     this.props = {...WidgetSource.defaultProps, ...props};
   }
 
+  /**
+   * Destroys the widget source and releases allocated resources.
+   *
+   * For remote sources (tables, queries) this has no effect, but for local
+   * sources (tilesets, rasters) these resources will affect performance
+   * and stability if many (10+) sources are created and not released.
+   */
+  destroy() {
+    // no-op in most cases, but required for worker sources.
+  }
+
   protected _getSpatialFiltersResolution(
     source: Omit<ModelSource, 'type' | 'data'>,
     spatialFilter?: SpatialFilter,
