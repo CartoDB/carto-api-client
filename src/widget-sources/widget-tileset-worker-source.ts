@@ -190,79 +190,51 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
   }
 
   async getFormula({
-    abortController,
+    signal,
     ...options
   }: FormulaRequestOptions): Promise<FormulaResponse> {
-    return this._executeWorkerMethod(
-      Method.GET_FORMULA,
-      [options],
-      abortController?.signal
-    );
+    return this._executeWorkerMethod(Method.GET_FORMULA, [options], signal);
   }
 
   override async getHistogram({
-    abortController,
+    signal,
     ...options
   }: HistogramRequestOptions): Promise<HistogramResponse> {
-    return this._executeWorkerMethod(
-      Method.GET_HISTOGRAM,
-      [options],
-      abortController?.signal
-    );
+    return this._executeWorkerMethod(Method.GET_HISTOGRAM, [options], signal);
   }
 
   override async getCategories({
-    abortController,
+    signal,
     ...options
   }: CategoryRequestOptions): Promise<CategoryResponse> {
-    return this._executeWorkerMethod(
-      Method.GET_CATEGORIES,
-      [options],
-      abortController?.signal
-    );
+    return this._executeWorkerMethod(Method.GET_CATEGORIES, [options], signal);
   }
 
   override async getScatter({
-    abortController,
+    signal,
     ...options
   }: ScatterRequestOptions): Promise<ScatterResponse> {
-    return this._executeWorkerMethod(
-      Method.GET_SCATTER,
-      [options],
-      abortController?.signal
-    );
+    return this._executeWorkerMethod(Method.GET_SCATTER, [options], signal);
   }
 
   override async getTable({
-    abortController,
+    signal,
     ...options
   }: TableRequestOptions): Promise<TableResponse> {
-    return this._executeWorkerMethod(
-      Method.GET_TABLE,
-      [options],
-      abortController?.signal
-    );
+    return this._executeWorkerMethod(Method.GET_TABLE, [options], signal);
   }
 
   override async getTimeSeries({
-    abortController,
+    signal,
     ...options
   }: TimeSeriesRequestOptions): Promise<TimeSeriesResponse> {
-    return this._executeWorkerMethod(
-      Method.GET_TIME_SERIES,
-      [options],
-      abortController?.signal
-    );
+    return this._executeWorkerMethod(Method.GET_TIME_SERIES, [options], signal);
   }
 
   override async getRange({
-    abortController,
+    signal,
     ...options
   }: RangeRequestOptions): Promise<RangeResponse> {
-    return this._executeWorkerMethod(
-      Method.GET_RANGE,
-      [options],
-      abortController?.signal
-    );
+    return this._executeWorkerMethod(Method.GET_RANGE, [options], signal);
   }
 }
