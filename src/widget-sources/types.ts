@@ -19,11 +19,11 @@ export interface ViewState {
 
 /** Common options for {@link WidgetRemoteSource} requests. */
 interface BaseRequestOptions {
+  signal?: AbortSignal;
   spatialFilter?: SpatialFilter;
   spatialFiltersMode?: SpatialFilterPolyfillMode;
   /** Required for table- and query-based spatial index sources (H3, Quadbin). */
   spatialIndexReferenceViewState?: ViewState;
-  abortController?: AbortController;
   /** Overrides source filters, if any. */
   filters?: Filters;
   filterOwner?: string;

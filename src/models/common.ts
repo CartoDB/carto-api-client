@@ -4,7 +4,7 @@ import {InvalidColumnError} from '../utils.js';
 export interface ModelRequestOptions {
   method: 'GET' | 'POST';
   headers?: Record<string, string>;
-  abortController?: AbortController;
+  signal?: AbortSignal;
   otherOptions?: Record<string, unknown>;
   body?: string;
 }
@@ -75,7 +75,7 @@ export async function makeCall({
         method: opts?.method,
         body: opts?.body,
       }),
-      signal: opts?.abortController?.signal,
+      signal: opts?.signal,
       ...opts?.otherOptions,
     });
     data = await response.json();

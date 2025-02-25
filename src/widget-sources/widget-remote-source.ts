@@ -42,12 +42,12 @@ export abstract class WidgetRemoteSource<
     options: CategoryRequestOptions
   ): Promise<CategoryResponse> {
     const {
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
       spatialIndexReferenceViewState,
-      abortController,
       ...params
     } = options;
     const {column, operation, operationColumn} = params;
@@ -73,7 +73,7 @@ export abstract class WidgetRemoteSource<
         operation,
         operationColumn: operationColumn || column,
       },
-      opts: {abortController, headers: this._headers},
+      opts: {signal, headers: this._headers},
     }).then((res: CategoriesModelResponse) => normalizeObjectKeys(res.rows));
   }
 
@@ -81,12 +81,12 @@ export abstract class WidgetRemoteSource<
     options: FeaturesRequestOptions
   ): Promise<FeaturesResponse> {
     const {
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
       spatialIndexReferenceViewState,
-      abortController,
       ...params
     } = options;
     const {columns, dataType, featureIds, z, limit, tileResolution} = params;
@@ -115,19 +115,19 @@ export abstract class WidgetRemoteSource<
         limit: limit || 1000,
         tileResolution: tileResolution || DEFAULT_TILE_RESOLUTION,
       },
-      opts: {abortController, headers: this._headers},
+      opts: {signal, headers: this._headers},
       // Avoid `normalizeObjectKeys()`, which changes column names.
     }).then(({rows}: FeaturesModelResponse) => ({rows}));
   }
 
   async getFormula(options: FormulaRequestOptions): Promise<FormulaResponse> {
     const {
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
       spatialIndexReferenceViewState,
-      abortController,
       operationExp,
       ...params
     } = options;
@@ -154,7 +154,7 @@ export abstract class WidgetRemoteSource<
         operation: operation ?? 'count',
         operationExp,
       },
-      opts: {abortController, headers: this._headers},
+      opts: {signal, headers: this._headers},
     }).then((res: FormulaModelResponse) => normalizeObjectKeys(res.rows[0]));
   }
 
@@ -162,12 +162,12 @@ export abstract class WidgetRemoteSource<
     options: HistogramRequestOptions
   ): Promise<HistogramResponse> {
     const {
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
       spatialIndexReferenceViewState,
-      abortController,
       ...params
     } = options;
     const {column, operation, ticks} = params;
@@ -189,7 +189,7 @@ export abstract class WidgetRemoteSource<
         spatialFilter,
       },
       params: {column, operation, ticks},
-      opts: {abortController, headers: this._headers},
+      opts: {signal, headers: this._headers},
     }).then((res: HistogramModelResponse) => normalizeObjectKeys(res.rows));
 
     if (data.length) {
@@ -207,12 +207,12 @@ export abstract class WidgetRemoteSource<
 
   async getRange(options: RangeRequestOptions): Promise<RangeResponse> {
     const {
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
       spatialIndexReferenceViewState,
-      abortController,
       ...params
     } = options;
     const {column} = params;
@@ -234,18 +234,18 @@ export abstract class WidgetRemoteSource<
         spatialFilter,
       },
       params: {column},
-      opts: {abortController, headers: this._headers},
+      opts: {signal, headers: this._headers},
     }).then((res: RangeModelResponse) => normalizeObjectKeys(res.rows[0]));
   }
 
   async getScatter(options: ScatterRequestOptions): Promise<ScatterResponse> {
     const {
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
       spatialIndexReferenceViewState,
-      abortController,
       ...params
     } = options;
     const {xAxisColumn, xAxisJoinOperation, yAxisColumn, yAxisJoinOperation} =
@@ -278,7 +278,7 @@ export abstract class WidgetRemoteSource<
         yAxisJoinOperation,
         limit: HARD_LIMIT,
       },
-      opts: {abortController, headers: this._headers},
+      opts: {signal, headers: this._headers},
     })
       .then((res: ScatterModelResponse) => normalizeObjectKeys(res.rows))
       .then((res) => res.map(({x, y}: {x: number; y: number}) => [x, y]));
@@ -286,12 +286,12 @@ export abstract class WidgetRemoteSource<
 
   async getTable(options: TableRequestOptions): Promise<TableResponse> {
     const {
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
       spatialIndexReferenceViewState,
-      abortController,
       ...params
     } = options;
     const {columns, sortBy, sortDirection, offset = 0, limit = 10} = params;
@@ -322,7 +322,7 @@ export abstract class WidgetRemoteSource<
         limit,
         offset,
       },
-      opts: {abortController, headers: this._headers},
+      opts: {signal, headers: this._headers},
     }).then((res: TableModelResponse) => ({
       // Avoid `normalizeObjectKeys()`, which changes column names.
       rows: res.rows ?? (res as any).ROWS,
@@ -334,9 +334,9 @@ export abstract class WidgetRemoteSource<
     options: TimeSeriesRequestOptions
   ): Promise<TimeSeriesResponse> {
     const {
+      signal,
       filters = this.props.filters,
       filterOwner,
-      abortController,
       spatialFilter,
       spatialFiltersMode,
       spatialIndexReferenceViewState,
@@ -385,7 +385,7 @@ export abstract class WidgetRemoteSource<
         splitByCategoryLimit,
         splitByCategoryValues,
       },
-      opts: {abortController, headers: this._headers},
+      opts: {signal, headers: this._headers},
     }).then((res: TimeSeriesModelResponse) => ({
       rows: normalizeObjectKeys(res.rows),
       categories: res.metadata?.categories,
