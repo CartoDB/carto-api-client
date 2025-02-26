@@ -1,10 +1,11 @@
-import {defineConfig} from 'tsup';
+import {defineConfig, Options} from 'tsup';
 
-const commonConfig = {
+const commonConfig: Options = {
   outDir: 'build',
   target: 'es2020',
   dts: true,
   clean: true,
+  splitting: false,
 };
 
 // Web Workers rely on ES Modules, and are not supported in our CJS builds.
