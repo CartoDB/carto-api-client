@@ -60,7 +60,7 @@ await updateSources();
 
 async function updateSources() {
   if (data?.widgetSource) {
-    await data.widgetSource.destroy();
+    data.widgetSource.destroy();
   }
 
   data = await vectorTilesetSource({
