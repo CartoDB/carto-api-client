@@ -8,8 +8,8 @@ import type {WorkerRequest, WorkerResponse} from './types.js';
 /*
  * Web Worker, compiled as a separate `@carto/api-client/worker` entrypoint.
  *
- * Workers are scoped to the lifecycle of a single WidgetTilesetWorkerSource
- * instance, representing and executing calculations on a single datasource.
+ * Workers are scoped to the lifecycle of a single WidgetTilesetSource instance,
+ * representing and executing calculations on a single datasource.
  */
 
 let source: WidgetTilesetSource;
@@ -18,7 +18,10 @@ addEventListener('message', (e) => {
   const {method, params, requestId} = e.data as WorkerRequest;
 
   if (method === Method.INIT) {
-    source = new WidgetTilesetSource(params[0] as WidgetTilesetSourceProps);
+    source = new WidgetTilesetSource({
+      ...(params[0] as WidgetTilesetSourceProps),
+      widgetSourceWorker: false,
+    });
     return;
   }
 

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/require-await */
-import {TilesetSourceOptions} from '../sources/index.js';
 import {
   CategoryRequestOptions,
   CategoryResponse,
@@ -18,7 +17,6 @@ import {
   TimeSeriesResponse,
 } from './types.js';
 import {InvalidColumnError, assert, getApplicableFilters} from '../utils.js';
-import {TileFormat} from '../constants.js';
 import {Filter, SpatialFilter, Tile} from '../types.js';
 import {
   TileFeatureExtractOptions,
@@ -36,46 +34,21 @@ import {
 } from '../operations/index.js';
 import {FeatureData} from '../types-internal.js';
 import {FeatureCollection} from 'geojson';
-import {SpatialDataType} from '../sources/types.js';
-import {WidgetSource, WidgetSourceProps} from './widget-source.js';
+import {WidgetSource} from './widget-source.js';
 import {booleanEqual} from '@turf/boolean-equal';
+import type {WidgetTilesetSourceProps} from './widget-tileset-source.js';
 
 // TODO(cleanup): Parameter defaults in source functions and widget API calls are
 // currently duplicated and possibly inconsistent. Consider consolidating and
 // operating on Required<T> objects. See:
 // https://github.com/CartoDB/carto-api-client/issues/39
 
-export type WidgetTilesetSourceProps = WidgetSourceProps &
-  Omit<TilesetSourceOptions, 'filters'> & {
-    tileFormat: TileFormat;
-    spatialDataType: SpatialDataType;
-  };
-
-export type WidgetTilesetSourceResult = {widgetSource: WidgetTilesetSource};
-
 /**
- * Source for Widget API requests on a data source defined by a tileset.
- *
- * Generally not intended to be constructed directly. Instead, call
- * {@link vectorTilesetSource}, {@link h3TilesetSource}, or {@link quadbinTilesetSource},
- * which can be shared with map layers. Sources contain a `widgetSource`
- * property, for use by widget implementations.
- *
- * Example:
- *
- * ```javascript
- * import { vectorTilesetSource } from '@carto/api-client';
- *
- * const data = vectorTilesetSource({
- *   accessToken: '••••',
- *   connectionName: 'carto_dw',
- *   tableName: 'carto-demo-data.demo_rasters.my_tileset_source'
- * });
- *
- * const { widgetSource } = await data;
- * ```
+ * Local (in-memory) implementation of tileset widget calculations. This class
+ * may be instantiated by {@link WidgetTilesetSource} in a Web Worker when
+ * supported, or on the main thread.
  */
-export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> {
+export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourceProps> {
   private _tiles: Tile[] = [];
   private _features: FeatureData[] = [];
   private _tileFeatureExtractOptions: TileFeatureExtractOptions = {};

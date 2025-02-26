@@ -6,9 +6,7 @@ import {getTileFormat} from '../utils/getTileFormat.js';
 import {
   WidgetTilesetSource,
   WidgetTilesetSourceResult,
-  WidgetTilesetWorkerSource,
 } from '../widget-sources/index.js';
-import {isModuleWorkerSupported} from '../workers/utils.js';
 import {baseSource} from './base-source.js';
 import type {
   SourceOptions,
@@ -28,15 +26,10 @@ export const quadbinTilesetSource = async function (
   const {tableName, spatialDataColumn = 'quadbin'} = options;
   const urlParameters: UrlParameters = {name: tableName};
 
-  const WidgetSourceClass =
-    options.widgetSourceWorker !== false && isModuleWorkerSupported()
-      ? WidgetTilesetWorkerSource
-      : WidgetTilesetSource;
-
   return baseSource<UrlParameters>('tileset', options, urlParameters).then(
     (result) => ({
       ...(result as TilejsonResult),
-      widgetSource: new WidgetSourceClass({
+      widgetSource: new WidgetTilesetSource({
         ...options,
         tileFormat: getTileFormat(result as TilejsonResult),
         spatialDataColumn,
