@@ -89,28 +89,25 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
    * Returns an initialized Worker, to be reused for the lifecycle of this
    * source instance.
    */
-  protected _getWorker(): Worker | null {
-    if (this._workerImpl || this._localImpl) {
+  protected _getWorker(): Worker {
+    if (this._workerImpl) {
       return this._workerImpl;
     }
 
-    try {
-      this._workerImpl = new Worker(new URL('worker.js', import.meta.url), {
+    this._workerImpl = new Worker(
+      new URL('@carto/api-client/worker', import.meta.url),
+      {
         type: 'module',
         name: 'cartowidgettileset',
-      });
+      }
+    );
 
-      this._workerImpl.postMessage({
-        method: Method.INIT,
-        params: [this.props],
-      } as WorkerRequest);
+    this._workerImpl.postMessage({
+      method: Method.INIT,
+      params: [this.props],
+    } as WorkerRequest);
 
-      return this._workerImpl;
-    } catch {
-      this._workerEnabled = false;
-      this._localImpl = new WidgetTilesetSourceImpl(this.props);
-      return null;
-    }
+    return this._workerImpl;
   }
 
   /** Executes a given method on the worker. */
@@ -119,12 +116,12 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
     params: unknown[],
     signal?: AbortSignal
   ): Promise<T> {
-    const worker = this._getWorker();
-    if (!worker) {
+    if (!this._workerEnabled) {
       // @ts-expect-error No type-checking dynamic method name.
       return this._localImpl[method](...params);
     }
 
+    const worker = this._getWorker();
     const requestId = this._workerNextRequestId++;
 
     // TODO: ViewState may contain non-serializable data, which we do not need.
@@ -193,10 +190,11 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
    * before computing statistics on the tiles.
    */
   loadTiles(tiles: unknown[]) {
-    const worker = this._getWorker();
-    if (!worker) {
+    if (!this._workerEnabled) {
       return this._localImpl!.loadTiles(tiles);
     }
+
+    const worker = this._getWorker();
 
     tiles = (tiles as Tile[]).map(({id, bbox, data}) => ({
       id,
@@ -212,10 +210,11 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
 
   /** Configures options used to extract features from tiles. */
   setTileFeatureExtractOptions(options: TileFeatureExtractOptions) {
-    const worker = this._getWorker();
-    if (!worker) {
+    if (!this._workerEnabled) {
       return this._localImpl?.setTileFeatureExtractOptions(options);
     }
+
+    const worker = this._getWorker();
 
     worker.postMessage({
       type: Method.SET_TILE_FEATURE_EXTRACT_OPTIONS,
@@ -235,10 +234,11 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
     geojson: FeatureCollection;
     spatialFilter: SpatialFilter;
   }) {
-    const worker = this._getWorker();
-    if (!worker) {
+    if (!this._workerEnabled) {
       return this._localImpl!.loadGeoJSON({geojson, spatialFilter});
     }
+
+    const worker = this._getWorker();
 
     worker.postMessage({
       method: Method.LOAD_GEOJSON,
