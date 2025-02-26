@@ -1,7 +1,5 @@
-import {
-  WidgetTilesetSource,
-  type WidgetTilesetSourceProps,
-} from '../widget-sources/widget-tileset-source.js';
+import {WidgetTilesetSourceImpl} from '../widget-sources/widget-tileset-source-impl.js';
+import {type WidgetTilesetSourceProps} from '../widget-sources/widget-tileset-source.js';
 import {Method} from './constants.js';
 import type {WorkerRequest, WorkerResponse} from './types.js';
 
@@ -12,13 +10,13 @@ import type {WorkerRequest, WorkerResponse} from './types.js';
  * representing and executing calculations on a single datasource.
  */
 
-let source: WidgetTilesetSource;
+let source: WidgetTilesetSourceImpl;
 
 addEventListener('message', (e) => {
   const {method, params, requestId} = e.data as WorkerRequest;
 
   if (method === Method.INIT) {
-    source = new WidgetTilesetSource({
+    source = new WidgetTilesetSourceImpl({
       ...(params[0] as WidgetTilesetSourceProps),
       widgetSourceWorker: false,
     });
