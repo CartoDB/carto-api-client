@@ -18,57 +18,99 @@ import {
 import {SpatialFilter, Tile} from '../types.js';
 import {TileFeatureExtractOptions} from '../filters/index.js';
 import {FeatureCollection} from 'geojson';
-import {WidgetSource} from './widget-source.js';
-import {WidgetTilesetSourceProps} from './widget-tileset-source.js';
+import {WidgetSource, WidgetSourceProps} from './widget-source.js';
 import {Method} from '../workers/constants.js';
 import {WorkerRequest, WorkerResponse} from '../workers/types.js';
+import {SpatialDataType, TilesetSourceOptions} from '../sources/types.js';
+import {TileFormat} from '../constants.js';
+import {WidgetTilesetSourceImpl} from './widget-tileset-source-impl.js';
+
+export type WidgetTilesetSourceProps = WidgetSourceProps &
+  Omit<TilesetSourceOptions, 'filters'> & {
+    tileFormat: TileFormat;
+    spatialDataType: SpatialDataType;
+  };
+
+export type WidgetTilesetSourceResult = {widgetSource: WidgetTilesetSource};
 
 /**
- * Wrapper for {@link WidgetTilesetSource}, moving calculations to Web Workers.
- * When supported, use of both classes is identical.
+ * Source for Widget API requests on a data source defined by a tileset.
  *
- * To use this wrapper, the application and environment must support ESM Web
- * Workers. For older build systems based on CommonJS, or in environments like
- * Node.js, it may be necessary to use {@link WidgetTilesetSource} directly,
- * and to (optionally) create workers manually in the application.
+ * Generally not intended to be constructed directly. Instead, call
+ * {@link vectorTilesetSource}, {@link h3TilesetSource}, or {@link quadbinTilesetSource},
+ * which can be shared with map layers. Sources contain a `widgetSource`
+ * property, for use by widget implementations.
+ *
+ * Example:
+ *
+ * ```javascript
+ * import { vectorTilesetSource } from '@carto/api-client';
+ *
+ * const data = vectorTilesetSource({
+ *   accessToken: '••••',
+ *   connectionName: 'carto_dw',
+ *   tableName: 'carto-demo-data.demo_rasters.my_tileset_source'
+ * });
+ *
+ * const { widgetSource } = await data;
+ * ```
  */
-export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceProps> {
+export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> {
+  protected _localImpl: WidgetTilesetSourceImpl | null = null;
+
+  protected _workerImpl: Worker | null = null;
+  protected _workerEnabled: boolean;
+  protected _workerNextRequestId = 1;
+
   constructor(props: WidgetTilesetSourceProps) {
     super(props);
+
+    this._workerEnabled =
+      (props.widgetSourceWorker ?? true) && TSUP_FORMAT !== 'cjs';
+    this._localImpl = this._workerEnabled
+      ? null
+      : new WidgetTilesetSourceImpl(this.props);
   }
 
   destroy() {
-    this._worker?.terminate();
-    this._worker = null;
+    this._localImpl?.destroy();
+    this._localImpl = null;
+
+    this._workerImpl?.terminate();
+    this._workerImpl = null;
+
     super.destroy();
   }
 
   /////////////////////////////////////////////////////////////////////////////
   // WEB WORKER MANAGEMENT
 
-  protected _worker: Worker | null = null;
-  protected _workerNextRequestId = 1;
-
   /**
    * Returns an initialized Worker, to be reused for the lifecycle of this
    * source instance.
    */
-  protected _getWorker() {
-    if (this._worker) {
-      return this._worker;
+  protected _getWorker(): Worker | null {
+    if (this._workerImpl || this._localImpl) {
+      return this._workerImpl;
     }
 
-    this._worker = new Worker(new URL('worker.js', import.meta.url), {
-      type: 'module',
-      name: 'cartowidgettileset',
-    });
+    try {
+      this._workerImpl = new Worker(new URL('worker.js', import.meta.url), {
+        type: 'module',
+        name: 'cartowidgettileset',
+      });
 
-    this._worker.postMessage({
-      method: Method.INIT,
-      params: [this.props],
-    } as WorkerRequest);
+      this._workerImpl.postMessage({
+        method: Method.INIT,
+        params: [this.props],
+      } as WorkerRequest);
 
-    return this._worker;
+      return this._workerImpl;
+    } catch {
+      this._workerEnabled = false;
+      this._localImpl = new WidgetTilesetSourceImpl(this.props);
+      return null;
+    }
   }
 
   /** Executes a given method on the worker. */
@@ -78,6 +120,11 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     signal?: AbortSignal
   ): Promise<T> {
     const worker = this._getWorker();
+    if (!worker) {
+      // @ts-expect-error No type-checking dynamic method name.
+      return this._localImpl[method](...params);
+    }
+
     const requestId = this._workerNextRequestId++;
 
     // TODO: ViewState may contain non-serializable data, which we do not need.
@@ -146,13 +193,18 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
    * before computing statistics on the tiles.
    */
   loadTiles(tiles: unknown[]) {
+    const worker = this._getWorker();
+    if (!worker) {
+      return this._localImpl!.loadTiles(tiles);
+    }
+
     tiles = (tiles as Tile[]).map(({id, bbox, data}) => ({
       id,
       bbox,
       data,
     }));
 
-    this._getWorker().postMessage({
+    worker.postMessage({
       method: Method.LOAD_TILES,
       params: [tiles],
     } as WorkerRequest);
@@ -160,7 +212,12 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
 
   /** Configures options used to extract features from tiles. */
   setTileFeatureExtractOptions(options: TileFeatureExtractOptions) {
-    this._getWorker().postMessage({
+    const worker = this._getWorker();
+    if (!worker) {
+      return this._localImpl?.setTileFeatureExtractOptions(options);
+    }
+
+    worker.postMessage({
       type: Method.SET_TILE_FEATURE_EXTRACT_OPTIONS,
       params: [options],
     });
@@ -178,7 +235,12 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
     geojson: FeatureCollection;
     spatialFilter: SpatialFilter;
   }) {
-    this._getWorker().postMessage({
+    const worker = this._getWorker();
+    if (!worker) {
+      return this._localImpl!.loadGeoJSON({geojson, spatialFilter});
+    }
+
+    worker.postMessage({
       method: Method.LOAD_GEOJSON,
       params: [{geojson, spatialFilter}],
     } as WorkerRequest);
