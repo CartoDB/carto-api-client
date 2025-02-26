@@ -191,6 +191,12 @@ export type TilesetSourceOptions = {
    * Fully qualified name of tileset.
    */
   tableName: string;
+
+  /**
+   * Whether to use Web Workers for local widget calculations. Workers
+   * are used by default if the runtime environment supports ES Module Workers.
+   */
+  widgetSourceWorker?: boolean;
 };
 
 export type ColumnsOption = {
