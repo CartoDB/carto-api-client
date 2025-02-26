@@ -58,13 +58,10 @@ export class WidgetTilesetWorkerSource extends WidgetSource<WidgetTilesetSourceP
       return this._worker;
     }
 
-    this._worker = new Worker(
-      new URL('@carto/api-client/worker', import.meta.url),
-      {
-        type: 'module',
-        name: 'cartowidgettileset',
-      }
-    );
+    this._worker = new Worker(new URL('worker.js', import.meta.url), {
+      type: 'module',
+      name: 'cartowidgettileset',
+    });
 
     this._worker.postMessage({
       method: Method.INIT,
