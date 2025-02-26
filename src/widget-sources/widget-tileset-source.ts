@@ -66,10 +66,13 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
     super(props);
 
     this._workerEnabled =
-      (props.widgetSourceWorker ?? true) && TSUP_FORMAT !== 'cjs';
-    this._localImpl = this._workerEnabled
-      ? null
-      : new WidgetTilesetSourceImpl(this.props);
+      (props.widgetSourceWorker ?? true) &&
+      TSUP_FORMAT !== 'cjs' &&
+      typeof Worker !== 'undefined';
+
+    if (!this._workerEnabled) {
+      this._localImpl = new WidgetTilesetSourceImpl(this.props);
+    }
   }
 
   destroy() {
