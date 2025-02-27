@@ -26,6 +26,30 @@ beforeEach(() => {
   });
 });
 
+describe('getCategories', () => {
+  it('counts features in categories', async () => {
+    expect(
+      await source.getCategories({
+        operation: 'count',
+        column: 'storetype',
+        joinOperation: undefined,
+        spatialFilter: MOCK_SPATIAL_FILTER,
+      })
+    ).toEqual([
+      {
+        name: 'Drugstore',
+        value: 6,
+      },
+    ]);
+  });
+});
+
+describe('getFeatures', () => {
+  it('not implemented', async () => {
+    await expect(() => source.getFeatures()).rejects.toThrow(/not supported/);
+  });
+});
+
 describe('getFormula', () => {
   it('counts features', async () => {
     expect(
@@ -80,6 +104,39 @@ describe('getHistogram', () => {
         spatialFilter: MOCK_SPATIAL_FILTER,
       })
     ).toEqual([0, 4, 2, 0]);
+  });
+});
+
+describe('getRange', () => {
+  it('computes ranges', async () => {
+    expect(
+      await source.getRange({
+        column: 'revenue',
+        spatialFilter: MOCK_SPATIAL_FILTER,
+      })
+    ).toEqual({
+      min: 1254145,
+      max: 1876776,
+    });
+  });
+});
+
+describe('getScatter', () => {
+  it('computes scatterplot points', async () => {
+    expect(
+      await source.getScatter({
+        xAxisColumn: 'size_m2',
+        yAxisColumn: 'revenue',
+        spatialFilter: MOCK_SPATIAL_FILTER,
+      })
+    ).toEqual([
+      [846, 1301427],
+      [809, 1646773],
+      [129, 1449786],
+      [954, 1876776],
+      [737, 1254145],
+      [103, 1866052],
+    ]);
   });
 });
 
