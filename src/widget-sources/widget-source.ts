@@ -35,7 +35,9 @@ export interface WidgetSourceProps extends Omit<SourceOptions, 'filters'> {
  *
  * Abstract class. Use {@link WidgetQuerySource} or {@link WidgetTableSource}.
  */
-export abstract class WidgetSource<Props extends WidgetSourceProps> {
+export abstract class WidgetSource<
+  Props extends WidgetSourceProps = WidgetSourceProps,
+> {
   readonly props: Props;
 
   static defaultProps: Partial<WidgetSourceProps> = {

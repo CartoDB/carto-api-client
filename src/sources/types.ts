@@ -196,7 +196,7 @@ export type TilesetSourceOptions = {
    * Whether to use Web Workers for local widget calculations. Workers
    * are used by default if the runtime environment supports ES Module Workers.
    */
-  widgetSourceWorker?: boolean;
+  widgetWorker?: boolean;
 };
 
 export type ColumnsOption = {
