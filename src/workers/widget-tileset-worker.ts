@@ -18,7 +18,7 @@ addEventListener('message', (e) => {
   if (method === Method.INIT) {
     source = new WidgetTilesetSourceImpl({
       ...(params[0] as WidgetTilesetSourceProps),
-      widgetSourceWorker: false,
+      widgetWorker: false,
     });
     return;
   }
