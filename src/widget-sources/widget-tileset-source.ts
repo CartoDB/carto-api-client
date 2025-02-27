@@ -147,7 +147,7 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
       if (response.requestId !== requestId) return;
 
       if (signal?.aborted) {
-        reject!(new Error(signal.reason));
+        onAbort();
       } else if (response.ok) {
         resolve!(response.result as T);
       } else {
@@ -157,7 +157,10 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
 
     // If request is aborted by user, immediately reject the Promise.
     function onAbort() {
-      reject!(new Error(signal!.reason));
+      // https://developer.mozilla.org/en-US/docs/Web/API/DOMException#aborterror
+      const abortError = new Error(signal!.reason);
+      abortError.name = 'AbortError';
+      reject!(abortError);
     }
 
     worker.addEventListener('message', onMessage);
