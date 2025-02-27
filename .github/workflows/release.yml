@@ -68,4 +68,4 @@ jobs:
       - name: Publish
         env:
           DIST_TAG: ${{ steps.dist-tag.outputs.result }}
-        run: yarn npm publish --tag ${DIST_TAG} --access public
+        run: yarn npm publish --tag ${DIST_TAG}
