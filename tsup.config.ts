@@ -5,6 +5,7 @@ const commonConfig: Options = {
   target: 'es2020',
   dts: true,
   clean: true,
+  sourcemap: true,
   splitting: false,
 };
 
