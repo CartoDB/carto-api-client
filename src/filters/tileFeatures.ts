@@ -20,6 +20,7 @@ export type TileFeatures = {
 /** @privateRemarks Source: @carto/react-core */
 export type TileFeatureExtractOptions = {
   storeGeometry?: boolean;
+  uniqueIdProperty?: string;
 };
 
 /** @privateRemarks Source: @carto/react-core */
