@@ -2417,30 +2417,30 @@ __metadata:
   linkType: hard
 
 "@luma.gl/core@npm:^9.1.0, @luma.gl/core@npm:~9.1.0":
-  version: 9.1.0
-  resolution: "@luma.gl/core@npm:9.1.0"
+  version: 9.1.4
+  resolution: "@luma.gl/core@npm:9.1.4"
   dependencies:
     "@math.gl/types": "npm:^4.1.0"
     "@probe.gl/env": "npm:^4.0.8"
     "@probe.gl/log": "npm:^4.0.8"
     "@probe.gl/stats": "npm:^4.0.8"
     "@types/offscreencanvas": "npm:^2019.6.4"
-  checksum: 10c0/da762980e20f654cfa45665a6aeb621ef0beafe78602e6048da32bc1a8db520a4dfb975493bee00865e75f9c46e6a0f1e470747ed912b96af0c2d25ae039906c
+  checksum: 10c0/0e958a5279a1763a2efb25ed669fa8abeab3c882386e37d704493890436e0dc917b7f36f4762630054eda29bc96942102b062283f7114b9ac3b585ae3c02ef30
   languageName: node
   linkType: hard
 
 "@luma.gl/engine@npm:^9.1.0, @luma.gl/engine@npm:~9.1.0":
-  version: 9.1.0
-  resolution: "@luma.gl/engine@npm:9.1.0"
+  version: 9.1.4
+  resolution: "@luma.gl/engine@npm:9.1.4"
   dependencies:
     "@math.gl/core": "npm:^4.1.0"
     "@math.gl/types": "npm:^4.1.0"
     "@probe.gl/log": "npm:^4.0.8"
     "@probe.gl/stats": "npm:^4.0.8"
   peerDependencies:
-    "@luma.gl/core": ^9.1.0-beta.1
-    "@luma.gl/shadertools": ^9.1.0-beta.1
-  checksum: 10c0/a9623b00302d7c44bf9f5cd3ea20cf5f4718fb32738d522de785f25936b7515a867c460e6617c96379920e9767f2575e747a22a8d6ffa61f30664dee1871da1c
+    "@luma.gl/core": ^9.1.0
+    "@luma.gl/shadertools": ^9.1.0
+  checksum: 10c0/a50cca2fb0aa894f940d6d43de3df7001c5ef6ccef08f096be1ddf32b3774ba99b70ffe9bd03cd163cffd04d539f2cf2ef4094a26ca67a4e494e49600d48f3f4
   languageName: node
   linkType: hard
 
@@ -2460,15 +2460,15 @@ __metadata:
   linkType: hard
 
 "@luma.gl/shadertools@npm:^9.1.0, @luma.gl/shadertools@npm:~9.1.0":
-  version: 9.1.0
-  resolution: "@luma.gl/shadertools@npm:9.1.0"
+  version: 9.1.4
+  resolution: "@luma.gl/shadertools@npm:9.1.4"
   dependencies:
     "@math.gl/core": "npm:^4.1.0"
     "@math.gl/types": "npm:^4.1.0"
     wgsl_reflect: "npm:^1.0.1"
   peerDependencies:
-    "@luma.gl/core": ^9.1.0-beta.1
-  checksum: 10c0/5e5163421f8deb4d263bd791cc00ca2157df9e1c8c5e4ac5982b3755901b4606f67c1bd32d739d87d3b54d15176a77135a0bc574da10e950373c7efcf5110102
+    "@luma.gl/core": ^9.1.0
+  checksum: 10c0/e81707d8ea42be226acb1b326a3765690eefe3ceb61c7e72bfa9167100dd6b66411ac4ae9fad005f59a702cc2c5b0fffa6a57f114e55ff002926f370ac62be69
   languageName: node
   linkType: hard
 
