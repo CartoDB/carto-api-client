@@ -25,9 +25,11 @@ export function tileFeaturesRaster({
   ...options
 }: TileFeaturesRasterOptions): FeatureData[] {
   // Cache band metadata for faster lookup while iterating over pixels.
-  const bandMetadataByName: Record<string, RasterMetadataBand> = {};
+  const metadataByBand: Record<string, RasterMetadataBand & {nodata: number}> =
+    {};
   for (const band of options.rasterMetadata.bands) {
-    bandMetadataByName[band.name] = band;
+    // TODO(cleanup): Remove copy and cast after API is updated to return 'nodata' as a number.
+    metadataByBand[band.name] = {...band, nodata: Number(band.nodata)};
   }
 
   // Omit empty and invisible tiles for simpler processing and types.
@@ -64,9 +66,9 @@ export function tileFeaturesRaster({
 
       for (const band in tile.data.cells.numericProps) {
         const value = tile.data.cells.numericProps[band].value[i];
-        const bandMetadata = bandMetadataByName[band];
+        const bandMetadata = metadataByBand[band];
 
-        if (isValidBandValue(value, bandMetadata)) {
+        if (isValidBandValue(value, bandMetadata.nodata)) {
           cellData[band] = tile.data.cells.numericProps[band].value[i];
           cellDataExists = true;
         }
@@ -115,19 +117,6 @@ function cellToChildrenSorted(parent: bigint, resolution: bigint): bigint[] {
  * Returns true if the given value is valid (not NaN, not 'nodata')
  * for the given raster band.
  */
-function isValidBandValue(
-  value: unknown,
-  bandMetadata: RasterMetadataBand
-): value is number {
-  if (Number.isNaN(value)) {
-    return false;
-  }
-
-  // TODO(cleanup): Remove after API is updated to return 'nodata' as a number.
-  const nodata = bandMetadata.nodata;
-  if (typeof nodata === 'string') {
-    return Number(nodata) !== value;
-  }
-
-  return nodata !== value;
+function isValidBandValue(value: unknown, nodata: number): value is number {
+  return Number.isNaN(value) ? false : nodata !== value;
 }
