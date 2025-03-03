@@ -55,14 +55,16 @@ export type WidgetTilesetSourceResult = {widgetSource: WidgetTilesetSource};
  * const { widgetSource } = await data;
  * ```
  */
-export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> {
+export class WidgetTilesetSource<
+  Props extends WidgetTilesetSourceProps = WidgetTilesetSourceProps,
+> extends WidgetSource<Props> {
   protected _localImpl: WidgetTilesetSourceImpl | null = null;
 
   protected _workerImpl: Worker | null = null;
   protected _workerEnabled: boolean;
   protected _workerNextRequestId = 1;
 
-  constructor(props: WidgetTilesetSourceProps) {
+  constructor(props: Props) {
     super(props);
 
     this._workerEnabled =
@@ -198,11 +200,22 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
 
     const worker = this._getWorker();
 
-    tiles = (tiles as Tile[]).map(({id, bbox, data}) => ({
-      id,
-      bbox,
-      data,
-    }));
+    // We cannot pass an instance of Tile2DHeader to a Web Worker, and must
+    // extract properties required for widget calculations. Note that the
+    // `tile: Tile = {...}` assignment is structured so TS will warn if any
+    // types required by the internal 'Tile' type are missing.
+    tiles = (tiles as Tile[]).map(
+      ({id, index, bbox, isVisible, data}: Tile) => {
+        const tile: Tile = {
+          id,
+          index,
+          isVisible,
+          data,
+          bbox,
+        };
+        return tile;
+      }
+    );
 
     worker.postMessage({
       method: Method.LOAD_TILES,
