@@ -1478,7 +1478,7 @@ __metadata:
     "@deck.gl/layers": "npm:~9.1.6"
     "@deck.gl/mapbox": "npm:~9.1.6"
     "@deck.gl/mesh-layers": "npm:~9.1.6"
-    "@eslint/js": "npm:^9.20.0"
+    "@eslint/js": "npm:^9.21.0"
     "@googlemaps/js-api-loader": "npm:^1.16.6"
     "@lit/react": "npm:^1.0.7"
     "@lit/task": "npm:^1.0.2"
@@ -1966,7 +1966,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/js@npm:^9.20.0":
+"@eslint/js@npm:^9.21.0":
   version: 9.21.0
   resolution: "@eslint/js@npm:9.21.0"
   checksum: 10c0/86c24a2668808995037e3f40c758335df2ae277c553ac0cf84381a1a8698f3099d8a22dd9c388947e6b7f93fcc1142f62406072faaa2b83c43ca79993fc01bb3
