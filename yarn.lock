@@ -232,6 +232,7 @@ __metadata:
     d3-format: "npm:^3.1.0"
     d3-scale: "npm:^4.0.2"
     h3-js: "npm:4.1.0"
+    quadbin: "npm:^0.4.0-alpha.2"
   languageName: node
   linkType: soft
 
@@ -287,6 +288,7 @@ __metadata:
     lit-analyzer: "npm:^2.0.3"
     maplibre-gl: "npm:^5.2.0"
     prettier: "npm:^3.5.3"
+    quadbin: "npm:^0.4.0-alpha.2"
     rimraf: "npm:^6.0.1"
     semver: "npm:^7.7.1"
     thenby: "npm:^1.3.4"
@@ -5278,6 +5280,16 @@ __metadata:
     "@mapbox/tile-cover": "npm:3.0.1"
     "@math.gl/web-mercator": "npm:^4.1.0"
   checksum: 10c0/24a49abadd820cbdd0187b6c16604401c6df9b3cfe1a5ac2cd02acf500de9f93cfd5a857f5882bfd8ce3e4bf9176512d9b6fe879158c7003ebca951b1b39457d
+  languageName: node
+  linkType: hard
+
+"quadbin@npm:^0.4.0-alpha.2":
+  version: 0.4.0-alpha.2
+  resolution: "quadbin@npm:0.4.0-alpha.2"
+  dependencies:
+    "@mapbox/tile-cover": "npm:3.0.1"
+    "@math.gl/web-mercator": "npm:^4.1.0"
+  checksum: 10c0/3df09bce66a4e880174705669763bb332f19db6c4c6cc5882b9e091dbdb8db8538c62b9c09d4b07da5bc512abbb5a59103cc57658c10c072d5981e4de312a6fd
   languageName: node
   linkType: hard
 
