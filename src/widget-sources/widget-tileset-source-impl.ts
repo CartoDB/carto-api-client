@@ -128,15 +128,6 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
     filterOwner,
     spatialFilter,
   }: FormulaRequestOptions): Promise<FormulaResponse> {
-    if (operation === 'custom') {
-      throw new Error('Custom aggregation not supported for tilesets');
-    }
-
-    // Column is required except when operation is 'count'.
-    if ((column && column !== '*') || operation !== 'count') {
-      assertColumn(this._features, column);
-    }
-
     const filteredFeatures = this._getFilteredFeatures(
       spatialFilter,
       filters,
@@ -145,6 +136,15 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
 
     if (filteredFeatures.length === 0 && operation !== 'count') {
       return {value: null};
+    }
+
+    if (operation === 'custom') {
+      throw new Error('Custom aggregation not supported for tilesets');
+    }
+
+    // Column is required except when operation is 'count'.
+    if ((column && column !== '*') || operation !== 'count') {
+      assertColumn(this._features, column);
     }
 
     const targetOperation = aggregationFunctions[operation];
@@ -347,8 +347,6 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
     filterOwner,
     spatialFilter,
   }: RangeRequestOptions): Promise<RangeResponse> {
-    assertColumn(this._features, column);
-
     const filteredFeatures = this._getFilteredFeatures(
       spatialFilter,
       filters,
@@ -360,6 +358,8 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       // can we do something more consistent?
       return null;
     }
+
+    assertColumn(this._features, column);
 
     return {
       min: aggregationFunctions.min(filteredFeatures, column),
