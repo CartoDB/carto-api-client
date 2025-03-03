@@ -9,7 +9,6 @@ import {DEBOUNCE_TIME_MS} from '../constants.js';
 import {sleep} from '../utils.js';
 import {DEFAULT_TEXT_STYLE} from './styles.js';
 import {BaseWidget} from './base-widget.js';
-import {HistogramResponse} from '@carto/api-client';
 
 const DEFAULT_HISTOGRAM_GRID = {
   left: 0,
