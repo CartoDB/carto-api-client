@@ -8,6 +8,16 @@ type TimeFilter = Filters['string'][FilterType.TIME] & {
   params?: {offsetBy?: number};
 };
 
+/**
+ * deck.gl's DataFilterExtension supports GPU filtering with 1–4 values. We
+ * allocate filters[0] to generic filters and filters[1] to time filters.
+ *
+ * getFilterValue() _must_ return an array of the same size as the filterSize
+ * used to initialize the DataFilterExtension. We document that users must use
+ * filterSize=4 for compatibility with @link {getDataFilterExtensionProps}.
+ */
+const DEFAULT_FILTER_SIZE = 4;
+
 /** @experimental Prefer type definition from deck.gl. */
 export type _DataFilterExtensionProps = {
   filterRange: number[][];
@@ -17,22 +27,30 @@ export type _DataFilterExtensionProps = {
 
 /**
  * Creates props for DataFilterExtension, from `@deck.gl/extensions`, given
- * a set of filters.
+ * a set of filters. Requires that DataFilterExtension is initialized with
+ * filterSize=4, where the CARTO filters will occupy the first two slots.
  *
- * @privateRemarks DataFilterExtension accepts up to 4 values to filter. This
- *  implementation uses the 1st for all filters except the time filter, and the
- *  2nd for the time filter.
+ * @example To create a deck.gl layer with GPU data filtering:
+ * ```typescript
+ * import {DataFilterExtension} from '@deck.gl/extensions';
+ * import {VectorTileLayer} from '@deck.gl/layers';
+ * import {getDataFilterExtensionProps} from '@carto/api-client';
+ *
+ * const layer = new VectorTileLayer({
+ *  data: data,
+ *  extensions: [new DataFilterExtension({filterSize: 4})],
+ *  ...getDataFilterExtensionProps(filters),
+ * });
+ * ```
  */
 export function getDataFilterExtensionProps(
   filters: Filters,
-  filtersLogicalOperator?: FilterLogicalOperator,
-  filterSize?: 0 | 1 | 2 | 3 | 4
+  filtersLogicalOperator?: FilterLogicalOperator
 ): _DataFilterExtensionProps {
-  filterSize ??= 4;
   const {filtersWithoutTimeType, timeColumn, timeFilter} =
     getFiltersByType(filters);
   return {
-    filterRange: getFilterRange(timeFilter, filterSize),
+    filterRange: getFilterRange(timeFilter, DEFAULT_FILTER_SIZE),
     updateTriggers: getUpdateTriggers(
       filtersWithoutTimeType,
       timeColumn,
@@ -42,7 +60,7 @@ export function getDataFilterExtensionProps(
       filtersWithoutTimeType,
       timeColumn,
       timeFilter,
-      filterSize,
+      DEFAULT_FILTER_SIZE,
       filtersLogicalOperator
     ),
   };
