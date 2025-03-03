@@ -55,14 +55,16 @@ export type WidgetTilesetSourceResult = {widgetSource: WidgetTilesetSource};
  * const { widgetSource } = await data;
  * ```
  */
-export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> {
+export class WidgetTilesetSource<
+  Props extends WidgetTilesetSourceProps = WidgetTilesetSourceProps,
+> extends WidgetSource<Props> {
   protected _localImpl: WidgetTilesetSourceImpl | null = null;
 
   protected _workerImpl: Worker | null = null;
   protected _workerEnabled: boolean;
   protected _workerNextRequestId = 1;
 
-  constructor(props: WidgetTilesetSourceProps) {
+  constructor(props: Props) {
     super(props);
 
     this._workerEnabled =
