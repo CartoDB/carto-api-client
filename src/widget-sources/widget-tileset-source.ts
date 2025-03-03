@@ -200,11 +200,22 @@ export class WidgetTilesetSource<
 
     const worker = this._getWorker();
 
-    tiles = (tiles as Tile[]).map(({id, bbox, data}) => ({
-      id,
-      bbox,
-      data,
-    }));
+    // We cannot pass an instance of Tile2DHeader to a Web Worker, and must
+    // extract properties required for widget calculations. Note that the
+    // `tile: Tile = {...}` assignment is structured so TS will warn if any
+    // types required by the internal 'Tile' type are missing.
+    tiles = (tiles as Tile[]).map(
+      ({id, index, bbox, isVisible, data}: Tile) => {
+        const tile: Tile = {
+          id,
+          index,
+          isVisible,
+          data,
+          bbox,
+        };
+        return tile;
+      }
+    );
 
     worker.postMessage({
       method: Method.LOAD_TILES,

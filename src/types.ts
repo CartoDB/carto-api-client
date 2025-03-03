@@ -28,8 +28,6 @@ export type Viewport = [number, number, number, number];
 export type Tile = {
   index: {x: number; y: number; z: number};
   id: string;
-  content: unknown;
-  zoom: number;
   bbox: {west: number; east: number; north: number; south: number};
   isVisible: boolean;
   data?: BinaryFeatureCollection;

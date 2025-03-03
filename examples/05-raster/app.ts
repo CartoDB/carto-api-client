@@ -67,6 +67,10 @@ await updateSources();
  */
 
 async function updateSources() {
+  if (data?.widgetSource) {
+    data.widgetSource.destroy();
+  }
+
   data = await rasterSource({
     connectionName: 'amanzanares-bq',
     tableName: 'cartodb-on-gcp-pm-team.amanzanares_raster.classification_us',
