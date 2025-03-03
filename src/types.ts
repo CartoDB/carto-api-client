@@ -28,8 +28,6 @@ export type Viewport = [number, number, number, number];
 export type Tile = {
   index: {x: number; y: number; z: number};
   id: string;
-  content: unknown;
-  zoom: number;
   bbox: {west: number; east: number; north: number; south: number};
   isVisible: boolean;
   data?: BinaryFeatureCollection;
@@ -38,6 +36,12 @@ export type Tile = {
 /** Subset of deck.gl's Tile2DHeader type, for spatial indexes. */
 export type SpatialIndexTile = Tile & {
   data?: (Feature & {id: bigint})[];
+};
+
+export type RasterTile = Tile & {
+  id: string;
+  index: {q: bigint; i: string};
+  data?: Raster;
 };
 
 /** @privateRemarks Source: @deck.gl/carto */

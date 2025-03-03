@@ -364,8 +364,20 @@ export enum RasterBandColorinterp {
   Palette = 'palette',
 }
 
+export type RasterBandType =
+  | 'uint8'
+  | 'int8'
+  | 'uint16'
+  | 'int16'
+  | 'uint32'
+  | 'int32'
+  | 'uint64'
+  | 'int64'
+  | 'float32'
+  | 'float64';
+
 export type RasterMetadataBand = {
-  type: string;
+  type: RasterBandType;
   name: string;
   stats: RasterMetadataBandStats;
   /**
@@ -379,7 +391,7 @@ export type RasterMetadataBand = {
   /**
    * Default color mapping for unique values (or if coloprinterp is `palette`)
    */
-  colortable?: Record<string, number[]>;
+  colortable?: Record<string, [number, number, number, number]>;
 
   /**
    * No value representation.

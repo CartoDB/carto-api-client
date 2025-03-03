@@ -49,7 +49,7 @@
     "format:check": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --check",
     "clean": "rimraf build/*",
     "postversion": "yarn postversion:check && yarn postversion:commit && yarn postversion:push",
-    "postversion:check": "yarn lint && yarn test",
+    "postversion:check": "yarn lint && yarn format:check && yarn test",
     "postversion:commit": "node scripts/postversion-commit.js",
     "postversion:push": "git push && git push --tags",
     "prepublish": "yarn lint && yarn test",
@@ -73,7 +73,8 @@
     "@turf/invariant": "^7.2.0",
     "@turf/union": "^7.2.0",
     "@types/geojson": "^7946.0.16",
-    "h3-js": "4.1.0"
+    "h3-js": "4.1.0",
+    "quadbin": "^0.4.0-alpha.2"
   },
   "devDependencies": {
     "@deck.gl/aggregation-layers": "~9.1.4",
