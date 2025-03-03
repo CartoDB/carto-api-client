@@ -62,13 +62,13 @@ export class CategoryWidget extends BaseWidget {
 
       const {widgetSource} = await data;
 
-      return (await widgetSource.getCategories({
+      return await widgetSource.getCategories({
         filterOwner: this._widgetId,
         spatialFilter: this.getSpatialFilterOrViewState(),
         operation,
         column,
         spatialIndexReferenceViewState: this.viewState ?? undefined,
-      })) as CategoryResponse;
+      });
     },
     args: () =>
       [

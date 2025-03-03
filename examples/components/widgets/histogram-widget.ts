@@ -55,14 +55,14 @@ export class HistogramWidget extends BaseWidget {
 
       const {widgetSource} = await data;
 
-      return (await widgetSource.getHistogram({
+      return await widgetSource.getHistogram({
         filterOwner: this._widgetId,
         spatialFilter: this.getSpatialFilterOrViewState(),
         column,
         operation,
         ticks,
         spatialIndexReferenceViewState: this.viewState ?? undefined,
-      })) as HistogramResponse;
+      });
     },
     args: () =>
       [
