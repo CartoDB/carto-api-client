@@ -47,7 +47,8 @@ test('constructor', () => {
 
 test('clientId', () => {
   const clientId1 = getClient();
-  const clientId2 = 'testtesttest';
+  const clientId2 = 'new default';
+  const clientId3 = 'override default';
 
   const widgetSource1 = new WidgetTestSource({
     accessToken: '<token>',
@@ -61,8 +62,15 @@ test('clientId', () => {
     connectionName: 'carto_dw',
   });
 
+  const widgetSource3 = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+    clientId: clientId3,
+  });
+
   expect(widgetSource1.props.clientId).toBe(clientId1);
   expect(widgetSource2.props.clientId).toBe(clientId2);
+  expect(widgetSource3.props.clientId).toBe(clientId3);
 });
 
 test('setRequestHeaders', async () => {
