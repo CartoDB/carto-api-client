@@ -110,6 +110,7 @@
     "vitest": "3.0.7"
   },
   "resolutions": {
+    "@carto/api-client": "portal:./",
     "rollup": "^4.20.0"
   }
 }
