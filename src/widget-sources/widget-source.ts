@@ -54,7 +54,11 @@ export abstract class WidgetSource<Props extends WidgetSourceProps> {
   };
 
   constructor(props: Props) {
-    this.props = {...WidgetSource.defaultProps, ...props};
+    this.props = {
+      ...WidgetSource.defaultProps,
+      clientId: getClient(), // Refresh clientId, default may have changed.
+      ...props,
+    };
   }
 
   /**
