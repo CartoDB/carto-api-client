@@ -2,6 +2,8 @@ import {afterEach, expect, test, vi} from 'vitest';
 import {
   Filters,
   FilterType,
+  getClient,
+  setClient,
   WidgetRemoteSource,
   WidgetRemoteSourceProps,
 } from '@carto/api-client';
@@ -41,6 +43,26 @@ test('constructor', () => {
     accessToken: '<token>',
     connectionName: 'carto_dw',
   });
+});
+
+test('clientId', () => {
+  const clientId1 = getClient();
+  const clientId2 = 'testtesttest';
+
+  const widgetSource1 = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+  });
+
+  setClient(clientId2);
+
+  const widgetSource2 = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+  });
+
+  expect(widgetSource1.props.clientId).toBe(clientId1);
+  expect(widgetSource2.props.clientId).toBe(clientId2);
 });
 
 test('setRequestHeaders', async () => {
