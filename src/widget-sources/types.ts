@@ -19,6 +19,8 @@ export interface ViewState {
 
 /** Common options for {@link WidgetRemoteSource} requests. */
 interface BaseRequestOptions {
+  /** @deprecated */
+  abortController?: AbortController;
   signal?: AbortSignal;
   spatialFilter?: SpatialFilter;
   spatialFiltersMode?: SpatialFilterPolyfillMode;

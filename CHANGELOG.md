@@ -1,8 +1,24 @@
 # CHANGELOG
 
-## Not released
+## 0.5 (Unreleased)
+
+### 0.5.0 (Unreleased)
+
+- BREAKING CHANGE: Replace 'abortController' with 'signal' parameter (#110)
+- feat: Add widget calculations for tileset sources (#50)
+- feat: Add widget calculations for raster sources (#119)
+- feat: Enable Web Workers for local tileset and raster widget calculations (#119)
 
 ## 0.4
+
+### 0.4.7
+
+- fix: Fix clientId customization in table and query widget calls (#120)
+- feat: Add getDataFilterExtensionProps (#105, #113)
+- feat: Add option to override HTTP headers in widget calls (#100, #111)
+- feat: Add filters parameter in widget calls (#103)
+- chore: Update to turf.js v7.2 (#98)
+- chore: Enable compatibility with moduleResolution=nodenext (#106)
 
 ### 0.4.6
 
