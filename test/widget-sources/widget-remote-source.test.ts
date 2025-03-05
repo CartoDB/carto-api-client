@@ -46,31 +46,29 @@ test('constructor', () => {
 });
 
 test('clientId', () => {
-  const clientId1 = getClient();
-  const clientId2 = 'new default';
-  const clientId3 = 'override default';
+  const clientIds = ['deck-gl-carto', 'new-default', 'override-default'];
+
+  const widgetSource0 = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+  });
+
+  setClient(clientIds[1]);
 
   const widgetSource1 = new WidgetTestSource({
     accessToken: '<token>',
     connectionName: 'carto_dw',
   });
 
-  setClient(clientId2);
-
   const widgetSource2 = new WidgetTestSource({
     accessToken: '<token>',
     connectionName: 'carto_dw',
+    clientId: clientIds[2],
   });
 
-  const widgetSource3 = new WidgetTestSource({
-    accessToken: '<token>',
-    connectionName: 'carto_dw',
-    clientId: clientId3,
-  });
-
-  expect(widgetSource1.props.clientId).toBe(clientId1);
-  expect(widgetSource2.props.clientId).toBe(clientId2);
-  expect(widgetSource3.props.clientId).toBe(clientId3);
+  expect(widgetSource0.props.clientId).toBe(clientIds[0]);
+  expect(widgetSource1.props.clientId).toBe(clientIds[1]);
+  expect(widgetSource2.props.clientId).toBe(clientIds[2]);
 });
 
 test('setRequestHeaders', async () => {
