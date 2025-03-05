@@ -1,5 +1,5 @@
 import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest';
-import {getClient, setClient, vectorTableSource} from '@carto/api-client';
+import {setClient, vectorTableSource} from '@carto/api-client';
 
 const CACHE = 'base-source-test';
 

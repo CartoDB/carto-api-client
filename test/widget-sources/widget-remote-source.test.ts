@@ -2,7 +2,6 @@ import {afterEach, expect, test, vi} from 'vitest';
 import {
   Filters,
   FilterType,
-  getClient,
   setClient,
   WidgetRemoteSource,
   WidgetRemoteSourceProps,

@@ -1,5 +1,5 @@
 import {test, vi, expect, beforeEach, afterEach} from 'vitest';
-import {getClient, query, setClient} from '@carto/api-client';
+import {query, setClient} from '@carto/api-client';
 
 const QUERY_RESPONSE = [{id: 1, value: 'string'}];
 
