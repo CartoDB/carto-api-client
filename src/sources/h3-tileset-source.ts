@@ -2,11 +2,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-import {getTileFormat} from '../utils/getTileFormat.js';
-import {
-  WidgetTilesetSource,
-  WidgetTilesetSourceResult,
-} from '../widget-sources/index.js';
 import {baseSource} from './base-source.js';
 import type {
   SourceOptions,
@@ -17,24 +12,17 @@ import type {
 export type H3TilesetSourceOptions = SourceOptions & TilesetSourceOptions;
 type UrlParameters = {name: string};
 
-export type H3TilesetSourceResponse = TilejsonResult &
-  WidgetTilesetSourceResult;
+export type H3TilesetSourceResponse = TilejsonResult;
 
 export const h3TilesetSource = async function (
   options: H3TilesetSourceOptions
 ): Promise<H3TilesetSourceResponse> {
-  const {tableName, spatialDataColumn = 'h3'} = options;
+  const {tableName} = options;
   const urlParameters: UrlParameters = {name: tableName};
 
-  return baseSource<UrlParameters>('tileset', options, urlParameters).then(
-    (result) => ({
-      ...(result as TilejsonResult),
-      widgetSource: new WidgetTilesetSource({
-        ...options,
-        tileFormat: getTileFormat(result as TilejsonResult),
-        spatialDataColumn,
-        spatialDataType: 'h3',
-      }),
-    })
+  return baseSource<UrlParameters>(
+    'tileset',
+    options,
+    urlParameters
   ) as Promise<H3TilesetSourceResponse>;
 };

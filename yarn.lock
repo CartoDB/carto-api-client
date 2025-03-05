@@ -1444,19 +1444,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@carto/api-client@npm:^0.4.4":
-  version: 0.4.6
-  resolution: "@carto/api-client@npm:0.4.6"
+"@carto/api-client@portal:./::locator=%40carto%2Fapi-client%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@carto/api-client@portal:./::locator=%40carto%2Fapi-client%40workspace%3A."
   dependencies:
-    "@turf/bbox-clip": "npm:^7.1.0"
-    "@turf/bbox-polygon": "npm:^7.1.0"
-    "@turf/helpers": "npm:^7.1.0"
-    "@turf/invariant": "npm:^7.1.0"
-    "@turf/union": "npm:^7.1.0"
-    "@types/geojson": "npm:^7946.0.15"
-  checksum: 10c0/0fecabaa58226603c2f200d811db07ef620690e619d18bbd1c906b093a0fe8215c5ecf1a0571416830a3564fd9b3a5379d7b261504e17cbdc08f4de80443fe7e
+    "@loaders.gl/schema": "npm:^4.3.3"
+    "@turf/bbox-clip": "npm:^7.2.0"
+    "@turf/bbox-polygon": "npm:^7.2.0"
+    "@turf/boolean-equal": "npm:^7.2.0"
+    "@turf/boolean-intersects": "npm:^7.2.0"
+    "@turf/boolean-within": "npm:^7.2.0"
+    "@turf/helpers": "npm:^7.2.0"
+    "@turf/intersect": "npm:^7.2.0"
+    "@turf/invariant": "npm:^7.2.0"
+    "@turf/union": "npm:^7.2.0"
+    "@types/geojson": "npm:^7946.0.16"
+    h3-js: "npm:4.1.0"
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "@carto/api-client@workspace:.":
   version: 0.0.0-use.local
@@ -2995,7 +3000,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@turf/bbox-clip@npm:^7.1.0, @turf/bbox-clip@npm:^7.2.0":
+"@turf/bbox-clip@npm:^7.2.0":
   version: 7.2.0
   resolution: "@turf/bbox-clip@npm:7.2.0"
   dependencies:
@@ -3007,7 +3012,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@turf/bbox-polygon@npm:^7.1.0, @turf/bbox-polygon@npm:^7.2.0":
+"@turf/bbox-polygon@npm:^7.2.0":
   version: 7.2.0
   resolution: "@turf/bbox-polygon@npm:7.2.0"
   dependencies:
@@ -3189,7 +3194,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@turf/helpers@npm:^7.1.0, @turf/helpers@npm:^7.2.0":
+"@turf/helpers@npm:^7.2.0":
   version: 7.2.0
   resolution: "@turf/helpers@npm:7.2.0"
   dependencies:
@@ -3221,7 +3226,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@turf/invariant@npm:^7.1.0, @turf/invariant@npm:^7.2.0":
+"@turf/invariant@npm:^7.2.0":
   version: 7.2.0
   resolution: "@turf/invariant@npm:7.2.0"
   dependencies:
@@ -3321,7 +3326,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@turf/union@npm:^7.1.0, @turf/union@npm:^7.2.0":
+"@turf/union@npm:^7.2.0":
   version: 7.2.0
   resolution: "@turf/union@npm:7.2.0"
   dependencies:
@@ -3417,7 +3422,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/geojson@npm:^7946.0.14, @types/geojson@npm:^7946.0.15, @types/geojson@npm:^7946.0.16":
+"@types/geojson@npm:^7946.0.14, @types/geojson@npm:^7946.0.16":
   version: 7946.0.16
   resolution: "@types/geojson@npm:7946.0.16"
   checksum: 10c0/1ff24a288bd5860b766b073ead337d31d73bdc715e5b50a2cee5cb0af57a1ed02cc04ef295f5fa68dc40fe3e4f104dd31282b2b818a5ba3231bc1001ba084e3c

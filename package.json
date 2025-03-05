@@ -8,7 +8,7 @@
   "homepage": "https://github.com/CartoDB/carto-api-client#readme",
   "author": "Don McCurdy <donmccurdy@carto.com>",
   "packageManager": "yarn@4.3.1",
-  "version": "0.5.0-alpha.2",
+  "version": "0.4.7",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -110,7 +110,7 @@
     "vitest": "3.0.7"
   },
   "resolutions": {
+    "@carto/api-client": "portal:./",
     "rollup": "^4.20.0"
-  },
-  "stableVersion": "0.4.6"
+  }
 }
