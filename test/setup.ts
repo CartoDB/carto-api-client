@@ -11,9 +11,6 @@ const DEFAULT_CLIENT_ID = getClient();
 
 afterEach(() => {
   setClient(DEFAULT_CLIENT_ID);
-});
-
-afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
