@@ -1,12 +1,4 @@
-import {
-  describe,
-  test,
-  expect,
-  vi,
-  afterEach,
-  beforeEach,
-  assert,
-} from 'vitest';
+import {describe, test, expect, vi, beforeEach, assert} from 'vitest';
 import {
   APIRequestType,
   CartoAPIError,
@@ -26,7 +18,6 @@ describe('requestWithParameters', () => {
     vi.stubGlobal('fetch', mockFetch);
     vi.stubGlobal('deck', {VERSION: 'untranspiled source'});
   });
-  afterEach(() => void vi.restoreAllMocks());
 
   test('cache baseURL', async () => {
     const mockFetch = vi.mocked(fetch);

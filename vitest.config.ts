@@ -6,6 +6,7 @@ import {defineConfig} from 'vitest/config';
 // these dependencies to be temporary. See: https://github.com/vitest-dev/vitest/discussions/5964.
 export default defineConfig({
   test: {
+    setupFiles: ['test/setup.ts'],
     coverage: {
       provider: 'istanbul',
       include: ['src/**/*', 'build/**/*'],

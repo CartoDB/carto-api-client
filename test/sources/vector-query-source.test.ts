@@ -1,5 +1,5 @@
 import {WidgetQuerySource, vectorQuerySource} from '@carto/api-client';
-import {describe, afterEach, vi, test, expect, beforeEach} from 'vitest';
+import {describe, vi, test, expect, beforeEach} from 'vitest';
 
 const CACHE = 'vector-query-source-test';
 
@@ -29,8 +29,6 @@ describe('vectorQuerySource', () => {
 
     vi.stubGlobal('fetch', mockFetch);
   });
-
-  afterEach(() => void vi.restoreAllMocks());
 
   test('default', async () => {
     const tilejson = await vectorQuerySource({

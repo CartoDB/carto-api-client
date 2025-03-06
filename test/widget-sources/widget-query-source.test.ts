@@ -1,13 +1,9 @@
-import {afterEach, expect, test, vi} from 'vitest';
+import {expect, test, vi} from 'vitest';
 import {WidgetQuerySource} from '@carto/api-client';
 
 const createMockResponse = (data: unknown) => ({
   ok: true,
   json: () => new Promise((resolve) => resolve(data)),
-});
-
-afterEach(() => {
-  vi.unstubAllGlobals();
 });
 
 test('exports', () => {

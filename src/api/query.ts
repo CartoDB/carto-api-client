@@ -11,6 +11,7 @@ import type {
 import {buildQueryUrl} from './endpoints.js';
 import {requestWithParameters} from './request-with-parameters.js';
 import {APIErrorContext} from './carto-api-error.js';
+import {getClient} from '../client.js';
 
 export type QueryOptions = SourceOptions & QuerySourceOptions;
 type UrlParameters = {q: string; queryParameters?: string};
@@ -20,8 +21,8 @@ export const query = async function (
 ): Promise<QueryResult> {
   const {
     apiBaseUrl = SOURCE_DEFAULTS.apiBaseUrl,
-    clientId = SOURCE_DEFAULTS.clientId,
     maxLengthURL = SOURCE_DEFAULTS.maxLengthURL,
+    clientId = getClient(),
     localCache,
     connectionName,
     sqlQuery,

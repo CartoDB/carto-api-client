@@ -1,5 +1,5 @@
 import {h3TilesetSource} from '@carto/api-client';
-import {describe, afterEach, vi, test, expect, beforeEach} from 'vitest';
+import {describe, vi, test, expect, beforeEach} from 'vitest';
 
 const CACHE = 'h3-tileset-source-test';
 
@@ -29,8 +29,6 @@ describe('h3TilesetSource', () => {
 
     vi.stubGlobal('fetch', mockFetch);
   });
-
-  afterEach(() => void vi.restoreAllMocks());
 
   test('default', async () => {
     const tilejson = await h3TilesetSource({
