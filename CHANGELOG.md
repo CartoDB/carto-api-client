@@ -11,6 +11,10 @@
 
 ## 0.4
 
+### 0.4.8
+
+- fix: Fix clientId defaults in query and source calls (#122)
+
 ### 0.4.7
 
 - fix: Fix clientId customization in table and query widget calls (#120)
