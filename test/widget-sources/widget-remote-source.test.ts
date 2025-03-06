@@ -1,4 +1,4 @@
-import {afterEach, expect, test, vi} from 'vitest';
+import {expect, test, vi} from 'vitest';
 import {
   Filters,
   FilterType,
@@ -23,10 +23,6 @@ class WidgetTestSource extends WidgetRemoteSource<WidgetRemoteSourceProps> {
     >;
   }
 }
-
-afterEach(() => {
-  vi.unstubAllGlobals();
-});
 
 test('exports', () => {
   expect(WidgetRemoteSource).toBeDefined();

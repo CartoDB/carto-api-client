@@ -1,5 +1,5 @@
 import {WidgetQuerySource, h3QuerySource} from '@carto/api-client';
-import {describe, afterEach, vi, test, expect, beforeEach} from 'vitest';
+import {describe, vi, test, expect, beforeEach} from 'vitest';
 
 const CACHE = 'h3-query-source-test';
 
@@ -30,7 +30,6 @@ describe('h3QuerySource', () => {
     vi.stubGlobal('fetch', mockFetch);
   });
 
-  afterEach(() => void vi.restoreAllMocks());
   test('default', async () => {
     const tilejson = await h3QuerySource({
       connectionName: 'carto_dw',
