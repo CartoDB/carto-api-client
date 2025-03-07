@@ -25,3 +25,4 @@ export * from './filters/index.js';
 export * from './operations/index.js';
 export * from './utils/makeIntervalComplete.js';
 export * from './utils/transformToTileCoords.js';
+export * from './fetchMap/getFetchMapConfig.js';

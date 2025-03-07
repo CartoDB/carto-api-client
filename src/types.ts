@@ -7,7 +7,7 @@ import type {BinaryFeature, BinaryFeatureCollection} from '@loaders.gl/schema';
  */
 
 /** @privateRemarks Source: @deck.gl/carto */
-export type Format = 'json' | 'geojson' | 'tilejson';
+export type Format = 'json' | 'geojson' | 'tilejson' | 'raster';
 
 /** @privateRemarks Source: @carto/constants, @deck.gl/carto */
 export type MapType = 'boundary' | 'query' | 'table' | 'tileset' | 'raster';

@@ -1488,6 +1488,7 @@ __metadata:
     "@turf/invariant": "npm:^7.2.0"
     "@turf/random": "npm:^7.2.0"
     "@turf/union": "npm:^7.2.0"
+    "@types/d3-scale": "npm:^4.0.9"
     "@types/geojson": "npm:^7946.0.16"
     "@types/json-schema": "npm:^7.0.15"
     "@types/react": "npm:^18.3.18"
@@ -1495,6 +1496,7 @@ __metadata:
     "@vitest/coverage-istanbul": "npm:^3.0.5"
     "@webcomponents/webcomponentsjs": "npm:^2.8.0"
     concurrently: "npm:^9.1.2"
+    d3-scale: "npm:^4.0.2"
     echarts: "npm:^5.6.0"
     eslint: "npm:^9.20.1"
     h3-js: "npm:4.1.0"
@@ -1511,6 +1513,8 @@ __metadata:
     typescript-eslint: "npm:^8.24.0"
     vite: "npm:^6.1.0"
     vitest: "npm:3.0.7"
+  peerDependencies:
+    "@deck.gl/carto": ~9.1.0
   languageName: unknown
   linkType: soft
 
@@ -3343,6 +3347,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/d3-scale@npm:^4.0.9":
+  version: 4.0.9
+  resolution: "@types/d3-scale@npm:4.0.9"
+  dependencies:
+    "@types/d3-time": "npm:*"
+  checksum: 10c0/4ac44233c05cd50b65b33ecb35d99fdf07566bcdbc55bc1306b2f27d1c5134d8c560d356f2c8e76b096e9125ffb8d26d95f78d56e210d1c542cb255bdf31d6c8
+  languageName: node
+  linkType: hard
+
+"@types/d3-time@npm:*":
+  version: 3.0.4
+  resolution: "@types/d3-time@npm:3.0.4"
+  checksum: 10c0/6d9e2255d63f7a313a543113920c612e957d70da4fb0890931da6c2459010291b8b1f95e149a538500c1c99e7e6c89ffcce5554dd29a31ff134a38ea94b6d174
+  languageName: node
+  linkType: hard
+
 "@types/d3-time@npm:^2":
   version: 2.1.4
   resolution: "@types/d3-time@npm:2.1.4"
@@ -4627,7 +4647,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"d3-scale@npm:^4.0.0":
+"d3-scale@npm:^4.0.0, d3-scale@npm:^4.0.2":
   version: 4.0.2
   resolution: "d3-scale@npm:4.0.2"
   dependencies:
