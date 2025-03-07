@@ -54,7 +54,11 @@ export abstract class WidgetSource<Props extends WidgetSourceProps> {
   };
 
   constructor(props: Props) {
-    this.props = {...WidgetSource.defaultProps, ...props};
+    this.props = {
+      ...WidgetSource.defaultProps,
+      clientId: getClient(), // Refresh clientId, default may have changed.
+      ...props,
+    };
   }
 
   /**
@@ -167,3 +171,15 @@ export abstract class WidgetSource<Props extends WidgetSourceProps> {
     options: TimeSeriesRequestOptions
   ): Promise<TimeSeriesResponse>;
 }
+
+/**
+ * @todo TODO(v0.5): Remove WidgetBaseSourceProps alias
+ * @deprecated Use WidgetSourceProps.
+ */
+export type WidgetBaseSourceProps = WidgetSourceProps;
+
+/**
+ * @todo TODO(v0.5): Remove WidgetBaseSource alias.
+ * @deprecated Use WidgetSourceP.
+ */
+export const WidgetBaseSource = WidgetSource;

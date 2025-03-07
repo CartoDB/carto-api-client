@@ -18,9 +18,8 @@ import {MapType} from '../types.js';
 import {APIErrorContext} from '../api/index.js';
 import {getClient} from '../client.js';
 
-export const SOURCE_DEFAULTS: SourceOptionalOptions = {
+export const SOURCE_DEFAULTS: Omit<SourceOptionalOptions, 'clientId'> = {
   apiBaseUrl: DEFAULT_API_BASE_URL,
-  clientId: getClient(),
   format: 'tilejson',
   headers: {},
   maxLengthURL: DEFAULT_MAX_LENGTH_URL,
@@ -34,6 +33,7 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
   const {accessToken, connectionName, cache, ...optionalOptions} = options;
   const mergedOptions = {
     ...SOURCE_DEFAULTS,
+    clientId: getClient(),
     accessToken,
     connectionName,
     endpoint,
@@ -80,6 +80,7 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
   if (format === 'tilejson') {
     const json = await requestWithParameters<TilejsonResult>({
       baseUrl: dataUrl,
+      parameters: {client: clientId},
       headers,
       errorContext,
       maxLengthURL,
@@ -93,6 +94,7 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
 
   return await requestWithParameters<GeojsonResult | JsonResult>({
     baseUrl: dataUrl,
+    parameters: {client: clientId},
     headers,
     errorContext,
     maxLengthURL,

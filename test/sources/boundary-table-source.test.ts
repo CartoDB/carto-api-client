@@ -1,5 +1,5 @@
 import {boundaryTableSource} from '@carto/api-client';
-import {describe, afterEach, vi, test, expect, beforeEach} from 'vitest';
+import {describe, vi, test, expect, beforeEach} from 'vitest';
 
 const CACHE = 'boundary-table-source-test';
 
@@ -29,8 +29,6 @@ describe('boundaryTableSource', () => {
 
     vi.stubGlobal('fetch', mockFetch);
   });
-
-  afterEach(() => void vi.restoreAllMocks());
 
   test('default', async () => {
     const tilejson = await boundaryTableSource({

@@ -1,7 +1,8 @@
-import {afterEach, expect, test, vi} from 'vitest';
+import {expect, test, vi} from 'vitest';
 import {
   Filters,
   FilterType,
+  setClient,
   WidgetRemoteSource,
   WidgetRemoteSourceProps,
 } from '@carto/api-client';
@@ -23,10 +24,6 @@ class WidgetTestSource extends WidgetRemoteSource<WidgetRemoteSourceProps> {
   }
 }
 
-afterEach(() => {
-  vi.unstubAllGlobals();
-});
-
 test('exports', () => {
   expect(WidgetRemoteSource).toBeDefined();
 });
@@ -41,6 +38,32 @@ test('constructor', () => {
     accessToken: '<token>',
     connectionName: 'carto_dw',
   });
+});
+
+test('clientId', () => {
+  const clientIds = ['deck-gl-carto', 'new-default', 'override-default'];
+
+  const widgetSource0 = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+  });
+
+  setClient(clientIds[1]);
+
+  const widgetSource1 = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+  });
+
+  const widgetSource2 = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+    clientId: clientIds[2],
+  });
+
+  expect(widgetSource0.props.clientId).toBe(clientIds[0]);
+  expect(widgetSource1.props.clientId).toBe(clientIds[1]);
+  expect(widgetSource2.props.clientId).toBe(clientIds[2]);
 });
 
 test('setRequestHeaders', async () => {

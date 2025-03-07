@@ -1,7 +1,7 @@
 import {rasterSource} from '@carto/api-client';
 import {describe, afterEach, vi, test, expect, beforeEach} from 'vitest';
 
-const CACHE = 'vector-tileset-source-test';
+const CACHE = 'raster-source-test';
 
 const INIT_RESPONSE = {
   tilejson: {url: [`https://xyz.com?format=tilejson&cache=${CACHE}`]},

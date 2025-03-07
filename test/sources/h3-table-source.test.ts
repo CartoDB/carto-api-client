@@ -1,5 +1,5 @@
 import {WidgetTableSource, h3TableSource} from '@carto/api-client';
-import {describe, afterEach, vi, test, expect, beforeEach} from 'vitest';
+import {describe, vi, test, expect, beforeEach} from 'vitest';
 
 const CACHE = 'h3-table-source-test';
 
@@ -29,8 +29,6 @@ describe('h3TableSource', () => {
 
     vi.stubGlobal('fetch', mockFetch);
   });
-
-  afterEach(() => void vi.restoreAllMocks());
 
   test('default', async () => {
     const tilejson = await h3TableSource({
