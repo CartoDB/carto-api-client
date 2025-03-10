@@ -1,9 +1,36 @@
-import { Dataset } from './types.js'
-import { SpatialIndex, SpatialIndexColumn } from '../constants.js'
-import { QuerySourceOptions, TableSourceOptions, TilejsonResult, TileResolution } from '../sources/types.js';
-import { DEFAULT_AGGREGATION_EXP, DEFAULT_AGGREGATION_RES_LEVEL_H3, DEFAULT_AGGREGATION_RES_LEVEL_QUADBIN, DEFAULT_TILE_RESOLUTION, REDUCED_QUERIES_TILE_RESOLUTION } from '../constants-internal.js';
-import { h3QuerySource, H3QuerySourceOptions, h3TableSource, H3TableSourceOptions, quadbinQuerySource, QuadbinQuerySourceOptions, quadbinTableSource, QuadbinTableSourceOptions, rasterSource, vectorQuerySource, VectorQuerySourceOptions, vectorTableSource, VectorTableSourceOptions, vectorTilesetSource, VectorTilesetSourceOptions, } from '../sources/index.js';
-import { Filter } from '../types.js';
+import {Dataset} from './types.js';
+import {SpatialIndex, SpatialIndexColumn} from '../constants.js';
+import {
+  QuerySourceOptions,
+  TableSourceOptions,
+  TilejsonResult,
+  TileResolution,
+} from '../sources/types.js';
+import {
+  DEFAULT_AGGREGATION_EXP,
+  DEFAULT_AGGREGATION_RES_LEVEL_H3,
+  DEFAULT_AGGREGATION_RES_LEVEL_QUADBIN,
+  DEFAULT_TILE_RESOLUTION,
+  REDUCED_QUERIES_TILE_RESOLUTION,
+} from '../constants-internal.js';
+import {
+  h3QuerySource,
+  H3QuerySourceOptions,
+  h3TableSource,
+  H3TableSourceOptions,
+  quadbinQuerySource,
+  QuadbinQuerySourceOptions,
+  quadbinTableSource,
+  QuadbinTableSourceOptions,
+  rasterSource,
+  vectorQuerySource,
+  VectorQuerySourceOptions,
+  vectorTableSource,
+  VectorTableSourceOptions,
+  vectorTilesetSource,
+  VectorTilesetSourceOptions,
+} from '../sources/index.js';
+import {Filter} from '../types.js';
 
 type FetchDatasetOptions = {
   accessToken: string;
@@ -11,84 +38,105 @@ type FetchDatasetOptions = {
   connection: string;
   headers?: Record<string, string>;
   localCache?: {
-      cacheControl: "no-cache"[];
+    cacheControl: 'no-cache'[];
   };
-}
+  maxLengthURL?: number;
+};
 
 type FetchDataset = {
   dataset: Dataset;
   filters?: Filter;
   options: FetchDatasetOptions;
-}
+};
 
-export function fetchMapDataset ({ dataset, filters, options }: FetchDataset): Promise<TilejsonResult> {
-  const { geoColumn, columns, type, source, queryParameters, aggregationExp, aggregationResLevel: originalAggregationResLevel } = dataset;
-  const sourceOptions = getSourceOptions(options)
-  const spatialDataColumn = getColumnNameFromGeoColumn(geoColumn) || undefined
-  const spatialIndex = geoColumn ? getSpatialIndexFromGeoColumn(geoColumn) : undefined
-  const tileResolution = getDynamicTileResolution(spatialIndex)
-  const isH3 = spatialIndex === SpatialIndex.H3
-  const isQuadbin = spatialIndex === SpatialIndex.QUADBIN
-  let aggregationResLevel = originalAggregationResLevel
+export function fetchMapDataset({
+  dataset,
+  filters,
+  options,
+}: FetchDataset): Promise<TilejsonResult> {
+  const {
+    geoColumn,
+    columns,
+    type,
+    source,
+    queryParameters,
+    aggregationExp,
+    aggregationResLevel: originalAggregationResLevel,
+  } = dataset;
+  const sourceOptions = getSourceOptions(options);
+  const spatialDataColumn = getColumnNameFromGeoColumn(geoColumn) || undefined;
+  const spatialIndex = geoColumn
+    ? getSpatialIndexFromGeoColumn(geoColumn)
+    : undefined;
+  const tileResolution = getDynamicTileResolution(spatialIndex);
+  const isH3 = spatialIndex === SpatialIndex.H3;
+  const isQuadbin = spatialIndex === SpatialIndex.QUADBIN;
+  let aggregationResLevel = originalAggregationResLevel;
 
   if (typeof originalAggregationResLevel !== 'number' && isH3) {
-    aggregationResLevel = DEFAULT_AGGREGATION_RES_LEVEL_H3
+    aggregationResLevel = DEFAULT_AGGREGATION_RES_LEVEL_H3;
   } else if (typeof originalAggregationResLevel !== 'number' && isQuadbin) {
-    aggregationResLevel = DEFAULT_AGGREGATION_RES_LEVEL_QUADBIN
+    aggregationResLevel = DEFAULT_AGGREGATION_RES_LEVEL_QUADBIN;
   }
 
   const spatialIndexOptions = {
     aggregationExp: !aggregationExp ? DEFAULT_AGGREGATION_EXP : aggregationExp,
-    aggregationResLevel: scaleAggregationResLevel(aggregationResLevel as number, tileResolution),
+    aggregationResLevel: scaleAggregationResLevel(
+      aggregationResLevel as number,
+      tileResolution
+    ),
     spatialDataColumn,
-    ...(filters && { filters })
-  } as H3QuerySourceOptions
+    ...(filters && {filters}),
+  } as H3QuerySourceOptions;
   const tilesetOptions = {
     ...sourceOptions,
-    tableName: source
-  } as VectorTilesetSourceOptions
+    tableName: source,
+  } as VectorTilesetSourceOptions;
   const tableOptions = {
     ...sourceOptions,
     tableName: source,
-    tileResolution
-  } as TableSourceOptions
+    tileResolution,
+  } as TableSourceOptions;
   const queryOptions = {
     ...sourceOptions,
     sqlQuery: source,
     tileResolution,
-    ...(queryParameters && { queryParameters })
-  } as QuerySourceOptions
+    ...(queryParameters && {queryParameters}),
+  } as QuerySourceOptions;
   const vectorOptions = {
     spatialDataColumn,
-    ...(columns && { columns }),
-    ...(filters && { filters }),
-    ...(aggregationExp && { aggregationExp })
-  } as VectorTableSourceOptions
+    ...(columns && {columns}),
+    ...(filters && {filters}),
+    ...(aggregationExp && {aggregationExp}),
+  } as VectorTableSourceOptions;
 
   if (type === 'raster') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return rasterSource({ ...sourceOptions, tableName: source, ...(filters && { filters: filters as any }) })
+    return rasterSource({
+      ...sourceOptions,
+      tableName: source,
+      ...(filters && {filters: filters as any}),
+    });
   }
   if (type === 'tileset') {
-    return vectorTilesetSource({ ...(tilesetOptions) })
+    return vectorTilesetSource({...tilesetOptions});
   }
 
   if (type === 'table') {
     if (isH3) {
       return h3TableSource({
         ...(tableOptions as H3TableSourceOptions),
-        ...spatialIndexOptions
-      })
+        ...spatialIndexOptions,
+      });
     } else if (isQuadbin) {
       return quadbinTableSource({
         ...(tableOptions as QuadbinTableSourceOptions),
-        ...spatialIndexOptions
-      })
+        ...spatialIndexOptions,
+      });
     } else {
       return vectorTableSource({
         ...(tableOptions as VectorTableSourceOptions),
-        ...vectorOptions
-      })
+        ...vectorOptions,
+      });
     }
   }
 
@@ -96,71 +144,78 @@ export function fetchMapDataset ({ dataset, filters, options }: FetchDataset): P
     if (isH3) {
       return h3QuerySource({
         ...(queryOptions as H3QuerySourceOptions),
-        ...spatialIndexOptions
-      })
+        ...spatialIndexOptions,
+      });
     } else if (isQuadbin) {
       return quadbinQuerySource({
         ...(queryOptions as QuadbinQuerySourceOptions),
-        ...spatialIndexOptions
-      })
+        ...spatialIndexOptions,
+      });
     } else {
       return vectorQuerySource({
         ...(queryOptions as VectorQuerySourceOptions),
-        ...vectorOptions
-      })
+        ...vectorOptions,
+      });
     }
   }
-  throw new Error(`Invalid source type: ${type}`)
-};
+  throw new Error(`Invalid source type: ${type}`);
+}
 
 function getSourceOptions({
   accessToken,
   apiBaseUrl,
   connection,
-  headers
+  headers,
+  maxLengthURL,
 }: FetchDatasetOptions) {
   return {
     accessToken,
     connectionName: connection,
     apiBaseUrl,
     headers,
+    maxLengthURL,
     ...(headers?.['Cache-Control']?.includes('no-cache') && {
       localCache: {
-        cacheControl: ['no-cache'] as 'no-cache'[]
-      }
-    })
-  }
+        cacheControl: ['no-cache'] as 'no-cache'[],
+      },
+    }),
+  };
 }
 
-function getDynamicTileResolution(spatialIndex?: SpatialIndex | null): TileResolution {
+function getDynamicTileResolution(
+  spatialIndex?: SpatialIndex | null
+): TileResolution {
   // TODO: Support increased tile size and resolution for dynamic H3 spatial indexes.
   if (spatialIndex !== SpatialIndex.H3) {
-    return REDUCED_QUERIES_TILE_RESOLUTION
+    return REDUCED_QUERIES_TILE_RESOLUTION;
   }
 
-  return DEFAULT_TILE_RESOLUTION
+  return DEFAULT_TILE_RESOLUTION;
 }
 
-function scaleAggregationResLevel(aggregationResLevel: number, tileResolution: number): number | undefined {
-  if (typeof aggregationResLevel !== 'number') return
-  return aggregationResLevel - Math.log2(0.5 / tileResolution)
+function scaleAggregationResLevel(
+  aggregationResLevel: number,
+  tileResolution: number
+): number | undefined {
+  if (typeof aggregationResLevel !== 'number') return;
+  return aggregationResLevel - Math.log2(0.5 / tileResolution);
 }
 
 function getColumnNameFromGeoColumn(geoColumn: string | null | undefined) {
   if (!geoColumn) {
-    return geoColumn
+    return geoColumn;
   }
-  const parts = geoColumn.split(':')
-  return parts.length === 1 ? parts[0] : parts.length === 2 ? parts[1] : null
+  const parts = geoColumn.split(':');
+  return parts.length === 1 ? parts[0] : parts.length === 2 ? parts[1] : null;
 }
 
 function getSpatialIndexFromGeoColumn(geoColumn: string) {
-  const spatialIndexToSearch = geoColumn.split(':')[0]
+  const spatialIndexToSearch = geoColumn.split(':')[0];
 
   for (const index of Object.values(SpatialIndex)) {
     if (SpatialIndexColumn[index].includes(spatialIndexToSearch)) {
-      return index
+      return index;
     }
   }
-  return null
+  return null;
 }

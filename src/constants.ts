@@ -58,5 +58,5 @@ export enum Provider {
 
 export const SpatialIndexColumn = Object.freeze({
   [SpatialIndex.H3]: ['h3', 'hex', 'h3id', 'hex_id', 'h3hex'],
-  [SpatialIndex.QUADBIN]: ['quadbin']
-})
+  [SpatialIndex.QUADBIN]: ['quadbin'],
+});

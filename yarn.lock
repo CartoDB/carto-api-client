@@ -1459,7 +1459,10 @@ __metadata:
     "@turf/invariant": "npm:^7.2.0"
     "@turf/union": "npm:^7.2.0"
     "@types/geojson": "npm:^7946.0.16"
+    d3-scale: "npm:^4.0.2"
     h3-js: "npm:4.1.0"
+  peerDependencies:
+    "@deck.gl/carto": ~9.1.0
   languageName: node
   linkType: soft
 

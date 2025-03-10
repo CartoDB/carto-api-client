@@ -6,7 +6,7 @@ import {
   scaleQuantile,
   scaleQuantize,
   scaleSqrt,
-  scaleThreshold
+  scaleThreshold,
 } from 'd3-scale';
 
 function scaleIdentity() {
@@ -46,7 +46,17 @@ export const SCALE_FUNCS = {
   quantize: scaleQuantize,
   sqrt: scaleSqrt,
   custom: scaleThreshold,
-  identity: scaleIdentity
+  identity: scaleIdentity,
 };
 
 export type SCALE_TYPE = keyof typeof SCALE_FUNCS;
+
+export const CHANNEL_SCALES = Object.freeze({
+  color: 'color',
+  radius: 'radius',
+  size: 'size',
+  customMarker: 'customMarker',
+  colorAggr: 'colorAggr',
+  sizeAggr: 'sizeAggr',
+  identity: 'identity',
+});

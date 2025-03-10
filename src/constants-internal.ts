@@ -20,7 +20,7 @@ export const DEFAULT_MAX_LENGTH_URL = 7000;
 export const DEFAULT_TILE_RESOLUTION = 0.5;
 
 /** @internal */
-export const REDUCED_QUERIES_TILE_RESOLUTION = 1
+export const REDUCED_QUERIES_TILE_RESOLUTION = 1;
 
 /**
  * @privateRemarks Source: @deck.gl/carto
@@ -35,5 +35,5 @@ export const DEFAULT_AGGREGATION_RES_LEVEL_H3 = 4;
 export const DEFAULT_AGGREGATION_RES_LEVEL_QUADBIN = 6;
 
 /** @internal */
-export const DEFAULT_AGGREGATION_EXP_ALIAS = '__aggregationValue'
-export const DEFAULT_AGGREGATION_EXP = `1 AS ${DEFAULT_AGGREGATION_EXP_ALIAS}`
+export const DEFAULT_AGGREGATION_EXP_ALIAS = '__aggregationValue';
+export const DEFAULT_AGGREGATION_EXP = `1 AS ${DEFAULT_AGGREGATION_EXP_ALIAS}`;

@@ -1,5 +1,5 @@
-import { Filter, Format, MapType, QueryParameters } from "../types.js";
-import { SCALE_TYPE } from "./scales.js";
+import {Filter, Format, MapType, QueryParameters} from '../types.js';
+import {SCALE_TYPE} from './scales.js';
 
 export type FetchMapOptions = {
   /**
@@ -52,9 +52,9 @@ export type Dataset = {
   connectionName: string;
   geoColumn?: string;
   columns?: string[];
-  format?: Format
-  aggregationExp?: string
-  aggregationResLevel?: number
+  format?: Format;
+  aggregationExp?: string;
+  aggregationResLevel?: number;
   queryParameters: QueryParameters;
 };
 
@@ -62,21 +62,23 @@ export type Map = {
   token: string;
   datasets: Dataset[];
   keplerMapConfig: KeplerMapConfig;
-}
+};
 
-type KeplerMapConfig = {
-  visState: {
-    layers: MapConfigLayer[];
+export type KeplerMapConfig = {
+  config: {
+    visState: {
+      layers: MapConfigLayer[];
+    };
+    filters?: {[sourceId: string]: Filter};
   };
-  filters?: { [sourceId: string]: Filter }
-}
+};
 
 type MapConfigLayer = {
   type: string;
   id: string;
   config: MapLayerConfig;
   visualChannels: VisualChannels;
-}
+};
 
 type MapLayerConfig = {
   columns?: Record<string, any>;
@@ -85,7 +87,7 @@ type MapLayerConfig = {
   dataId: string;
   textLabel: TextLabel[];
   visConfig: VisConfig;
-}
+};
 
 type VisualChannels = {
   colorField?: VisualChannelField;
@@ -110,7 +112,7 @@ type VisualChannels = {
   heightScale?: SCALE_TYPE;
 
   weightField?: VisualChannelField;
-}
+};
 
 type TextLabel = {
   field: VisualChannelField | null | undefined;
@@ -120,13 +122,14 @@ type TextLabel = {
   color?: number[];
   offset?: [number, number];
   outlineColor?: number[];
-}
+};
 
 type VisualChannelField = {
   name: string;
   type: string;
   colorColumn?: string;
-}
+  channelScaleType?: string;
+};
 
 type VisConfig = {
   filled?: boolean;
@@ -154,7 +157,7 @@ type VisConfig = {
   heightAggregation?: any;
 
   weightAggregation?: any;
-}
+};
 
 type ColorRange = {
   category: string;
@@ -162,7 +165,7 @@ type ColorRange = {
   colorMap: string[][] | undefined;
   name: string;
   type: string;
-}
+};
 
 type CustomMarkersRange = {
   markerMap: {
@@ -170,4 +173,49 @@ type CustomMarkersRange = {
     markerUrl?: string;
   }[];
   othersMarker?: string;
+};
+
+export enum AttributeType {
+  String = 'String',
+  Number = 'Number',
+  Timestamp = 'Timestamp',
+  Boolean = 'Boolean',
 }
+
+export type AttributeStatsBase = {
+  attribute: string;
+  type: AttributeType;
+};
+
+export type AttributeStatsNumber = AttributeStatsBase & {
+  type: AttributeType.Number;
+  min: number;
+  avg: number;
+  max: number;
+  sum: number;
+  quantiles: number[][];
+};
+
+export type AttributeStatsTimestamp = AttributeStatsBase & {
+  type: AttributeType.Timestamp;
+  min: string;
+  max: string;
+};
+
+export interface AttributeStatsStringCategory {
+  category: string;
+  frequency: number;
+}
+
+export type AttributeStatsString = AttributeStatsBase & {
+  type: AttributeType.String | AttributeType.Boolean;
+  categories: AttributeStatsStringCategory[];
+};
+
+/**
+ * Result of getAttributeStats request to backend.
+ */
+export type AttributeStats =
+  | AttributeStatsString
+  | AttributeStatsNumber
+  | AttributeStatsTimestamp;
