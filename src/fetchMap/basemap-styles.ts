@@ -1,39 +1,46 @@
 import {CartoAPIError, APIErrorContext} from '../api/index.js';
 import {GoogleBasemapProps} from './types.js';
 
-const cartoStyleUrlTemplate = 'https://basemaps.cartocdn.com/gl/{basemap}-gl-style/style.json';
+const cartoStyleUrlTemplate =
+  'https://basemaps.cartocdn.com/gl/{basemap}-gl-style/style.json';
 
 export const CARTO_MAP_STYLES = ['positron', 'dark-matter', 'voyager'];
 
 export const GOOGLE_BASEMAPS: Record<string, GoogleBasemapProps> = {
   roadmap: {
     mapTypeId: 'roadmap',
-    mapId: '3754c817b510f791'
+    mapId: '3754c817b510f791',
   },
   'google-positron': {
     mapTypeId: 'roadmap',
-    mapId: 'ea84ae4203ef21cd'
+    mapId: 'ea84ae4203ef21cd',
   },
   'google-dark-matter': {
     mapTypeId: 'roadmap',
-    mapId: '2fccc3b36c22a0e2'
+    mapId: '2fccc3b36c22a0e2',
   },
   'google-voyager': {
     mapTypeId: 'roadmap',
-    mapId: '885caf1e15bb9ef2'
+    mapId: '885caf1e15bb9ef2',
   },
   satellite: {
-    mapTypeId: 'satellite'
+    mapTypeId: 'satellite',
   },
   hybrid: {
-    mapTypeId: 'hybrid'
+    mapTypeId: 'hybrid',
   },
   terrain: {
-    mapTypeId: 'terrain'
-  }
+    mapTypeId: 'terrain',
+  },
 };
 
-type StyleLayerGroupSlug = 'label' | 'road' | 'border' | 'building' | 'water' | 'land';
+type StyleLayerGroupSlug =
+  | 'label'
+  | 'road'
+  | 'border'
+  | 'building'
+  | 'water'
+  | 'land';
 type StyleLayerGroup = {
   slug: StyleLayerGroupSlug;
   filter: (layer: any) => boolean;
@@ -45,37 +52,43 @@ export const STYLE_LAYER_GROUPS: StyleLayerGroup[] = [
     slug: 'label',
     filter: ({id}: {id: string}) =>
       Boolean(
-        id.match(/(?=(label|_label|place-|place_|poi-|poi_|watername_|roadname_|housenumber))/)
+        id.match(
+          /(?=(label|_label|place-|place_|poi-|poi_|watername_|roadname_|housenumber))/
+        )
       ),
-    defaultVisibility: true
+    defaultVisibility: true,
   },
   {
     slug: 'road',
     filter: ({id}: {id: string}) =>
       Boolean(id.match(/(?=(road|railway|tunnel|street|bridge))(?!.*label)/)),
-    defaultVisibility: true
+    defaultVisibility: true,
   },
   {
     slug: 'border',
-    filter: ({id}: {id: string}) => Boolean(id.match(/border|boundaries|boundary_/)),
-    defaultVisibility: false
+    filter: ({id}: {id: string}) =>
+      Boolean(id.match(/border|boundaries|boundary_/)),
+    defaultVisibility: false,
   },
   {
     slug: 'building',
     filter: ({id}: {id: string}) => Boolean(id.match(/building/)),
-    defaultVisibility: true
+    defaultVisibility: true,
   },
   {
     slug: 'water',
-    filter: ({id}: {id: string}) => Boolean(id.match(/(?=(water|stream|ferry))/)),
-    defaultVisibility: true
+    filter: ({id}: {id: string}) =>
+      Boolean(id.match(/(?=(water|stream|ferry))/)),
+    defaultVisibility: true,
   },
   {
     slug: 'land',
     filter: ({id}: {id: string}) =>
-      Boolean(id.match(/(?=(parks|landcover|industrial|sand|hillshade|park_))/)),
-    defaultVisibility: true
-  }
+      Boolean(
+        id.match(/(?=(parks|landcover|industrial|sand|hillshade|park_))/)
+      ),
+    defaultVisibility: true,
+  },
 ];
 
 export function applyLayerGroupFilters(
@@ -86,22 +99,27 @@ export function applyLayerGroupFilters(
     return style;
   }
 
-  const removedLayerFilters = STYLE_LAYER_GROUPS.filter(lg => !visibleLayerGroups[lg.slug]).map(
-    lg => lg.filter
-  );
+  const removedLayerFilters = STYLE_LAYER_GROUPS.filter(
+    (lg) => !visibleLayerGroups[lg.slug]
+  ).map((lg) => lg.filter);
 
   const visibleLayers = style.layers.filter((layer: any) =>
-    removedLayerFilters.every(match => !match(layer))
+    removedLayerFilters.every((match) => !match(layer))
   );
 
   return {
     ...style,
-    layers: visibleLayers
+    layers: visibleLayers,
   };
 }
 
-export function someLayerGroupsDisabled(visibleLayerGroups?: Record<StyleLayerGroupSlug, boolean>) {
-  return visibleLayerGroups && Object.values(visibleLayerGroups).every(Boolean) === false;
+export function someLayerGroupsDisabled(
+  visibleLayerGroups?: Record<StyleLayerGroupSlug, boolean>
+) {
+  return (
+    visibleLayerGroups &&
+    Object.values(visibleLayerGroups).every(Boolean) === false
+  );
 }
 
 export function getStyleUrl(styleType: string) {
@@ -110,7 +128,7 @@ export function getStyleUrl(styleType: string) {
 
 export async function fetchStyle({
   styleUrl,
-  errorContext
+  errorContext,
 }: {
   styleUrl: string;
   errorContext?: APIErrorContext;
@@ -118,12 +136,16 @@ export async function fetchStyle({
   /* global fetch */
   let response: Response | undefined;
   return await fetch(styleUrl, {mode: 'cors'})
-    .then(res => {
+    .then((res) => {
       response = res;
       return res.json();
     })
-    .catch(error => {
-      throw new CartoAPIError(error, {...errorContext, requestType: 'Basemap style'}, response);
+    .catch((error) => {
+      throw new CartoAPIError(
+        error,
+        {...errorContext, requestType: 'Basemap style'},
+        response
+      );
     });
 }
 
@@ -133,5 +155,5 @@ export default {
   DARK_MATTER: getStyleUrl('dark-matter'),
   VOYAGER_NOLABELS: getStyleUrl('voyager-nolabels'),
   POSITRON_NOLABELS: getStyleUrl('positron-nolabels'),
-  DARK_MATTER_NOLABELS: getStyleUrl('dark-matter-nolabels')
+  DARK_MATTER_NOLABELS: getStyleUrl('dark-matter-nolabels'),
 } as const;

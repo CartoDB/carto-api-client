@@ -9,7 +9,7 @@ import {
   quadbinTableSource,
   vectorQuerySource,
   vectorTableSource,
-  vectorTilesetSource
+  vectorTilesetSource,
 } from '../sources/index.js';
 
 import type {Format, MapType, QueryParameters} from '../types.js';
@@ -55,7 +55,7 @@ async function _fetchMapDataset(dataset: Dataset, context: _FetchMapContext) {
     geoColumn,
     source,
     type,
-    queryParameters
+    queryParameters,
   } = dataset;
 
   const cache: {value?: number} = {};
@@ -63,40 +63,70 @@ async function _fetchMapDataset(dataset: Dataset, context: _FetchMapContext) {
     ...context,
     cache,
     connectionName,
-    format
+    format,
   } as SourceOptions;
 
   if (type === 'tileset') {
     // TODO do we want a generic tilesetSource?
     // @ts-ignore
-    dataset.data = await vectorTilesetSource({...globalOptions, tableName: source});
+    dataset.data = await vectorTilesetSource({
+      ...globalOptions,
+      tableName: source,
+    });
   } else {
-    const [spatialDataType, spatialDataColumn] = geoColumn ? geoColumn.split(':') : ['geom'];
+    const [spatialDataType, spatialDataColumn] = geoColumn
+      ? geoColumn.split(':')
+      : ['geom'];
     if (spatialDataType === 'geom') {
       const options = {...globalOptions, spatialDataColumn};
       if (type === 'table') {
-        dataset.data = await vectorTableSource({...options, columns, tableName: source});
+        dataset.data = await vectorTableSource({
+          ...options,
+          columns,
+          tableName: source,
+        });
       } else if (type === 'query') {
         dataset.data = await vectorQuerySource({
           ...options,
           columns,
           sqlQuery: source,
-          queryParameters
+          queryParameters,
         });
       }
     } else if (spatialDataType === 'h3') {
-      const options = {...globalOptions, aggregationExp, aggregationResLevel, spatialDataColumn};
+      const options = {
+        ...globalOptions,
+        aggregationExp,
+        aggregationResLevel,
+        spatialDataColumn,
+      };
       if (type === 'table') {
         dataset.data = await h3TableSource({...options, tableName: source});
       } else if (type === 'query') {
-        dataset.data = await h3QuerySource({...options, sqlQuery: source, queryParameters});
+        dataset.data = await h3QuerySource({
+          ...options,
+          sqlQuery: source,
+          queryParameters,
+        });
       }
     } else if (spatialDataType === 'quadbin') {
-      const options = {...globalOptions, aggregationExp, aggregationResLevel, spatialDataColumn};
+      const options = {
+        ...globalOptions,
+        aggregationExp,
+        aggregationResLevel,
+        spatialDataColumn,
+      };
       if (type === 'table') {
-        dataset.data = await quadbinTableSource({...options, tableName: source});
+        dataset.data = await quadbinTableSource({
+          ...options,
+          tableName: source,
+        });
       } else if (type === 'query') {
-        dataset.data = await quadbinQuerySource({...options, sqlQuery: source, queryParameters});
+        dataset.data = await quadbinQuerySource({
+          ...options,
+          sqlQuery: source,
+          queryParameters,
+        });
       }
     }
   }
@@ -109,17 +139,24 @@ async function _fetchMapDataset(dataset: Dataset, context: _FetchMapContext) {
   return cacheChanged;
 }
 
-async function _fetchTilestats(attribute: string, dataset: Dataset, context: _FetchMapContext) {
+async function _fetchTilestats(
+  attribute: string,
+  dataset: Dataset,
+  context: _FetchMapContext
+) {
   const {connectionName, data, id, source, type, queryParameters} = dataset;
   const {apiBaseUrl} = context;
   const errorContext: APIErrorContext = {
     requestType: 'Tile stats',
     connection: connectionName,
     type,
-    source
+    source,
   };
   if (!('tilestats' in data)) {
-    throw new CartoAPIError(new Error(`Invalid dataset for tilestats: ${id}`), errorContext);
+    throw new CartoAPIError(
+      new Error(`Invalid dataset for tilestats: ${id}`),
+      errorContext
+    );
   }
 
   const baseUrl = buildStatsUrl({attribute, apiBaseUrl, ...dataset});
@@ -140,18 +177,23 @@ async function _fetchTilestats(attribute: string, dataset: Dataset, context: _Fe
     headers,
     parameters,
     errorContext,
-    maxLengthURL: context.maxLengthURL
+    maxLengthURL: context.maxLengthURL,
   });
 
   // Replace tilestats for attribute with value from API
   const {attributes} = data.tilestats.layers[0];
-  const index = attributes.findIndex(d => d.attribute === attribute);
+  const index = attributes.findIndex((d) => d.attribute === attribute);
   attributes[index] = stats;
   return true;
 }
 
-async function fillInMapDatasets({datasets}: {datasets: Dataset[]}, context: _FetchMapContext) {
-  const promises = datasets.map(dataset => _fetchMapDataset(dataset, context));
+async function fillInMapDatasets(
+  {datasets}: {datasets: Dataset[]},
+  context: _FetchMapContext
+) {
+  const promises = datasets.map((dataset) =>
+    _fetchMapDataset(dataset, context)
+  );
   return await Promise.all(promises);
 }
 
@@ -165,8 +207,12 @@ async function fillInTileStats(
     for (const channel of Object.keys(layer.visualChannels)) {
       const attribute = layer.visualChannels[channel]?.name;
       if (attribute) {
-        const dataset = datasets.find(d => d.id === layer.config.dataId);
-        if (dataset && dataset.type !== 'tileset' && (dataset.data as TilejsonResult).tilestats) {
+        const dataset = datasets.find((d) => d.id === layer.config.dataId);
+        if (
+          dataset &&
+          dataset.type !== 'tileset' &&
+          (dataset.data as TilejsonResult).tilestats
+        ) {
           // Only fetch stats for QUERY & TABLE map types
           attributes.push({attribute, dataset});
         }
@@ -178,7 +224,8 @@ async function fillInTileStats(
   for (const a of attributes) {
     if (
       !filteredAttributes.find(
-        ({attribute, dataset}) => attribute === a.attribute && dataset === a.dataset
+        ({attribute, dataset}) =>
+          attribute === a.attribute && dataset === a.dataset
       )
     ) {
       filteredAttributes.push(a);
@@ -260,9 +307,12 @@ export async function fetchMap({
   headers,
   autoRefresh,
   onNewData,
-  maxLengthURL
+  maxLengthURL,
 }: FetchMapOptions): Promise<FetchMapResult> {
-  assert(cartoMapId, 'Must define CARTO map id: fetchMap({cartoMapId: "XXXX-XXXX-XXXX"})');
+  assert(
+    cartoMapId,
+    'Must define CARTO map id: fetchMap({cartoMapId: "XXXX-XXXX-XXXX"})'
+  );
 
   if (accessToken) {
     headers = {Authorization: `Bearer ${accessToken}`, ...headers};
@@ -278,14 +328,22 @@ export async function fetchMap({
   }
 
   const baseUrl = buildPublicMapUrl({apiBaseUrl, cartoMapId});
-  const errorContext: APIErrorContext = {requestType: 'Public map', mapId: cartoMapId};
-  const map = await requestWithParameters({baseUrl, headers, errorContext, maxLengthURL});
+  const errorContext: APIErrorContext = {
+    requestType: 'Public map',
+    mapId: cartoMapId,
+  };
+  const map = await requestWithParameters({
+    baseUrl,
+    headers,
+    errorContext,
+    maxLengthURL,
+  });
   const context: _FetchMapContext = {
     accessToken: map.token || accessToken,
     apiBaseUrl,
     clientId,
     headers,
-    maxLengthURL
+    maxLengthURL,
   };
 
   // Periodically check if the data has changed. Note that this
@@ -298,10 +356,10 @@ export async function fetchMap({
         ...context,
         headers: {
           ...headers,
-          'If-Modified-Since': new Date().toUTCString()
-        }
+          'If-Modified-Since': new Date().toUTCString(),
+        },
       });
-      if (onNewData && changed.some(v => v === true)) {
+      if (onNewData && changed.some((v) => v === true)) {
         onNewData(parseMap(map));
       }
     }, autoRefresh * 1000);
@@ -313,10 +371,14 @@ export async function fetchMap({
   const geojsonLayers = map.keplerMapConfig.config.visState.layers.filter(
     ({type}: {type: string}) => type === 'geojson' || type === 'point'
   );
-  const geojsonDatasetIds = geojsonLayers.map(({config}: {config: any}) => config.dataId);
+  const geojsonDatasetIds = geojsonLayers.map(
+    ({config}: {config: any}) => config.dataId
+  );
   map.datasets.forEach((dataset: any) => {
     if (geojsonDatasetIds.includes(dataset.id)) {
-      const {config} = geojsonLayers.find(({config}: {config: any}) => config.dataId === dataset.id);
+      const {config} = geojsonLayers.find(
+        ({config}: {config: any}) => config.dataId === dataset.id
+      );
       dataset.format = 'geojson';
       // Support for very old maps. geoColumn was not stored in the past
       if (!dataset.geoColumn && config.columns.geojson) {
@@ -329,7 +391,7 @@ export async function fetchMap({
     fetchBasemapProps({config: map.keplerMapConfig.config, errorContext}),
 
     // Mutates map.datasets so that dataset.data contains data
-    fillInMapDatasets(map, context)
+    fillInMapDatasets(map, context),
   ]);
 
   // Mutates attributes in visualChannels to contain tile stats
@@ -343,13 +405,17 @@ export async function fetchMap({
   });
 
   /* global FontFace, window, document */
-  if (textLayers.length && window.FontFace && !document.fonts.check('12px Inter')) {
+  if (
+    textLayers.length &&
+    window.FontFace &&
+    !document.fonts.check('12px Inter')
+  ) {
     // Fetch font needed for labels
     const font = new FontFace(
       'Inter',
       'url(https://fonts.gstatic.com/s/inter/v12/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7W0Q5nw.woff2)'
     );
-    await font.load().then(f => document.fonts.add(f));
+    await font.load().then((f) => document.fonts.add(f));
   }
 
   return out;

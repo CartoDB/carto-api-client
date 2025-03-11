@@ -8,13 +8,17 @@ import {
   scaleQuantile,
   scaleQuantize,
   scaleSqrt,
-  scaleThreshold
+  scaleThreshold,
 } from 'd3-scale';
 import {format as d3Format} from 'd3-format';
 import moment from 'moment-timezone';
 
 import {Accessor, Layer, _ConstructorOf as ConstructorOf} from '@deck.gl/core';
-import {GridLayer, HeatmapLayer, HexagonLayer} from '@deck.gl/aggregation-layers';
+import {
+  GridLayer,
+  HeatmapLayer,
+  HexagonLayer,
+} from '@deck.gl/aggregation-layers';
 import {GeoJsonLayer} from '@deck.gl/layers';
 import {H3HexagonLayer} from '@deck.gl/geo-layers';
 import {
@@ -23,7 +27,7 @@ import {
   QuadbinTileLayer,
   RasterTileLayer,
   VectorTileLayer,
-  HeatmapTileLayer
+  HeatmapTileLayer,
 } from '@deck.gl/carto';
 
 import {assert} from '../utils.js';
@@ -34,7 +38,7 @@ import {
   MapTextSubLayerConfig,
   VisConfig,
   VisualChannelField,
-  VisualChannels
+  VisualChannels,
 } from './types.js';
 
 const SCALE_FUNCS: Record<string, () => any> = {
@@ -46,7 +50,7 @@ const SCALE_FUNCS: Record<string, () => any> = {
   quantize: scaleQuantize,
   sqrt: scaleSqrt,
   custom: scaleThreshold,
-  identity: scaleIdentity
+  identity: scaleIdentity,
 };
 export type SCALE_TYPE = keyof typeof SCALE_FUNCS;
 
@@ -58,7 +62,13 @@ type TileLayerType =
   | 'quadbin'
   | 'raster'
   | 'tileset';
-export type DocumentLayerType = 'geojson' | 'grid' | 'heatmap' | 'hexagon' | 'hexagonId' | 'point';
+export type DocumentLayerType =
+  | 'geojson'
+  | 'grid'
+  | 'heatmap'
+  | 'hexagon'
+  | 'hexagonId'
+  | 'point';
 export type LayerType = TileLayerType | DocumentLayerType;
 
 function identity<T>(v: T): T {
@@ -71,22 +81,24 @@ export const AGGREGATION: Record<string, string> = {
   average: 'MEAN',
   maximum: 'MAX',
   minimum: 'MIN',
-  sum: 'SUM'
+  sum: 'SUM',
 };
 
 export const OPACITY_MAP: Record<string, string> = {
   getFillColor: 'opacity',
   getLineColor: 'strokeOpacity',
-  getTextColor: 'opacity'
+  getTextColor: 'opacity',
 };
 
 const AGGREGATION_FUNC: Record<string, (values: any, accessor: any) => any> = {
-  'count unique': (values: any, accessor: any) => groupSort(values, v => v.length, accessor).length,
+  'count unique': (values: any, accessor: any) =>
+    groupSort(values, (v) => v.length, accessor).length,
   median,
   // Unfortunately mode() is only available in d3-array@3+ which is ESM only
-  mode: (values: any, accessor: any) => groupSort(values, v => v.length, accessor).pop(),
+  mode: (values: any, accessor: any) =>
+    groupSort(values, (v) => v.length, accessor).pop(),
   stddev: deviation,
-  variance
+  variance,
 };
 
 const TILE_LAYER_TYPE_TO_LAYER: Record<TileLayerType, ConstructorOf<Layer>> = {
@@ -96,7 +108,7 @@ const TILE_LAYER_TYPE_TO_LAYER: Record<TileLayerType, ConstructorOf<Layer>> = {
   mvt: VectorTileLayer,
   quadbin: QuadbinTileLayer,
   raster: RasterTileLayer,
-  tileset: VectorTileLayer
+  tileset: VectorTileLayer,
 };
 
 const hexToRGBA = (c: any) => {
@@ -118,7 +130,7 @@ const sharedPropMap = {
     anchor: 'getTextAnchor',
     // Apply the value of Kepler `textLabel.color` prop to the deck `getTextColor` prop
     color: 'getTextColor',
-    size: 'getTextSize'
+    size: 'getTextSize',
   },
   visConfig: {
     enable3d: 'extruded',
@@ -128,30 +140,32 @@ const sharedPropMap = {
     stroked: 'stroked',
     thickness: 'getLineWidth',
     radius: 'getPointRadius',
-    wireframe: 'wireframe'
-  }
+    wireframe: 'wireframe',
+  },
 };
 
 const customMarkersPropsMap = {
   color: 'getIconColor',
   visConfig: {
-    radius: 'getIconSize'
-  }
+    radius: 'getIconSize',
+  },
 };
 
 const heatmapTilePropsMap = {
-  visConfig: {  
+  visConfig: {
     colorRange: (x: any) => ({colorRange: x.colors.map(hexToRGBA)}),
-    radius: 'radiusPixels'
-  }
+    radius: 'radiusPixels',
+  },
 };
 
 const aggregationVisConfig = {
-  colorAggregation: (x: any) => ({colorAggregation: AGGREGATION[x] || AGGREGATION.sum}),
+  colorAggregation: (x: any) => ({
+    colorAggregation: AGGREGATION[x] || AGGREGATION.sum,
+  }),
   colorRange: (x: any) => ({colorRange: x.colors.map(hexToRGBA)}),
   coverage: 'coverage',
   elevationPercentile: ['elevationLowerPercentile', 'elevationUpperPercentile'],
-  percentile: ['lowerPercentile', 'upperPercentile']
+  percentile: ['lowerPercentile', 'upperPercentile'],
 };
 
 const defaultProps = {
@@ -159,10 +173,13 @@ const defaultProps = {
   lineWidthUnits: 'pixels',
   pointRadiusUnits: 'pixels',
   rounded: true,
-  wrapLongitude: false
+  wrapLongitude: false,
 };
 
-function mergePropMaps(a: Record<string, any> = {}, b: Record<string, any> = {}) {
+function mergePropMaps(
+  a: Record<string, any> = {},
+  b: Record<string, any> = {}
+) {
   return {...a, ...b, visConfig: {...a.visConfig, ...b.visConfig}};
 }
 
@@ -196,34 +213,44 @@ export function getLayer(
       Layer: GeoJsonLayer,
       propMap: {
         columns: {
-          altitude: (x: any) => ({parameters: {depthWriteEnabled: Boolean(x)}})
+          altitude: (x: any) => ({parameters: {depthWriteEnabled: Boolean(x)}}),
         },
-        visConfig: {outline: 'stroked'}
-      }
+        visConfig: {outline: 'stroked'},
+      },
     },
     geojson: {
-      Layer: GeoJsonLayer
+      Layer: GeoJsonLayer,
     },
     grid: {
       Layer: GridLayer,
-      propMap: {visConfig: {...aggregationVisConfig, worldUnitSize: (x: any) => ({cellSize: 1000 * x})}},
-      defaultProps: {getPosition}
+      propMap: {
+        visConfig: {
+          ...aggregationVisConfig,
+          worldUnitSize: (x: any) => ({cellSize: 1000 * x}),
+        },
+      },
+      defaultProps: {getPosition},
     },
     heatmap: {
       Layer: HeatmapLayer,
       propMap: {visConfig: {...aggregationVisConfig, radius: 'radiusPixels'}},
-      defaultProps: {getPosition}
+      defaultProps: {getPosition},
     },
     hexagon: {
       Layer: HexagonLayer,
-      propMap: {visConfig: {...aggregationVisConfig, worldUnitSize: (x: any) => ({radius: 1000 * x})}},
-      defaultProps: {getPosition}
+      propMap: {
+        visConfig: {
+          ...aggregationVisConfig,
+          worldUnitSize: (x: any) => ({radius: 1000 * x}),
+        },
+      },
+      defaultProps: {getPosition},
     },
     hexagonId: {
       Layer: H3HexagonLayer,
       propMap: {visConfig: {coverage: 'coverage'}},
-      defaultProps: {getHexagon: (d: any) => d[hexagonId], stroked: false}
-    }
+      defaultProps: {getHexagon: (d: any) => d[hexagonId], stroked: false},
+    },
   };
 
   const layer = layerTypeDefs[type as DocumentLayerType];
@@ -232,7 +259,7 @@ export function getLayer(
   return {
     ...layer,
     propMap: mergePropMaps(basePropMap, layer.propMap),
-    defaultProps: {...defaultProps, ...layer.defaultProps}
+    defaultProps: {...defaultProps, ...layer.defaultProps},
   };
 }
 
@@ -246,14 +273,20 @@ function getTileLayer(dataset: MapDataset, basePropMap: any, type: LayerType) {
       ...defaultProps,
       ...(aggregationExp && {aggregationExp}),
       ...(aggregationResLevel && {aggregationResLevel}),
-      uniqueIdProperty: 'geoid'
-    }
+      uniqueIdProperty: 'geoid',
+    },
   };
 }
 
-function domainFromAttribute(attribute: any, scaleType: SCALE_TYPE, scaleLength: number) {
+function domainFromAttribute(
+  attribute: any,
+  scaleType: SCALE_TYPE,
+  scaleLength: number
+) {
   if (scaleType === 'ordinal' || scaleType === 'point') {
-    return attribute.categories.map((c: any) => c.category).filter((c: any) => c !== undefined && c !== null);
+    return attribute.categories
+      .map((c: any) => c.category)
+      .filter((c: any) => c !== undefined && c !== null);
   }
 
   if (scaleType === 'quantile' && attribute.quantiles) {
@@ -273,8 +306,8 @@ function domainFromValues(values: any, scaleType: SCALE_TYPE) {
   if (scaleType === 'ordinal' || scaleType === 'point') {
     return groupSort(
       values,
-      g => -g.length,
-      d => d
+      (g) => -g.length,
+      (d) => d
     );
   } else if (scaleType === 'quantile') {
     return values.sort((a: any, b: any) => a - b);
@@ -285,7 +318,12 @@ function domainFromValues(values: any, scaleType: SCALE_TYPE) {
   return extent(values);
 }
 
-function calculateDomain(data: any, name: any, scaleType: SCALE_TYPE, scaleLength?: number) {
+function calculateDomain(
+  data: any,
+  name: any,
+  scaleType: SCALE_TYPE,
+  scaleLength?: number
+) {
   if (data.tilestats) {
     // Tileset data type
     const {attributes} = data.tilestats.layers[0];
@@ -293,7 +331,9 @@ function calculateDomain(data: any, name: any, scaleType: SCALE_TYPE, scaleLengt
     return domainFromAttribute(attribute, scaleType, scaleLength as number);
   } else if (data.features) {
     // GeoJSON data type
-    const values = data.features.map(({properties}: {properties: any}) => properties[name]);
+    const values = data.features.map(
+      ({properties}: {properties: any}) => properties[name]
+    );
     return domainFromValues(values, scaleType);
   } else if (Array.isArray(data) && data[0][name] !== undefined) {
     // JSON data type
@@ -320,14 +360,21 @@ function normalizeAccessor(accessor: any, data: any) {
 }
 
 export function opacityToAlpha(opacity?: number) {
-  return opacity !== undefined ? Math.round(255 * Math.pow(opacity, 1 / 2.2)) : 255;
+  return opacity !== undefined
+    ? Math.round(255 * Math.pow(opacity, 1 / 2.2))
+    : 255;
 }
 
-function getAccessorKeys(name: string, aggregation?: string | null | undefined): string[] {
+function getAccessorKeys(
+  name: string,
+  aggregation?: string | null | undefined
+): string[] {
   let keys = [name];
   if (aggregation) {
     // Snowflake will capitalized the keys, need to check lower and upper case version
-    keys = keys.concat([aggregation, aggregation.toUpperCase()].map(a => `${name}_${a}`));
+    keys = keys.concat(
+      [aggregation, aggregation.toUpperCase()].map((a) => `${name}_${a}`)
+    );
   }
   return keys;
 }
@@ -342,7 +389,11 @@ function findAccessorKey(keys: string[], properties: any): string[] {
   throw new Error(`Could not find property for any accessor key: ${keys}`);
 }
 
-export function getColorValueAccessor({name}: VisualChannelField, colorAggregation: string, data: any) {
+export function getColorValueAccessor(
+  {name}: VisualChannelField,
+  colorAggregation: string,
+  data: any
+) {
   const aggregator = AGGREGATION_FUNC[colorAggregation];
   const accessor = (values: any) => aggregator(values, (p: any) => p[name]);
   return normalizeAccessor(accessor, data);
@@ -351,11 +402,16 @@ export function getColorValueAccessor({name}: VisualChannelField, colorAggregati
 export function getColorAccessor(
   {name, colorColumn}: VisualChannelField,
   scaleType: SCALE_TYPE,
-  {aggregation, range}: {aggregation: string, range: any},
+  {aggregation, range}: {aggregation: string; range: any},
   opacity: number | undefined,
   data: any
 ) {
-  const scale = calculateLayerScale(colorColumn || name, scaleType, range, data);
+  const scale = calculateLayerScale(
+    colorColumn || name,
+    scaleType,
+    range,
+    data
+  );
   const alpha = opacityToAlpha(opacity);
 
   let accessorKeys = getAccessorKeys(name, aggregation);
@@ -370,7 +426,12 @@ export function getColorAccessor(
   return normalizeAccessor(accessor, data);
 }
 
-function calculateLayerScale(name: any, scaleType: SCALE_TYPE, range: any, data: any) {
+function calculateLayerScale(
+  name: any,
+  scaleType: SCALE_TYPE,
+  range: any,
+  data: any
+) {
   const scale = SCALE_FUNCS[scaleType]();
   let domain: (string | number)[] = [];
   let scaleColor: string[] = [];
@@ -406,7 +467,15 @@ const FALLBACK_ICON =
 export function getIconUrlAccessor(
   field: VisualChannelField | null | undefined,
   range: CustomMarkersRange | null | undefined,
-  {fallbackUrl, maxIconSize, useMaskedIcons}: {fallbackUrl?: string | null, maxIconSize: number, useMaskedIcons?: boolean},
+  {
+    fallbackUrl,
+    maxIconSize,
+    useMaskedIcons,
+  }: {
+    fallbackUrl?: string | null;
+    maxIconSize: number;
+    useMaskedIcons?: boolean;
+  },
   data: any
 ) {
   const urlToUnpackedIcon = (url: string) => ({
@@ -414,7 +483,7 @@ export function getIconUrlAccessor(
     url,
     width: maxIconSize,
     height: maxIconSize,
-    mask: useMaskedIcons
+    mask: useMaskedIcons,
   });
   let unknownValue = fallbackUrl || FALLBACK_ICON;
 
@@ -441,14 +510,19 @@ export function getIconUrlAccessor(
   return normalizeAccessor(accessor, data);
 }
 
-export function getMaxMarkerSize(visConfig: VisConfig, visualChannels: VisualChannels): number {
+export function getMaxMarkerSize(
+  visConfig: VisConfig,
+  visualChannels: VisualChannels
+): number {
   const {radiusRange, radius} = visConfig;
   const {radiusField, sizeField} = visualChannels;
   const field = radiusField || sizeField;
   return Math.ceil(radiusRange && field ? radiusRange[1] : radius);
 }
 
-export function negateAccessor<T>(accessor: Accessor<T, number>): Accessor<T, number> {
+export function negateAccessor<T>(
+  accessor: Accessor<T, number>
+): Accessor<T, number> {
   return typeof accessor === 'function' ? (d, i) => -accessor(d, i) : -accessor;
 }
 
@@ -479,11 +553,11 @@ export function getSizeAccessor(
 }
 
 const FORMATS: Record<string, (value: any) => string> = {
-  date: s => moment.utc(s).format('MM/DD/YY HH:mm:ssa'),
+  date: (s) => moment.utc(s).format('MM/DD/YY HH:mm:ssa'),
   integer: d3Format('i'),
   float: d3Format('.5f'),
-  timestamp: s => moment.utc(s).format('X'),
-  default: String
+  timestamp: (s) => moment.utc(s).format('X'),
+  default: String,
 };
 
 export function getTextAccessor({name, type}: VisualChannelField, data: any) {

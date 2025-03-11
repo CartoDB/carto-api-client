@@ -12,12 +12,18 @@ import {
   getIconUrlAccessor,
   negateAccessor,
   getMaxMarkerSize,
-  LayerType
+  LayerType,
 } from './layer-map.js';
 import {PointLabelLayer} from '@deck.gl/carto';
 import {CollisionFilterExtension} from '@deck.gl/extensions';
 import {assert} from '../utils.js';
-import {KeplerMapConfig, MapDataset, MapLayerConfig, VisualChannels, VisConfig} from './types.js';
+import {
+  KeplerMapConfig,
+  MapDataset,
+  MapLayerConfig,
+  VisualChannels,
+  VisConfig,
+} from './types.js';
 
 const collisionFilterExtension = new CollisionFilterExtension();
 
@@ -45,7 +51,8 @@ export function parseMap(json: any) {
   const {keplerMapConfig, datasets, token} = json;
   assert(keplerMapConfig.version === 'v1', 'Only support Kepler v1');
   const {mapState, mapStyle} = keplerMapConfig.config as KeplerMapConfig;
-  const {layers, layerBlending, interactionConfig} = keplerMapConfig.config.visState;
+  const {layers, layerBlending, interactionConfig} =
+    keplerMapConfig.config.visState;
 
   return {
     id: json.id,
@@ -57,37 +64,65 @@ export function parseMap(json: any) {
     /** @deprecated Use `basemap`. */
     mapStyle,
     token,
-    layers: layers.reverse().map(({id, type, config, visualChannels}: {id: string, type: string, config: any, visualChannels: any}) => {
-      try {
-        const {dataId} = config;
-        const dataset: MapDataset | null = datasets.find((d: any) => d.id === dataId);
-        assert(dataset, `No dataset matching dataId: ${dataId}`);
-        const {data} = dataset;
-        assert(data, `No data loaded for dataId: ${dataId}`);
-        const {Layer, propMap, defaultProps} = getLayer(type as LayerType, config, dataset);
-        const styleProps = createStyleProps(config, propMap);
-        return new Layer({
+    layers: layers
+      .reverse()
+      .map(
+        ({
           id,
-          data,
-          ...defaultProps,
-          ...createInteractionProps(interactionConfig),
-          ...styleProps,
-          ...createChannelProps(id, type, config, visualChannels, data), // Must come after style
-          ...createParametersProp(layerBlending, styleProps.parameters || {}), // Must come after style
-          ...createLoadOptions(token)
-        });
-      } catch (e: any) {
-        log.error(e.message)();
-        return undefined;
-      }
-    })
+          type,
+          config,
+          visualChannels,
+        }: {
+          id: string;
+          type: string;
+          config: any;
+          visualChannels: any;
+        }) => {
+          try {
+            const {dataId} = config;
+            const dataset: MapDataset | null = datasets.find(
+              (d: any) => d.id === dataId
+            );
+            assert(dataset, `No dataset matching dataId: ${dataId}`);
+            const {data} = dataset;
+            assert(data, `No data loaded for dataId: ${dataId}`);
+            const {Layer, propMap, defaultProps} = getLayer(
+              type as LayerType,
+              config,
+              dataset
+            );
+            const styleProps = createStyleProps(config, propMap);
+            return new Layer({
+              id,
+              data,
+              ...defaultProps,
+              ...createInteractionProps(interactionConfig),
+              ...styleProps,
+              ...createChannelProps(id, type, config, visualChannels, data), // Must come after style
+              ...createParametersProp(
+                layerBlending,
+                styleProps.parameters || {}
+              ), // Must come after style
+              ...createLoadOptions(token),
+            });
+          } catch (e: any) {
+            log.error(e.message)();
+            return undefined;
+          }
+        }
+      ),
   };
 }
 
-function createParametersProp(layerBlending: string, parameters: ColorParameters) {
+function createParametersProp(
+  layerBlending: string,
+  parameters: ColorParameters
+) {
   if (layerBlending === 'additive') {
-    parameters.blendColorSrcFactor = parameters.blendAlphaSrcFactor = 'src-alpha';
-    parameters.blendColorDstFactor = parameters.blendAlphaDstFactor = 'dst-alpha';
+    parameters.blendColorSrcFactor = parameters.blendAlphaSrcFactor =
+      'src-alpha';
+    parameters.blendColorDstFactor = parameters.blendAlphaDstFactor =
+      'dst-alpha';
     parameters.blendColorOperation = parameters.blendAlphaOperation = 'add';
   } else if (layerBlending === 'subtractive') {
     parameters.blendColorSrcFactor = 'one';
@@ -105,7 +140,7 @@ function createInteractionProps(interactionConfig: any) {
   const pickable = interactionConfig && interactionConfig.tooltip.enabled;
   return {
     autoHighlight: pickable,
-    pickable
+    pickable,
   };
 }
 
@@ -149,7 +184,9 @@ function createStyleProps(config: MapLayerConfig, mapping: any) {
     }
   }
 
-  result.highlightColor = config.visConfig.enable3d ? [255, 255, 255, 60] : [252, 242, 26, 255];
+  result.highlightColor = config.visConfig.enable3d
+    ? [255, 255, 255, 60]
+    : [252, 242, 26, 255];
   return result;
 }
 
@@ -170,7 +207,7 @@ function createChannelProps(
     sizeScale,
     strokeColorField,
     strokeColorScale,
-    weightField
+    weightField,
   } = visualChannels;
   let {heightField, heightScale} = visualChannels;
   if (type === 'hexagonId') {
@@ -185,7 +222,11 @@ function createChannelProps(
     if (colorField) {
       const {colorAggregation} = config.visConfig;
       if (!AGGREGATION[colorAggregation]) {
-        result.getColorValue = getColorValueAccessor(colorField, colorAggregation, data);
+        result.getColorValue = getColorValueAccessor(
+          colorField,
+          colorAggregation,
+          data
+        );
       } else {
         result.getColorWeight = (d: any) => d[colorField.name];
       }
@@ -206,12 +247,14 @@ function createChannelProps(
     const altitude = config.columns?.altitude;
     if (altitude) {
       result.dataTransform = (data: any) => {
-        data.features.forEach(({geometry, properties}: {geometry: any, properties: any}) => {
-          const {type, coordinates} = geometry;
-          if (type === 'Point') {
-            coordinates[2] = properties[altitude];
+        data.features.forEach(
+          ({geometry, properties}: {geometry: any; properties: any}) => {
+            const {type, coordinates} = geometry;
+            if (type === 'Point') {
+              coordinates[2] = properties[altitude];
+            }
           }
-        });
+        );
         return data;
       };
     }
@@ -232,8 +275,11 @@ function createChannelProps(
   if (strokeColorField) {
     const fallbackOpacity = type === 'point' ? visConfig.opacity : 1;
     const opacity =
-      visConfig.strokeOpacity !== undefined ? visConfig.strokeOpacity : fallbackOpacity;
-    const {strokeColorAggregation: aggregation, strokeColorRange: range} = visConfig;
+      visConfig.strokeOpacity !== undefined
+        ? visConfig.strokeOpacity
+        : fallbackOpacity;
+    const {strokeColorAggregation: aggregation, strokeColorRange: range} =
+      visConfig;
     result.getLineColor = getColorAccessor(
       strokeColorField,
       // @ts-ignore
@@ -268,7 +314,11 @@ function createChannelProps(
   if (visConfig.customMarkers) {
     const maxIconSize = getMaxMarkerSize(visConfig, visualChannels);
     const {getPointRadius, getFillColor} = result;
-    const {customMarkersUrl, customMarkersRange, filled: useMaskedIcons} = visConfig;
+    const {
+      customMarkersUrl,
+      customMarkersRange,
+      filled: useMaskedIcons,
+    } = visConfig;
 
     result.pointType = 'icon';
     result.getIcon = getIconUrlAccessor(
@@ -281,15 +331,15 @@ function createChannelProps(
       'points-icon': {
         loadOptions: {
           image: {
-            type: 'imagebitmap'
+            type: 'imagebitmap',
           },
           imagebitmap: {
             resizeWidth: maxIconSize,
             resizeHeight: maxIconSize,
-            resizeQuality: 'high'
-          }
-        }
-      }
+            resizeQuality: 'high',
+          },
+        },
+      },
     };
 
     if (getFillColor && useMaskedIcons) {
@@ -302,7 +352,13 @@ function createChannelProps(
 
     if (visualChannels.rotationField) {
       result.getIconAngle = negateAccessor(
-        getSizeAccessor(visualChannels.rotationField, undefined, null, undefined, data)
+        getSizeAccessor(
+          visualChannels.rotationField,
+          undefined,
+          null,
+          undefined,
+          data
+        )
       );
     }
   } else if (type === 'point' || type === 'tileset') {
@@ -318,17 +374,18 @@ function createChannelProps(
       anchor: result.getTextAnchor,
       color: result.getTextColor,
       outlineColor: result.textOutlineColor,
-      size: result.textSizeScale
+      size: result.textSizeScale,
     } = mainLabel);
     const {
       color: getSecondaryColor,
       field: secondaryField,
       outlineColor: secondaryOutlineColor,
-      size: secondarySizeScale
+      size: secondarySizeScale,
     } = secondaryLabel || {};
 
     result.getText = mainLabel.field && getTextAccessor(mainLabel.field, data);
-    const getSecondaryText = secondaryField && getTextAccessor(secondaryField, data);
+    const getSecondaryText =
+      secondaryField && getTextAccessor(secondaryField, data);
 
     result.pointType = `${result.pointType}+text`;
     result.textCharacterSet = 'auto';
@@ -354,9 +411,9 @@ function createChannelProps(
           getSecondaryText,
           getSecondaryColor,
           secondarySizeScale,
-          secondaryOutlineColor
-        })
-      }
+          secondaryOutlineColor,
+        }),
+      },
     };
   }
 
@@ -365,6 +422,6 @@ function createChannelProps(
 
 function createLoadOptions(accessToken: string) {
   return {
-    loadOptions: {fetch: {headers: {Authorization: `Bearer ${accessToken}`}}}
+    loadOptions: {fetch: {headers: {Authorization: `Bearer ${accessToken}`}}},
   };
 }

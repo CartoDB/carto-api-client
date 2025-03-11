@@ -5,7 +5,7 @@ import {
   applyLayerGroupFilters,
   fetchStyle,
   getStyleUrl,
-  someLayerGroupsDisabled
+  someLayerGroupsDisabled,
 } from './basemap-styles.js';
 import {Basemap, KeplerMapConfig, MapLibreBasemapProps} from './types.js';
 import {APIErrorContext} from '../api/index.js';
@@ -13,11 +13,13 @@ import {APIErrorContext} from '../api/index.js';
 const CUSTOM_STYLE_ID_PREFIX = 'custom:';
 const DEFAULT_CARTO_STYLE = 'positron';
 
-function mapLibreViewpros(config: KeplerMapConfig): Omit<MapLibreBasemapProps, 'style'> {
+function mapLibreViewpros(
+  config: KeplerMapConfig
+): Omit<MapLibreBasemapProps, 'style'> {
   const {longitude, latitude, ...rest} = config.mapState as MapViewState;
   return {
     center: [longitude, latitude],
-    ...rest
+    ...rest,
   };
 }
 
@@ -34,7 +36,7 @@ export async function fetchBasemapProps({
   config,
   errorContext,
 
-  applyLayerFilters = true
+  applyLayerFilters = true,
 }: {
   config: KeplerMapConfig;
 
@@ -51,9 +53,9 @@ export async function fetchBasemapProps({
         type: 'maplibre',
         props: {
           style: currentCustomStyle.style || currentCustomStyle.url,
-          ...mapLibreViewpros(config)
+          ...mapLibreViewpros(config),
         },
-        attribution: currentCustomStyle.customAttribution
+        attribution: currentCustomStyle.customAttribution,
       };
     }
   }
@@ -63,7 +65,11 @@ export async function fetchBasemapProps({
     const styleUrl = getStyleUrl(styleType);
     let style = styleUrl;
     let rawStyle = styleUrl;
-    if (applyLayerFilters && visibleLayerGroups && someLayerGroupsDisabled(visibleLayerGroups)) {
+    if (
+      applyLayerFilters &&
+      visibleLayerGroups &&
+      someLayerGroupsDisabled(visibleLayerGroups)
+    ) {
       rawStyle = await fetchStyle({styleUrl, errorContext});
       style = applyLayerGroupFilters(rawStyle, visibleLayerGroups);
     }
@@ -71,10 +77,10 @@ export async function fetchBasemapProps({
       type: 'maplibre',
       props: {
         style,
-        ...mapLibreViewpros(config)
+        ...mapLibreViewpros(config),
       },
       visibleLayerGroups,
-      rawStyle
+      rawStyle,
     };
   }
   const googleBasemapDef = GOOGLE_BASEMAPS[styleType];
@@ -87,15 +93,15 @@ export async function fetchBasemapProps({
         center: {lat: mapState.latitude, lng: mapState.longitude},
         zoom: mapState.zoom + 1,
         tilt: mapState.pitch,
-        heading: mapState.bearing
-      }
+        heading: mapState.bearing,
+      },
     };
   }
   return {
     type: 'maplibre',
     props: {
       style: getStyleUrl(DEFAULT_CARTO_STYLE),
-      ...mapLibreViewpros(config)
-    }
+      ...mapLibreViewpros(config),
+    },
   };
 }
