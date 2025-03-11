@@ -37,7 +37,7 @@ import {
   VisualChannels
 } from './types.js';
 
-const SCALE_FUNCS = {
+const SCALE_FUNCS: Record<string, () => any> = {
   linear: scaleLinear,
   ordinal: scaleOrdinal,
   log: scaleLog,
@@ -80,11 +80,11 @@ export const OPACITY_MAP: Record<string, string> = {
   getTextColor: 'opacity'
 };
 
-const AGGREGATION_FUNC = {
-  'count unique': (values, accessor) => groupSort(values, v => v.length, accessor).length,
+const AGGREGATION_FUNC: Record<string, (values: any, accessor: any) => any> = {
+  'count unique': (values: any, accessor: any) => groupSort(values, v => v.length, accessor).length,
   median,
   // Unfortunately mode() is only available in d3-array@3+ which is ESM only
-  mode: (values, accessor) => groupSort(values, v => v.length, accessor).pop(),
+  mode: (values: any, accessor: any) => groupSort(values, v => v.length, accessor).pop(),
   stddev: deviation,
   variance
 };
@@ -99,7 +99,7 @@ const TILE_LAYER_TYPE_TO_LAYER: Record<TileLayerType, ConstructorOf<Layer>> = {
   tileset: VectorTileLayer
 };
 
-const hexToRGBA = c => {
+const hexToRGBA = (c: any) => {
   const {r, g, b, opacity} = rgb(c);
   return [r, g, b, 255 * opacity];
 };
@@ -140,15 +140,15 @@ const customMarkersPropsMap = {
 };
 
 const heatmapTilePropsMap = {
-  visConfig: {
-    colorRange: x => ({colorRange: x.colors.map(hexToRGBA)}),
+  visConfig: {  
+    colorRange: (x: any) => ({colorRange: x.colors.map(hexToRGBA)}),
     radius: 'radiusPixels'
   }
 };
 
 const aggregationVisConfig = {
-  colorAggregation: x => ({colorAggregation: AGGREGATION[x] || AGGREGATION.sum}),
-  colorRange: x => ({colorRange: x.colors.map(hexToRGBA)}),
+  colorAggregation: (x: any) => ({colorAggregation: AGGREGATION[x] || AGGREGATION.sum}),
+  colorRange: (x: any) => ({colorRange: x.colors.map(hexToRGBA)}),
   coverage: 'coverage',
   elevationPercentile: ['elevationLowerPercentile', 'elevationUpperPercentile'],
   percentile: ['lowerPercentile', 'upperPercentile']
@@ -179,12 +179,12 @@ export function getLayer(
   if (type === 'heatmapTile') {
     basePropMap = mergePropMaps(basePropMap, heatmapTilePropsMap);
   }
-  if (TILE_LAYER_TYPE_TO_LAYER[type]) {
+  if (TILE_LAYER_TYPE_TO_LAYER[type as TileLayerType]) {
     return getTileLayer(dataset, basePropMap, type);
   }
 
   const geoColumn = dataset?.geoColumn;
-  const getPosition = d => d[geoColumn].coordinates;
+  const getPosition = (d: any) => d[geoColumn].coordinates;
 
   const hexagonId = config.columns?.hex_id;
 
@@ -196,7 +196,7 @@ export function getLayer(
       Layer: GeoJsonLayer,
       propMap: {
         columns: {
-          altitude: x => ({parameters: {depthWriteEnabled: Boolean(x)}})
+          altitude: (x: any) => ({parameters: {depthWriteEnabled: Boolean(x)}})
         },
         visConfig: {outline: 'stroked'}
       }
@@ -206,7 +206,7 @@ export function getLayer(
     },
     grid: {
       Layer: GridLayer,
-      propMap: {visConfig: {...aggregationVisConfig, worldUnitSize: x => ({cellSize: 1000 * x})}},
+      propMap: {visConfig: {...aggregationVisConfig, worldUnitSize: (x: any) => ({cellSize: 1000 * x})}},
       defaultProps: {getPosition}
     },
     heatmap: {
@@ -216,17 +216,17 @@ export function getLayer(
     },
     hexagon: {
       Layer: HexagonLayer,
-      propMap: {visConfig: {...aggregationVisConfig, worldUnitSize: x => ({radius: 1000 * x})}},
+      propMap: {visConfig: {...aggregationVisConfig, worldUnitSize: (x: any) => ({radius: 1000 * x})}},
       defaultProps: {getPosition}
     },
     hexagonId: {
       Layer: H3HexagonLayer,
       propMap: {visConfig: {coverage: 'coverage'}},
-      defaultProps: {getHexagon: d => d[hexagonId], stroked: false}
+      defaultProps: {getHexagon: (d: any) => d[hexagonId], stroked: false}
     }
   };
 
-  const layer = layerTypeDefs[type];
+  const layer = layerTypeDefs[type as DocumentLayerType];
 
   assert(layer, `Unsupported layer type: ${type}`);
   return {
@@ -236,11 +236,11 @@ export function getLayer(
   };
 }
 
-function getTileLayer(dataset: MapDataset, basePropMap, type: LayerType) {
+function getTileLayer(dataset: MapDataset, basePropMap: any, type: LayerType) {
   const {aggregationExp, aggregationResLevel} = dataset;
 
   return {
-    Layer: TILE_LAYER_TYPE_TO_LAYER[type] || VectorTileLayer,
+    Layer: TILE_LAYER_TYPE_TO_LAYER[type as TileLayerType] || VectorTileLayer,
     propMap: basePropMap,
     defaultProps: {
       ...defaultProps,
@@ -251,9 +251,9 @@ function getTileLayer(dataset: MapDataset, basePropMap, type: LayerType) {
   };
 }
 
-function domainFromAttribute(attribute, scaleType: SCALE_TYPE, scaleLength: number) {
+function domainFromAttribute(attribute: any, scaleType: SCALE_TYPE, scaleLength: number) {
   if (scaleType === 'ordinal' || scaleType === 'point') {
-    return attribute.categories.map(c => c.category).filter(c => c !== undefined && c !== null);
+    return attribute.categories.map((c: any) => c.category).filter((c: any) => c !== undefined && c !== null);
   }
 
   if (scaleType === 'quantile' && attribute.quantiles) {
@@ -269,7 +269,7 @@ function domainFromAttribute(attribute, scaleType: SCALE_TYPE, scaleLength: numb
   return [min, attribute.max];
 }
 
-function domainFromValues(values, scaleType: SCALE_TYPE) {
+function domainFromValues(values: any, scaleType: SCALE_TYPE) {
   if (scaleType === 'ordinal' || scaleType === 'point') {
     return groupSort(
       values,
@@ -277,7 +277,7 @@ function domainFromValues(values, scaleType: SCALE_TYPE) {
       d => d
     );
   } else if (scaleType === 'quantile') {
-    return values.sort((a, b) => a - b);
+    return values.sort((a: any, b: any) => a - b);
   } else if (scaleType === 'log') {
     const [d0, d1] = extent(values as number[]);
     return [d0 === 0 ? 1e-5 : d0, d1];
@@ -285,28 +285,28 @@ function domainFromValues(values, scaleType: SCALE_TYPE) {
   return extent(values);
 }
 
-function calculateDomain(data, name, scaleType, scaleLength?) {
+function calculateDomain(data: any, name: any, scaleType: SCALE_TYPE, scaleLength?: number) {
   if (data.tilestats) {
     // Tileset data type
     const {attributes} = data.tilestats.layers[0];
-    const attribute = attributes.find(a => a.attribute === name);
-    return domainFromAttribute(attribute, scaleType, scaleLength);
+    const attribute = attributes.find((a: any) => a.attribute === name);
+    return domainFromAttribute(attribute, scaleType, scaleLength as number);
   } else if (data.features) {
     // GeoJSON data type
-    const values = data.features.map(({properties}) => properties[name]);
+    const values = data.features.map(({properties}: {properties: any}) => properties[name]);
     return domainFromValues(values, scaleType);
   } else if (Array.isArray(data) && data[0][name] !== undefined) {
     // JSON data type
-    const values = data.map(properties => properties[name]);
+    const values = data.map((properties: any) => properties[name]);
     return domainFromValues(values, scaleType);
   }
 
   return [0, 1];
 }
 
-function normalizeAccessor(accessor, data) {
+function normalizeAccessor(accessor: any, data: any) {
   if (data.features || data.tilestats) {
-    return (object, info) => {
+    return (object: any, info: any) => {
       if (object) {
         return accessor(object.properties || object.__source.object.properties);
       }
@@ -323,7 +323,7 @@ export function opacityToAlpha(opacity?: number) {
   return opacity !== undefined ? Math.round(255 * Math.pow(opacity, 1 / 2.2)) : 255;
 }
 
-function getAccessorKeys(name: string, aggregation?: string | undefined): string[] {
+function getAccessorKeys(name: string, aggregation?: string | null | undefined): string[] {
   let keys = [name];
   if (aggregation) {
     // Snowflake will capitalized the keys, need to check lower and upper case version
@@ -332,7 +332,7 @@ function getAccessorKeys(name: string, aggregation?: string | undefined): string
   return keys;
 }
 
-function findAccessorKey(keys: string[], properties): string[] {
+function findAccessorKey(keys: string[], properties: any): string[] {
   for (const key of keys) {
     if (key in properties) {
       return [key];
@@ -342,16 +342,16 @@ function findAccessorKey(keys: string[], properties): string[] {
   throw new Error(`Could not find property for any accessor key: ${keys}`);
 }
 
-export function getColorValueAccessor({name}, colorAggregation, data: any) {
+export function getColorValueAccessor({name}: VisualChannelField, colorAggregation: string, data: any) {
   const aggregator = AGGREGATION_FUNC[colorAggregation];
-  const accessor = values => aggregator(values, p => p[name]);
+  const accessor = (values: any) => aggregator(values, (p: any) => p[name]);
   return normalizeAccessor(accessor, data);
 }
 
 export function getColorAccessor(
   {name, colorColumn}: VisualChannelField,
   scaleType: SCALE_TYPE,
-  {aggregation, range},
+  {aggregation, range}: {aggregation: string, range: any},
   opacity: number | undefined,
   data: any
 ) {
@@ -359,7 +359,7 @@ export function getColorAccessor(
   const alpha = opacityToAlpha(opacity);
 
   let accessorKeys = getAccessorKeys(name, aggregation);
-  const accessor = properties => {
+  const accessor = (properties: any) => {
     if (!(accessorKeys[0] in properties)) {
       accessorKeys = findAccessorKey(accessorKeys, properties);
     }
@@ -370,7 +370,7 @@ export function getColorAccessor(
   return normalizeAccessor(accessor, data);
 }
 
-function calculateLayerScale(name, scaleType, range, data) {
+function calculateLayerScale(name: any, scaleType: SCALE_TYPE, range: any, data: any) {
   const scale = SCALE_FUNCS[scaleType]();
   let domain: (string | number)[] = [];
   let scaleColor: string[] = [];
@@ -406,7 +406,7 @@ const FALLBACK_ICON =
 export function getIconUrlAccessor(
   field: VisualChannelField | null | undefined,
   range: CustomMarkersRange | null | undefined,
-  {fallbackUrl, maxIconSize, useMaskedIcons},
+  {fallbackUrl, maxIconSize, useMaskedIcons}: {fallbackUrl?: string | null, maxIconSize: number, useMaskedIcons?: boolean},
   data: any
 ) {
   const urlToUnpackedIcon = (url: string) => ({
@@ -434,7 +434,7 @@ export function getIconUrlAccessor(
     }
   }
 
-  const accessor = properties => {
+  const accessor = (properties: any) => {
     const propertyValue = properties[field.name];
     return mapping[propertyValue] || unknownIcon;
   };
@@ -453,10 +453,10 @@ export function negateAccessor<T>(accessor: Accessor<T, number>): Accessor<T, nu
 }
 
 export function getSizeAccessor(
-  {name},
+  {name}: VisualChannelField,
   scaleType: SCALE_TYPE | undefined,
-  aggregation,
-  range: Iterable<Range> | undefined,
+  aggregation: string | null | undefined,
+  range: Iterable<Range> | null | undefined,
   data: any
 ) {
   const scale = scaleType ? SCALE_FUNCS[scaleType as any]() : identity;
@@ -468,7 +468,7 @@ export function getSizeAccessor(
   }
 
   let accessorKeys = getAccessorKeys(name, aggregation);
-  const accessor = properties => {
+  const accessor = (properties: any) => {
     if (!(accessorKeys[0] in properties)) {
       accessorKeys = findAccessorKey(accessorKeys, properties);
     }
@@ -486,9 +486,9 @@ const FORMATS: Record<string, (value: any) => string> = {
   default: String
 };
 
-export function getTextAccessor({name, type}: VisualChannelField, data) {
+export function getTextAccessor({name, type}: VisualChannelField, data: any) {
   const format = FORMATS[type] || FORMATS.default;
-  const accessor = properties => {
+  const accessor = (properties: any) => {
     return format(properties[name]);
   };
   return normalizeAccessor(accessor, data);

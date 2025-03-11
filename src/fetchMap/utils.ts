@@ -15,7 +15,7 @@ export function createBinaryProxy(
       if (property in numericProps) {
         return numericProps[property as string].value[index];
       }
-      return target[property as string];
+      return target[property as any];
     },
 
     has(target, property) {
@@ -33,17 +33,17 @@ export function createBinaryProxy(
 }
 
 export function scaleIdentity() {
-  let unknown;
+  let unknown: any;
 
-  function scale(x) {
+  function scale(x: any) {
     return x === null ? unknown : x;
   }
 
   scale.invert = scale;
 
-  scale.domain = scale.range = d => d;
+  scale.domain = scale.range = (d: any) => d;
 
-  scale.unknown = u => {
+  scale.unknown = (u: any) => {
     if (u) {
       unknown = u;
     }

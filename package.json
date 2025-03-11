@@ -68,6 +68,7 @@
     "@turf/invariant": "^7.2.0",
     "@turf/union": "^7.2.0",
     "@types/geojson": "^7946.0.16",
+    "d3-format": "^3.1.0",
     "d3-scale": "^4.0.2",
     "h3-js": "4.1.0"
   },
@@ -91,6 +92,7 @@
     "@luma.gl/shadertools": "~9.1.0",
     "@turf/buffer": "^7.2.0",
     "@turf/random": "^7.2.0",
+    "@types/d3-format": "^3.0.4",
     "@types/d3-scale": "^4.0.9",
     "@types/json-schema": "^7.0.15",
     "@types/react": "^18.3.18",
