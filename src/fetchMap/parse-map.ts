@@ -11,12 +11,13 @@ import {
   opacityToAlpha,
   getIconUrlAccessor,
   negateAccessor,
-  getMaxMarkerSize
+  getMaxMarkerSize,
+  LayerType
 } from './layer-map.js';
 import {PointLabelLayer} from '@deck.gl/carto';
 import {CollisionFilterExtension} from '@deck.gl/extensions';
 import {assert} from '../utils.js';
-import {KeplerMapConfig, MapDataset, MapLayerConfig, VisualChannels} from './types.js';
+import {KeplerMapConfig, MapDataset, MapLayerConfig, VisualChannels, VisConfig} from './types.js';
 
 const collisionFilterExtension = new CollisionFilterExtension();
 
@@ -40,7 +41,7 @@ export type ParseMapResult = {
   layers: Layer[];
 };
 
-export function parseMap(json) {
+export function parseMap(json: any) {
   const {keplerMapConfig, datasets, token} = json;
   assert(keplerMapConfig.version === 'v1', 'Only support Kepler v1');
   const {mapState, mapStyle} = keplerMapConfig.config as KeplerMapConfig;
@@ -56,14 +57,14 @@ export function parseMap(json) {
     /** @deprecated Use `basemap`. */
     mapStyle,
     token,
-    layers: layers.reverse().map(({id, type, config, visualChannels}) => {
+    layers: layers.reverse().map(({id, type, config, visualChannels}: {id: string, type: string, config: any, visualChannels: any}) => {
       try {
         const {dataId} = config;
-        const dataset: MapDataset | null = datasets.find(d => d.id === dataId);
+        const dataset: MapDataset | null = datasets.find((d: any) => d.id === dataId);
         assert(dataset, `No dataset matching dataId: ${dataId}`);
         const {data} = dataset;
         assert(data, `No data loaded for dataId: ${dataId}`);
-        const {Layer, propMap, defaultProps} = getLayer(type, config, dataset);
+        const {Layer, propMap, defaultProps} = getLayer(type as LayerType, config, dataset);
         const styleProps = createStyleProps(config, propMap);
         return new Layer({
           id,
@@ -100,7 +101,7 @@ function createParametersProp(layerBlending: string, parameters: ColorParameters
   return Object.keys(parameters).length ? {parameters} : {};
 }
 
-function createInteractionProps(interactionConfig) {
+function createInteractionProps(interactionConfig: any) {
   const pickable = interactionConfig && interactionConfig.tooltip.enabled;
   return {
     autoHighlight: pickable,
@@ -108,7 +109,7 @@ function createInteractionProps(interactionConfig) {
   };
 }
 
-function mapProps(source, target, mapping) {
+function mapProps(source: any, target: any, mapping: any) {
   for (const sourceKey in mapping) {
     const sourceValue = source[sourceKey];
     const targetKey = mapping[sourceKey];
@@ -128,7 +129,7 @@ function mapProps(source, target, mapping) {
   }
 }
 
-function createStyleProps(config: MapLayerConfig, mapping) {
+function createStyleProps(config: MapLayerConfig, mapping: any) {
   const result: Record<string, any> = {};
   mapProps(config, result, mapping);
 
@@ -142,7 +143,7 @@ function createStyleProps(config: MapLayerConfig, mapping) {
     if (Array.isArray(result[colorAccessor])) {
       const color = [...result[colorAccessor]];
       const opacityKey = OPACITY_MAP[colorAccessor];
-      const opacity = config.visConfig[opacityKey];
+      const opacity = config.visConfig[opacityKey as keyof VisConfig];
       color[3] = opacityToAlpha(opacity);
       result[colorAccessor] = color;
     }
@@ -158,7 +159,7 @@ function createChannelProps(
   type: string,
   config: MapLayerConfig,
   visualChannels: VisualChannels,
-  data
+  data: any
 ) {
   const {
     colorField,
@@ -186,7 +187,7 @@ function createChannelProps(
       if (!AGGREGATION[colorAggregation]) {
         result.getColorValue = getColorValueAccessor(colorField, colorAggregation, data);
       } else {
-        result.getColorWeight = d => d[colorField.name];
+        result.getColorWeight = (d: any) => d[colorField.name];
       }
     }
   } else if (colorField) {
@@ -204,8 +205,8 @@ function createChannelProps(
   if (type === 'point') {
     const altitude = config.columns?.altitude;
     if (altitude) {
-      result.dataTransform = data => {
-        data.features.forEach(({geometry, properties}) => {
+      result.dataTransform = (data: any) => {
+        data.features.forEach(({geometry, properties}: {geometry: any, properties: any}) => {
           const {type, coordinates} = geometry;
           if (type === 'Point') {
             coordinates[2] = properties[altitude];

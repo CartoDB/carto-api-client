@@ -1,25 +1,28 @@
 import {
-  DEFAULT_API_BASE_URL,
-  APIErrorContext,
-  CartoAPIError,
   GeojsonResult,
   JsonResult,
   TilejsonResult,
-  Format,
-  MapType,
-  QueryParameters,
   SourceOptions,
-  buildPublicMapUrl,
-  buildStatsUrl,
   h3QuerySource,
   h3TableSource,
   quadbinQuerySource,
   quadbinTableSource,
   vectorQuerySource,
   vectorTableSource,
-  vectorTilesetSource,
-  requestWithParameters
-} from '@carto/api-client';
+  vectorTilesetSource
+} from '../sources/index.js';
+
+import type {Format, MapType, QueryParameters} from '../types.js';
+import {DEFAULT_API_BASE_URL} from '../constants.js';
+
+import {
+  APIErrorContext,
+  CartoAPIError,
+  buildPublicMapUrl,
+  buildStatsUrl,
+  requestWithParameters,
+} from '../api/index.js';
+
 import {ParseMapResult, parseMap} from './parse-map.js';
 import {assert} from '../utils.js';
 import type {Basemap} from './types.js';
@@ -308,12 +311,12 @@ export async function fetchMap({
   }
 
   const geojsonLayers = map.keplerMapConfig.config.visState.layers.filter(
-    ({type}) => type === 'geojson' || type === 'point'
+    ({type}: {type: string}) => type === 'geojson' || type === 'point'
   );
-  const geojsonDatasetIds = geojsonLayers.map(({config}) => config.dataId);
-  map.datasets.forEach(dataset => {
+  const geojsonDatasetIds = geojsonLayers.map(({config}: {config: any}) => config.dataId);
+  map.datasets.forEach((dataset: any) => {
     if (geojsonDatasetIds.includes(dataset.id)) {
-      const {config} = geojsonLayers.find(({config}) => config.dataId === dataset.id);
+      const {config} = geojsonLayers.find(({config}: {config: any}) => config.dataId === dataset.id);
       dataset.format = 'geojson';
       // Support for very old maps. geoColumn was not stored in the past
       if (!dataset.geoColumn && config.columns.geojson) {
@@ -334,7 +337,7 @@ export async function fetchMap({
 
   const out = {...parseMap(map), basemap, ...{stopAutoRefresh}};
 
-  const textLayers = out.layers.filter(layer => {
+  const textLayers = out.layers.filter((layer: any) => {
     const pointType = layer.props.pointType || '';
     return pointType.includes('text');
   });

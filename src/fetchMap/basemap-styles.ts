@@ -1,4 +1,4 @@
-import {CartoAPIError, APIErrorContext} from '@carto/api-client';
+import {CartoAPIError, APIErrorContext} from '../api/index.js';
 import {GoogleBasemapProps} from './types.js';
 
 const cartoStyleUrlTemplate = 'https://basemaps.cartocdn.com/gl/{basemap}-gl-style/style.json';
@@ -79,7 +79,7 @@ export const STYLE_LAYER_GROUPS: StyleLayerGroup[] = [
 ];
 
 export function applyLayerGroupFilters(
-  style,
+  style: any,
   visibleLayerGroups: Record<StyleLayerGroupSlug, boolean>
 ) {
   if (!Array.isArray(style?.layers)) {
@@ -90,7 +90,7 @@ export function applyLayerGroupFilters(
     lg => lg.filter
   );
 
-  const visibleLayers = style.layers.filter(layer =>
+  const visibleLayers = style.layers.filter((layer: any) =>
     removedLayerFilters.every(match => !match(layer))
   );
 

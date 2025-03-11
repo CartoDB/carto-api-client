@@ -58,8 +58,8 @@ type TileLayerType =
   | 'quadbin'
   | 'raster'
   | 'tileset';
-type DocumentLayerType = 'geojson' | 'grid' | 'heatmap' | 'hexagon' | 'hexagonId' | 'point';
-type LayerType = TileLayerType | DocumentLayerType;
+export type DocumentLayerType = 'geojson' | 'grid' | 'heatmap' | 'hexagon' | 'hexagonId' | 'point';
+export type LayerType = TileLayerType | DocumentLayerType;
 
 function identity<T>(v: T): T {
   return v;
@@ -67,14 +67,14 @@ function identity<T>(v: T): T {
 
 const UNKNOWN_COLOR = '#868d91';
 
-export const AGGREGATION = {
+export const AGGREGATION: Record<string, string> = {
   average: 'MEAN',
   maximum: 'MAX',
   minimum: 'MIN',
   sum: 'SUM'
 };
 
-export const OPACITY_MAP = {
+export const OPACITY_MAP: Record<string, string> = {
   getFillColor: 'opacity',
   getLineColor: 'strokeOpacity',
   getTextColor: 'opacity'
