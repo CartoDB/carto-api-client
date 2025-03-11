@@ -24,10 +24,10 @@ import {
   vectorTilesetSource,
   requestWithParameters
 } from '@carto/api-client';
-import {ParseMapResult, parseMap} from './parse-map';
-import {assert} from '../utils';
-import type {Basemap} from './types';
-import {fetchBasemapProps} from './basemap';
+import {ParseMapResult, parseMap} from './parse-map.js';
+import {assert} from '../utils.js';
+import type {Basemap} from './types.js';
+import {fetchBasemapProps} from './basemap.js';
 
 type Dataset = {
   id: string;

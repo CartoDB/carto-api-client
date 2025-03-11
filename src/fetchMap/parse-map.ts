@@ -16,11 +16,11 @@ import {
   getIconUrlAccessor,
   negateAccessor,
   getMaxMarkerSize
-} from './layer-map';
-import PointLabelLayer from '../layers/point-label-layer';
+} from './layer-map.js';
+import {PointLabelLayer} from '@deck.gl/carto';
 import {CollisionFilterExtension} from '@deck.gl/extensions';
-import {assert} from '../utils';
-import {KeplerMapConfig, MapDataset, MapLayerConfig, VisualChannels} from './types';
+import {assert} from '../utils.js';
+import {KeplerMapConfig, MapDataset, MapLayerConfig, VisualChannels} from './types.js';
 
 const collisionFilterExtension = new CollisionFilterExtension();
 

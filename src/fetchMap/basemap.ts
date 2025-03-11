@@ -10,8 +10,8 @@ import {
   fetchStyle,
   getStyleUrl,
   someLayerGroupsDisabled
-} from '../basemap';
-import {Basemap, KeplerMapConfig, MapLibreBasemapProps} from './types';
+} from '../basemap.js';
+import {Basemap, KeplerMapConfig, MapLibreBasemapProps} from './types.js';
 import {APIErrorContext} from '@carto/api-client';
 
 const CUSTOM_STYLE_ID_PREFIX = 'custom:';
