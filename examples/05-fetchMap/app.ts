@@ -7,7 +7,7 @@ import {
   fetchMap,
   FetchMapOptions,
   _GoogleBasemap as GoogleBasemap,
-  _MapLibreBasemap as MapLibreBasemap
+  _MapLibreBasemap as MapLibreBasemap,
 } from '@deck.gl/carto';
 import {Deck} from '@deck.gl/core';
 import maplibregl from 'maplibre-gl';
@@ -34,10 +34,10 @@ function createMapWithMapLibreOverlay(result: FetchMapResult) {
     ...basemap?.props,
     style: basemap?.props.style || BASEMAP.POSITRON,
     interactive: true,
-    attributionControl: false
+    attributionControl: false,
   }).addControl(
     new maplibregl.AttributionControl({
-      customAttribution: basemap?.attribution
+      customAttribution: basemap?.attribution,
     })
   );
 
@@ -56,7 +56,7 @@ async function createMapWithGoogleMapsOverlay(result: FetchMapResult) {
   const map = new googlemaps.Map(document.getElementById('map')!, {
     ...basemap.props,
     isFractionalZoomEnabled: true,
-    disableDefaultUI: true
+    disableDefaultUI: true,
   });
 
   const overlay = new GoogleMapsOverlay({layers: result.layers});
@@ -67,9 +67,9 @@ async function createMapWithGoogleMapsOverlay(result: FetchMapResult) {
 
 async function createMap(cartoMapId: string) {
   const options: FetchMapOptions = {
-    apiBaseUrl, 
+    apiBaseUrl,
     cartoMapId,
-    accessToken: import.meta.env.VITE_CARTO_ACCESS_TOKEN
+    accessToken: import.meta.env.VITE_CARTO_ACCESS_TOKEN,
   };
 
   let deck: Deck | GoogleMapsOverlay | MapboxOverlay | undefined;
@@ -117,7 +117,7 @@ const examples = [
   '8ead73bb-aa1f-4bf6-91fc-52a50c682938', // Quadbin — Tileset 14M Spatial Features USA
 
   // Heatmap
-  '0b3c86ad-3c14-4c89-986a-07ba23306c3d' // Quadbin - Tileset, represented through Heatmap
+  '0b3c86ad-3c14-4c89-986a-07ba23306c3d', // Quadbin - Tileset, represented through Heatmap
 ];
 const params = new URLSearchParams(location.search.slice(1));
 const id = params.has('id') ? params.get('id')! : examples[0];
