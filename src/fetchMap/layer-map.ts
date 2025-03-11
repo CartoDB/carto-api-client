@@ -1,7 +1,3 @@
-// deck.gl
-// SPDX-License-Identifier: MIT
-// Copyright (c) vis.gl contributors
-
 import {deviation, extent, groupSort, median, variance} from 'd3-array';
 import {rgb} from 'd3-color';
 import {
@@ -21,13 +17,16 @@ import {Accessor, Layer, _ConstructorOf as ConstructorOf} from '@deck.gl/core';
 import {GridLayer, HeatmapLayer, HexagonLayer} from '@deck.gl/aggregation-layers';
 import {GeoJsonLayer} from '@deck.gl/layers';
 import {H3HexagonLayer} from '@deck.gl/geo-layers';
+import {
+  ClusterTileLayer,
+  H3TileLayer,
+  QuadbinTileLayer,
+  RasterTileLayer,
+  VectorTileLayer,
+  HeatmapTileLayer
+} from '@deck.gl/carto';
 
-import ClusterTileLayer from '../layers/cluster-tile-layer';
-import H3TileLayer from '../layers/h3-tile-layer';
-import QuadbinTileLayer from '../layers/quadbin-tile-layer';
-import RasterTileLayer from '../layers/raster-tile-layer';
-import VectorTileLayer from '../layers/vector-tile-layer';
-import {assert, createBinaryProxy, scaleIdentity} from '../utils';
+import {assert, createBinaryProxy, scaleIdentity} from '../utils.js';
 import {
   CustomMarkersRange,
   MapDataset,
@@ -35,8 +34,7 @@ import {
   VisConfig,
   VisualChannelField,
   VisualChannels
-} from './types';
-import HeatmapTileLayer from '../layers/heatmap-tile-layer';
+} from './types.js';
 
 const SCALE_FUNCS = {
   linear: scaleLinear,

@@ -1,7 +1,3 @@
-// deck.gl
-// SPDX-License-Identifier: MIT
-// Copyright (c) vis.gl contributors
-
 import {MapViewState} from '@deck.gl/core';
 import {
   GOOGLE_BASEMAPS,
@@ -10,7 +6,7 @@ import {
   fetchStyle,
   getStyleUrl,
   someLayerGroupsDisabled
-} from '../basemap.js';
+} from './basemap-styles.js';
 import {Basemap, KeplerMapConfig, MapLibreBasemapProps} from './types.js';
 import {APIErrorContext} from '@carto/api-client';
 
