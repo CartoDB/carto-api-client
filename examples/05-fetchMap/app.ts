@@ -10,8 +10,8 @@ import {
   _MapLibreBasemap as MapLibreBasemap
 } from '@deck.gl/carto';
 import {Deck} from '@deck.gl/core';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import {Loader} from '@googlemaps/js-api-loader';
 
 import {_getStyleUrl} from '@deck.gl/carto';
@@ -37,7 +37,7 @@ async function createMapWithDeckController(result: FetchMapResult) {
   deck.setProps({initialViewState, layers});
 
   const basemap = result.basemap as MapLibreBasemap;
-  const map = new mapboxgl.Map({
+  const map = new maplibregl.Map({
     container: 'map',
     ...basemap.props,
     interactive: false
@@ -52,18 +52,18 @@ async function createMapWithDeckController(result: FetchMapResult) {
   return deck;
 }
 
-async function createMapWithMapboxOverlay(result: FetchMapResult) {
+async function createMapWithMapLibreOverlay(result: FetchMapResult) {
   document.getElementById('deck-canvas')!.style.display = 'none';
 
   const basemap = result.basemap as MapLibreBasemap;
-  const map = new mapboxgl.Map({
+  const map = new maplibregl.Map({
     container: 'map',
     ...basemap?.props,
     style: basemap?.props.style || BASEMAP.POSITRON,
     interactive: true,
     attributionControl: false
   }).addControl(
-    new mapboxgl.AttributionControl({
+    new maplibregl.AttributionControl({
       customAttribution: basemap?.attribution
     })
   );
@@ -93,7 +93,11 @@ async function createMapWithGoogleMapsOverlay(result: FetchMapResult) {
 }
 
 async function createMap(cartoMapId: string) {
-  const options: FetchMapOptions = {apiBaseUrl, cartoMapId};
+  const options: FetchMapOptions = {
+    apiBaseUrl, 
+    cartoMapId,
+    accessToken: import.meta.env.VITE_CARTO_ACCESS_TOKEN
+  };
 
   let deck: Deck | GoogleMapsOverlay | MapboxOverlay | undefined;
 
@@ -113,7 +117,7 @@ async function createMap(cartoMapId: string) {
   if (GOOGLE_MAPS_API_KEY && result.basemap?.type === 'google-maps') {
     deck = await createMapWithGoogleMapsOverlay(result);
   } else {
-    deck = await createMapWithMapboxOverlay(result);
+    deck = await createMapWithMapLibreOverlay(result);
     // deck = await createMapWithDeckController(result);
   }
 }
