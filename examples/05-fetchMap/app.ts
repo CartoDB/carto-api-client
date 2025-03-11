@@ -14,14 +14,9 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import {Loader} from '@googlemaps/js-api-loader';
 
-import {_getStyleUrl} from '@deck.gl/carto';
-import {FetchMapResult} from 'modules/carto/src/api/fetch-map';
+type FetchMapResult = any; // TODO: fix type
 import {GoogleMapsOverlay} from '@deck.gl/google-maps';
 import {MapboxOverlay} from '@deck.gl/mapbox';
-
-// // Simplest instantiation
-// const cartoMapId = 'ff6ac53f-741a-49fb-b615-d040bc5a96b8';
-// fetchMap({cartoMapId}).then(map => new Deck(map));
 
 // Get proper API key to be able to render Google basemaps, otherwise we
 // render on maplibre/positron style
@@ -30,29 +25,7 @@ const GOOGLE_MAPS_API_KEY = '';
 const apiBaseUrl = 'https://gcp-us-east1.api.carto.com';
 // const apiBaseUrl = 'https://gcp-us-east1-05.dev.api.carto.com';
 
-async function createMapWithDeckController(result: FetchMapResult) {
-  const deck = new Deck({canvas: 'deck-canvas'});
-  // Get map info from CARTO and update deck
-  const {initialViewState, layers} = result;
-  deck.setProps({initialViewState, layers});
-
-  const basemap = result.basemap as MapLibreBasemap;
-  const map = new maplibregl.Map({
-    container: 'map',
-    ...basemap.props,
-    interactive: false
-  });
-  deck.setProps({
-    controller: true,
-    onViewStateChange: ({viewState}) => {
-      const {longitude, latitude, ...rest} = viewState;
-      map.jumpTo({center: [longitude, latitude], ...rest});
-    }
-  });
-  return deck;
-}
-
-async function createMapWithMapLibreOverlay(result: FetchMapResult) {
+function createMapWithMapLibreOverlay(result: FetchMapResult) {
   document.getElementById('deck-canvas')!.style.display = 'none';
 
   const basemap = result.basemap as MapLibreBasemap;
@@ -117,8 +90,7 @@ async function createMap(cartoMapId: string) {
   if (GOOGLE_MAPS_API_KEY && result.basemap?.type === 'google-maps') {
     deck = await createMapWithGoogleMapsOverlay(result);
   } else {
-    deck = await createMapWithMapLibreOverlay(result);
-    // deck = await createMapWithDeckController(result);
+    deck = createMapWithMapLibreOverlay(result);
   }
 }
 
@@ -177,4 +149,4 @@ const mapContainer = document.getElementById('container')!;
 mapContainer.style.height = 'calc(50% - 26px)';
 mapContainer.style.margin = '5px';
 
-createMap(id);
+await createMap(id);
