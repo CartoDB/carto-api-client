@@ -26,7 +26,8 @@ import {
   HeatmapTileLayer
 } from '@deck.gl/carto';
 
-import {assert, createBinaryProxy, scaleIdentity} from '../utils.js';
+import {assert} from '../utils.js';
+import {createBinaryProxy, scaleIdentity} from './utils.js';
 import {
   CustomMarkersRange,
   MapDataset,
