@@ -6,8 +6,8 @@ import {
   BASEMAP,
   fetchMap,
   FetchMapOptions,
-  _GoogleBasemap as GoogleBasemap,
-  _MapLibreBasemap as MapLibreBasemap,
+  GoogleBasemap,
+  MapLibreBasemap,
 } from '@carto/api-client';
 import {Deck} from '@deck.gl/core';
 import maplibregl from 'maplibre-gl';
