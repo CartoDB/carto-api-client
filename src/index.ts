@@ -1,6 +1,7 @@
 export * from './client.js';
 export * from './constants.js';
 export * from './deck/index.js';
+export * from './fetchMap/index.js';
 export * from './filters.js';
 export * from './geo.js';
 export * from './sources/index.js';
