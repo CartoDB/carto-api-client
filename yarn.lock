@@ -1461,8 +1461,6 @@ __metadata:
     "@types/geojson": "npm:^7946.0.16"
     d3-scale: "npm:^4.0.2"
     h3-js: "npm:4.1.0"
-  peerDependencies:
-    "@deck.gl/carto": ~9.1.0
   languageName: node
   linkType: soft
 
@@ -1524,8 +1522,6 @@ __metadata:
     typescript-eslint: "npm:^8.24.0"
     vite: "npm:^6.1.0"
     vitest: "npm:3.0.7"
-  peerDependencies:
-    "@deck.gl/carto": ~9.1.0
   languageName: unknown
   linkType: soft
 
