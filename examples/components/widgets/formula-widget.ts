@@ -59,7 +59,6 @@ export class FormulaWidget extends BaseWidget {
         operation,
         column,
         spatialFilter: this.getSpatialFilterOrViewState(),
-        spatialIndexReferenceViewState: this.viewState ?? undefined,
       });
       return response.value;
     },
