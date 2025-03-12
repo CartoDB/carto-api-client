@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
+import {describe, test, expect} from 'vitest';
 import {BASEMAP, _MapLibreBasemap as MapLibreBasemap} from '@deck.gl/carto';
-import test from 'tape-catch';
 import {withMockFetchMapsV3} from '../mock-fetch';
 import {KeplerMapConfig} from '@deck.gl/carto/api/types';
 import {fetchBasemapProps} from '@deck.gl/carto';
@@ -27,10 +27,12 @@ const mockedMapConfig: KeplerMapConfig = {
   layerBlending: undefined,
   interactionConfig: undefined
 };
+
 const mockedCartoStyle = {
   id: '1234',
   layers: [{id: 'background'}, {id: 'label'}, {id: 'road'}, {id: 'boundaries'}, {id: 'water'}]
 };
+
 async function responseFunc(url: string) {
   if (url === BASEMAP.VOYAGER) {
     return {
@@ -47,15 +49,17 @@ async function responseFunc(url: string) {
     };
   }
 }
-test('fetchBasemapProps#carto - no filters', async t =>
-  withMockFetchMapsV3(async calls => {
-    t.equals(calls.length, 0, '0 initial calls');
 
-    const r = await fetchBasemapProps({config: mockedMapConfig});
-    t.equals(calls.length, 0, 'no style loaded, when there are no filters');
-    t.deepEquals(
-      r,
-      {
+describe('fetchBasemapProps', () => {
+  test('carto - no filters', async () => {
+    let calls: any[] = [];
+    await withMockFetchMapsV3(async _calls => {
+      calls = _calls;
+      expect(calls.length).toBe(0);
+
+      const r = await fetchBasemapProps({config: mockedMapConfig});
+      expect(calls.length).toBe(0);
+      expect(r).toEqual({
         type: 'maplibre',
         props: {
           style: BASEMAP.POSITRON,
@@ -66,62 +70,61 @@ test('fetchBasemapProps#carto - no filters', async t =>
         },
         visibleLayerGroups: {},
         rawStyle: BASEMAP.POSITRON
-      },
-      'style is just positron URL'
-    );
-    t.end();
-  }, responseFunc));
+      });
+    }, responseFunc);
+  });
 
-test('fetchBasemapProps#carto - with filters', async t =>
-  withMockFetchMapsV3(async calls => {
-    const visibleLayerGroups = {label: false, road: true, border: true, water: true};
-    const r = await fetchBasemapProps({
-      config: {
-        ...mockedMapConfig,
-        mapStyle: {
-          styleType: 'voyager',
-          visibleLayerGroups
-        }
-      }
-    });
-    t.equals(calls.length, 1, 'should call fetch only once');
-    t.equals(calls[0].url, BASEMAP.VOYAGER, 'should request voyager style');
-    t.equals(r.type, 'maplibre', 'proper basemap type is returned');
-    const r2 = r as MapLibreBasemap;
-    t.equals(r2.rawStyle, mockedCartoStyle, 'raw style is returned');
-    t.deepEquals(
-      r2.props.style,
-      {
-        ...mockedCartoStyle,
-        layers: mockedCartoStyle.layers.filter(l => l.id !== 'label')
-      },
-      'actual style is loaded with layers filtered-out'
-    );
-    t.deepEquals(r2.visibleLayerGroups, visibleLayerGroups, 'visibleLayerGroups are passed');
-    t.end();
-  }, responseFunc));
-
-test('fetchBasemapProps#custom', async t =>
-  withMockFetchMapsV3(async calls => {
-    const r = await fetchBasemapProps({
-      config: {
-        ...mockedMapConfig,
-        mapStyle: {
-          styleType: 'custom:uuid1234'
-        },
-        customBaseMaps: {
-          customStyle: {
-            id: 'custom:uuid1234',
-            style: 'http://example.com/style.json',
-            customAttribution: 'custom attribution'
+  test('carto - with filters', async () => {
+    let calls: any[] = [];
+    await withMockFetchMapsV3(async _calls => {
+      calls = _calls;
+      const visibleLayerGroups = {label: false, road: true, border: true, water: true};
+      const r = await fetchBasemapProps({
+        config: {
+          ...mockedMapConfig,
+          mapStyle: {
+            styleType: 'voyager',
+            visibleLayerGroups
           }
         }
-      }
-    });
-    t.equals(calls.length, 0, `shouldn't make any fetch requests`);
-    t.deepEquals(
-      r,
-      {
+      });
+
+      expect(calls.length).toBe(1);
+      expect(calls[0].url).toBe(BASEMAP.VOYAGER);
+      expect(r.type).toBe('maplibre');
+
+      const r2 = r as MapLibreBasemap;
+      expect(r2.rawStyle).toBe(mockedCartoStyle);
+      expect(r2.props.style).toEqual({
+        ...mockedCartoStyle,
+        layers: mockedCartoStyle.layers.filter(l => l.id !== 'label')
+      });
+      expect(r2.visibleLayerGroups).toEqual(visibleLayerGroups);
+    }, responseFunc);
+  });
+
+  test('custom basemap', async () => {
+    let calls: any[] = [];
+    await withMockFetchMapsV3(async _calls => {
+      calls = _calls;
+      const r = await fetchBasemapProps({
+        config: {
+          ...mockedMapConfig,
+          mapStyle: {
+            styleType: 'custom:uuid1234'
+          },
+          customBaseMaps: {
+            customStyle: {
+              id: 'custom:uuid1234',
+              style: 'http://example.com/style.json',
+              customAttribution: 'custom attribution'
+            }
+          }
+        }
+      });
+
+      expect(calls.length).toBe(0);
+      expect(r).toEqual({
         type: 'maplibre',
         props: {
           style: 'http://example.com/style.json',
@@ -131,27 +134,25 @@ test('fetchBasemapProps#custom', async t =>
           bearing: 0
         },
         attribution: 'custom attribution'
-      },
-      'should return proper basemap settings'
-    );
-    t.end();
-  }, responseFunc));
+      });
+    }, responseFunc);
+  });
 
-test('fetchBasemapProps#google', async t =>
-  withMockFetchMapsV3(async calls => {
-    const r = await fetchBasemapProps({
-      config: {
-        ...mockedMapConfig,
-        mapStyle: {
-          styleType: 'google-voyager'
+  test('google maps', async () => {
+    let calls: any[] = [];
+    await withMockFetchMapsV3(async _calls => {
+      calls = _calls;
+      const r = await fetchBasemapProps({
+        config: {
+          ...mockedMapConfig,
+          mapStyle: {
+            styleType: 'google-voyager'
+          }
         }
-      }
-    });
+      });
 
-    t.equals(calls.length, 0, 'should fetch anything');
-    t.deepEquals(
-      r,
-      {
+      expect(calls.length).toBe(0);
+      expect(r).toEqual({
         type: 'google-maps',
         props: {
           mapTypeId: 'roadmap',
@@ -164,31 +165,28 @@ test('fetchBasemapProps#google', async t =>
           tilt: 0,
           heading: 0
         }
-      },
-      'should return proper google map props'
-    );
-    t.end();
-  }, responseFunc));
+      });
+    }, responseFunc);
+  });
 
-test('fetchBasemapProps#carto - error handling', async t =>
-  withMockFetchMapsV3(async calls => {
-    const expectedError = await fetchBasemapProps({
-      config: {
-        ...mockedMapConfig,
-        mapStyle: {
-          styleType: 'dark-matter',
-          visibleLayerGroups: {label: false, road: true, border: true, water: true}
+  test('error handling', async () => {
+    let calls: any[] = [];
+    await withMockFetchMapsV3(async _calls => {
+      calls = _calls;
+      const expectedError = await fetchBasemapProps({
+        config: {
+          ...mockedMapConfig,
+          mapStyle: {
+            styleType: 'dark-matter',
+            visibleLayerGroups: {label: false, road: true, border: true, water: true}
+          }
         }
-      }
-    }).catch(error => error);
+      }).catch(error => error);
 
-    t.equals(calls.length, 1, 'should call fetch only once');
-    t.equals(calls[0].url, BASEMAP.DARK_MATTER, 'should request proper style URL');
-    t.true(expectedError instanceof CartoAPIError, 'error is CartoAPIError');
-    t.equals(
-      expectedError.errorContext.requestType,
-      'Basemap style',
-      'proper requestType in error'
-    );
-    t.end();
-  }, responseFunc));
+      expect(calls.length).toBe(1);
+      expect(calls[0].url).toBe(BASEMAP.DARK_MATTER);
+      expect(expectedError).toBeInstanceOf(CartoAPIError);
+      expect(expectedError.errorContext.requestType).toBe('Basemap style');
+    }, responseFunc);
+  });
+});
