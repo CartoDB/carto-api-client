@@ -4,12 +4,12 @@
 
 import {describe, test, expect} from 'vitest';
 import {BASEMAP, _MapLibreBasemap as MapLibreBasemap} from '@deck.gl/carto';
-import {withMockFetchMapsV3} from '../mock-fetch';
-import {KeplerMapConfig} from '@deck.gl/carto/api/types';
+import {withMockFetchMapsV3} from '../__mock-fetch.js';
+import {KeplerMapConfig} from '@carto/api-client';
 import {fetchBasemapProps} from '@deck.gl/carto';
 import {CartoAPIError} from '@carto/api-client';
 
-const mockedMapConfig: KeplerMapConfig = {
+const mockedMapConfig = {
   mapState: {
     latitude: 33.3232,
     longitude: -122.0312,
@@ -26,7 +26,7 @@ const mockedMapConfig: KeplerMapConfig = {
   },
   layerBlending: undefined,
   interactionConfig: undefined
-};
+} as any;
 
 const mockedCartoStyle = {
   id: '1234',
@@ -185,7 +185,9 @@ describe('fetchBasemapProps', () => {
 
       expect(calls.length).toBe(1);
       expect(calls[0].url).toBe(BASEMAP.DARK_MATTER);
-      expect(expectedError).toBeInstanceOf(CartoAPIError);
+      expect(expectedError.message).toBe(`Basemap style API request failed
+Failed to connect connection error
+`);
       expect(expectedError.errorContext.requestType).toBe('Basemap style');
     }, responseFunc);
   });
