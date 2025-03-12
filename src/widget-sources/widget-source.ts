@@ -15,20 +15,13 @@ import {
   TableResponse,
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
-  ViewState,
 } from './types.js';
-import {
-  FilterLogicalOperator,
-  Filter,
-  SpatialFilter,
-  Filters,
-} from '../types.js';
+import {FilterLogicalOperator, Filter, Filters} from '../types.js';
 import {getApplicableFilters} from '../utils.js';
 import {getClient} from '../client.js';
 import {ModelSource} from '../models/model.js';
 import {SourceOptions} from '../sources/index.js';
 import {ApiVersion, DEFAULT_API_BASE_URL} from '../constants.js';
-import {getSpatialFiltersResolution} from '../spatial-index.js';
 import {AggregationOptions} from '../sources/types.js';
 
 export interface WidgetSourceProps extends Omit<SourceOptions, 'filters'> {
@@ -89,25 +82,6 @@ export abstract class WidgetSource<Props extends WidgetSourceProps> {
       spatialDataColumn: props.spatialDataColumn,
       dataResolution: (props as Partial<AggregationOptions>).dataResolution,
     };
-  }
-
-  protected _getSpatialFiltersResolution(
-    source: Omit<ModelSource, 'type' | 'data'>,
-    spatialFilter?: SpatialFilter,
-    referenceViewState?: ViewState
-  ): number | undefined {
-    // spatialFiltersResolution applies only to spatial index sources.
-    if (!spatialFilter || source.spatialDataType === 'geo') {
-      return;
-    }
-
-    if (!referenceViewState) {
-      throw new Error(
-        'Missing required option, "spatialIndexReferenceViewState".'
-      );
-    }
-
-    return getSpatialFiltersResolution(source, referenceViewState);
   }
 
   /**

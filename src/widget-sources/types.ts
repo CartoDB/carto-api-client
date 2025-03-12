@@ -24,8 +24,6 @@ interface BaseRequestOptions {
   signal?: AbortSignal;
   spatialFilter?: SpatialFilter;
   spatialFiltersMode?: SpatialFilterPolyfillMode;
-  /** Required for table- and query-based spatial index sources (H3, Quadbin). */
-  spatialIndexReferenceViewState?: ViewState;
   /** Overrides source filters, if any. */
   filters?: Filters;
   filterOwner?: string;
