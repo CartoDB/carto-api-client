@@ -1459,6 +1459,7 @@ __metadata:
     "@turf/invariant": "npm:^7.2.0"
     "@turf/union": "npm:^7.2.0"
     "@types/geojson": "npm:^7946.0.16"
+    d3-scale: "npm:^4.0.2"
     h3-js: "npm:4.1.0"
   languageName: node
   linkType: soft
@@ -1472,9 +1473,12 @@ __metadata:
     "@deck.gl/core": "npm:~9.1.0"
     "@deck.gl/extensions": "npm:~9.1.0"
     "@deck.gl/geo-layers": "npm:~9.1.0"
+    "@deck.gl/google-maps": "npm:~9.1.0"
     "@deck.gl/layers": "npm:~9.1.0"
+    "@deck.gl/mapbox": "npm:~9.1.0"
     "@deck.gl/mesh-layers": "npm:~9.1.0"
     "@eslint/js": "npm:^9.20.0"
+    "@googlemaps/js-api-loader": "npm:^1.16.6"
     "@lit/react": "npm:^1.0.7"
     "@lit/task": "npm:^1.0.2"
     "@loaders.gl/core": "npm:^4.3.3"
@@ -1493,6 +1497,7 @@ __metadata:
     "@turf/invariant": "npm:^7.2.0"
     "@turf/random": "npm:^7.2.0"
     "@turf/union": "npm:^7.2.0"
+    "@types/d3-scale": "npm:^4.0.9"
     "@types/geojson": "npm:^7946.0.16"
     "@types/json-schema": "npm:^7.0.15"
     "@types/react": "npm:^18.3.18"
@@ -1500,6 +1505,7 @@ __metadata:
     "@vitest/coverage-istanbul": "npm:^3.0.5"
     "@webcomponents/webcomponentsjs": "npm:^2.8.0"
     concurrently: "npm:^9.1.2"
+    d3-scale: "npm:^4.0.2"
     echarts: "npm:^5.6.0"
     eslint: "npm:^9.20.1"
     h3-js: "npm:4.1.0"
@@ -1648,6 +1654,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@deck.gl/google-maps@npm:~9.1.0":
+  version: 9.1.4
+  resolution: "@deck.gl/google-maps@npm:9.1.4"
+  dependencies:
+    "@luma.gl/constants": "npm:^9.1.2"
+    "@math.gl/core": "npm:^4.1.0"
+    "@types/google.maps": "npm:^3.48.6"
+  peerDependencies:
+    "@deck.gl/core": ^9.1.0
+    "@luma.gl/core": ^9.1.0
+    "@luma.gl/webgl": ^9.1.0
+  checksum: 10c0/b0cb5eeb60d83022c27c46bc2ea75809883071174832bcbbb1887a4ec943a244e6a25523c7ac07b7aba26fc86ac33ed16ca55ec6904d1020f3719f2013f40317
+  languageName: node
+  linkType: hard
+
 "@deck.gl/layers@npm:~9.1.0":
   version: 9.1.4
   resolution: "@deck.gl/layers@npm:9.1.4"
@@ -1666,6 +1687,19 @@ __metadata:
     "@luma.gl/core": ^9.1.0
     "@luma.gl/engine": ^9.1.0
   checksum: 10c0/74eae408ad1fe2392117419cef4988fb9ea00375f2c24ac450834957a5b6164845e07c93c1b6575afe7af3136dc9d619274f15113d683657de35b14b54891d9c
+  languageName: node
+  linkType: hard
+
+"@deck.gl/mapbox@npm:~9.1.0":
+  version: 9.1.4
+  resolution: "@deck.gl/mapbox@npm:9.1.4"
+  dependencies:
+    "@luma.gl/constants": "npm:^9.1.2"
+    "@math.gl/web-mercator": "npm:^4.1.0"
+  peerDependencies:
+    "@deck.gl/core": ^9.1.0
+    "@luma.gl/core": ^9.1.0
+  checksum: 10c0/297519d1250d8dbf9a21bfc30c02e0402b8b6c77e071c8bee09ed9c1b041741b245ae3448ae3227aaa4c4e7e92bfb2e7d486a1d8f58f3d2bc34541f55642d1c5
   languageName: node
   linkType: hard
 
@@ -1935,6 +1969,13 @@ __metadata:
     "@eslint/core": "npm:^0.12.0"
     levn: "npm:^0.4.1"
   checksum: 10c0/0a1aff1ad63e72aca923217e556c6dfd67d7cd121870eb7686355d7d1475d569773528a8b2111b9176f3d91d2ea81f7413c34600e8e5b73d59e005d70780b633
+  languageName: node
+  linkType: hard
+
+"@googlemaps/js-api-loader@npm:^1.16.6":
+  version: 1.16.8
+  resolution: "@googlemaps/js-api-loader@npm:1.16.8"
+  checksum: 10c0/c4159411f784253ef36c8a674756716637fcf50f7bf0600e7a5298c20229f3962f5fb73d8011dc478b60baea369c0d730db6ad13baa4e43cfc5444379a1ee75d
   languageName: node
   linkType: hard
 
@@ -3378,6 +3419,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/d3-scale@npm:^4.0.9":
+  version: 4.0.9
+  resolution: "@types/d3-scale@npm:4.0.9"
+  dependencies:
+    "@types/d3-time": "npm:*"
+  checksum: 10c0/4ac44233c05cd50b65b33ecb35d99fdf07566bcdbc55bc1306b2f27d1c5134d8c560d356f2c8e76b096e9125ffb8d26d95f78d56e210d1c542cb255bdf31d6c8
+  languageName: node
+  linkType: hard
+
+"@types/d3-time@npm:*":
+  version: 3.0.4
+  resolution: "@types/d3-time@npm:3.0.4"
+  checksum: 10c0/6d9e2255d63f7a313a543113920c612e957d70da4fb0890931da6c2459010291b8b1f95e149a538500c1c99e7e6c89ffcce5554dd29a31ff134a38ea94b6d174
+  languageName: node
+  linkType: hard
+
 "@types/d3-time@npm:^2":
   version: 2.1.4
   resolution: "@types/d3-time@npm:2.1.4"
@@ -3426,6 +3483,13 @@ __metadata:
   version: 7946.0.16
   resolution: "@types/geojson@npm:7946.0.16"
   checksum: 10c0/1ff24a288bd5860b766b073ead337d31d73bdc715e5b50a2cee5cb0af57a1ed02cc04ef295f5fa68dc40fe3e4f104dd31282b2b818a5ba3231bc1001ba084e3c
+  languageName: node
+  linkType: hard
+
+"@types/google.maps@npm:^3.48.6":
+  version: 3.58.1
+  resolution: "@types/google.maps@npm:3.58.1"
+  checksum: 10c0/0247c61d2aeb216d04ab9392602ef41d58328c6336ed4e9a4e9e69834002e82c116a34def2bf4ceb31c4292f14899815058da4bb8d803147295c6b47c1162621
   languageName: node
   linkType: hard
 
@@ -4662,7 +4726,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"d3-scale@npm:^4.0.0":
+"d3-scale@npm:^4.0.0, d3-scale@npm:^4.0.2":
   version: 4.0.2
   resolution: "d3-scale@npm:4.0.2"
   dependencies:
