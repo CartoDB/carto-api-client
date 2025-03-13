@@ -15,8 +15,12 @@ import {
   LayerType,
   LayerProvider,
 } from './layer-map.js';
+
+// TODO move these into VectorTileLayer to avoid extra dependencies
 import {PointLabelLayer} from '@deck.gl/carto';
 import {CollisionFilterExtension} from '@deck.gl/extensions';
+const collisionFilterExtension = new CollisionFilterExtension();
+
 import {assert} from '../utils.js';
 import {
   KeplerMapConfig,
@@ -27,7 +31,6 @@ import {
   MapConfigLayer,
 } from './types.js';
 
-const collisionFilterExtension = new CollisionFilterExtension();
 
 export type ParseMapResult = {
   /** Map id. */
@@ -388,6 +391,7 @@ function createChannelProps(
 
     result._subLayerProps = {
       ...result._subLayerProps,
+      // TODO: move this into deck.gl as a default
       'points-text': {
         type: PointLabelLayer,
         extensions: [collisionFilterExtension],

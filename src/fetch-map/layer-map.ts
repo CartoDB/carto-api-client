@@ -14,15 +14,7 @@ import {format as d3Format} from 'd3-format';
 import moment from 'moment-timezone';
 
 import type {Accessor, Layer, _ConstructorOf as ConstructorOf} from '@deck.gl/core';
-
-import type {
-  ClusterTileLayer,
-  H3TileLayer,
-  QuadbinTileLayer,
-  RasterTileLayer,
-  VectorTileLayer,
-  HeatmapTileLayer,
-} from '@deck.gl/carto';
+import type { ClusterTileLayer, H3TileLayer, QuadbinTileLayer, RasterTileLayer, VectorTileLayer, HeatmapTileLayer } from '@deck.gl/carto';
 
 export type LayerProvider = {
   clusterTile: ConstructorOf<ClusterTileLayer>,
