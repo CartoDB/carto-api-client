@@ -1,7 +1,3 @@
-// deck.gl
-// SPDX-License-Identifier: MIT
-// Copyright (c) vis.gl contributors
-
 import {describe, test, expect} from 'vitest';
 import {
   getColorAccessor,

@@ -1,13 +1,7 @@
-// deck.gl
-// SPDX-License-Identifier: MIT
-// Copyright (c) vis.gl contributors
-
 import {describe, test, expect} from 'vitest';
 import {BASEMAP, _MapLibreBasemap as MapLibreBasemap} from '@deck.gl/carto';
 import {withMockFetchMapsV3} from '../__mock-fetch.js';
-import {KeplerMapConfig} from '@carto/api-client';
 import {fetchBasemapProps} from '@deck.gl/carto';
-import {CartoAPIError} from '@carto/api-client';
 
 const mockedMapConfig = {
   mapState: {

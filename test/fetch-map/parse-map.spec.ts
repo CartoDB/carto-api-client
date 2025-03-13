@@ -1,10 +1,5 @@
-// deck.gl
-// SPDX-License-Identifier: MIT
-// Copyright (c) vis.gl contributors
-
 import {describe, test, expect} from 'vitest';
 import {parseMap} from '@carto/api-client';
-import {H3TileLayer, QuadbinTileLayer, VectorTileLayer, HeatmapTileLayer} from '@deck.gl/carto';
 
 const METADATA = {
   id: 1234,
