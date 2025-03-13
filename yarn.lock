@@ -1489,6 +1489,7 @@ __metadata:
     "@luma.gl/core": "npm:~9.1.0"
     "@luma.gl/engine": "npm:~9.1.0"
     "@luma.gl/shadertools": "npm:~9.1.0"
+    "@luma.gl/webgl": "npm:~9.1.0"
     "@turf/bbox-clip": "npm:^7.2.0"
     "@turf/bbox-polygon": "npm:^7.2.0"
     "@turf/boolean-equal": "npm:^7.2.0"
@@ -2499,6 +2500,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@luma.gl/constants@npm:9.1.5":
+  version: 9.1.5
+  resolution: "@luma.gl/constants@npm:9.1.5"
+  checksum: 10c0/713ddd4c9ced9e2f3c04c841df04b9f1a49ef0a636d88a091de25aa2c8fe903764953f1cd773a341df5bfe20365fb98e08d73ea2bc70609ca37a7e05cb410850
+  languageName: node
+  linkType: hard
+
 "@luma.gl/core@npm:^9.1.2, @luma.gl/core@npm:~9.1.0":
   version: 9.1.4
   resolution: "@luma.gl/core@npm:9.1.4"
@@ -2565,6 +2573,19 @@ __metadata:
   peerDependencies:
     "@luma.gl/core": ^9.1.0
   checksum: 10c0/bf38f785dbf69d52f616632746e17641560ca32c07924a4cbcedb805167a0c5d5326bcb532390f804243ead68efedf6e2b62773e5a3b26afec28a8c132f9ff69
+  languageName: node
+  linkType: hard
+
+"@luma.gl/webgl@npm:~9.1.0":
+  version: 9.1.5
+  resolution: "@luma.gl/webgl@npm:9.1.5"
+  dependencies:
+    "@luma.gl/constants": "npm:9.1.5"
+    "@math.gl/types": "npm:^4.1.0"
+    "@probe.gl/env": "npm:^4.0.8"
+  peerDependencies:
+    "@luma.gl/core": ^9.1.0
+  checksum: 10c0/b64fe292ee7810f517eef5f7e44c23c9e8bb068cfed9268b0fc8efd9e821a286575c748cd82938b607ef833c6a84724ccaf138ebb444c669fe388cec7f9f984a
   languageName: node
   linkType: hard
 
