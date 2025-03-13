@@ -13,8 +13,9 @@ import {
 import {format as d3Format} from 'd3-format';
 import moment from 'moment-timezone';
 
-import {Accessor, Layer, _ConstructorOf as ConstructorOf} from '@deck.gl/core';
-import {
+import type {Accessor, Layer, _ConstructorOf as ConstructorOf} from '@deck.gl/core';
+
+import type {
   ClusterTileLayer,
   H3TileLayer,
   QuadbinTileLayer,
@@ -22,6 +23,16 @@ import {
   VectorTileLayer,
   HeatmapTileLayer,
 } from '@deck.gl/carto';
+
+export type LayerProvider = {
+  clusterTile: ConstructorOf<ClusterTileLayer>,
+  h3: ConstructorOf<H3TileLayer>,
+  heatmapTile: ConstructorOf<HeatmapTileLayer>,
+  mvt: ConstructorOf<VectorTileLayer>,
+  quadbin: ConstructorOf<QuadbinTileLayer>,
+  raster: ConstructorOf<RasterTileLayer>,
+  tileset: ConstructorOf<VectorTileLayer>
+}
 
 import {createBinaryProxy, scaleIdentity} from './utils.js';
 import {
@@ -46,14 +57,7 @@ const SCALE_FUNCS: Record<string, () => any> = {
 };
 export type SCALE_TYPE = keyof typeof SCALE_FUNCS;
 
-type TileLayerType =
-  | 'clusterTile'
-  | 'h3'
-  | 'heatmapTile'
-  | 'mvt'
-  | 'quadbin'
-  | 'raster'
-  | 'tileset';
+type TileLayerType = keyof LayerProvider;
 export type LayerType = TileLayerType;
 
 function identity<T>(v: T): T {
@@ -84,16 +88,6 @@ const AGGREGATION_FUNC: Record<string, (values: any, accessor: any) => any> = {
     groupSort(values, (v) => v.length, accessor).pop(),
   stddev: deviation,
   variance,
-};
-
-const TILE_LAYER_TYPE_TO_LAYER: Record<TileLayerType, ConstructorOf<Layer>> = {
-  clusterTile: ClusterTileLayer,
-  h3: H3TileLayer,
-  heatmapTile: HeatmapTileLayer,
-  mvt: VectorTileLayer,
-  quadbin: QuadbinTileLayer,
-  raster: RasterTileLayer,
-  tileset: VectorTileLayer,
 };
 
 const hexToRGBA = (c: any) => {
@@ -171,27 +165,24 @@ function mergePropMaps(
 export function getLayer(
   type: LayerType,
   config: MapTextSubLayerConfig,
-  dataset: MapDataset
+  dataset: MapDataset,
+  layerProvider: LayerProvider
 ): {Layer: ConstructorOf<Layer>; propMap: any; defaultProps: any} {
-  let basePropMap: any = sharedPropMap;
+  if (!layerProvider[type]) {
+    throw new Error(`Unsupported layer type: ${type}`);
+  }
 
+  let basePropMap: any = sharedPropMap;
   if (config.visConfig?.customMarkers) {
     basePropMap = mergePropMaps(basePropMap, customMarkersPropsMap);
   }
   if (type === 'heatmapTile') {
     basePropMap = mergePropMaps(basePropMap, heatmapTilePropsMap);
   }
-  if (!TILE_LAYER_TYPE_TO_LAYER[type as TileLayerType]) {
-    throw new Error(`Unsupported layer type: ${type}`);
-  }
-  return getTileLayer(dataset, basePropMap, type);
-}
-
-function getTileLayer(dataset: MapDataset, basePropMap: any, type: LayerType) {
   const {aggregationExp, aggregationResLevel} = dataset;
 
   return {
-    Layer: TILE_LAYER_TYPE_TO_LAYER[type as TileLayerType] || VectorTileLayer,
+    Layer: layerProvider[type],
     propMap: basePropMap,
     defaultProps: {
       ...defaultProps,

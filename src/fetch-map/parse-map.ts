@@ -13,6 +13,7 @@ import {
   negateAccessor,
   getMaxMarkerSize,
   LayerType,
+  LayerProvider,
 } from './layer-map.js';
 import {PointLabelLayer} from '@deck.gl/carto';
 import {CollisionFilterExtension} from '@deck.gl/extensions';
@@ -48,7 +49,7 @@ export type ParseMapResult = {
   layers: Layer[];
 };
 
-export function parseMap(json: any) {
+export function parseMap(json: any, layerProvider: LayerProvider) {
   const {keplerMapConfig, datasets, token} = json;
   assert(keplerMapConfig.version === 'v1', 'Only support Kepler v1');
   const config = keplerMapConfig.config as KeplerMapConfig;
@@ -81,7 +82,8 @@ export function parseMap(json: any) {
               type as LayerType,
               // @ts-ignore
               config,
-              dataset
+              dataset,
+              layerProvider
             );
             const styleProps = createStyleProps(config, propMap);
             return new Layer({
