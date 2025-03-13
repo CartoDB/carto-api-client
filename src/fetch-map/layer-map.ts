@@ -129,16 +129,6 @@ const heatmapTilePropsMap = {
   },
 };
 
-const aggregationVisConfig = {
-  colorAggregation: (x: any) => ({
-    colorAggregation: AGGREGATION[x] || AGGREGATION.sum,
-  }),
-  colorRange: (x: any) => ({colorRange: x.colors.map(hexToRGBA)}),
-  coverage: 'coverage',
-  elevationPercentile: ['elevationLowerPercentile', 'elevationUpperPercentile'],
-  percentile: ['lowerPercentile', 'upperPercentile'],
-};
-
 const defaultProps = {
   lineMiterLimit: 2,
   lineWidthUnits: 'pixels',
