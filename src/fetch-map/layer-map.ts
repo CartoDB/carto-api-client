@@ -365,10 +365,7 @@ export function opacityToAlpha(opacity?: number) {
     : 255;
 }
 
-function getAccessorKeys(
-  name: string,
-  aggregation?: string | null 
-): string[] {
+function getAccessorKeys(name: string, aggregation?: string | null): string[] {
   let keys = [name];
   if (aggregation) {
     // Snowflake will capitalized the keys, need to check lower and upper case version
@@ -386,7 +383,9 @@ function findAccessorKey(keys: string[], properties: any): string[] {
     }
   }
 
-  throw new Error(`Could not find property for any accessor key: ${keys.join(', ')}`);
+  throw new Error(
+    `Could not find property for any accessor key: ${keys.join(', ')}`
+  );
 }
 
 export function getColorValueAccessor(
