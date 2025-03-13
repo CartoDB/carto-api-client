@@ -23,6 +23,7 @@ import {
   MapLayerConfig,
   VisualChannels,
   VisConfig,
+  MapConfigLayer,
 } from './types.js';
 
 const collisionFilterExtension = new CollisionFilterExtension();
@@ -50,9 +51,9 @@ export type ParseMapResult = {
 export function parseMap(json: any) {
   const {keplerMapConfig, datasets, token} = json;
   assert(keplerMapConfig.version === 'v1', 'Only support Kepler v1');
-  const {mapState, mapStyle} = keplerMapConfig.config as KeplerMapConfig;
-  const {layers, layerBlending, interactionConfig} =
-    keplerMapConfig.config.visState;
+  const config = keplerMapConfig.config as KeplerMapConfig;
+  const {mapState, mapStyle} = config;
+  const {layers, layerBlending, interactionConfig} = config.visState;
 
   return {
     id: json.id,
@@ -67,17 +68,7 @@ export function parseMap(json: any) {
     layers: layers
       .reverse()
       .map(
-        ({
-          id,
-          type,
-          config,
-          visualChannels,
-        }: {
-          id: string;
-          type: string;
-          config: any;
-          visualChannels: any;
-        }) => {
+        ({ id, type, config, visualChannels }: MapConfigLayer) => {
           try {
             const {dataId} = config;
             const dataset: MapDataset | null = datasets.find(
@@ -88,6 +79,7 @@ export function parseMap(json: any) {
             assert(data, `No data loaded for dataId: ${dataId}`);
             const {Layer, propMap, defaultProps} = getLayer(
               type as LayerType,
+              // @ts-ignore
               config,
               dataset
             );
