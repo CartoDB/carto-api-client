@@ -416,5 +416,5 @@ export async function fetchMap({
     await font.load().then((f) => document.fonts.add(f));
   }
 
-  return out;
+  return out as FetchMapResult;
 }
