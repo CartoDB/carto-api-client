@@ -11,7 +11,7 @@
 
 ## 0.4
 
-### 0.4.9 (Unreleased)
+### 0.4.9
 
 - feat: Remove spatialIndexReferenceViewState param (#128)
 
