@@ -149,7 +149,6 @@ function mapProps(source: any, target: any, mapping: any) {
     const sourceValue = source[sourceKey];
     const targetKey = mapping[sourceKey];
     if (sourceValue === undefined) {
-      // eslint-disable-next-line no-continue
       continue;
     }
     if (typeof targetKey === 'string') {
@@ -190,7 +189,6 @@ function createStyleProps(config: MapLayerConfig, mapping: any) {
   return result;
 }
 
-/* eslint-disable complexity, max-statements */
 function createChannelProps(
   id: string,
   type: string,

@@ -1,4 +1,3 @@
-import {log} from '@deck.gl/core';
 import {BinaryFeature} from '@loaders.gl/schema';
 type Properties = BinaryFeature['properties'];
 type NumericProps = BinaryFeature['numericProps'];
@@ -26,7 +25,7 @@ export function createBinaryProxy(
       return [...Object.keys(numericProps), ...Reflect.ownKeys(target)];
     },
 
-    getOwnPropertyDescriptor(target, prop) {
+    getOwnPropertyDescriptor() {
       return {enumerable: true, configurable: true};
     },
   });

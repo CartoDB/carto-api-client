@@ -44,7 +44,6 @@ type Dataset = {
 };
 
 /* global clearInterval, setInterval, URL */
-/* eslint-disable complexity, max-statements, max-params */
 async function _fetchMapDataset(dataset: Dataset, context: _FetchMapContext) {
   const {
     aggregationExp,
@@ -298,7 +297,6 @@ export type FetchMapResult = ParseMapResult & {
   stopAutoRefresh?: () => void;
 };
 
-/* eslint-disable max-statements */
 export async function fetchMap({
   accessToken,
   apiBaseUrl = DEFAULT_API_BASE_URL,

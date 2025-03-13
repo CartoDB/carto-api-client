@@ -367,7 +367,7 @@ export function opacityToAlpha(opacity?: number) {
 
 function getAccessorKeys(
   name: string,
-  aggregation?: string | null | undefined
+  aggregation?: string | null 
 ): string[] {
   let keys = [name];
   if (aggregation) {
@@ -386,7 +386,7 @@ function findAccessorKey(keys: string[], properties: any): string[] {
     }
   }
 
-  throw new Error(`Could not find property for any accessor key: ${keys}`);
+  throw new Error(`Could not find property for any accessor key: ${keys.join(', ')}`);
 }
 
 export function getColorValueAccessor(
