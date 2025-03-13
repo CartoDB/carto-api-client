@@ -1,5 +1,5 @@
 import {ColorParameters} from '@luma.gl/core';
-import {Layer, log} from '@deck.gl/core';
+import type {Layer} from '@deck.gl/core';
 import {
   AGGREGATION,
   getLayer,
@@ -15,11 +15,6 @@ import {
   LayerType,
   LayerProvider,
 } from './layer-map.js';
-
-// TODO move these into VectorTileLayer to avoid extra dependencies
-import {PointLabelLayer} from '@deck.gl/carto';
-import {CollisionFilterExtension} from '@deck.gl/extensions';
-const collisionFilterExtension = new CollisionFilterExtension();
 
 import {assert} from '../utils.js';
 import {
@@ -103,7 +98,7 @@ export function parseMap(json: any, layerProvider: LayerProvider) {
               ...createLoadOptions(token),
             });
           } catch (e: any) {
-            log.error(e.message)();
+            console.error(e.message);
             return undefined;
           }
         }
@@ -391,10 +386,7 @@ function createChannelProps(
 
     result._subLayerProps = {
       ...result._subLayerProps,
-      // TODO: move this into deck.gl as a default
       'points-text': {
-        type: PointLabelLayer,
-        extensions: [collisionFilterExtension],
         collisionEnabled: true,
         collisionGroup,
 
