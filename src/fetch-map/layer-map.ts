@@ -15,13 +15,6 @@ import moment from 'moment-timezone';
 
 import {Accessor, Layer, _ConstructorOf as ConstructorOf} from '@deck.gl/core';
 import {
-  GridLayer,
-  HeatmapLayer,
-  HexagonLayer,
-} from '@deck.gl/aggregation-layers';
-import {GeoJsonLayer} from '@deck.gl/layers';
-import {H3HexagonLayer} from '@deck.gl/geo-layers';
-import {
   ClusterTileLayer,
   H3TileLayer,
   QuadbinTileLayer,
@@ -30,7 +23,6 @@ import {
   HeatmapTileLayer,
 } from '@deck.gl/carto';
 
-import {assert} from '../utils.js';
 import {createBinaryProxy, scaleIdentity} from './utils.js';
 import {
   CustomMarkersRange,
