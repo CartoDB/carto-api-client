@@ -39,7 +39,6 @@ export interface ModelSource {
   queryParameters?: QueryParameters;
   spatialDataColumn?: string;
   spatialDataType?: SpatialDataType;
-  spatialFiltersResolution?: number;
   spatialFiltersMode?: SpatialFilterPolyfillMode;
   /** original resolution of the spatial index data as stored in the DW */
   dataResolution?: number;
@@ -86,7 +85,6 @@ export function executeModel(props: {
     filtersLogicalOperator = 'and',
     spatialDataType = 'geo',
     spatialFiltersMode = 'intersects',
-    spatialFiltersResolution = 0,
   } = source;
 
   const queryParams: Record<string, unknown> = {
@@ -118,9 +116,6 @@ export function executeModel(props: {
   }
 
   if (spatialDataType !== 'geo') {
-    if (spatialFiltersResolution > 0) {
-      queryParams.spatialFiltersResolution = spatialFiltersResolution;
-    }
     queryParams.spatialFiltersMode = spatialFiltersMode;
   }
 

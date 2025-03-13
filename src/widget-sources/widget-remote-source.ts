@@ -40,24 +40,16 @@ export abstract class WidgetRemoteSource<
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
-      spatialIndexReferenceViewState,
       ...params
     } = options;
     const {column, operation, operationColumn} = params;
-    const source = this.getModelSource(filters, filterOwner);
-    const spatialFiltersResolution = this._getSpatialFiltersResolution(
-      source,
-      spatialFilter,
-      spatialIndexReferenceViewState
-    );
 
     type CategoriesModelResponse = {rows: {name: string; value: number}[]};
 
     return executeModel({
       model: 'category',
       source: {
-        ...source,
-        spatialFiltersResolution,
+        ...this.getModelSource(filters, filterOwner),
         spatialFiltersMode,
         spatialFilter,
       },
@@ -80,24 +72,16 @@ export abstract class WidgetRemoteSource<
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
-      spatialIndexReferenceViewState,
       ...params
     } = options;
     const {columns, dataType, featureIds, z, limit, tileResolution} = params;
-    const source = this.getModelSource(filters, filterOwner);
-    const spatialFiltersResolution = this._getSpatialFiltersResolution(
-      source,
-      spatialFilter,
-      spatialIndexReferenceViewState
-    );
 
     type FeaturesModelResponse = {rows: Record<string, unknown>[]};
 
     return executeModel({
       model: 'pick',
       source: {
-        ...source,
-        spatialFiltersResolution,
+        ...this.getModelSource(filters, filterOwner),
         spatialFiltersMode,
         spatialFilter,
       },
@@ -122,25 +106,17 @@ export abstract class WidgetRemoteSource<
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
-      spatialIndexReferenceViewState,
       operationExp,
       ...params
     } = options;
     const {column, operation} = params;
-    const source = this.getModelSource(filters, filterOwner);
-    const spatialFiltersResolution = this._getSpatialFiltersResolution(
-      source,
-      spatialFilter,
-      spatialIndexReferenceViewState
-    );
 
     type FormulaModelResponse = {rows: {value: number}[]};
 
     return executeModel({
       model: 'formula',
       source: {
-        ...source,
-        spatialFiltersResolution,
+        ...this.getModelSource(filters, filterOwner),
         spatialFiltersMode,
         spatialFilter,
       },
@@ -163,24 +139,16 @@ export abstract class WidgetRemoteSource<
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
-      spatialIndexReferenceViewState,
       ...params
     } = options;
     const {column, operation, ticks} = params;
-    const source = this.getModelSource(filters, filterOwner);
-    const spatialFiltersResolution = this._getSpatialFiltersResolution(
-      source,
-      spatialFilter,
-      spatialIndexReferenceViewState
-    );
 
     type HistogramModelResponse = {rows: {tick: number; value: number}[]};
 
     const data = await executeModel({
       model: 'histogram',
       source: {
-        ...source,
-        spatialFiltersResolution,
+        ...this.getModelSource(filters, filterOwner),
         spatialFiltersMode,
         spatialFilter,
       },
@@ -209,24 +177,16 @@ export abstract class WidgetRemoteSource<
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
-      spatialIndexReferenceViewState,
       ...params
     } = options;
     const {column} = params;
-    const source = this.getModelSource(filters, filterOwner);
-    const spatialFiltersResolution = this._getSpatialFiltersResolution(
-      source,
-      spatialFilter,
-      spatialIndexReferenceViewState
-    );
 
     type RangeModelResponse = {rows: {min: number; max: number}[]};
 
     return executeModel({
       model: 'range',
       source: {
-        ...source,
-        spatialFiltersResolution,
+        ...this.getModelSource(filters, filterOwner),
         spatialFiltersMode,
         spatialFilter,
       },
@@ -243,18 +203,10 @@ export abstract class WidgetRemoteSource<
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
-      spatialIndexReferenceViewState,
       ...params
     } = options;
     const {xAxisColumn, xAxisJoinOperation, yAxisColumn, yAxisJoinOperation} =
       params;
-
-    const source = this.getModelSource(filters, filterOwner);
-    const spatialFiltersResolution = this._getSpatialFiltersResolution(
-      source,
-      spatialFilter,
-      spatialIndexReferenceViewState
-    );
 
     // Make sure this is sync with the same constant in cloud-native/maps-api
     const HARD_LIMIT = 500;
@@ -264,8 +216,7 @@ export abstract class WidgetRemoteSource<
     return executeModel({
       model: 'scatterplot',
       source: {
-        ...source,
-        spatialFiltersResolution,
+        ...this.getModelSource(filters, filterOwner),
         spatialFiltersMode,
         spatialFilter,
       },
@@ -290,16 +241,9 @@ export abstract class WidgetRemoteSource<
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
-      spatialIndexReferenceViewState,
       ...params
     } = options;
     const {columns, sortBy, sortDirection, offset = 0, limit = 10} = params;
-    const source = this.getModelSource(filters, filterOwner);
-    const spatialFiltersResolution = this._getSpatialFiltersResolution(
-      source,
-      spatialFilter,
-      spatialIndexReferenceViewState
-    );
 
     type TableModelResponse = {
       rows: Record<string, number | string>[];
@@ -309,8 +253,7 @@ export abstract class WidgetRemoteSource<
     return executeModel({
       model: 'table',
       source: {
-        ...source,
-        spatialFiltersResolution,
+        ...this.getModelSource(filters, filterOwner),
         spatialFiltersMode,
         spatialFilter,
       },
@@ -339,7 +282,6 @@ export abstract class WidgetRemoteSource<
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
-      spatialIndexReferenceViewState,
       ...params
     } = options;
     const {
@@ -354,13 +296,6 @@ export abstract class WidgetRemoteSource<
       splitByCategoryValues,
     } = params;
 
-    const source = this.getModelSource(filters, filterOwner);
-    const spatialFiltersResolution = this._getSpatialFiltersResolution(
-      source,
-      spatialFilter,
-      spatialIndexReferenceViewState
-    );
-
     type TimeSeriesModelResponse = {
       rows: {name: string; value: number}[];
       metadata: {categories: string[]};
@@ -369,8 +304,7 @@ export abstract class WidgetRemoteSource<
     return executeModel({
       model: 'timeseries',
       source: {
-        ...source,
-        spatialFiltersResolution,
+        ...this.getModelSource(filters, filterOwner),
         spatialFiltersMode,
         spatialFilter,
       },
