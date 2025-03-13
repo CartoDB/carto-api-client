@@ -4,9 +4,7 @@
 
 /* global Headers */
 
-// See test/modules/carto/responseToJson for details for creating test data
-import binaryTileData from './data/binaryTile.json';
-const BINARY_TILE = new Uint8Array(binaryTileData).buffer;
+const BINARY_TILE = new Uint8Array().buffer;
 
 const fetch = globalThis.fetch;
 type MockFetchCall = {
