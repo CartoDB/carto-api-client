@@ -62,14 +62,7 @@ type TileLayerType =
   | 'quadbin'
   | 'raster'
   | 'tileset';
-export type DocumentLayerType =
-  | 'geojson'
-  | 'grid'
-  | 'heatmap'
-  | 'hexagon'
-  | 'hexagonId'
-  | 'point';
-export type LayerType = TileLayerType | DocumentLayerType;
+export type LayerType = TileLayerType;
 
 function identity<T>(v: T): T {
   return v;
@@ -196,71 +189,10 @@ export function getLayer(
   if (type === 'heatmapTile') {
     basePropMap = mergePropMaps(basePropMap, heatmapTilePropsMap);
   }
-  if (TILE_LAYER_TYPE_TO_LAYER[type as TileLayerType]) {
-    return getTileLayer(dataset, basePropMap, type);
+  if (!TILE_LAYER_TYPE_TO_LAYER[type as TileLayerType]) {
+    throw new Error(`Unsupported layer type: ${type}`);
   }
-
-  const geoColumn = dataset?.geoColumn;
-  const getPosition = (d: any) => d[geoColumn].coordinates;
-
-  const hexagonId = config.columns?.hex_id;
-
-  const layerTypeDefs: Record<
-    DocumentLayerType,
-    {Layer: ConstructorOf<Layer>; propMap?: any; defaultProps?: any}
-  > = {
-    point: {
-      Layer: GeoJsonLayer,
-      propMap: {
-        columns: {
-          altitude: (x: any) => ({parameters: {depthWriteEnabled: Boolean(x)}}),
-        },
-        visConfig: {outline: 'stroked'},
-      },
-    },
-    geojson: {
-      Layer: GeoJsonLayer,
-    },
-    grid: {
-      Layer: GridLayer,
-      propMap: {
-        visConfig: {
-          ...aggregationVisConfig,
-          worldUnitSize: (x: any) => ({cellSize: 1000 * x}),
-        },
-      },
-      defaultProps: {getPosition},
-    },
-    heatmap: {
-      Layer: HeatmapLayer,
-      propMap: {visConfig: {...aggregationVisConfig, radius: 'radiusPixels'}},
-      defaultProps: {getPosition},
-    },
-    hexagon: {
-      Layer: HexagonLayer,
-      propMap: {
-        visConfig: {
-          ...aggregationVisConfig,
-          worldUnitSize: (x: any) => ({radius: 1000 * x}),
-        },
-      },
-      defaultProps: {getPosition},
-    },
-    hexagonId: {
-      Layer: H3HexagonLayer,
-      propMap: {visConfig: {coverage: 'coverage'}},
-      defaultProps: {getHexagon: (d: any) => d[hexagonId], stroked: false},
-    },
-  };
-
-  const layer = layerTypeDefs[type as DocumentLayerType];
-
-  assert(layer, `Unsupported layer type: ${type}`);
-  return {
-    ...layer,
-    propMap: mergePropMaps(basePropMap, layer.propMap),
-    defaultProps: {...defaultProps, ...layer.defaultProps},
-  };
+  return getTileLayer(dataset, basePropMap, type);
 }
 
 function getTileLayer(dataset: MapDataset, basePropMap: any, type: LayerType) {
