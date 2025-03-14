@@ -134,12 +134,17 @@ function mergePropMaps(
   return {...a, ...b, visConfig: {...a.visConfig, ...b.visConfig}};
 }
 
+const deprecatedLayerTypes = ['geojson', 'grid', 'heatmap', 'hexagon', 'hexagonId', 'point'];
+
 export function getLayer(
   type: LayerType,
   config: MapTextSubLayerConfig,
   dataset: MapDataset,
   layerProvider: LayerProvider
 ): {Layer: ConstructorOf<Layer>; propMap: any; defaultProps: any} {
+  if (deprecatedLayerTypes.includes(type)) {
+    throw new Error(`Outdated layer type: ${type}. Please open map in CARTO Builder to automaticallymigrate.`);
+  }
   if (!layerProvider[type]) {
     throw new Error(`No layer provided for type: ${type} in layerProvider`);
   }
