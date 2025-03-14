@@ -90,6 +90,7 @@
     "@luma.gl/core": "~9.1.0",
     "@luma.gl/engine": "~9.1.0",
     "@luma.gl/shadertools": "~9.1.0",
+    "@luma.gl/webgl": "~9.1.0",
     "@turf/buffer": "^7.2.0",
     "@turf/random": "^7.2.0",
     "@types/d3-format": "^3.0.4",
@@ -117,7 +118,7 @@
     "vitest": "3.0.7"
   },
   "peerDependencies": {
-    "@deck.gl/carto": "~9.1.0"
+    "@deck.gl/core": "~9.1.0"
   },
   "resolutions": {
     "@carto/api-client": "portal:./",

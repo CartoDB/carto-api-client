@@ -27,7 +27,7 @@ import {ParseMapResult, parseMap} from './parse-map.js';
 import {assert} from '../utils.js';
 import type {Basemap} from './types.js';
 import {fetchBasemapProps} from './basemap.js';
-
+import type {LayerProvider} from './layer-map.js';
 type Dataset = {
   id: string;
   type: MapType;
@@ -306,7 +306,7 @@ export async function fetchMap({
   autoRefresh,
   onNewData,
   maxLengthURL,
-}: FetchMapOptions): Promise<FetchMapResult> {
+}: FetchMapOptions, layerProvider: LayerProvider): Promise<FetchMapResult> {
   assert(
     cartoMapId,
     'Must define CARTO map id: fetchMap({cartoMapId: "XXXX-XXXX-XXXX"})'
@@ -358,7 +358,7 @@ export async function fetchMap({
         },
       });
       if (onNewData && changed.some((v) => v === true)) {
-        onNewData(parseMap(map));
+        onNewData(parseMap(map, layerProvider));
       }
     }, autoRefresh * 1000);
     stopAutoRefresh = () => {
@@ -395,7 +395,7 @@ export async function fetchMap({
   // Mutates attributes in visualChannels to contain tile stats
   await fillInTileStats(map, context);
 
-  const out = {...parseMap(map), basemap, ...{stopAutoRefresh}};
+  const out = {...parseMap(map, layerProvider), basemap, ...{stopAutoRefresh}};
 
   const textLayers = out.layers.filter((layer: any) => {
     const pointType = layer.props.pointType || '';
