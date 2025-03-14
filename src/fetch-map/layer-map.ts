@@ -14,17 +14,10 @@ import {format as d3Format} from 'd3-format';
 import moment from 'moment-timezone';
 
 import type {Accessor, Layer, _ConstructorOf as ConstructorOf} from '@deck.gl/core';
-import type { ClusterTileLayer, H3TileLayer, QuadbinTileLayer, RasterTileLayer, VectorTileLayer, HeatmapTileLayer } from '@deck.gl/carto';
 
-export type LayerProvider = {
-  clusterTile: ConstructorOf<ClusterTileLayer>,
-  h3: ConstructorOf<H3TileLayer>,
-  heatmapTile: ConstructorOf<HeatmapTileLayer>,
-  mvt: ConstructorOf<VectorTileLayer>,
-  quadbin: ConstructorOf<QuadbinTileLayer>,
-  raster: ConstructorOf<RasterTileLayer>,
-  tileset: ConstructorOf<VectorTileLayer>
-}
+export type LayerType = 'clusterTile' | 'h3' | 'heatmapTile' | 'mvt' | 'quadbin' | 'raster' | 'tileset';
+
+export type LayerProvider = Record<LayerType, ConstructorOf<Layer>>;
 
 import {createBinaryProxy, scaleIdentity} from './utils.js';
 import {
@@ -48,9 +41,6 @@ const SCALE_FUNCS: Record<string, () => any> = {
   identity: scaleIdentity,
 };
 export type SCALE_TYPE = keyof typeof SCALE_FUNCS;
-
-type TileLayerType = keyof LayerProvider;
-export type LayerType = TileLayerType;
 
 function identity<T>(v: T): T {
   return v;
@@ -151,7 +141,7 @@ export function getLayer(
   layerProvider: LayerProvider
 ): {Layer: ConstructorOf<Layer>; propMap: any; defaultProps: any} {
   if (!layerProvider[type]) {
-    throw new Error(`Unsupported layer type: ${type}`);
+    throw new Error(`No layer provided for type: ${type} in layerProvider`);
   }
 
   let basePropMap: any = sharedPropMap;
