@@ -1463,7 +1463,7 @@ __metadata:
     d3-scale: "npm:^4.0.2"
     h3-js: "npm:4.1.0"
   peerDependencies:
-    "@deck.gl/carto": ~9.1.0
+    "@deck.gl/core": ~9.1.0
   languageName: node
   linkType: soft
 
@@ -1529,7 +1529,7 @@ __metadata:
     vite: "npm:^6.1.0"
     vitest: "npm:3.0.7"
   peerDependencies:
-    "@deck.gl/carto": ~9.1.0
+    "@deck.gl/core": ~9.1.0
   languageName: unknown
   linkType: soft
 
