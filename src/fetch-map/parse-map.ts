@@ -41,6 +41,7 @@ export type ParseMapResult = {
 
   /** @deprecated Use `basemap`. */
   mapStyle: any;
+  popupSettings: any;
   token: string;
 
   layers: Layer[];
