@@ -116,11 +116,6 @@ export type AggregationOptions = {
    * @default 6 for quadbin and 4 for h3 sources
    */
   aggregationResLevel?: number;
-
-  /**
-   * Original resolution of the spatial index data as stored in the DW
-   */
-  dataResolution?: number;
 };
 
 export type FilterOptions = {

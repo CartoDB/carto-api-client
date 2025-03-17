@@ -40,8 +40,6 @@ export interface ModelSource {
   spatialDataColumn?: string;
   spatialDataType?: SpatialDataType;
   spatialFiltersMode?: SpatialFilterPolyfillMode;
-  /** original resolution of the spatial index data as stored in the DW */
-  dataResolution?: number;
 }
 
 const {V3} = ApiVersion;

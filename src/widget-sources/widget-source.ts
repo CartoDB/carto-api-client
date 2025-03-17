@@ -80,7 +80,6 @@ export abstract class WidgetSource<Props extends WidgetSourceProps> {
       filtersLogicalOperator: props.filtersLogicalOperator,
       spatialDataType: props.spatialDataType,
       spatialDataColumn: props.spatialDataColumn,
-      dataResolution: (props as Partial<AggregationOptions>).dataResolution,
     };
   }
 
