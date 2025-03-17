@@ -116,6 +116,14 @@ export type AggregationOptions = {
    * @default 6 for quadbin and 4 for h3 sources
    */
   aggregationResLevel?: number;
+
+  /**
+   * Deprecated parameter previously used for H3 and Quadbin widgets. Now has
+   * no effect and will be removed in a future version.
+   * @deprecated Parameter has no effect.
+   * @todo TODO(v0.5): Remove spatialIndexReferenceViewState parameter.
+   */
+  dataResolution?: number;
 };
 
 export type FilterOptions = {
