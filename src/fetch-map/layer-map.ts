@@ -143,7 +143,7 @@ export function getLayer(
   layerProvider: LayerProvider
 ): {Layer: ConstructorOf<Layer>; propMap: any; defaultProps: any} {
   if (deprecatedLayerTypes.includes(type)) {
-    throw new Error(`Outdated layer type: ${type}. Please open map in CARTO Builder to automaticallymigrate.`);
+    throw new Error(`Outdated layer type: ${type}. Please open map in CARTO Builder to automatically migrate.`);
   }
   if (!layerProvider[type]) {
     throw new Error(`No layer provided for type: ${type} in layerProvider`);
