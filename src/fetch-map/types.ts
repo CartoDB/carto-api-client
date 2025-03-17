@@ -119,12 +119,14 @@ export interface CustomStyle {
   customAttribution?: string;
 }
 
+// TODO replace with more complete type from Builder
 export type KeplerMapConfig = {
   mapState: any;
   mapStyle: {
     styleType: string;
     visibleLayerGroups: Record<string, boolean>;
   };
+  popupSettings: any;
   visState: {
     layers: MapConfigLayer[];
     layerBlending: any;
