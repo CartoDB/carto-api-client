@@ -6,9 +6,9 @@ import {
   BASEMAP,
   fetchMap,
   FetchMapOptions,
-  _GoogleBasemap as GoogleBasemap,
-  _MapLibreBasemap as MapLibreBasemap,
-} from '@deck.gl/carto';
+  GoogleBasemap,
+  MapLibreBasemap,
+} from '@carto/api-client';
 import {Deck} from '@deck.gl/core';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -32,7 +32,7 @@ function createMapWithMapLibreOverlay(result: FetchMapResult) {
   const map = new maplibregl.Map({
     container: 'map',
     ...basemap?.props,
-    style: basemap?.props.style || BASEMAP.POSITRON,
+    style: (basemap?.props.style as string) || BASEMAP.POSITRON,
     interactive: true,
     attributionControl: false,
   }).addControl(

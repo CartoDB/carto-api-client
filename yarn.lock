@@ -1459,8 +1459,11 @@ __metadata:
     "@turf/invariant": "npm:^7.2.0"
     "@turf/union": "npm:^7.2.0"
     "@types/geojson": "npm:^7946.0.16"
+    d3-format: "npm:^3.1.0"
     d3-scale: "npm:^4.0.2"
     h3-js: "npm:4.1.0"
+  peerDependencies:
+    "@deck.gl/carto": ~9.1.0
   languageName: node
   linkType: soft
 
@@ -1497,6 +1500,7 @@ __metadata:
     "@turf/invariant": "npm:^7.2.0"
     "@turf/random": "npm:^7.2.0"
     "@turf/union": "npm:^7.2.0"
+    "@types/d3-format": "npm:^3.0.4"
     "@types/d3-scale": "npm:^4.0.9"
     "@types/geojson": "npm:^7946.0.16"
     "@types/json-schema": "npm:^7.0.15"
@@ -1505,6 +1509,7 @@ __metadata:
     "@vitest/coverage-istanbul": "npm:^3.0.5"
     "@webcomponents/webcomponentsjs": "npm:^2.8.0"
     concurrently: "npm:^9.1.2"
+    d3-format: "npm:^3.1.0"
     d3-scale: "npm:^4.0.2"
     echarts: "npm:^5.6.0"
     eslint: "npm:^9.20.1"
@@ -1522,6 +1527,8 @@ __metadata:
     typescript-eslint: "npm:^8.24.0"
     vite: "npm:^6.1.0"
     vitest: "npm:3.0.7"
+  peerDependencies:
+    "@deck.gl/carto": ~9.1.0
   languageName: unknown
   linkType: soft
 
@@ -3407,6 +3414,13 @@ __metadata:
   version: 1.4.5
   resolution: "@types/d3-color@npm:1.4.5"
   checksum: 10c0/d84233fdfb3ea81710a2aa7eb8f332a0199dfbefb10cd81a68e504dfb2a00b78d309ebe0b1b452c97d7b9de193a301b8ce3cec0842ec300277caef34ef2dd8ed
+  languageName: node
+  linkType: hard
+
+"@types/d3-format@npm:^3.0.4":
+  version: 3.0.4
+  resolution: "@types/d3-format@npm:3.0.4"
+  checksum: 10c0/3ac1600bf9061a59a228998f7cd3f29e85cbf522997671ba18d4d84d10a2a1aff4f95aceb143fa9960501c3ec351e113fc75884e6a504ace44dc1744083035ee
   languageName: node
   linkType: hard
 
