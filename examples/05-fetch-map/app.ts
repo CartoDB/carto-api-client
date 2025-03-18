@@ -1,12 +1,9 @@
-// deck.gl
-// SPDX-License-Identifier: MIT
-// Copyright (c) vis.gl contributors
-
 import {
   BASEMAP,
   fetchMap,
   FetchMapOptions,
   GoogleBasemap,
+  LayerProvider,
   MapLibreBasemap,
 } from '@carto/api-client';
 import {Deck} from '@deck.gl/core';
@@ -17,6 +14,14 @@ import {Loader} from '@googlemaps/js-api-loader';
 type FetchMapResult = any; // TODO: fix type
 import {GoogleMapsOverlay} from '@deck.gl/google-maps';
 import {MapboxOverlay} from '@deck.gl/mapbox';
+import {
+  ClusterTileLayer,
+  H3TileLayer,
+  HeatmapTileLayer,
+  VectorTileLayer,
+  QuadbinTileLayer,
+  RasterTileLayer,
+} from '@deck.gl/carto';
 
 // Get proper API key to be able to render Google basemaps, otherwise we
 // render on maplibre/positron style
@@ -65,6 +70,17 @@ async function createMapWithGoogleMapsOverlay(result: FetchMapResult) {
   return overlay;
 }
 
+// For testing define LayerProvider here for now
+const layerProvider: LayerProvider = {
+  clusterTile: ClusterTileLayer,
+  h3: H3TileLayer,
+  heatmapTile: HeatmapTileLayer,
+  mvt: VectorTileLayer,
+  quadbin: QuadbinTileLayer,
+  raster: RasterTileLayer,
+  tileset: VectorTileLayer,
+};
+
 async function createMap(cartoMapId: string) {
   const options: FetchMapOptions = {
     apiBaseUrl,
@@ -85,7 +101,7 @@ async function createMap(cartoMapId: string) {
   }
 
   // Get map info from CARTO and update deck
-  const result = await fetchMap(options);
+  const result = await fetchMap(options, layerProvider);
 
   if (GOOGLE_MAPS_API_KEY && result.basemap?.type === 'google-maps') {
     deck = await createMapWithGoogleMapsOverlay(result);

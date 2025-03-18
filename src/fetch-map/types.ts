@@ -1,7 +1,3 @@
-// deck.gl
-// SPDX-License-Identifier: MIT
-// Copyright (c) vis.gl contributors
-
 import {SCALE_TYPE} from './layer-map.js';
 
 export type VisualChannelField = {
@@ -131,9 +127,9 @@ export type KeplerMapConfig = {
   };
   visState: {
     layers: MapConfigLayer[];
+    layerBlending: any;
+    interactionConfig: any;
   };
-  layerBlending: any;
-  interactionConfig: any;
   customBaseMaps?: {
     customStyle?: CustomStyle;
   };
