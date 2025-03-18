@@ -1,7 +1,6 @@
 import {describe, test, expect} from 'vitest';
 import {
   getColorAccessor,
-  getSizeAccessor,
   getTextAccessor,
   getLayer,
   _domainFromValues,
