@@ -16,8 +16,9 @@ const RESTRICTED_IMPORTS = {
       patterns: [
         {
           group: ['@deck.gl/*'],
-          message: 'Only type imports from @deck.gl/* are allowed.',
-          allowTypeImports: true,
+          message:
+            '@deck.gl/* imports are not allowed to avoid circular dependency.',
+          allowTypeImports: false,
         },
       ],
     },

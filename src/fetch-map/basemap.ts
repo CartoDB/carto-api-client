@@ -1,4 +1,3 @@
-import type {MapViewState} from '@deck.gl/core';
 import {
   GOOGLE_BASEMAPS,
   CARTO_MAP_STYLES,
@@ -12,6 +11,20 @@ import {APIErrorContext} from '../api/index.js';
 
 const CUSTOM_STYLE_ID_PREFIX = 'custom:';
 const DEFAULT_CARTO_STYLE = 'positron';
+
+// Subset of type from @deck.gl/core to avoid adding dependency
+type MapViewState = {
+  /** Longitude of the map center */
+  longitude: number;
+  /** Latitude of the map center */
+  latitude: number;
+  /** Zoom level */
+  zoom: number;
+  /** Pitch (tilt) of the map, in degrees. `0` looks top down */
+  pitch?: number;
+  /** Bearing (rotation) of the map, in degrees. `0` is north up */
+  bearing?: number;
+};
 
 function mapLibreViewpros(
   config: KeplerMapConfig

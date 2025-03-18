@@ -13,12 +13,6 @@ import {
 import {format as d3Format} from 'd3-format';
 import moment from 'moment-timezone';
 
-import type {
-  Accessor,
-  Layer,
-  _ConstructorOf as ConstructorOf,
-} from '@deck.gl/core';
-
 export type LayerType =
   | 'clusterTile'
   | 'h3'
@@ -27,8 +21,6 @@ export type LayerType =
   | 'quadbin'
   | 'raster'
   | 'tileset';
-
-export type LayerProvider = Record<LayerType, ConstructorOf<Layer>>;
 
 import {createBinaryProxy, scaleIdentity} from './utils.js';
 import {
@@ -157,16 +149,12 @@ const deprecatedLayerTypes = [
 export function getLayer(
   type: LayerType,
   config: MapTextSubLayerConfig,
-  dataset: MapDataset,
-  layerProvider: LayerProvider
-): {Layer: ConstructorOf<Layer>; propMap: any; defaultProps: any} {
+  dataset: MapDataset
+): {propMap: any; defaultProps: any} {
   if (deprecatedLayerTypes.includes(type)) {
     throw new Error(
       `Outdated layer type: ${type}. Please open map in CARTO Builder to automatically migrate.`
     );
-  }
-  if (!layerProvider[type]) {
-    throw new Error(`No layer provided for type: ${type} in layerProvider`);
   }
 
   let basePropMap: any = sharedPropMap;
@@ -179,7 +167,6 @@ export function getLayer(
   const {aggregationExp, aggregationResLevel} = dataset;
 
   return {
-    Layer: layerProvider[type],
     propMap: basePropMap,
     defaultProps: {
       ...defaultProps,
@@ -421,10 +408,12 @@ export function getMaxMarkerSize(
   return Math.ceil(radiusRange && field ? radiusRange[1] : radius);
 }
 
-export function negateAccessor<T>(
-  accessor: Accessor<T, number>
-): Accessor<T, number> {
-  return typeof accessor === 'function' ? (d, i) => -accessor(d, i) : -accessor;
+type Accessor = number | ((d: any, i: any) => number);
+export function negateAccessor(accessor: Accessor): Accessor {
+  if (typeof accessor === 'function') {
+    return (d: any, i: any) => -accessor(d, i);
+  }
+  return -accessor;
 }
 
 export function getSizeAccessor(

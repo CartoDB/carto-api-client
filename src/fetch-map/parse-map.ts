@@ -1,5 +1,4 @@
-import {ColorParameters} from '@luma.gl/core';
-import type {Layer} from '@deck.gl/core';
+import type {ColorParameters} from '@luma.gl/core';
 import {
   AGGREGATION,
   getLayer,
@@ -13,7 +12,6 @@ import {
   negateAccessor,
   getMaxMarkerSize,
   LayerType,
-  LayerProvider,
 } from './layer-map.js';
 
 import {assert} from '../utils.js';
@@ -25,6 +23,13 @@ import {
   VisConfig,
   MapConfigLayer,
 } from './types.js';
+
+export type LayerProps = {
+  id: string;
+  type: LayerType;
+  data: any;
+  props: Record<string, any>;
+};
 
 export type ParseMapResult = {
   /** Map id. */
@@ -43,10 +48,10 @@ export type ParseMapResult = {
   mapStyle: any;
   token: string;
 
-  layers: Layer[];
+  layers: LayerProps[];
 };
 
-export function parseMap(json: any, layerProvider: LayerProvider) {
+export function parseMap(json: any) {
   const {keplerMapConfig, datasets, token} = json;
   assert(keplerMapConfig.version === 'v1', 'Only support Kepler v1');
   const config = keplerMapConfig.config as KeplerMapConfig;
@@ -74,24 +79,33 @@ export function parseMap(json: any, layerProvider: LayerProvider) {
           assert(dataset, `No dataset matching dataId: ${dataId}`);
           const {data} = dataset;
           assert(data, `No data loaded for dataId: ${dataId}`);
-          const {Layer, propMap, defaultProps} = getLayer(
-            type as LayerType,
+
+          const layerType = type as LayerType;
+          const {propMap, defaultProps} = getLayer(
+            layerType,
             // @ts-ignore
             config,
-            dataset,
-            layerProvider
+            dataset
           );
+
           const styleProps = createStyleProps(config, propMap);
-          return new Layer({
+
+          return {
             id,
+            type: layerType,
             data,
-            ...defaultProps,
-            ...createInteractionProps(interactionConfig),
-            ...styleProps,
-            ...createChannelProps(id, type, config, visualChannels, data), // Must come after style
-            ...createParametersProp(layerBlending, styleProps.parameters || {}), // Must come after style
-            ...createLoadOptions(token),
-          });
+            props: {
+              ...defaultProps,
+              ...createInteractionProps(interactionConfig),
+              ...styleProps,
+              ...createChannelProps(id, type, config, visualChannels, data), // Must come after style
+              ...createParametersProp(
+                layerBlending,
+                styleProps.parameters || {}
+              ), // Must come after style
+              ...createLoadOptions(token),
+            },
+          };
         } catch (e: any) {
           console.error(e.message);
           return undefined;
