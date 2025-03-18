@@ -241,16 +241,6 @@ function calculateDomain(
     const {attributes} = data.tilestats.layers[0];
     const attribute = attributes.find((a: any) => a.attribute === name);
     return domainFromAttribute(attribute, scaleType, scaleLength as number);
-  } else if (data.features) {
-    // GeoJSON data type
-    const values = data.features.map(
-      ({properties}: {properties: any}) => properties[name]
-    );
-    return domainFromValues(values, scaleType);
-  } else if (Array.isArray(data) && data[0][name] !== undefined) {
-    // JSON data type
-    const values = data.map((properties: any) => properties[name]);
-    return domainFromValues(values, scaleType);
   }
 
   return [0, 1];
