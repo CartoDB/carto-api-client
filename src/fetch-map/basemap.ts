@@ -1,4 +1,4 @@
-import {MapViewState} from '@deck.gl/core';
+import type {MapViewState} from '@deck.gl/core';
 import {
   GOOGLE_BASEMAPS,
   CARTO_MAP_STYLES,

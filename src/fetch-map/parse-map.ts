@@ -1,5 +1,5 @@
 import {ColorParameters} from '@luma.gl/core';
-import {Layer, log} from '@deck.gl/core';
+import type {Layer} from '@deck.gl/core';
 import {
   AGGREGATION,
   getLayer,
@@ -13,9 +13,9 @@ import {
   negateAccessor,
   getMaxMarkerSize,
   LayerType,
+  LayerProvider,
 } from './layer-map.js';
-import {PointLabelLayer} from '@deck.gl/carto';
-import {CollisionFilterExtension} from '@deck.gl/extensions';
+
 import {assert} from '../utils.js';
 import {
   KeplerMapConfig,
@@ -23,9 +23,9 @@ import {
   MapLayerConfig,
   VisualChannels,
   VisConfig,
+  MapConfigLayer,
 } from './types.js';
 
-const collisionFilterExtension = new CollisionFilterExtension();
 
 export type ParseMapResult = {
   /** Map id. */
@@ -47,12 +47,12 @@ export type ParseMapResult = {
   layers: Layer[];
 };
 
-export function parseMap(json: any) {
+export function parseMap(json: any, layerProvider: LayerProvider) {
   const {keplerMapConfig, datasets, token} = json;
   assert(keplerMapConfig.version === 'v1', 'Only support Kepler v1');
-  const {mapState, mapStyle} = keplerMapConfig.config as KeplerMapConfig;
-  const {layers, layerBlending, interactionConfig} =
-    keplerMapConfig.config.visState;
+  const config = keplerMapConfig.config as KeplerMapConfig;
+  const {mapState, mapStyle} = config;
+  const {layers, layerBlending, interactionConfig} = config.visState;
 
   return {
     id: json.id,
@@ -67,17 +67,7 @@ export function parseMap(json: any) {
     layers: layers
       .reverse()
       .map(
-        ({
-          id,
-          type,
-          config,
-          visualChannels,
-        }: {
-          id: string;
-          type: string;
-          config: any;
-          visualChannels: any;
-        }) => {
+        ({ id, type, config, visualChannels }: MapConfigLayer) => {
           try {
             const {dataId} = config;
             const dataset: MapDataset | null = datasets.find(
@@ -88,8 +78,10 @@ export function parseMap(json: any) {
             assert(data, `No data loaded for dataId: ${dataId}`);
             const {Layer, propMap, defaultProps} = getLayer(
               type as LayerType,
+              // @ts-ignore
               config,
-              dataset
+              dataset,
+              layerProvider
             );
             const styleProps = createStyleProps(config, propMap);
             return new Layer({
@@ -106,7 +98,7 @@ export function parseMap(json: any) {
               ...createLoadOptions(token),
             });
           } catch (e: any) {
-            log.error(e.message)();
+            console.error(e.message);
             return undefined;
           }
         }
@@ -395,8 +387,6 @@ function createChannelProps(
     result._subLayerProps = {
       ...result._subLayerProps,
       'points-text': {
-        type: PointLabelLayer,
-        extensions: [collisionFilterExtension],
         collisionEnabled: true,
         collisionGroup,
 

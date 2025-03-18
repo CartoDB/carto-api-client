@@ -13,24 +13,12 @@ import {
 import {format as d3Format} from 'd3-format';
 import moment from 'moment-timezone';
 
-import {Accessor, Layer, _ConstructorOf as ConstructorOf} from '@deck.gl/core';
-import {
-  GridLayer,
-  HeatmapLayer,
-  HexagonLayer,
-} from '@deck.gl/aggregation-layers';
-import {GeoJsonLayer} from '@deck.gl/layers';
-import {H3HexagonLayer} from '@deck.gl/geo-layers';
-import {
-  ClusterTileLayer,
-  H3TileLayer,
-  QuadbinTileLayer,
-  RasterTileLayer,
-  VectorTileLayer,
-  HeatmapTileLayer,
-} from '@deck.gl/carto';
+import type {Accessor, Layer, _ConstructorOf as ConstructorOf} from '@deck.gl/core';
 
-import {assert} from '../utils.js';
+export type LayerType = 'clusterTile' | 'h3' | 'heatmapTile' | 'mvt' | 'quadbin' | 'raster' | 'tileset';
+
+export type LayerProvider = Record<LayerType, ConstructorOf<Layer>>;
+
 import {createBinaryProxy, scaleIdentity} from './utils.js';
 import {
   CustomMarkersRange,
@@ -53,23 +41,6 @@ const SCALE_FUNCS: Record<string, () => any> = {
   identity: scaleIdentity,
 };
 export type SCALE_TYPE = keyof typeof SCALE_FUNCS;
-
-type TileLayerType =
-  | 'clusterTile'
-  | 'h3'
-  | 'heatmapTile'
-  | 'mvt'
-  | 'quadbin'
-  | 'raster'
-  | 'tileset';
-export type DocumentLayerType =
-  | 'geojson'
-  | 'grid'
-  | 'heatmap'
-  | 'hexagon'
-  | 'hexagonId'
-  | 'point';
-export type LayerType = TileLayerType | DocumentLayerType;
 
 function identity<T>(v: T): T {
   return v;
@@ -99,16 +70,6 @@ const AGGREGATION_FUNC: Record<string, (values: any, accessor: any) => any> = {
     groupSort(values, (v) => v.length, accessor).pop(),
   stddev: deviation,
   variance,
-};
-
-const TILE_LAYER_TYPE_TO_LAYER: Record<TileLayerType, ConstructorOf<Layer>> = {
-  clusterTile: ClusterTileLayer,
-  h3: H3TileLayer,
-  heatmapTile: HeatmapTileLayer,
-  mvt: VectorTileLayer,
-  quadbin: QuadbinTileLayer,
-  raster: RasterTileLayer,
-  tileset: VectorTileLayer,
 };
 
 const hexToRGBA = (c: any) => {
@@ -158,16 +119,6 @@ const heatmapTilePropsMap = {
   },
 };
 
-const aggregationVisConfig = {
-  colorAggregation: (x: any) => ({
-    colorAggregation: AGGREGATION[x] || AGGREGATION.sum,
-  }),
-  colorRange: (x: any) => ({colorRange: x.colors.map(hexToRGBA)}),
-  coverage: 'coverage',
-  elevationPercentile: ['elevationLowerPercentile', 'elevationUpperPercentile'],
-  percentile: ['lowerPercentile', 'upperPercentile'],
-};
-
 const defaultProps = {
   lineMiterLimit: 2,
   lineWidthUnits: 'pixels',
@@ -183,91 +134,32 @@ function mergePropMaps(
   return {...a, ...b, visConfig: {...a.visConfig, ...b.visConfig}};
 }
 
+const deprecatedLayerTypes = ['geojson', 'grid', 'heatmap', 'hexagon', 'hexagonId', 'point'];
+
 export function getLayer(
   type: LayerType,
   config: MapTextSubLayerConfig,
-  dataset: MapDataset
+  dataset: MapDataset,
+  layerProvider: LayerProvider
 ): {Layer: ConstructorOf<Layer>; propMap: any; defaultProps: any} {
-  let basePropMap: any = sharedPropMap;
+  if (deprecatedLayerTypes.includes(type)) {
+    throw new Error(`Outdated layer type: ${type}. Please open map in CARTO Builder to automatically migrate.`);
+  }
+  if (!layerProvider[type]) {
+    throw new Error(`No layer provided for type: ${type} in layerProvider`);
+  }
 
+  let basePropMap: any = sharedPropMap;
   if (config.visConfig?.customMarkers) {
     basePropMap = mergePropMaps(basePropMap, customMarkersPropsMap);
   }
   if (type === 'heatmapTile') {
     basePropMap = mergePropMaps(basePropMap, heatmapTilePropsMap);
   }
-  if (TILE_LAYER_TYPE_TO_LAYER[type as TileLayerType]) {
-    return getTileLayer(dataset, basePropMap, type);
-  }
-
-  const geoColumn = dataset?.geoColumn;
-  const getPosition = (d: any) => d[geoColumn].coordinates;
-
-  const hexagonId = config.columns?.hex_id;
-
-  const layerTypeDefs: Record<
-    DocumentLayerType,
-    {Layer: ConstructorOf<Layer>; propMap?: any; defaultProps?: any}
-  > = {
-    point: {
-      Layer: GeoJsonLayer,
-      propMap: {
-        columns: {
-          altitude: (x: any) => ({parameters: {depthWriteEnabled: Boolean(x)}}),
-        },
-        visConfig: {outline: 'stroked'},
-      },
-    },
-    geojson: {
-      Layer: GeoJsonLayer,
-    },
-    grid: {
-      Layer: GridLayer,
-      propMap: {
-        visConfig: {
-          ...aggregationVisConfig,
-          worldUnitSize: (x: any) => ({cellSize: 1000 * x}),
-        },
-      },
-      defaultProps: {getPosition},
-    },
-    heatmap: {
-      Layer: HeatmapLayer,
-      propMap: {visConfig: {...aggregationVisConfig, radius: 'radiusPixels'}},
-      defaultProps: {getPosition},
-    },
-    hexagon: {
-      Layer: HexagonLayer,
-      propMap: {
-        visConfig: {
-          ...aggregationVisConfig,
-          worldUnitSize: (x: any) => ({radius: 1000 * x}),
-        },
-      },
-      defaultProps: {getPosition},
-    },
-    hexagonId: {
-      Layer: H3HexagonLayer,
-      propMap: {visConfig: {coverage: 'coverage'}},
-      defaultProps: {getHexagon: (d: any) => d[hexagonId], stroked: false},
-    },
-  };
-
-  const layer = layerTypeDefs[type as DocumentLayerType];
-
-  assert(layer, `Unsupported layer type: ${type}`);
-  return {
-    ...layer,
-    propMap: mergePropMaps(basePropMap, layer.propMap),
-    defaultProps: {...defaultProps, ...layer.defaultProps},
-  };
-}
-
-function getTileLayer(dataset: MapDataset, basePropMap: any, type: LayerType) {
   const {aggregationExp, aggregationResLevel} = dataset;
 
   return {
-    Layer: TILE_LAYER_TYPE_TO_LAYER[type as TileLayerType] || VectorTileLayer,
+    Layer: layerProvider[type],
     propMap: basePropMap,
     defaultProps: {
       ...defaultProps,
