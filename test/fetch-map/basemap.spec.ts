@@ -29,18 +29,16 @@ const mockedCartoStyle = {
 
 async function responseFunc(url: string) {
   if (url === BASEMAP.VOYAGER) {
-    return {
-      json: async () => mockedCartoStyle
-    };
+    return await Promise.resolve({
+      json: async () => await Promise.resolve(mockedCartoStyle)
+    });
   } else if (url === BASEMAP.DARK_MATTER) {
     throw new Error('connection error');
   } else {
-    return {
+    return await Promise.resolve({
       ok: false,
-      json: async () => {
-        throw new Error('fake error');
-      }
-    };
+      json: async () => await Promise.reject(new Error('fake error'))
+    });
   }
 }
 
