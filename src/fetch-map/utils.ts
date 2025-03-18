@@ -1,4 +1,4 @@
-import {BinaryFeature} from '@loaders.gl/schema';
+import type {BinaryFeature} from '@loaders.gl/schema';
 type Properties = BinaryFeature['properties'];
 type NumericProps = BinaryFeature['numericProps'];
 

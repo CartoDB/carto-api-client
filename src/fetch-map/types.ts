@@ -127,9 +127,9 @@ export type KeplerMapConfig = {
   };
   visState: {
     layers: MapConfigLayer[];
+    layerBlending: any;
+    interactionConfig: any;
   };
-  layerBlending: any;
-  interactionConfig: any;
   customBaseMaps?: {
     customStyle?: CustomStyle;
   };

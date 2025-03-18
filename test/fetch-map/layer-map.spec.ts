@@ -213,10 +213,14 @@ describe('layer-map', () => {
     });
   });
 
-  test('getHexagon', () => {
-    const accessor = getLayer('hexagonId', {columns: {hex_id: 'h3'}}).defaultProps.getHexagon;
-    const data = {h3: 1234};
-    expect(accessor(data)).toBe(1234);
+  test('throws error for deprecated layer types', () => {
+    const deprecatedTypes = ['geojson', 'grid', 'heatmap', 'hexagon', 'hexagonId', 'point'];
+    
+    deprecatedTypes.forEach(type => {
+      expect(() => 
+        getLayer(type as any, {columns: {}}, {}, {})
+      ).toThrow(`Outdated layer type: ${type}. Please open map in CARTO Builder to automatically migrate.`);
+    });
   });
 
   test('domainFromValues', () => {
