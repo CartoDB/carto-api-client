@@ -26,7 +26,6 @@ import {
   MapConfigLayer,
 } from './types.js';
 
-
 export type ParseMapResult = {
   /** Map id. */
   id: string;
@@ -66,43 +65,38 @@ export function parseMap(json: any, layerProvider: LayerProvider) {
     token,
     layers: layers
       .reverse()
-      .map(
-        ({ id, type, config, visualChannels }: MapConfigLayer) => {
-          try {
-            const {dataId} = config;
-            const dataset: MapDataset | null = datasets.find(
-              (d: any) => d.id === dataId
-            );
-            assert(dataset, `No dataset matching dataId: ${dataId}`);
-            const {data} = dataset;
-            assert(data, `No data loaded for dataId: ${dataId}`);
-            const {Layer, propMap, defaultProps} = getLayer(
-              type as LayerType,
-              // @ts-ignore
-              config,
-              dataset,
-              layerProvider
-            );
-            const styleProps = createStyleProps(config, propMap);
-            return new Layer({
-              id,
-              data,
-              ...defaultProps,
-              ...createInteractionProps(interactionConfig),
-              ...styleProps,
-              ...createChannelProps(id, type, config, visualChannels, data), // Must come after style
-              ...createParametersProp(
-                layerBlending,
-                styleProps.parameters || {}
-              ), // Must come after style
-              ...createLoadOptions(token),
-            });
-          } catch (e: any) {
-            console.error(e.message);
-            return undefined;
-          }
+      .map(({id, type, config, visualChannels}: MapConfigLayer) => {
+        try {
+          const {dataId} = config;
+          const dataset: MapDataset | null = datasets.find(
+            (d: any) => d.id === dataId
+          );
+          assert(dataset, `No dataset matching dataId: ${dataId}`);
+          const {data} = dataset;
+          assert(data, `No data loaded for dataId: ${dataId}`);
+          const {Layer, propMap, defaultProps} = getLayer(
+            type as LayerType,
+            // @ts-ignore
+            config,
+            dataset,
+            layerProvider
+          );
+          const styleProps = createStyleProps(config, propMap);
+          return new Layer({
+            id,
+            data,
+            ...defaultProps,
+            ...createInteractionProps(interactionConfig),
+            ...styleProps,
+            ...createChannelProps(id, type, config, visualChannels, data), // Must come after style
+            ...createParametersProp(layerBlending, styleProps.parameters || {}), // Must come after style
+            ...createLoadOptions(token),
+          });
+        } catch (e: any) {
+          console.error(e.message);
+          return undefined;
         }
-      ),
+      }),
   };
 }
 
