@@ -1,4 +1,4 @@
-import {SCALE_TYPE} from './layer-map.js';
+import {LayerType, SCALE_TYPE} from './layer-map.js';
 
 export type VisualChannelField = {
   name: string;
@@ -94,12 +94,8 @@ export type MapLayerConfig = {
   visConfig: VisConfig;
 };
 
-export type MapTextSubLayerConfig = Omit<MapLayerConfig, 'textLabel'> & {
-  textLabel?: TextLabel;
-};
-
 export type MapConfigLayer = {
-  type: string;
+  type: LayerType;
   id: string;
   config: MapLayerConfig;
   visualChannels: VisualChannels;

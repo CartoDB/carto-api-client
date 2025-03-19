@@ -27,7 +27,6 @@ import {ParseMapResult, parseMap} from './parse-map.js';
 import {assert} from '../utils.js';
 import type {Basemap} from './types.js';
 import {fetchBasemapProps} from './basemap.js';
-import type {LayerProvider} from './layer-map.js';
 type Dataset = {
   id: string;
   type: MapType;
@@ -297,19 +296,16 @@ export type FetchMapResult = ParseMapResult & {
   stopAutoRefresh?: () => void;
 };
 
-export async function fetchMap(
-  {
-    accessToken,
-    apiBaseUrl = DEFAULT_API_BASE_URL,
-    cartoMapId,
-    clientId,
-    headers,
-    autoRefresh,
-    onNewData,
-    maxLengthURL,
-  }: FetchMapOptions,
-  layerProvider: LayerProvider
-): Promise<FetchMapResult> {
+export async function fetchMap({
+  accessToken,
+  apiBaseUrl = DEFAULT_API_BASE_URL,
+  cartoMapId,
+  clientId,
+  headers,
+  autoRefresh,
+  onNewData,
+  maxLengthURL,
+}: FetchMapOptions): Promise<FetchMapResult> {
   assert(
     cartoMapId,
     'Must define CARTO map id: fetchMap({cartoMapId: "XXXX-XXXX-XXXX"})'
@@ -351,7 +347,6 @@ export async function fetchMap(
   // will not update when a map is published.
   let stopAutoRefresh: (() => void) | undefined;
   if (autoRefresh) {
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     const intervalId = setInterval(async () => {
       const changed = await fillInMapDatasets(map, {
         ...context,
@@ -361,7 +356,7 @@ export async function fetchMap(
         },
       });
       if (onNewData && changed.some((v) => v === true)) {
-        onNewData(parseMap(map, layerProvider));
+        onNewData(parseMap(map));
       }
     }, autoRefresh * 1000);
     stopAutoRefresh = () => {
@@ -398,10 +393,10 @@ export async function fetchMap(
   // Mutates attributes in visualChannels to contain tile stats
   await fillInTileStats(map, context);
 
-  const out = {...parseMap(map, layerProvider), basemap, ...{stopAutoRefresh}};
+  const out = {...parseMap(map), basemap, ...{stopAutoRefresh}};
 
   const textLayers = out.layers.filter((layer: any) => {
-    const pointType = layer.props.pointType || '';
+    const pointType = layer.props?.pointType || '';
     return pointType.includes('text');
   });
 
