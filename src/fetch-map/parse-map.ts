@@ -1,7 +1,7 @@
 import type {ColorParameters} from '@luma.gl/core';
 import {
   AGGREGATION,
-  getLayer,
+  getLayerProps,
   getColorAccessor,
   getColorValueAccessor,
   getSizeAccessor,
@@ -78,7 +78,7 @@ export function parseMap(json: any) {
           const {data} = dataset;
           assert(data, `No data loaded for dataId: ${dataId}`);
 
-          const {propMap, defaultProps} = getLayer(type, config, dataset);
+          const {propMap, defaultProps} = getLayerProps(type, config, dataset);
 
           const styleProps = createStyleProps(config, propMap);
 
