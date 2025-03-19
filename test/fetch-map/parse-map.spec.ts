@@ -131,4 +131,38 @@ describe('parseMap', () => {
     const map = parseMap({...METADATA, datasets: DATASETS, keplerMapConfig});
     expect(map.layers).toEqual([undefined]);
   });
+
+  test('popupSettings are exported', () => {
+    // Mock input with popupSettings
+    const mockInput = {
+      id: 'test-map',
+      title: 'Test Map',
+      keplerMapConfig: {
+        version: 'v1',
+        config: {
+          mapState: {},
+          mapStyle: {},
+          popupSettings: {
+            enabled: true,
+            fields: ['field1', 'field2'],
+          },
+          visState: {
+            layers: [],
+            layerBlending: 'normal',
+            interactionConfig: {},
+          },
+        },
+      },
+      datasets: [],
+      token: 'test-token',
+    };
+
+    const result = parseMap(mockInput);
+
+    expect(result.popupSettings).toBeDefined();
+    expect(result.popupSettings).toEqual({
+      enabled: true,
+      fields: ['field1', 'field2'],
+    });
+  });
 });
