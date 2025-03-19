@@ -117,9 +117,6 @@
     "vite": "^6.1.0",
     "vitest": "3.0.7"
   },
-  "peerDependencies": {
-    "@deck.gl/core": "~9.1.0"
-  },
   "resolutions": {
     "@carto/api-client": "portal:./",
     "rollup": "^4.20.0"

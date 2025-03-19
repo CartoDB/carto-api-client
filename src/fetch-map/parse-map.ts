@@ -1,8 +1,7 @@
-import {ColorParameters} from '@luma.gl/core';
-import type {Layer} from '@deck.gl/core';
+import type {ColorParameters} from '@luma.gl/core';
 import {
   AGGREGATION,
-  getLayer,
+  getLayerProps,
   getColorAccessor,
   getColorValueAccessor,
   getSizeAccessor,
@@ -13,7 +12,6 @@ import {
   negateAccessor,
   getMaxMarkerSize,
   LayerType,
-  LayerProvider,
 } from './layer-map.js';
 
 import {assert} from '../utils.js';
@@ -25,6 +23,11 @@ import {
   VisConfig,
   MapConfigLayer,
 } from './types.js';
+
+export type LayerDescriptor = {
+  type: LayerType;
+  props: Record<string, any>;
+};
 
 export type ParseMapResult = {
   /** Map id. */
@@ -41,16 +44,17 @@ export type ParseMapResult = {
 
   /** @deprecated Use `basemap`. */
   mapStyle: any;
+  popupSettings: any;
   token: string;
 
-  layers: Layer[];
+  layers: LayerDescriptor[];
 };
 
-export function parseMap(json: any, layerProvider: LayerProvider) {
+export function parseMap(json: any) {
   const {keplerMapConfig, datasets, token} = json;
   assert(keplerMapConfig.version === 'v1', 'Only support Kepler v1');
   const config = keplerMapConfig.config as KeplerMapConfig;
-  const {mapState, mapStyle} = config;
+  const {mapState, mapStyle, popupSettings} = config;
   const {layers, layerBlending, interactionConfig} = config.visState;
 
   return {
@@ -62,6 +66,7 @@ export function parseMap(json: any, layerProvider: LayerProvider) {
     initialViewState: mapState,
     /** @deprecated Use `basemap`. */
     mapStyle,
+    popupSettings,
     token,
     layers: layers
       .reverse()
@@ -74,24 +79,28 @@ export function parseMap(json: any, layerProvider: LayerProvider) {
           assert(dataset, `No dataset matching dataId: ${dataId}`);
           const {data} = dataset;
           assert(data, `No data loaded for dataId: ${dataId}`);
-          const {Layer, propMap, defaultProps} = getLayer(
-            type as LayerType,
-            // @ts-ignore
-            config,
-            dataset,
-            layerProvider
-          );
+
+          const {propMap, defaultProps} = getLayerProps(type, config, dataset);
+
           const styleProps = createStyleProps(config, propMap);
-          return new Layer({
-            id,
-            data,
-            ...defaultProps,
-            ...createInteractionProps(interactionConfig),
-            ...styleProps,
-            ...createChannelProps(id, type, config, visualChannels, data), // Must come after style
-            ...createParametersProp(layerBlending, styleProps.parameters || {}), // Must come after style
-            ...createLoadOptions(token),
-          });
+
+          const layer: LayerDescriptor = {
+            type,
+            props: {
+              id,
+              data,
+              ...defaultProps,
+              ...createInteractionProps(interactionConfig),
+              ...styleProps,
+              ...createChannelProps(id, type, config, visualChannels, data), // Must come after style
+              ...createParametersProp(
+                layerBlending,
+                styleProps.parameters || {}
+              ), // Must come after style
+              ...createLoadOptions(token),
+            },
+          };
+          return layer;
         } catch (e: any) {
           console.error(e.message);
           return undefined;

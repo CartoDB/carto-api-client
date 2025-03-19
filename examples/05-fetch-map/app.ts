@@ -3,10 +3,11 @@ import {
   fetchMap,
   FetchMapOptions,
   GoogleBasemap,
-  LayerProvider,
+  LayerDescriptor,
+  LayerType,
   MapLibreBasemap,
 } from '@carto/api-client';
-import {Deck} from '@deck.gl/core';
+import {_ConstructorOf, Deck, Layer} from '@deck.gl/core';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import {Loader} from '@googlemaps/js-api-loader';
@@ -30,6 +31,29 @@ const GOOGLE_MAPS_API_KEY = '';
 const apiBaseUrl = 'https://gcp-us-east1.api.carto.com';
 // const apiBaseUrl = 'https://gcp-us-east1-05.dev.api.carto.com';
 
+// For now, define here. Eventually LayerFactory will be available in @deck.gl/carto
+const layerClasses: Record<LayerType, _ConstructorOf<Layer>> = {
+  clusterTile: ClusterTileLayer,
+  h3: H3TileLayer,
+  heatmapTile: HeatmapTileLayer,
+  mvt: VectorTileLayer,
+  quadbin: QuadbinTileLayer,
+  raster: RasterTileLayer,
+  tileset: VectorTileLayer,
+};
+function LayerFactory(layers: LayerDescriptor[]) {
+  return layers
+    .map(({type, props}) => {
+      const LayerClass = layerClasses[type];
+      if (!LayerClass) {
+        console.error(`No layer class found for type: ${type}`);
+        return null;
+      }
+      return new LayerClass(props);
+    })
+    .filter(Boolean);
+}
+
 function createMapWithMapLibreOverlay(result: FetchMapResult) {
   document.getElementById('deck-canvas')!.style.display = 'none';
 
@@ -46,7 +70,7 @@ function createMapWithMapLibreOverlay(result: FetchMapResult) {
     })
   );
 
-  const overlay = new MapboxOverlay({layers: result.layers});
+  const overlay = new MapboxOverlay({layers: LayerFactory(result.layers)});
   map.addControl(overlay);
 
   return overlay;
@@ -64,22 +88,11 @@ async function createMapWithGoogleMapsOverlay(result: FetchMapResult) {
     disableDefaultUI: true,
   });
 
-  const overlay = new GoogleMapsOverlay({layers: result.layers});
+  const overlay = new GoogleMapsOverlay({layers: LayerFactory(result.layers)});
   overlay.setMap(map);
 
   return overlay;
 }
-
-// For testing define LayerProvider here for now
-const layerProvider: LayerProvider = {
-  clusterTile: ClusterTileLayer,
-  h3: H3TileLayer,
-  heatmapTile: HeatmapTileLayer,
-  mvt: VectorTileLayer,
-  quadbin: QuadbinTileLayer,
-  raster: RasterTileLayer,
-  tileset: VectorTileLayer,
-};
 
 async function createMap(cartoMapId: string) {
   const options: FetchMapOptions = {
@@ -95,13 +108,13 @@ async function createMap(cartoMapId: string) {
   if (autoRefresh) {
     // Autorefresh the data every 5 seconds
     options.autoRefresh = 5;
-    options.onNewData = ({layers}) => {
-      deck?.setProps({layers});
+    options.onNewData = (result) => {
+      deck?.setProps({layers: LayerFactory(result.layers)});
     };
   }
 
   // Get map info from CARTO and update deck
-  const result = await fetchMap(options, layerProvider);
+  const result = await fetchMap(options);
 
   if (GOOGLE_MAPS_API_KEY && result.basemap?.type === 'google-maps') {
     deck = await createMapWithGoogleMapsOverlay(result);

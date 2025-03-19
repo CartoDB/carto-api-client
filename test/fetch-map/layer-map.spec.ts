@@ -2,7 +2,7 @@ import {describe, test, expect} from 'vitest';
 import {
   getColorAccessor,
   getTextAccessor,
-  getLayer,
+  getLayerProps,
   _domainFromValues,
 } from '@carto/api-client';
 
@@ -139,7 +139,7 @@ describe('layer-map', () => {
     ];
 
     deprecatedTypes.forEach((type) => {
-      expect(() => getLayer(type as any, {columns: {}}, {}, {})).toThrow(
+      expect(() => getLayerProps(type as any, {} as any, {} as any)).toThrow(
         `Outdated layer type: ${type}. Please open map in CARTO Builder to automatically migrate.`
       );
     });
