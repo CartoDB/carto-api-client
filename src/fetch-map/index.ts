@@ -8,5 +8,6 @@ export type {
   KeplerMapConfig,
 } from './types.js';
 
+export * from './basemap.js';
 export * from './layer-map.js';
 export * from './parse-map.js';

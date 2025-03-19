@@ -1,7 +1,6 @@
 import {describe, test, expect} from 'vitest';
-import {BASEMAP, _MapLibreBasemap as MapLibreBasemap} from '@deck.gl/carto';
+import {BASEMAP, fetchBasemapProps, MapLibreBasemap} from '@carto/api-client';
 import {withMockFetchMapsV3} from '../__mock-fetch.js';
-import {fetchBasemapProps} from '@deck.gl/carto';
 
 const mockedMapConfig = {
   mapState: {
