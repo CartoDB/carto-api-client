@@ -1,14 +1,4 @@
-import {
-  TilejsonResult,
-  SourceOptions,
-  h3QuerySource,
-  h3TableSource,
-  quadbinQuerySource,
-  quadbinTableSource,
-  vectorQuerySource,
-  vectorTableSource,
-  vectorTilesetSource,
-} from '../sources/index.js';
+import {TilejsonResult} from '../sources/index.js';
 
 import {DEFAULT_API_BASE_URL} from '../constants.js';
 

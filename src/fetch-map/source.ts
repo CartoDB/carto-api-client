@@ -84,7 +84,7 @@ export function configureSource({
   const spatialIndexOptions = {
     aggregationExp: !aggregationExp ? DEFAULT_AGGREGATION_EXP : aggregationExp,
     aggregationResLevel: scaleAggregationResLevel(
-      aggregationResLevel as number,
+      aggregationResLevel,
       tileResolution
     ),
     spatialDataColumn,
