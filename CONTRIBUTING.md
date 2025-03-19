@@ -9,6 +9,16 @@ _Contributions are subject to CARTO's [community contributions policy](https://c
 
 ## Quickstart
 
+To configure Node.js and Yarn versions, install [nvm](https://github.com/nvm-sh/nvm) and run:
+
+```bash
+# set recommended Node.js version
+nvm use
+
+# enable Corepack, which will set recommended Yarn version
+corepack enable
+```
+
 To install and build `@carto/api-client` locally from source:
 
 ```bash

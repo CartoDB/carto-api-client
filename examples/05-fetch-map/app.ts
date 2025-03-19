@@ -14,7 +14,14 @@ import {Loader} from '@googlemaps/js-api-loader';
 type FetchMapResult = any; // TODO: fix type
 import {GoogleMapsOverlay} from '@deck.gl/google-maps';
 import {MapboxOverlay} from '@deck.gl/mapbox';
-import { ClusterTileLayer, H3TileLayer, HeatmapTileLayer, VectorTileLayer, QuadbinTileLayer, RasterTileLayer } from '@deck.gl/carto';
+import {
+  ClusterTileLayer,
+  H3TileLayer,
+  HeatmapTileLayer,
+  VectorTileLayer,
+  QuadbinTileLayer,
+  RasterTileLayer,
+} from '@deck.gl/carto';
 
 // Get proper API key to be able to render Google basemaps, otherwise we
 // render on maplibre/positron style

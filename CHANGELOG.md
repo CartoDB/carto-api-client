@@ -11,6 +11,10 @@
 
 ## 0.4
 
+### 0.4.9
+
+- feat: Remove spatialIndexReferenceViewState param (#128)
+
 ### 0.4.8
 
 - fix: Fix clientId defaults in query and source calls (#122)

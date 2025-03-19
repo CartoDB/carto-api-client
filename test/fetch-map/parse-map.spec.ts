@@ -7,7 +7,7 @@ const METADATA = {
   description: 'Description',
   createdAt: 'createdAt timestamp',
   updatedAt: 'updatedAt timestamp',
-  token: 'API_TOKEN'
+  token: 'API_TOKEN',
 };
 
 const EMPTY_KEPLER_MAP_CONFIG = {
@@ -16,9 +16,9 @@ const EMPTY_KEPLER_MAP_CONFIG = {
     mapState: 'INITIAL_VIEW_STATE',
     mapStyle: 'MAP_STYLE',
     visState: {
-      layers: []
-    }
-  }
+      layers: [],
+    },
+  },
 };
 
 const tilestats = {
@@ -27,16 +27,16 @@ const tilestats = {
       attributes: [
         {
           attribute: 'STRING_ATTR',
-          categories: [{category: '1'}, {category: '2'}, {category: '3'}]
+          categories: [{category: '1'}, {category: '2'}, {category: '3'}],
         },
         {
           attribute: 'NUMBER_ATTR',
           min: 0,
-          max: 10
-        }
-      ]
-    }
-  ]
+          max: 10,
+        },
+      ],
+    },
+  ],
 };
 
 const DATASETS = [
@@ -44,39 +44,43 @@ const DATASETS = [
     id: 'DATA_TILESET_ID',
     data: {
       tiles: [
-        `https://gcp-us-east1.api.carto.com/v3/maps/my_connection/tileset/{z}/{x}/{y}?name=my_data&formatTiles=mvt`
+        `https://gcp-us-east1.api.carto.com/v3/maps/my_connection/tileset/{z}/{x}/{y}?name=my_data&formatTiles=mvt`,
       ],
-      tilestats
+      tilestats,
     },
-    type: 'tileset'
+    type: 'tileset',
   },
   {
     id: 'DATA_TILESET_H3_ID',
     data: {
       scheme: 'h3',
       tiles: [
-        `https://gcp-us-east1.api.carto.com/v3/maps/my_connection/tileset/{i}?name=my_data&formatTiles=json&spatialIndex=h3`
+        `https://gcp-us-east1.api.carto.com/v3/maps/my_connection/tileset/{i}?name=my_data&formatTiles=json&spatialIndex=h3`,
       ],
-      tilestats
+      tilestats,
     },
-    type: 'tileset'
+    type: 'tileset',
   },
   {
     id: 'DATA_TILESET_QUADBIN_ID',
     data: {
       scheme: 'quadbin',
       tiles: [
-        `https://gcp-us-east1.api.carto.com/v3/maps/my_connection/tileset/{i}?name=my_data&formatTiles=json&spatialIndex=quadbin`
+        `https://gcp-us-east1.api.carto.com/v3/maps/my_connection/tileset/{i}?name=my_data&formatTiles=json&spatialIndex=quadbin`,
       ],
-      tilestats
+      tilestats,
     },
-    type: 'tileset'
-  }
+    type: 'tileset',
+  },
 ];
 
 describe('parseMap', () => {
   test('empty map config', () => {
-    const map = parseMap({...METADATA, datasets: DATASETS, keplerMapConfig: EMPTY_KEPLER_MAP_CONFIG});
+    const map = parseMap({
+      ...METADATA,
+      datasets: DATASETS,
+      keplerMapConfig: EMPTY_KEPLER_MAP_CONFIG,
+    });
     expect(map.layers).toEqual([]);
   });
 
@@ -92,12 +96,12 @@ describe('parseMap', () => {
               config: {
                 dataId: 'DATA_ID',
                 label: 'Unsupported Layer',
-                isVisible: true
-              }
-            }
-          ]
-        }
-      }
+                isVisible: true,
+              },
+            },
+          ],
+        },
+      },
     };
 
     const map = parseMap({...METADATA, datasets: DATASETS, keplerMapConfig});
@@ -116,12 +120,12 @@ describe('parseMap', () => {
               config: {
                 dataId: 'MISSING_DATA_ID',
                 label: 'Missing Data Layer',
-                isVisible: true
-              }
-            }
-          ]
-        }
-      }
+                isVisible: true,
+              },
+            },
+          ],
+        },
+      },
     };
 
     const map = parseMap({...METADATA, datasets: DATASETS, keplerMapConfig});

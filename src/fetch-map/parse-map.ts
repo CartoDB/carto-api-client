@@ -26,7 +26,6 @@ import {
   MapConfigLayer,
 } from './types.js';
 
-
 export type ParseMapResult = {
   /** Map id. */
   id: string;
@@ -42,7 +41,6 @@ export type ParseMapResult = {
 
   /** @deprecated Use `basemap`. */
   mapStyle: any;
-  popupSettings: any;
   token: string;
 
   layers: Layer[];
@@ -52,7 +50,7 @@ export function parseMap(json: any, layerProvider: LayerProvider) {
   const {keplerMapConfig, datasets, token} = json;
   assert(keplerMapConfig.version === 'v1', 'Only support Kepler v1');
   const config = keplerMapConfig.config as KeplerMapConfig;
-  const {mapState, mapStyle, popupSettings} = config;
+  const {mapState, mapStyle} = config;
   const {layers, layerBlending, interactionConfig} = config.visState;
 
   return {
@@ -64,47 +62,41 @@ export function parseMap(json: any, layerProvider: LayerProvider) {
     initialViewState: mapState,
     /** @deprecated Use `basemap`. */
     mapStyle,
-    popupSettings,
     token,
     layers: layers
       .reverse()
-      .map(
-        ({ id, type, config, visualChannels }: MapConfigLayer) => {
-          try {
-            const {dataId} = config;
-            const dataset: MapDataset | null = datasets.find(
-              (d: any) => d.id === dataId
-            );
-            assert(dataset, `No dataset matching dataId: ${dataId}`);
-            const {data} = dataset;
-            assert(data, `No data loaded for dataId: ${dataId}`);
-            const {Layer, propMap, defaultProps} = getLayer(
-              type as LayerType,
-              // @ts-ignore
-              config,
-              dataset,
-              layerProvider
-            );
-            const styleProps = createStyleProps(config, propMap);
-            return new Layer({
-              id,
-              data,
-              ...defaultProps,
-              ...createInteractionProps(interactionConfig),
-              ...styleProps,
-              ...createChannelProps(id, type, config, visualChannels, data), // Must come after style
-              ...createParametersProp(
-                layerBlending,
-                styleProps.parameters || {}
-              ), // Must come after style
-              ...createLoadOptions(token),
-            });
-          } catch (e: any) {
-            console.error(e.message);
-            return undefined;
-          }
+      .map(({id, type, config, visualChannels}: MapConfigLayer) => {
+        try {
+          const {dataId} = config;
+          const dataset: MapDataset | null = datasets.find(
+            (d: any) => d.id === dataId
+          );
+          assert(dataset, `No dataset matching dataId: ${dataId}`);
+          const {data} = dataset;
+          assert(data, `No data loaded for dataId: ${dataId}`);
+          const {Layer, propMap, defaultProps} = getLayer(
+            type as LayerType,
+            // @ts-ignore
+            config,
+            dataset,
+            layerProvider
+          );
+          const styleProps = createStyleProps(config, propMap);
+          return new Layer({
+            id,
+            data,
+            ...defaultProps,
+            ...createInteractionProps(interactionConfig),
+            ...styleProps,
+            ...createChannelProps(id, type, config, visualChannels, data), // Must come after style
+            ...createParametersProp(layerBlending, styleProps.parameters || {}), // Must come after style
+            ...createLoadOptions(token),
+          });
+        } catch (e: any) {
+          console.error(e.message);
+          return undefined;
         }
-      ),
+      }),
   };
 }
 

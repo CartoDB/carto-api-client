@@ -9,6 +9,22 @@ import {fileURLToPath} from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /** @type {Partial<Record<string, any>>} */
+const RESTRICTED_IMPORTS = {
+  '@typescript-eslint/no-restricted-imports': [
+    'error',
+    {
+      patterns: [
+        {
+          group: ['@deck.gl/*'],
+          message: 'Only type imports from @deck.gl/* are allowed.',
+          allowTypeImports: true,
+        },
+      ],
+    },
+  ],
+};
+
+/** @type {Partial<Record<string, any>>} */
 const PRODUCTION_RULES = {
   // TODO: These rules should be re-enabled for production code.
   '@typescript-eslint/no-explicit-any': 'off',
@@ -18,6 +34,7 @@ const PRODUCTION_RULES = {
   '@typescript-eslint/no-unsafe-member-access': 'off',
   '@typescript-eslint/no-unsafe-return': 'off',
   '@typescript-eslint/ban-ts-comment': 'off',
+  ...RESTRICTED_IMPORTS,
 };
 
 /** @type {Partial<Record<string, any>>} */

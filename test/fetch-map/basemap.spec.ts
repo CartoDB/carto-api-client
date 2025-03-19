@@ -9,45 +9,49 @@ const mockedMapConfig = {
     longitude: -122.0312,
     zoom: 5,
     pitch: 0,
-    bearing: 0
+    bearing: 0,
   },
   mapStyle: {
     styleType: 'positron',
-    visibleLayerGroups: {}
+    visibleLayerGroups: {},
   },
   visState: {
-    layers: []
+    layers: [],
   },
   layerBlending: undefined,
-  interactionConfig: undefined
+  interactionConfig: undefined,
 } as any;
 
 const mockedCartoStyle = {
   id: '1234',
-  layers: [{id: 'background'}, {id: 'label'}, {id: 'road'}, {id: 'boundaries'}, {id: 'water'}]
+  layers: [
+    {id: 'background'},
+    {id: 'label'},
+    {id: 'road'},
+    {id: 'boundaries'},
+    {id: 'water'},
+  ],
 };
 
 async function responseFunc(url: string) {
   if (url === BASEMAP.VOYAGER) {
-    return {
-      json: async () => mockedCartoStyle
-    };
+    return await Promise.resolve({
+      json: async () => await Promise.resolve(mockedCartoStyle),
+    });
   } else if (url === BASEMAP.DARK_MATTER) {
     throw new Error('connection error');
   } else {
-    return {
+    return await Promise.resolve({
       ok: false,
-      json: async () => {
-        throw new Error('fake error');
-      }
-    };
+      json: async () => await Promise.reject(new Error('fake error')),
+    });
   }
 }
 
 describe('fetchBasemapProps', () => {
   test('carto - no filters', async () => {
     let calls: any[] = [];
-    await withMockFetchMapsV3(async _calls => {
+    await withMockFetchMapsV3(async (_calls) => {
       calls = _calls;
       expect(calls.length).toBe(0);
 
@@ -60,27 +64,32 @@ describe('fetchBasemapProps', () => {
           center: [-122.0312, 33.3232],
           zoom: 5,
           pitch: 0,
-          bearing: 0
+          bearing: 0,
         },
         visibleLayerGroups: {},
-        rawStyle: BASEMAP.POSITRON
+        rawStyle: BASEMAP.POSITRON,
       });
     }, responseFunc);
   });
 
   test('carto - with filters', async () => {
     let calls: any[] = [];
-    await withMockFetchMapsV3(async _calls => {
+    await withMockFetchMapsV3(async (_calls) => {
       calls = _calls;
-      const visibleLayerGroups = {label: false, road: true, border: true, water: true};
+      const visibleLayerGroups = {
+        label: false,
+        road: true,
+        border: true,
+        water: true,
+      };
       const r = await fetchBasemapProps({
         config: {
           ...mockedMapConfig,
           mapStyle: {
             styleType: 'voyager',
-            visibleLayerGroups
-          }
-        }
+            visibleLayerGroups,
+          },
+        },
       });
 
       expect(calls.length).toBe(1);
@@ -91,7 +100,7 @@ describe('fetchBasemapProps', () => {
       expect(r2.rawStyle).toBe(mockedCartoStyle);
       expect(r2.props.style).toEqual({
         ...mockedCartoStyle,
-        layers: mockedCartoStyle.layers.filter(l => l.id !== 'label')
+        layers: mockedCartoStyle.layers.filter((l) => l.id !== 'label'),
       });
       expect(r2.visibleLayerGroups).toEqual(visibleLayerGroups);
     }, responseFunc);
@@ -99,22 +108,22 @@ describe('fetchBasemapProps', () => {
 
   test('custom basemap', async () => {
     let calls: any[] = [];
-    await withMockFetchMapsV3(async _calls => {
+    await withMockFetchMapsV3(async (_calls) => {
       calls = _calls;
       const r = await fetchBasemapProps({
         config: {
           ...mockedMapConfig,
           mapStyle: {
-            styleType: 'custom:uuid1234'
+            styleType: 'custom:uuid1234',
           },
           customBaseMaps: {
             customStyle: {
               id: 'custom:uuid1234',
               style: 'http://example.com/style.json',
-              customAttribution: 'custom attribution'
-            }
-          }
-        }
+              customAttribution: 'custom attribution',
+            },
+          },
+        },
       });
 
       expect(calls.length).toBe(0);
@@ -125,24 +134,24 @@ describe('fetchBasemapProps', () => {
           center: [-122.0312, 33.3232],
           zoom: 5,
           pitch: 0,
-          bearing: 0
+          bearing: 0,
         },
-        attribution: 'custom attribution'
+        attribution: 'custom attribution',
       });
     }, responseFunc);
   });
 
   test('google maps', async () => {
     let calls: any[] = [];
-    await withMockFetchMapsV3(async _calls => {
+    await withMockFetchMapsV3(async (_calls) => {
       calls = _calls;
       const r = await fetchBasemapProps({
         config: {
           ...mockedMapConfig,
           mapStyle: {
-            styleType: 'google-voyager'
-          }
-        }
+            styleType: 'google-voyager',
+          },
+        },
       });
 
       expect(calls.length).toBe(0);
@@ -153,29 +162,34 @@ describe('fetchBasemapProps', () => {
           mapId: '885caf1e15bb9ef2',
           center: {
             lat: 33.3232,
-            lng: -122.0312
+            lng: -122.0312,
           },
           zoom: 6,
           tilt: 0,
-          heading: 0
-        }
+          heading: 0,
+        },
       });
     }, responseFunc);
   });
 
   test('error handling', async () => {
     let calls: any[] = [];
-    await withMockFetchMapsV3(async _calls => {
+    await withMockFetchMapsV3(async (_calls) => {
       calls = _calls;
       const expectedError = await fetchBasemapProps({
         config: {
           ...mockedMapConfig,
           mapStyle: {
             styleType: 'dark-matter',
-            visibleLayerGroups: {label: false, road: true, border: true, water: true}
-          }
-        }
-      }).catch(error => error);
+            visibleLayerGroups: {
+              label: false,
+              road: true,
+              border: true,
+              water: true,
+            },
+          },
+        },
+      }).catch((error) => error);
 
       expect(calls.length).toBe(1);
       expect(calls[0].url).toBe(BASEMAP.DARK_MATTER);

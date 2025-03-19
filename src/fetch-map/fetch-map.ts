@@ -297,16 +297,19 @@ export type FetchMapResult = ParseMapResult & {
   stopAutoRefresh?: () => void;
 };
 
-export async function fetchMap({
-  accessToken,
-  apiBaseUrl = DEFAULT_API_BASE_URL,
-  cartoMapId,
-  clientId,
-  headers,
-  autoRefresh,
-  onNewData,
-  maxLengthURL,
-}: FetchMapOptions, layerProvider: LayerProvider): Promise<FetchMapResult> {
+export async function fetchMap(
+  {
+    accessToken,
+    apiBaseUrl = DEFAULT_API_BASE_URL,
+    cartoMapId,
+    clientId,
+    headers,
+    autoRefresh,
+    onNewData,
+    maxLengthURL,
+  }: FetchMapOptions,
+  layerProvider: LayerProvider
+): Promise<FetchMapResult> {
   assert(
     cartoMapId,
     'Must define CARTO map id: fetchMap({cartoMapId: "XXXX-XXXX-XXXX"})'
