@@ -24,10 +24,8 @@ import {
   MapConfigLayer,
 } from './types.js';
 
-export type LayerProps = {
-  id: string;
+export type LayerDescriptor = {
   type: LayerType;
-  data: any;
   props: Record<string, any>;
 };
 
@@ -48,7 +46,7 @@ export type ParseMapResult = {
   mapStyle: any;
   token: string;
 
-  layers: LayerProps[];
+  layers: LayerDescriptor[];
 };
 
 export function parseMap(json: any) {
@@ -80,21 +78,15 @@ export function parseMap(json: any) {
           const {data} = dataset;
           assert(data, `No data loaded for dataId: ${dataId}`);
 
-          const layerType = type as LayerType;
-          const {propMap, defaultProps} = getLayer(
-            layerType,
-            // @ts-ignore
-            config,
-            dataset
-          );
+          const {propMap, defaultProps} = getLayer(type, config, dataset);
 
           const styleProps = createStyleProps(config, propMap);
 
-          return {
-            id,
-            type: layerType,
-            data,
+          const layer: LayerDescriptor = {
+            type,
             props: {
+              id,
+              data,
               ...defaultProps,
               ...createInteractionProps(interactionConfig),
               ...styleProps,
@@ -106,6 +98,7 @@ export function parseMap(json: any) {
               ...createLoadOptions(token),
             },
           };
+          return layer;
         } catch (e: any) {
           console.error(e.message);
           return undefined;

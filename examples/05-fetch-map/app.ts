@@ -3,6 +3,7 @@ import {
   fetchMap,
   FetchMapOptions,
   GoogleBasemap,
+  LayerDescriptor,
   LayerType,
   MapLibreBasemap,
 } from '@carto/api-client';
@@ -40,15 +41,15 @@ const layerClasses: Record<LayerType, _ConstructorOf<Layer>> = {
   raster: RasterTileLayer,
   tileset: VectorTileLayer,
 };
-function LayerFactory(layerProps: LayerProps[]) {
-  return layerProps
-    .map(({id, type, data, props}) => {
+function LayerFactory(layers: LayerDescriptor[]) {
+  return layers
+    .map(({type, props}) => {
       const LayerClass = layerClasses[type];
       if (!LayerClass) {
         console.error(`No layer class found for type: ${type}`);
         return null;
       }
-      return new LayerClass({id, data, ...props});
+      return new LayerClass(props);
     })
     .filter(Boolean);
 }
