@@ -2,12 +2,14 @@ import {
   BASEMAP,
   fetchMap,
   FetchMapOptions,
+  getDataFilterExtensionProps,
   GoogleBasemap,
   LayerDescriptor,
   LayerType,
   MapLibreBasemap,
 } from '@carto/api-client';
 import {_ConstructorOf, Deck, Layer} from '@deck.gl/core';
+import {DataFilterExtension} from '@deck.gl/extensions';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import {Loader} from '@googlemaps/js-api-loader';
@@ -43,13 +45,17 @@ const layerClasses: Record<LayerType, _ConstructorOf<Layer>> = {
 };
 function LayerFactory(layers: LayerDescriptor[]) {
   return layers
-    .map(({type, props}) => {
+    .map(({type, props, filters}) => {
       const LayerClass = layerClasses[type];
       if (!LayerClass) {
         console.error(`No layer class found for type: ${type}`);
         return null;
       }
-      return new LayerClass(props);
+      const filterProps = filters && {
+        ...getDataFilterExtensionProps(filters),
+        extensions: [new DataFilterExtension({filterSize: 4})],
+      };
+      return new LayerClass({...props, ...filterProps});
     })
     .filter(Boolean);
 }

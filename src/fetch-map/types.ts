@@ -117,6 +117,7 @@ export interface CustomStyle {
 
 // TODO replace with more complete type from Builder
 export type KeplerMapConfig = {
+  filters: any;
   mapState: any;
   mapStyle: {
     styleType: string;

@@ -15,6 +15,7 @@ import {
 } from './layer-map.js';
 
 import {assert} from '../utils.js';
+import {Filters} from '../types.js';
 import {
   KeplerMapConfig,
   MapDataset,
@@ -27,6 +28,7 @@ import {
 export type LayerDescriptor = {
   type: LayerType;
   props: Record<string, any>;
+  filters?: Filters;
 };
 
 export type ParseMapResult = {
@@ -54,7 +56,7 @@ export function parseMap(json: any) {
   const {keplerMapConfig, datasets, token} = json;
   assert(keplerMapConfig.version === 'v1', 'Only support Kepler v1');
   const config = keplerMapConfig.config as KeplerMapConfig;
-  const {mapState, mapStyle, popupSettings} = config;
+  const {filters, mapState, mapStyle, popupSettings} = config;
   const {layers, layerBlending, interactionConfig} = config.visState;
 
   return {
@@ -67,6 +69,7 @@ export function parseMap(json: any) {
     /** @deprecated Use `basemap`. */
     mapStyle,
     popupSettings,
+    filters,
     token,
     layers: layers
       .reverse()
@@ -86,6 +89,7 @@ export function parseMap(json: any) {
 
           const layer: LayerDescriptor = {
             type,
+            filters: filters[dataId],
             props: {
               id,
               data,
