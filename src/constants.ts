@@ -43,7 +43,6 @@ export enum TileFormat {
 /** @privateRemarks Source: @carto/react-core */
 export enum SpatialIndex {
   H3 = 'h3',
-  S2 = 's2',
   QUADBIN = 'quadbin',
 }
 
@@ -56,3 +55,8 @@ export enum Provider {
   DATABRICKS = 'databricks',
   DATABRICKS_REST = 'databricksRest',
 }
+
+export const SpatialIndexColumn = Object.freeze({
+  [SpatialIndex.H3]: ['h3', 'hex', 'h3id', 'hex_id', 'h3hex'],
+  [SpatialIndex.QUADBIN]: ['quadbin'],
+});

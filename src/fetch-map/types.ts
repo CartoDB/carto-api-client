@@ -1,4 +1,6 @@
 import {LayerType, SCALE_TYPE} from './layer-map.js';
+import {Format, MapType, QueryParameters} from '../types.js';
+import {TilejsonResult, GeojsonResult, JsonResult} from '../sources/types.js';
 
 export type VisualChannelField = {
   name: string;
@@ -205,3 +207,63 @@ export type GoogleBasemapProps = {
   tilt?: number;
   heading?: number;
 };
+
+export type Dataset = {
+  id: string;
+  type: MapType;
+  source: string;
+  cache?: number;
+  connectionName: string;
+  geoColumn: string;
+  data: TilejsonResult | GeojsonResult | JsonResult;
+  columns: string[];
+  format: Format;
+  aggregationExp: string;
+  aggregationResLevel: number;
+  queryParameters: QueryParameters;
+};
+
+export enum AttributeType {
+  String = 'String',
+  Number = 'Number',
+  Timestamp = 'Timestamp',
+  Boolean = 'Boolean',
+}
+
+export type AttributeStatsBase = {
+  attribute: string;
+  type: AttributeType;
+};
+
+export type AttributeStatsNumber = AttributeStatsBase & {
+  type: AttributeType.Number;
+  min: number;
+  avg: number;
+  max: number;
+  sum: number;
+  quantiles: number[][];
+};
+
+export type AttributeStatsTimestamp = AttributeStatsBase & {
+  type: AttributeType.Timestamp;
+  min: string;
+  max: string;
+};
+
+export interface AttributeStatsStringCategory {
+  category: string;
+  frequency: number;
+}
+
+export type AttributeStatsString = AttributeStatsBase & {
+  type: AttributeType.String | AttributeType.Boolean;
+  categories: AttributeStatsStringCategory[];
+};
+
+/**
+ * Result of getAttributeStats request to backend.
+ */
+export type AttributeStats =
+  | AttributeStatsString
+  | AttributeStatsNumber
+  | AttributeStatsTimestamp;
