@@ -91,7 +91,9 @@ export function parseMap(json: any) {
 
           const layer: LayerDescriptor = {
             type,
-            filters: isRemoteCalculationSupported(dataset) ? undefined : filters[dataId],
+            filters: isRemoteCalculationSupported(dataset)
+              ? undefined
+              : filters[dataId],
             props: {
               id,
               data,

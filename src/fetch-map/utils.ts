@@ -61,10 +61,7 @@ export function scaleIdentity() {
 }
 
 export function isRemoteCalculationSupported(dataset: Dataset) {
-  if (
-    dataset?.type === 'tileset' ||
-    dataset.providerId === 'databricks'
-  ) {
+  if (dataset?.type === 'tileset' || dataset.providerId === 'databricks') {
     return false;
   }
 
