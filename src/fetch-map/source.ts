@@ -195,6 +195,11 @@ function getDynamicTileResolution(
   return DEFAULT_TILE_RESOLUTION;
 }
 
+/**
+ * State of `aggregationResLevel` in the UI and backend config is based on an assumption of
+ * 512x512px tiles. Because we may change tile resolution for performance goals, the
+ * `aggregationResLevel` passed to the deck.gl layer must be scaled with tile resolution.
+ */
 function scaleAggregationResLevel(
   aggregationResLevel: number,
   tileResolution: number
