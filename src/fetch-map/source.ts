@@ -184,6 +184,11 @@ function getSourceOptions({
   };
 }
 
+/**
+ * Returns default tile resolution for dynamic tilesets, based on layer configuration
+ * Result is not applicable for static tilesets, for which tile resolution is defined
+ * by tilejson.
+ */
 function getDynamicTileResolution(
   spatialIndex?: SpatialIndex | null
 ): TileResolution {
