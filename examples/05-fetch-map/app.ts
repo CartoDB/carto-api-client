@@ -153,6 +153,10 @@ const examples = [
 
   // Heatmap
   '0b3c86ad-3c14-4c89-986a-07ba23306c3d', // Quadbin - Tileset, represented through Heatmap
+
+  // Filtering
+  'be57ed8b-f6ca-41ba-bc38-6864a83c621f', // Server-side filtering
+  '879da3c7-363f-43b5-a9b4-b0abc1b866bc', // Client-side filtering
 ];
 const params = new URLSearchParams(location.search.slice(1));
 const id = params.has('id') ? params.get('id')! : examples[0];

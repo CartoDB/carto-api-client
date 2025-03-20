@@ -1,4 +1,5 @@
 import type {BinaryFeature} from '@loaders.gl/schema';
+import type {Dataset} from './types.js';
 type Properties = BinaryFeature['properties'];
 type NumericProps = BinaryFeature['numericProps'];
 
@@ -57,4 +58,15 @@ export function scaleIdentity() {
   };
 
   return scale;
+}
+
+export function isRemoteCalculationSupported(dataset: Dataset) {
+  if (
+    dataset?.type === 'tileset' ||
+    dataset.providerId === 'databricks'
+  ) {
+    return false;
+  }
+
+  return true;
 }

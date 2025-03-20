@@ -16,6 +16,7 @@ import type {Basemap, Dataset, KeplerMapConfig} from './types.js';
 import {fetchBasemapProps} from './basemap.js';
 import {configureSource} from './source.js';
 import {Filters} from '../types.js';
+import {isRemoteCalculationSupported} from './utils.js';
 
 /* global clearInterval, setInterval, URL */
 async function _fetchMapDataset(dataset: Dataset, filters: Filters, context: _FetchMapContext) {
@@ -23,7 +24,7 @@ async function _fetchMapDataset(dataset: Dataset, filters: Filters, context: _Fe
   const cache: {value?: number} = {};
   const configuredSource = configureSource({
     dataset,
-    filters,
+    filters: isRemoteCalculationSupported(dataset) ? filters : undefined,
     options: {
       ...context,
       connection: connectionName,
@@ -97,7 +98,7 @@ async function fillInMapDatasets(
   context: _FetchMapContext
 ) {
   const {filters} = keplerMapConfig.config as KeplerMapConfig;
-  const promises = datasets.map((dataset) =>
+  const promises = datasets.map((dataset) => 
     _fetchMapDataset(dataset, filters[dataset.id], context)
   );
   return await Promise.all(promises);

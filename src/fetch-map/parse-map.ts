@@ -23,7 +23,9 @@ import {
   VisualChannels,
   VisConfig,
   MapConfigLayer,
+  Dataset,
 } from './types.js';
+import {isRemoteCalculationSupported} from './utils.js';
 
 export type LayerDescriptor = {
   type: LayerType;
@@ -76,7 +78,7 @@ export function parseMap(json: any) {
       .map(({id, type, config, visualChannels}: MapConfigLayer) => {
         try {
           const {dataId} = config;
-          const dataset: MapDataset | null = datasets.find(
+          const dataset: Dataset | null = datasets.find(
             (d: any) => d.id === dataId
           );
           assert(dataset, `No dataset matching dataId: ${dataId}`);
@@ -89,7 +91,7 @@ export function parseMap(json: any) {
 
           const layer: LayerDescriptor = {
             type,
-            filters: filters[dataId],
+            filters: isRemoteCalculationSupported(dataset) ? undefined : filters[dataId],
             props: {
               id,
               data,

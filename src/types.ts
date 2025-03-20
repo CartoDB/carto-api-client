@@ -12,6 +12,16 @@ export type Format = 'json' | 'geojson' | 'tilejson';
 /** @privateRemarks Source: @carto/constants, @deck.gl/carto */
 export type MapType = 'boundary' | 'query' | 'table' | 'tileset' | 'raster';
 
+/** @privateRemarks Source: cloud-native */
+export type ProviderType =
+  | 'bigquery'
+  | 'postgres'
+  | 'snowflake'
+  | 'redshift'
+  | 'databricks'
+  | 'carto'
+  | 'carto_dw';
+
 /**
  * Alias for GeoJSON 'BBox' type, semantically representing a viewport.
  * Order of values is "west", "south", "east", "north".
