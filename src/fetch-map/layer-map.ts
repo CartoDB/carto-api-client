@@ -25,7 +25,7 @@ export type LayerType =
 import {createBinaryProxy, scaleIdentity} from './utils.js';
 import {
   CustomMarkersRange,
-  MapDataset,
+  Dataset,
   MapLayerConfig,
   VisConfig,
   VisualChannelField,
@@ -149,7 +149,7 @@ const deprecatedLayerTypes = [
 export function getLayerProps(
   type: LayerType,
   config: MapLayerConfig,
-  dataset: MapDataset
+  dataset: Dataset
 ): {propMap: any; defaultProps: any} {
   if (deprecatedLayerTypes.includes(type)) {
     throw new Error(

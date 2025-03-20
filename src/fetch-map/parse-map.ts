@@ -89,9 +89,10 @@ export function parseMap(json: any) {
 
           const layer: LayerDescriptor = {
             type,
-            filters: isEmptyObject(filters) || isRemoteCalculationSupported(dataset)
-              ? undefined
-              : filters[dataId],
+            filters:
+              isEmptyObject(filters) || isRemoteCalculationSupported(dataset)
+                ? undefined
+                : filters[dataId],
             props: {
               id,
               data,
