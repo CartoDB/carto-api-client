@@ -14,11 +14,10 @@ import {
   LayerType,
 } from './layer-map.js';
 
-import {assert} from '../utils.js';
+import {assert, isEmptyObject} from '../utils.js';
 import {Filters} from '../types.js';
 import {
   KeplerMapConfig,
-  MapDataset,
   MapLayerConfig,
   VisualChannels,
   VisConfig,
@@ -71,7 +70,6 @@ export function parseMap(json: any) {
     /** @deprecated Use `basemap`. */
     mapStyle,
     popupSettings,
-    filters,
     token,
     layers: layers
       .reverse()
@@ -91,7 +89,7 @@ export function parseMap(json: any) {
 
           const layer: LayerDescriptor = {
             type,
-            filters: isRemoteCalculationSupported(dataset)
+            filters: isEmptyObject(filters) || isRemoteCalculationSupported(dataset)
               ? undefined
               : filters[dataId],
             props: {
