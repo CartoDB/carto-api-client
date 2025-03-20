@@ -19,7 +19,10 @@ export const DEFAULT_MAX_LENGTH_URL = 7000;
 /** @privateRemarks Source: @deck.gl/carto */
 export const DEFAULT_TILE_RESOLUTION = 0.5;
 
-/** @internal */
+/**
+ * @todo TODO(v0.5): Update DEFAULT_TILE_RESOLUTION and remove this constant.
+ * @internal
+ */
 export const REDUCED_QUERIES_TILE_RESOLUTION = 1;
 
 /**
