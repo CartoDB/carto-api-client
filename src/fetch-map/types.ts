@@ -1,5 +1,5 @@
 import {LayerType, SCALE_TYPE} from './layer-map.js';
-import {Format, MapType, QueryParameters} from '../types.js';
+import {Format, MapType, ProviderType, QueryParameters} from '../types.js';
 import {TilejsonResult, GeojsonResult, JsonResult} from '../sources/types.js';
 
 export type VisualChannelField = {
@@ -103,14 +103,6 @@ export type MapConfigLayer = {
   visualChannels: VisualChannels;
 };
 
-export type MapDataset = {
-  id: string;
-  data: any;
-  aggregationExp: string | null;
-  aggregationResLevel: number | null;
-  geoColumn: string;
-};
-
 export interface CustomStyle {
   url?: string;
   style?: any;
@@ -119,6 +111,7 @@ export interface CustomStyle {
 
 // TODO replace with more complete type from Builder
 export type KeplerMapConfig = {
+  filters: any;
   mapState: any;
   mapStyle: {
     styleType: string;
@@ -221,6 +214,17 @@ export type Dataset = {
   aggregationExp: string;
   aggregationResLevel: number;
   queryParameters: QueryParameters;
+  connectionId?: string;
+  providerId: ProviderType;
+  createdAt?: string;
+  updatedAt?: string;
+  label?: string;
+  color?: string;
+  uniqueIdProperty?: string;
+  queryTemplate?: string | null;
+  name?: string | null;
+  spatialIndex?: string | null;
+  exportToBucketAvailable?: boolean;
 };
 
 export type AttributeType = 'String' | 'Number' | 'Timestamp' | 'Boolean';

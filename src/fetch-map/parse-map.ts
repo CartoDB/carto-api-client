@@ -14,19 +14,22 @@ import {
   LayerType,
 } from './layer-map.js';
 
-import {assert} from '../utils.js';
+import {assert, isEmptyObject} from '../utils.js';
+import {Filters} from '../types.js';
 import {
   KeplerMapConfig,
-  MapDataset,
   MapLayerConfig,
   VisualChannels,
   VisConfig,
   MapConfigLayer,
+  Dataset,
 } from './types.js';
+import {isRemoteCalculationSupported} from './utils.js';
 
 export type LayerDescriptor = {
   type: LayerType;
   props: Record<string, any>;
+  filters?: Filters;
 };
 
 export type ParseMapResult = {
@@ -54,7 +57,7 @@ export function parseMap(json: any) {
   const {keplerMapConfig, datasets, token} = json;
   assert(keplerMapConfig.version === 'v1', 'Only support Kepler v1');
   const config = keplerMapConfig.config as KeplerMapConfig;
-  const {mapState, mapStyle, popupSettings} = config;
+  const {filters, mapState, mapStyle, popupSettings} = config;
   const {layers, layerBlending, interactionConfig} = config.visState;
 
   return {
@@ -73,7 +76,7 @@ export function parseMap(json: any) {
       .map(({id, type, config, visualChannels}: MapConfigLayer) => {
         try {
           const {dataId} = config;
-          const dataset: MapDataset | null = datasets.find(
+          const dataset: Dataset | null = datasets.find(
             (d: any) => d.id === dataId
           );
           assert(dataset, `No dataset matching dataId: ${dataId}`);
@@ -86,6 +89,10 @@ export function parseMap(json: any) {
 
           const layer: LayerDescriptor = {
             type,
+            filters:
+              isEmptyObject(filters) || isRemoteCalculationSupported(dataset)
+                ? undefined
+                : filters[dataId],
             props: {
               id,
               data,
