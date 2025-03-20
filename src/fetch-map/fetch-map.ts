@@ -12,17 +12,18 @@ import {
 
 import {ParseMapResult, parseMap} from './parse-map.js';
 import {assert} from '../utils.js';
-import type {Basemap, Dataset} from './types.js';
+import type {Basemap, Dataset, KeplerMapConfig} from './types.js';
 import {fetchBasemapProps} from './basemap.js';
 import {configureSource} from './source.js';
+import {Filters} from '../types.js';
 
 /* global clearInterval, setInterval, URL */
-async function _fetchMapDataset(dataset: Dataset, context: _FetchMapContext) {
+async function _fetchMapDataset(dataset: Dataset, filters: Filters, context: _FetchMapContext) {
   const {connectionName} = dataset;
   const cache: {value?: number} = {};
   const configuredSource = configureSource({
     dataset,
-    filters: undefined,
+    filters,
     options: {
       ...context,
       connection: connectionName,
@@ -92,11 +93,12 @@ async function _fetchTilestats(
 }
 
 async function fillInMapDatasets(
-  {datasets}: {datasets: Dataset[]},
+  {datasets, keplerMapConfig}: {datasets: Dataset[]; keplerMapConfig: any},
   context: _FetchMapContext
 ) {
+  const {filters} = keplerMapConfig.config as KeplerMapConfig;
   const promises = datasets.map((dataset) =>
-    _fetchMapDataset(dataset, context)
+    _fetchMapDataset(dataset, filters[dataset.id], context)
   );
   return await Promise.all(promises);
 }
