@@ -1,18 +1,5 @@
-import {
-  GeojsonResult,
-  JsonResult,
-  TilejsonResult,
-  SourceOptions,
-  h3QuerySource,
-  h3TableSource,
-  quadbinQuerySource,
-  quadbinTableSource,
-  vectorQuerySource,
-  vectorTableSource,
-  vectorTilesetSource,
-} from '../sources/index.js';
+import {TilejsonResult} from '../sources/index.js';
 
-import type {Format, MapType, QueryParameters} from '../types.js';
 import {DEFAULT_API_BASE_URL} from '../constants.js';
 
 import {
@@ -25,109 +12,28 @@ import {
 
 import {ParseMapResult, parseMap} from './parse-map.js';
 import {assert} from '../utils.js';
-import type {Basemap} from './types.js';
+import type {Basemap, Dataset} from './types.js';
 import {fetchBasemapProps} from './basemap.js';
-type Dataset = {
-  id: string;
-  type: MapType;
-  source: string;
-  cache?: number;
-  connectionName: string;
-  geoColumn: string;
-  data: TilejsonResult | GeojsonResult | JsonResult;
-  columns: string[];
-  format: Format;
-  aggregationExp: string;
-  aggregationResLevel: number;
-  queryParameters: QueryParameters;
-};
+import {configureSource} from './source.js';
 
 /* global clearInterval, setInterval, URL */
 async function _fetchMapDataset(dataset: Dataset, context: _FetchMapContext) {
-  const {
-    aggregationExp,
-    aggregationResLevel,
-    connectionName,
-    columns,
-    format,
-    geoColumn,
-    source,
-    type,
-    queryParameters,
-  } = dataset;
-
+  const {connectionName} = dataset;
   const cache: {value?: number} = {};
-  const globalOptions = {
-    ...context,
-    cache,
-    connectionName,
-    format,
-  } as SourceOptions;
+  const configuredSource = configureSource({
+    dataset,
+    filters: undefined,
+    options: {
+      ...context,
+      connection: connectionName,
+      headers: context.headers,
+      accessToken: context.accessToken!,
+      apiBaseUrl: context.apiBaseUrl,
+      maxLengthURL: context.maxLengthURL,
+    },
+  });
+  dataset.data = await configuredSource;
 
-  if (type === 'tileset') {
-    // TODO do we want a generic tilesetSource?
-    // @ts-ignore
-    dataset.data = await vectorTilesetSource({
-      ...globalOptions,
-      tableName: source,
-    });
-  } else {
-    const [spatialDataType, spatialDataColumn] = geoColumn
-      ? geoColumn.split(':')
-      : ['geom'];
-    if (spatialDataType === 'geom') {
-      const options = {...globalOptions, spatialDataColumn};
-      if (type === 'table') {
-        dataset.data = await vectorTableSource({
-          ...options,
-          columns,
-          tableName: source,
-        });
-      } else if (type === 'query') {
-        dataset.data = await vectorQuerySource({
-          ...options,
-          columns,
-          sqlQuery: source,
-          queryParameters,
-        });
-      }
-    } else if (spatialDataType === 'h3') {
-      const options = {
-        ...globalOptions,
-        aggregationExp,
-        aggregationResLevel,
-        spatialDataColumn,
-      };
-      if (type === 'table') {
-        dataset.data = await h3TableSource({...options, tableName: source});
-      } else if (type === 'query') {
-        dataset.data = await h3QuerySource({
-          ...options,
-          sqlQuery: source,
-          queryParameters,
-        });
-      }
-    } else if (spatialDataType === 'quadbin') {
-      const options = {
-        ...globalOptions,
-        aggregationExp,
-        aggregationResLevel,
-        spatialDataColumn,
-      };
-      if (type === 'table') {
-        dataset.data = await quadbinTableSource({
-          ...options,
-          tableName: source,
-        });
-      } else if (type === 'query') {
-        dataset.data = await quadbinQuerySource({
-          ...options,
-          sqlQuery: source,
-          queryParameters,
-        });
-      }
-    }
-  }
   let cacheChanged = true;
   if (cache.value) {
     cacheChanged = dataset.cache !== cache.value;

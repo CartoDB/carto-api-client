@@ -22,7 +22,6 @@ import {getClient} from '../client.js';
 import {ModelSource} from '../models/model.js';
 import {SourceOptions} from '../sources/index.js';
 import {ApiVersion, DEFAULT_API_BASE_URL} from '../constants.js';
-import {AggregationOptions} from '../sources/types.js';
 
 export interface WidgetSourceProps extends Omit<SourceOptions, 'filters'> {
   apiVersion?: ApiVersion;
@@ -80,7 +79,6 @@ export abstract class WidgetSource<Props extends WidgetSourceProps> {
       filtersLogicalOperator: props.filtersLogicalOperator,
       spatialDataType: props.spatialDataType,
       spatialDataColumn: props.spatialDataColumn,
-      dataResolution: (props as Partial<AggregationOptions>).dataResolution,
     };
   }
 

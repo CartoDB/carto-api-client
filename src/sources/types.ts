@@ -118,7 +118,10 @@ export type AggregationOptions = {
   aggregationResLevel?: number;
 
   /**
-   * Original resolution of the spatial index data as stored in the DW
+   * Deprecated parameter previously used for H3 and Quadbin widgets. Now has
+   * no effect and will be removed in a future version.
+   * @deprecated Parameter has no effect.
+   * @todo TODO(v0.5): Remove spatialIndexReferenceViewState parameter.
    */
   dataResolution?: number;
 };
