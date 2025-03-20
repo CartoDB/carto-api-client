@@ -223,12 +223,7 @@ export type Dataset = {
   queryParameters: QueryParameters;
 };
 
-export enum AttributeType {
-  String = 'String',
-  Number = 'Number',
-  Timestamp = 'Timestamp',
-  Boolean = 'Boolean',
-}
+export type AttributeType = 'String' | 'Number' | 'Timestamp' | 'Boolean';
 
 export type AttributeStatsBase = {
   attribute: string;
@@ -236,7 +231,7 @@ export type AttributeStatsBase = {
 };
 
 export type AttributeStatsNumber = AttributeStatsBase & {
-  type: AttributeType.Number;
+  type: 'Number';
   min: number;
   avg: number;
   max: number;
@@ -245,7 +240,7 @@ export type AttributeStatsNumber = AttributeStatsBase & {
 };
 
 export type AttributeStatsTimestamp = AttributeStatsBase & {
-  type: AttributeType.Timestamp;
+  type: 'Timestamp';
   min: string;
   max: string;
 };
@@ -256,7 +251,7 @@ export interface AttributeStatsStringCategory {
 }
 
 export type AttributeStatsString = AttributeStatsBase & {
-  type: AttributeType.String | AttributeType.Boolean;
+  type: 'String' | 'Boolean';
   categories: AttributeStatsStringCategory[];
 };
 
