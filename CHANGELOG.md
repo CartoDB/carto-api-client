@@ -11,6 +11,11 @@
 
 ## 0.4
 
+### 0.4.10
+
+- Add fetchMap: (#126, #132, #133, #135, #136, #137, #138, #139)
+- chore(widgets,deps): Clean up dataResolution references, examples, deps (#134)
+
 ### 0.4.9
 
 - feat: Remove spatialIndexReferenceViewState param (#128)
