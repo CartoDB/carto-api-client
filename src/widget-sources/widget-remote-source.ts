@@ -60,7 +60,6 @@ export abstract class WidgetRemoteSource<
       filtersLogicalOperator: props.filtersLogicalOperator,
       spatialDataType: props.spatialDataType,
       spatialDataColumn: props.spatialDataColumn,
-      dataResolution: (props as Partial<AggregationOptions>).dataResolution,
     };
   }
 
