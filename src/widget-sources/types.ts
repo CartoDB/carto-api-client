@@ -19,18 +19,9 @@ export interface ViewState {
 
 /** Common options for {@link WidgetRemoteSource} requests. */
 interface BaseRequestOptions {
-  /** @deprecated */
-  abortController?: AbortController;
   signal?: AbortSignal;
   spatialFilter?: SpatialFilter;
   spatialFiltersMode?: SpatialFilterPolyfillMode;
-  /**
-   * Deprecated parameter previously used for H3 and Quadbin widgets. Now has
-   * no effect and will be removed in a future version.
-   * @deprecated Parameter has no effect.
-   * @todo TODO(v0.5): Remove spatialIndexReferenceViewState parameter.
-   */
-  spatialIndexReferenceViewState?: ViewState;
   /** Overrides source filters, if any. */
   filters?: Filters;
   filterOwner?: string;
