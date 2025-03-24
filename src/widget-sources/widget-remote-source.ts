@@ -98,8 +98,7 @@ export abstract class WidgetRemoteSource<
     options: FeaturesRequestOptions
   ): Promise<FeaturesResponse> {
     const {
-      abortController,
-      signal = abortController?.signal,
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
@@ -132,8 +131,7 @@ export abstract class WidgetRemoteSource<
 
   async getFormula(options: FormulaRequestOptions): Promise<FormulaResponse> {
     const {
-      abortController,
-      signal = abortController?.signal,
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
@@ -165,8 +163,7 @@ export abstract class WidgetRemoteSource<
     options: HistogramRequestOptions
   ): Promise<HistogramResponse> {
     const {
-      abortController,
-      signal = abortController?.signal,
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
@@ -203,8 +200,7 @@ export abstract class WidgetRemoteSource<
 
   async getRange(options: RangeRequestOptions): Promise<RangeResponse> {
     const {
-      abortController,
-      signal = abortController?.signal,
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
@@ -229,8 +225,7 @@ export abstract class WidgetRemoteSource<
 
   async getScatter(options: ScatterRequestOptions): Promise<ScatterResponse> {
     const {
-      abortController,
-      signal = abortController?.signal,
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
@@ -267,8 +262,7 @@ export abstract class WidgetRemoteSource<
 
   async getTable(options: TableRequestOptions): Promise<TableResponse> {
     const {
-      abortController,
-      signal = abortController?.signal,
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
@@ -308,8 +302,7 @@ export abstract class WidgetRemoteSource<
     options: TimeSeriesRequestOptions
   ): Promise<TimeSeriesResponse> {
     const {
-      abortController,
-      signal = abortController?.signal,
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
