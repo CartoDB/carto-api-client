@@ -129,15 +129,6 @@ export class WidgetTilesetSource<
     const worker = this._getWorker();
     const requestId = this._workerNextRequestId++;
 
-    // TODO: ViewState may contain non-serializable data, which we do not need.
-    // Remove this sanitization after sc-469614 is fixed.
-    const options = params[0] as any;
-    if (options?.spatialIndexReferenceViewState) {
-      const {zoom, latitude, longitude} =
-        options.spatialIndexReferenceViewState;
-      options.spatialIndexReferenceViewState = {zoom, latitude, longitude};
-    }
-
     let resolve: ((value: T) => void) | null = null;
     let reject: ((reason: any) => void) | null = null;
 
