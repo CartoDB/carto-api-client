@@ -232,7 +232,7 @@ export class WidgetTilesetSource<
     const worker = this._getWorker();
 
     worker.postMessage({
-      type: Method.SET_TILE_FEATURE_EXTRACT_OPTIONS,
+      method: Method.SET_TILE_FEATURE_EXTRACT_OPTIONS,
       params: [options],
     });
   }
