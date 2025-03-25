@@ -20,15 +20,15 @@ test('dependencies support esm', async () => {
       `${pkg.name} must be esm`
     ).toBeTruthy();
 
-    pkgVisited.add(pkg.name);
-
     const dependencies = pkg.dependencies ? Object.keys(pkg.dependencies) : [];
     const peerDependencies = pkg.peerDependencies
       ? Object.keys(pkg.peerDependencies)
       : [];
+
     for (const dep of [...dependencies, ...peerDependencies]) {
       if (!pkgVisited.has(dep) && !dep.startsWith('@types/')) {
         pkgQueue.push(resolvePackagePath(dep, path));
+        pkgVisited.add(dep);
       }
     }
   }
