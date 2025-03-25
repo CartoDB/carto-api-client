@@ -1,4 +1,4 @@
-import {firstBy} from '../vendor/thenby.js';
+import {firstBy} from 'thenby';
 import {SortDirection} from '../types.js';
 import {FeatureData} from '../types-internal.js';
 

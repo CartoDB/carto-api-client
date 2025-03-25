@@ -292,6 +292,7 @@ __metadata:
     resolve-package-path: "npm:^4.0.3"
     rimraf: "npm:^6.0.1"
     semver: "npm:^7.7.1"
+    thenby: "npm:^1.3.4"
     tinybench: "npm:^3.1.1"
     tsup: "npm:^8.3.6"
     typescript: "npm:~5.8.2"
@@ -5851,6 +5852,13 @@ __metadata:
   bin:
     texture-compressor: ./bin/texture-compressor.js
   checksum: 10c0/ea0bce1cbda3a64f826867e97ee2a1f17a7219d21d97d7625a6370792afddc697e6832a9b3b39bf2eef0978af7bc0d1dcefaf7fd91d719213658b0a010a83c44
+  languageName: node
+  linkType: hard
+
+"thenby@npm:^1.3.4":
+  version: 1.3.4
+  resolution: "thenby@npm:1.3.4"
+  checksum: 10c0/8845b44db18e74885c7eb34ba8aed7950be5de4903c0e284425ee83ebb089cb8a8215c066e5fd161e4621b0a82f18dc8fb1f44dcc36522b3a4a1ac0190133087
   languageName: node
   linkType: hard
 
