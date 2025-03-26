@@ -53,6 +53,8 @@ const map = new maplibregl.Map({
   style:
     'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json',
   interactive: false,
+  center: [viewState.longitude, viewState.latitude],
+  zoom: viewState.zoom,
 });
 
 const formulaWidget = bindWidget('#formula');
