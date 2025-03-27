@@ -16,10 +16,8 @@ import {
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
 } from './types.js';
-import {FilterLogicalOperator, Filter, Filters} from '../types.js';
-import {getApplicableFilters} from '../utils.js';
+import {FilterLogicalOperator, Filter} from '../types.js';
 import {getClient} from '../client.js';
-import {ModelSource} from '../models/model.js';
 import {SourceOptions} from '../sources/index.js';
 import {ApiVersion, DEFAULT_API_BASE_URL} from '../constants.js';
 
@@ -34,7 +32,9 @@ export interface WidgetSourceProps extends Omit<SourceOptions, 'filters'> {
  *
  * Abstract class. Use {@link WidgetQuerySource} or {@link WidgetTableSource}.
  */
-export abstract class WidgetSource<Props extends WidgetSourceProps> {
+export abstract class WidgetSource<
+  Props extends WidgetSourceProps = WidgetSourceProps,
+> {
   readonly props: Props;
 
   static defaultProps: Partial<WidgetSourceProps> = {
@@ -54,32 +54,14 @@ export abstract class WidgetSource<Props extends WidgetSourceProps> {
   }
 
   /**
-   * Subclasses of {@link WidgetRemoteSource} must implement this method, calling
-   * {@link WidgetRemoteSource.prototype._getModelSource} for common source
-   * properties, and adding additional required properties including 'type' and
-   * 'data'.
+   * Destroys the widget source and releases allocated resources.
+   *
+   * For remote sources (tables, queries) this has no effect, but for local
+   * sources (tilesets, rasters) these resources will affect performance
+   * and stability if many (10+) sources are created and not released.
    */
-  protected abstract getModelSource(
-    filters: Filters | undefined,
-    filterOwner?: string
-  ): ModelSource;
-
-  protected _getModelSource(
-    filters: Filters | undefined,
-    filterOwner?: string
-  ): Omit<ModelSource, 'type' | 'data'> {
-    const props = this.props;
-    return {
-      apiVersion: props.apiVersion as ApiVersion,
-      apiBaseUrl: props.apiBaseUrl as string,
-      clientId: props.clientId as string,
-      accessToken: props.accessToken,
-      connectionName: props.connectionName,
-      filters: getApplicableFilters(filterOwner, filters || props.filters),
-      filtersLogicalOperator: props.filtersLogicalOperator,
-      spatialDataType: props.spatialDataType,
-      spatialDataColumn: props.spatialDataColumn,
-    };
+  destroy() {
+    // no-op in most cases, but required for worker sources.
   }
 
   /**
@@ -143,15 +125,3 @@ export abstract class WidgetSource<Props extends WidgetSourceProps> {
     options: TimeSeriesRequestOptions
   ): Promise<TimeSeriesResponse>;
 }
-
-/**
- * @todo TODO(v0.5): Remove WidgetBaseSourceProps alias
- * @deprecated Use WidgetSourceProps.
- */
-export type WidgetBaseSourceProps = WidgetSourceProps;
-
-/**
- * @todo TODO(v0.5): Remove WidgetBaseSource alias.
- * @deprecated Use WidgetSourceP.
- */
-export const WidgetBaseSource = WidgetSource;

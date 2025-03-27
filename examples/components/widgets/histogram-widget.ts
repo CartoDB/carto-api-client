@@ -26,12 +26,14 @@ export class HistogramWidget extends BaseWidget {
       column: {type: String},
       operation: {type: String},
       ticks: {type: Array},
+      getItemColor: {type: Function, attribute: false},
     };
   }
 
   declare column: string;
   declare operation: 'count' | 'avg' | 'min' | 'max' | 'sum';
   declare ticks: number[];
+  declare getItemColor?: (item: string | number) => string;
 
   protected _chart: echarts.ECharts | null = null;
   protected _chartRef: Ref<HTMLElement> = createRef();
@@ -114,6 +116,9 @@ export class HistogramWidget extends BaseWidget {
     const data = values.map((value: number, binIndex: number) => ({
       name: getTickLabel(binIndex, this.ticks),
       value,
+      ...(this.getItemColor && {
+        itemStyle: {color: this.getItemColor(this.ticks[binIndex - 1])},
+      }),
     }));
 
     this._chart!.setOption({

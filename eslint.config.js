@@ -56,6 +56,7 @@ export default tseslint.config(
     ignores: [
       'build/**',
       'coverage/**',
+      '**/tsup.config.ts',
       '**/vite-env.d.ts',
       '**/vite.config.ts',
     ],

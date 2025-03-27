@@ -1,4 +1,4 @@
-import {executeModel} from '../models/index.js';
+import {executeModel, ModelSource} from '../models/index.js';
 import {
   CategoryRequestOptions,
   CategoryResponse,
@@ -17,9 +17,11 @@ import {
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
 } from './types.js';
-import {normalizeObjectKeys} from '../utils.js';
+import {getApplicableFilters, normalizeObjectKeys} from '../utils.js';
 import {DEFAULT_TILE_RESOLUTION} from '../constants-internal.js';
 import {WidgetSource, WidgetSourceProps} from './widget-source.js';
+import {Filters} from '../types.js';
+import {ApiVersion} from '../constants.js';
 
 export type WidgetRemoteSourceProps = WidgetSourceProps;
 
@@ -31,6 +33,35 @@ export type WidgetRemoteSourceProps = WidgetSourceProps;
 export abstract class WidgetRemoteSource<
   Props extends WidgetRemoteSourceProps,
 > extends WidgetSource<Props> {
+  /**
+   * Subclasses of {@link WidgetRemoteSource} must implement this method, calling
+   * {@link WidgetRemoteSource.prototype._getModelSource} for common source
+   * properties, and adding additional required properties including 'type' and
+   * 'data'.
+   */
+  protected abstract getModelSource(
+    filters: Filters | undefined,
+    filterOwner?: string
+  ): ModelSource;
+
+  protected _getModelSource(
+    filters: Filters | undefined,
+    filterOwner?: string
+  ): Omit<ModelSource, 'type' | 'data'> {
+    const props = this.props;
+    return {
+      apiVersion: props.apiVersion as ApiVersion,
+      apiBaseUrl: props.apiBaseUrl as string,
+      clientId: props.clientId as string,
+      accessToken: props.accessToken,
+      connectionName: props.connectionName,
+      filters: getApplicableFilters(filterOwner, filters || props.filters),
+      filtersLogicalOperator: props.filtersLogicalOperator,
+      spatialDataType: props.spatialDataType,
+      spatialDataColumn: props.spatialDataColumn,
+    };
+  }
+
   async getCategories(
     options: CategoryRequestOptions
   ): Promise<CategoryResponse> {
@@ -66,8 +97,7 @@ export abstract class WidgetRemoteSource<
     options: FeaturesRequestOptions
   ): Promise<FeaturesResponse> {
     const {
-      abortController,
-      signal = abortController?.signal,
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
@@ -100,8 +130,7 @@ export abstract class WidgetRemoteSource<
 
   async getFormula(options: FormulaRequestOptions): Promise<FormulaResponse> {
     const {
-      abortController,
-      signal = abortController?.signal,
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
@@ -133,8 +162,7 @@ export abstract class WidgetRemoteSource<
     options: HistogramRequestOptions
   ): Promise<HistogramResponse> {
     const {
-      abortController,
-      signal = abortController?.signal,
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
@@ -171,8 +199,7 @@ export abstract class WidgetRemoteSource<
 
   async getRange(options: RangeRequestOptions): Promise<RangeResponse> {
     const {
-      abortController,
-      signal = abortController?.signal,
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
@@ -197,8 +224,7 @@ export abstract class WidgetRemoteSource<
 
   async getScatter(options: ScatterRequestOptions): Promise<ScatterResponse> {
     const {
-      abortController,
-      signal = abortController?.signal,
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
@@ -235,8 +261,7 @@ export abstract class WidgetRemoteSource<
 
   async getTable(options: TableRequestOptions): Promise<TableResponse> {
     const {
-      abortController,
-      signal = abortController?.signal,
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,
@@ -276,8 +301,7 @@ export abstract class WidgetRemoteSource<
     options: TimeSeriesRequestOptions
   ): Promise<TimeSeriesResponse> {
     const {
-      abortController,
-      signal = abortController?.signal,
+      signal,
       filters = this.props.filters,
       filterOwner,
       spatialFilter,

@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/require-await */
-import {TilesetSourceOptions} from '../sources/index.js';
-import type {ModelSource} from '../models/index.js';
 import {
   CategoryRequestOptions,
   CategoryResponse,
@@ -18,33 +15,15 @@ import {
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
 } from './types.js';
-import {InvalidColumnError, assert, getApplicableFilters} from '../utils.js';
-import {TileFormat} from '../constants.js';
-import {Filter, Filters, SpatialFilter, Tile} from '../types.js';
-import {
-  TileFeatureExtractOptions,
-  applyFilters,
-  geojsonFeatures,
-  tileFeatures,
-} from '../filters/index.js';
-import {
-  aggregationFunctions,
-  applySorting,
-  groupValuesByColumn,
-  groupValuesByDateColumn,
-  histogram,
-  scatterPlot,
-} from '../operations/index.js';
-import {FeatureData} from '../types-internal.js';
+import {SpatialFilter, Tile} from '../types.js';
+import {TileFeatureExtractOptions} from '../filters/index.js';
 import {FeatureCollection} from 'geojson';
-import {SpatialDataType} from '../sources/types.js';
 import {WidgetSource, WidgetSourceProps} from './widget-source.js';
-import {booleanEqual} from '@turf/boolean-equal';
-
-// TODO(cleanup): Parameter defaults in source functions and widget API calls are
-// currently duplicated and possibly inconsistent. Consider consolidating and
-// operating on Required<T> objects. See:
-// https://github.com/CartoDB/carto-api-client/issues/39
+import {Method} from '../workers/constants.js';
+import {WorkerRequest, WorkerResponse} from '../workers/types.js';
+import {SpatialDataType, TilesetSourceOptions} from '../sources/types.js';
+import {TileFormat} from '../constants.js';
+import {WidgetTilesetSourceImpl} from './widget-tileset-source-impl.js';
 
 export type WidgetTilesetSourceProps = WidgetSourceProps &
   Omit<TilesetSourceOptions, 'filters'> & {
@@ -76,23 +55,129 @@ export type WidgetTilesetSourceResult = {widgetSource: WidgetTilesetSource};
  * const { widgetSource } = await data;
  * ```
  */
-export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> {
-  private _tiles: Tile[] = [];
-  private _features: FeatureData[] = [];
-  private _tileFeatureExtractOptions: TileFeatureExtractOptions = {};
-  private _tileFeatureExtractPreviousInputs: {spatialFilter?: SpatialFilter} =
-    {};
+export class WidgetTilesetSource<
+  Props extends WidgetTilesetSourceProps = WidgetTilesetSourceProps,
+> extends WidgetSource<Props> {
+  protected _localImpl: WidgetTilesetSourceImpl | null = null;
 
-  protected override getModelSource(
-    filters: Filters | undefined,
-    filterOwner: string
-  ): ModelSource {
-    return {
-      ...super._getModelSource(filters, filterOwner),
-      type: 'tileset',
-      data: this.props.tableName,
-    };
+  protected _workerImpl: Worker | null = null;
+  protected _workerEnabled: boolean;
+  protected _workerNextRequestId = 1;
+
+  constructor(props: Props) {
+    super(props);
+
+    this._workerEnabled =
+      (props.widgetWorker ?? true) &&
+      TSUP_FORMAT !== 'cjs' &&
+      typeof Worker !== 'undefined';
+
+    if (!this._workerEnabled) {
+      this._localImpl = new WidgetTilesetSourceImpl(this.props);
+    }
   }
+
+  destroy() {
+    this._localImpl?.destroy();
+    this._localImpl = null;
+
+    this._workerImpl?.terminate();
+    this._workerImpl = null;
+
+    super.destroy();
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // WEB WORKER MANAGEMENT
+
+  /**
+   * Returns an initialized Worker, to be reused for the lifecycle of this
+   * source instance.
+   */
+  protected _getWorker(): Worker {
+    if (this._workerImpl) {
+      return this._workerImpl;
+    }
+
+    this._workerImpl = new Worker(
+      new URL('@carto/api-client/worker', import.meta.url),
+      {
+        type: 'module',
+        name: 'cartowidgettileset',
+      }
+    );
+
+    this._workerImpl.postMessage({
+      method: Method.INIT,
+      params: [this.props],
+    } as WorkerRequest);
+
+    return this._workerImpl;
+  }
+
+  /** Executes a given method on the worker. */
+  protected _executeWorkerMethod<T>(
+    method: Method,
+    params: unknown[],
+    signal?: AbortSignal
+  ): Promise<T> {
+    if (!this._workerEnabled) {
+      // @ts-expect-error No type-checking dynamic method name.
+      return this._localImpl[method](...params);
+    }
+
+    const worker = this._getWorker();
+    const requestId = this._workerNextRequestId++;
+
+    let resolve: ((value: T) => void) | null = null;
+    let reject: ((reason: any) => void) | null = null;
+
+    // If worker sends message to main process, check whether it's a response
+    // to this request, and whether the request can been aborted. Then resolve
+    // or reject the Promise.
+    function onMessage(e: MessageEvent) {
+      const response = e.data as WorkerResponse;
+      if (response.requestId !== requestId) return;
+      if (signal?.aborted) return; // handled by 'abort' listener
+
+      if (response.ok) {
+        resolve!(response.result as T);
+      } else {
+        reject!(new Error(response.error));
+      }
+    }
+
+    // If request is aborted by user, immediately reject the Promise.
+    function onAbort() {
+      reject!(new Error(signal!.reason));
+    }
+
+    worker.addEventListener('message', onMessage);
+    signal?.addEventListener('abort', onAbort);
+
+    // Send the task to the worker, creating a Promise to resolve/reject later.
+    const promise = new Promise<T>((_resolve, _reject) => {
+      resolve = _resolve;
+      reject = _reject;
+
+      worker.postMessage({
+        requestId,
+        method,
+        params,
+      } as WorkerRequest);
+    });
+
+    // Whether the task completes, fails, or aborts: clean up afterward.
+    void promise.finally(() => {
+      worker.removeEventListener('message', onMessage);
+      signal?.removeEventListener('abort', onAbort);
+    });
+
+    return promise;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // DATA LOADING
 
   /**
    * Loads features as a list of tiles (typically provided by deck.gl).
@@ -100,39 +185,47 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
    * before computing statistics on the tiles.
    */
   loadTiles(tiles: unknown[]) {
-    this._tiles = tiles as Tile[];
-    this._features.length = 0;
+    if (!this._workerEnabled) {
+      return this._localImpl!.loadTiles(tiles);
+    }
+
+    const worker = this._getWorker();
+
+    // We cannot pass an instance of Tile2DHeader to a Web Worker, and must
+    // extract properties required for widget calculations. Note that the
+    // `tile: Tile = {...}` assignment is structured so TS will warn if any
+    // types required by the internal 'Tile' type are missing.
+    tiles = (tiles as Tile[]).map(
+      ({id, index, bbox, isVisible, data}: Tile) => {
+        const tile: Tile = {
+          id,
+          index,
+          isVisible,
+          data,
+          bbox,
+        };
+        return tile;
+      }
+    );
+
+    worker.postMessage({
+      method: Method.LOAD_TILES,
+      params: [tiles],
+    } as WorkerRequest);
   }
 
   /** Configures options used to extract features from tiles. */
   setTileFeatureExtractOptions(options: TileFeatureExtractOptions) {
-    this._tileFeatureExtractOptions = options;
-    this._features.length = 0;
-  }
-
-  protected _extractTileFeatures(spatialFilter: SpatialFilter) {
-    // When spatial filter has not changed, don't redo extraction. If tiles or
-    // tile extract options change, features will have been cleared already.
-    const prevInputs = this._tileFeatureExtractPreviousInputs;
-    if (
-      this._features.length &&
-      prevInputs.spatialFilter &&
-      booleanEqual(prevInputs.spatialFilter, spatialFilter)
-    ) {
-      return;
+    if (!this._workerEnabled) {
+      return this._localImpl?.setTileFeatureExtractOptions(options);
     }
 
-    this._features = tileFeatures({
-      tiles: this._tiles,
-      tileFormat: this.props.tileFormat,
-      ...this._tileFeatureExtractOptions,
+    const worker = this._getWorker();
 
-      spatialFilter,
-      spatialDataColumn: this.props.spatialDataColumn,
-      spatialDataType: this.props.spatialDataType,
+    worker.postMessage({
+      method: Method.SET_TILE_FEATURE_EXTRACT_OPTIONS,
+      params: [options],
     });
-
-    prevInputs.spatialFilter = spatialFilter;
   }
 
   /**
@@ -147,310 +240,72 @@ export class WidgetTilesetSource extends WidgetSource<WidgetTilesetSourceProps> 
     geojson: FeatureCollection;
     spatialFilter: SpatialFilter;
   }) {
-    this._features = geojsonFeatures({
-      geojson,
-      spatialFilter,
-      ...this._tileFeatureExtractOptions,
-    });
-    this._tileFeatureExtractPreviousInputs.spatialFilter = spatialFilter;
+    if (!this._workerEnabled) {
+      return this._localImpl!.loadGeoJSON({geojson, spatialFilter});
+    }
+
+    const worker = this._getWorker();
+
+    worker.postMessage({
+      method: Method.LOAD_GEOJSON,
+      params: [{geojson, spatialFilter}],
+    } as WorkerRequest);
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  // WIDGETS API
+
+  // eslint-disable-next-line @typescript-eslint/require-await
   override async getFeatures(): Promise<FeaturesResponse> {
     throw new Error('getFeatures not supported for tilesets');
   }
 
   async getFormula({
-    column = '*',
-    operation = 'count',
-    joinOperation,
-    filters,
-    filterOwner,
-    spatialFilter,
+    signal,
+    ...options
   }: FormulaRequestOptions): Promise<FormulaResponse> {
-    if (operation === 'custom') {
-      throw new Error('Custom aggregation not supported for tilesets');
-    }
-
-    // Column is required except when operation is 'count'.
-    if ((column && column !== '*') || operation !== 'count') {
-      assertColumn(this._features, column);
-    }
-
-    const filteredFeatures = this._getFilteredFeatures(
-      spatialFilter,
-      filters,
-      filterOwner
-    );
-
-    if (filteredFeatures.length === 0 && operation !== 'count') {
-      return {value: null};
-    }
-
-    const targetOperation = aggregationFunctions[operation];
-    return {
-      value: targetOperation(filteredFeatures, column, joinOperation),
-    };
+    return this._executeWorkerMethod(Method.GET_FORMULA, [options], signal);
   }
 
   override async getHistogram({
-    operation = 'count',
-    ticks,
-    column,
-    joinOperation,
-    filters,
-    filterOwner,
-    spatialFilter,
+    signal,
+    ...options
   }: HistogramRequestOptions): Promise<HistogramResponse> {
-    const filteredFeatures = this._getFilteredFeatures(
-      spatialFilter,
-      filters,
-      filterOwner
-    );
-
-    assertColumn(this._features, column);
-
-    if (!this._features.length) {
-      return [];
-    }
-
-    return histogram({
-      data: filteredFeatures,
-      valuesColumns: normalizeColumns(column),
-      joinOperation,
-      ticks,
-      operation,
-    });
+    return this._executeWorkerMethod(Method.GET_HISTOGRAM, [options], signal);
   }
 
   override async getCategories({
-    column,
-    operation = 'count',
-    operationColumn,
-    joinOperation,
-    filters,
-    filterOwner,
-    spatialFilter,
+    signal,
+    ...options
   }: CategoryRequestOptions): Promise<CategoryResponse> {
-    const filteredFeatures = this._getFilteredFeatures(
-      spatialFilter,
-      filters,
-      filterOwner
-    );
-
-    if (!filteredFeatures.length) {
-      return [];
-    }
-
-    assertColumn(this._features, column, operationColumn as string);
-
-    const groups = groupValuesByColumn({
-      data: filteredFeatures,
-      valuesColumns: normalizeColumns(operationColumn || column),
-      joinOperation,
-      keysColumn: column,
-      operation,
-    });
-
-    return groups || [];
+    return this._executeWorkerMethod(Method.GET_CATEGORIES, [options], signal);
   }
 
   override async getScatter({
-    xAxisColumn,
-    yAxisColumn,
-    xAxisJoinOperation,
-    yAxisJoinOperation,
-    filters,
-    filterOwner,
-    spatialFilter,
+    signal,
+    ...options
   }: ScatterRequestOptions): Promise<ScatterResponse> {
-    const filteredFeatures = this._getFilteredFeatures(
-      spatialFilter,
-      filters,
-      filterOwner
-    );
-
-    if (!filteredFeatures.length) {
-      return [];
-    }
-
-    assertColumn(this._features, xAxisColumn, yAxisColumn);
-
-    return scatterPlot({
-      data: filteredFeatures,
-      xAxisColumns: normalizeColumns(xAxisColumn),
-      xAxisJoinOperation,
-      yAxisColumns: normalizeColumns(yAxisColumn),
-      yAxisJoinOperation,
-    });
+    return this._executeWorkerMethod(Method.GET_SCATTER, [options], signal);
   }
 
   override async getTable({
-    columns,
-    searchFilterColumn,
-    searchFilterText,
-    sortBy,
-    sortDirection,
-    sortByColumnType,
-    offset = 0,
-    limit = 10,
-    filters,
-    filterOwner,
-    spatialFilter,
+    signal,
+    ...options
   }: TableRequestOptions): Promise<TableResponse> {
-    // Filter.
-    let filteredFeatures = this._getFilteredFeatures(
-      spatialFilter,
-      filters,
-      filterOwner
-    );
-
-    if (!filteredFeatures.length) {
-      return {rows: [], totalCount: 0};
-    }
-
-    // Search.
-    if (searchFilterColumn && searchFilterText) {
-      filteredFeatures = filteredFeatures.filter(
-        (row) =>
-          row[searchFilterColumn] &&
-          String(row[searchFilterColumn] as unknown)
-            .toLowerCase()
-            .includes(String(searchFilterText).toLowerCase())
-      );
-    }
-
-    // Sort.
-    let rows = applySorting(filteredFeatures, {
-      sortBy,
-      sortByDirection: sortDirection,
-      sortByColumnType,
-    });
-    const totalCount = rows.length;
-
-    // Offset and limit.
-    rows = rows.slice(
-      Math.min(offset, totalCount),
-      Math.min(offset + limit, totalCount)
-    );
-
-    // Select columns.
-    rows = rows.map((srcRow: FeatureData) => {
-      const dstRow: FeatureData = {};
-      for (const column of columns) {
-        dstRow[column] = srcRow[column];
-      }
-      return dstRow;
-    });
-
-    return {rows, totalCount} as TableResponse;
+    return this._executeWorkerMethod(Method.GET_TABLE, [options], signal);
   }
 
   override async getTimeSeries({
-    column,
-    stepSize,
-    operation,
-    operationColumn,
-    joinOperation,
-    filters,
-    filterOwner,
-    spatialFilter,
+    signal,
+    ...options
   }: TimeSeriesRequestOptions): Promise<TimeSeriesResponse> {
-    const filteredFeatures = this._getFilteredFeatures(
-      spatialFilter,
-      filters,
-      filterOwner
-    );
-
-    if (!filteredFeatures.length) {
-      return {rows: []};
-    }
-
-    assertColumn(this._features, column, operationColumn as string);
-
-    const rows =
-      groupValuesByDateColumn({
-        data: filteredFeatures,
-        valuesColumns: normalizeColumns(operationColumn || column),
-        keysColumn: column,
-        groupType: stepSize,
-        operation,
-        joinOperation,
-      }) || [];
-
-    return {rows};
+    return this._executeWorkerMethod(Method.GET_TIME_SERIES, [options], signal);
   }
 
   override async getRange({
-    column,
-    filters,
-    filterOwner,
-    spatialFilter,
+    signal,
+    ...options
   }: RangeRequestOptions): Promise<RangeResponse> {
-    assertColumn(this._features, column);
-
-    const filteredFeatures = this._getFilteredFeatures(
-      spatialFilter,
-      filters,
-      filterOwner
-    );
-
-    if (!this._features.length) {
-      // TODO: Is this the only nullable response in the Widgets API? If so,
-      // can we do something more consistent?
-      return null;
-    }
-
-    return {
-      min: aggregationFunctions.min(filteredFeatures, column),
-      max: aggregationFunctions.max(filteredFeatures, column),
-    };
+    return this._executeWorkerMethod(Method.GET_RANGE, [options], signal);
   }
-
-  /****************************************************************************
-   * INTERNAL
-   */
-
-  private _getFilteredFeatures(
-    spatialFilter?: SpatialFilter,
-    filters?: Record<string, Filter>,
-    filterOwner?: string
-  ): FeatureData[] {
-    assert(spatialFilter, 'spatialFilter required for tilesets');
-    this._extractTileFeatures(spatialFilter);
-    return applyFilters(
-      this._features,
-      getApplicableFilters(filterOwner, filters || this.props.filters),
-      this.props.filtersLogicalOperator || 'and'
-    );
-  }
-}
-
-function assertColumn(
-  features: FeatureData[],
-  ...columnArgs: string[] | string[][]
-) {
-  // TODO(cleanup): Can drop support for multiple column shapes here?
-
-  // Due to the multiple column shape, we normalise it as an array with normalizeColumns
-  const columns = Array.from(new Set(columnArgs.map(normalizeColumns).flat()));
-
-  const featureKeys = Object.keys(features[0]);
-
-  const invalidColumns = columns.filter(
-    (column) => !featureKeys.includes(column)
-  );
-
-  if (invalidColumns.length) {
-    throw new InvalidColumnError(
-      `Missing column(s): ${invalidColumns.join(', ')}`
-    );
-  }
-}
-
-function normalizeColumns(columns: string | string[]): string[] {
-  return Array.isArray(columns)
-    ? columns
-    : typeof columns === 'string'
-      ? [columns]
-      : [];
 }

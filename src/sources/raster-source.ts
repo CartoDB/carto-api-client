@@ -3,6 +3,12 @@
 // Copyright (c) vis.gl contributors
 
 import {baseSource} from './base-source.js';
+import {getTileFormat} from '../utils/getTileFormat.js';
+import {
+  WidgetRasterSource,
+  WidgetRasterSourceResult,
+} from '../widget-sources/index.js';
+
 import type {
   FilterOptions,
   SourceOptions,
@@ -18,7 +24,7 @@ type UrlParameters = {
   filters?: Record<string, unknown>;
 };
 
-export type RasterSourceResponse = TilejsonResult;
+export type RasterSourceResponse = TilejsonResult & WidgetRasterSourceResult;
 
 export const rasterSource = async function (
   options: RasterSourceOptions
@@ -29,9 +35,16 @@ export const rasterSource = async function (
     urlParameters.filters = filters;
   }
 
-  return baseSource<UrlParameters>(
-    'raster',
-    options,
-    urlParameters
+  return baseSource<UrlParameters>('raster', options, urlParameters).then(
+    (result) => ({
+      ...(result as TilejsonResult),
+      widgetSource: new WidgetRasterSource({
+        ...options,
+        tileFormat: getTileFormat(result as TilejsonResult),
+        spatialDataColumn: 'quadbin',
+        spatialDataType: 'quadbin',
+        rasterMetadata: (result as TilejsonResult).raster_metadata!,
+      }),
+    })
   ) as Promise<RasterSourceResponse>;
 };

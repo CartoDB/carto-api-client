@@ -27,12 +27,14 @@ export class CategoryWidget extends BaseWidget {
       ...super.properties,
       operation: {type: String},
       column: {type: String},
+      getItemColor: {type: Function, attribute: false},
       _filterValues: {state: true},
     };
   }
 
   declare column: string;
   declare operation: 'count' | 'avg' | 'min' | 'max' | 'sum';
+  declare getItemColor?: (item: string | number) => string;
 
   protected _chart: echarts.ECharts | null = null;
   protected _chartRef: Ref<HTMLElement> = createRef();
@@ -160,10 +162,14 @@ export class CategoryWidget extends BaseWidget {
       .sort((a: Category, b: Category) => (a.value > b.value ? -1 : 1));
 
     const data = categories.map(({name, value}: Category, index: number) => {
-      let color = DEFAULT_PALETTE[index % DEFAULT_PALETTE.length];
+      let color = this.getItemColor
+        ? this.getItemColor(name)
+        : DEFAULT_PALETTE[index % DEFAULT_PALETTE.length];
+
       if (this._filterValues.length > 0) {
         color = this._filterValues.includes(name) ? color : '#cccccc';
       }
+
       return {value, name, itemStyle: {color}};
     });
 
