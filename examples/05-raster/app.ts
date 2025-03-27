@@ -20,23 +20,6 @@ import type {
 let data: TilejsonResult & {widgetSource: WidgetRasterSource};
 let viewState = {latitude: 42.728, longitude: -87.731, zoom: 8.75};
 
-const _getFillColor = (value: number): Color => {
-  if (value === 0) {
-    return [0, 0, 0, 0];
-  } else if (value < 64) {
-    return [255, 0, 0, 255];
-  } else if (value < 128) {
-    return [0, 255, 0, 255];
-  } else if (value < 192) {
-    return [0, 0, 255, 255];
-  } else {
-    return [0, 255, 255, 255];
-  }
-};
-const getFillColorLayer = (d: any): Color => _getFillColor(d.properties.band_1);
-const getFillColorCSS = (item: string | number): string =>
-  `rgba(${_getFillColor(Number(item)).join()})`;
-
 /**************************************************************************
  * DECK.GL
  */
@@ -83,6 +66,7 @@ async function updateSources() {
   document.querySelector('#footer')!.innerHTML = data.attribution;
 
   updateLayers();
+  updateWidgets();
 }
 
 function updateLayers() {
@@ -99,6 +83,7 @@ function updateLayers() {
 
 function updateTiles(tiles: unknown[]) {
   data.widgetSource.loadTiles(tiles);
+  console.log('loadTiles', tiles);
   updateWidgetsDebounced();
 }
 
@@ -143,4 +128,26 @@ function debounce<T extends Function>(callback: T, ms: number): T {
       callback(...args);
     }, ms);
   }) as unknown as T;
+}
+
+function _getFillColor(value: number): Color {
+  if (value === 0) {
+    return [0, 0, 0, 0];
+  } else if (value < 64) {
+    return [255, 0, 0, 255];
+  } else if (value < 128) {
+    return [0, 255, 0, 255];
+  } else if (value < 192) {
+    return [0, 0, 255, 255];
+  } else {
+    return [0, 255, 255, 255];
+  }
+}
+
+function getFillColorLayer(d: any): Color {
+  return _getFillColor(d.properties.band_1);
+}
+
+function getFillColorCSS(item: string | number): string {
+  return `rgba(${_getFillColor(Number(item)).join()})`;
 }
