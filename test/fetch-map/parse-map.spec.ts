@@ -1,4 +1,4 @@
-import {describe, test, expect} from 'vitest';
+import {describe, test, expect, vi} from 'vitest';
 import {parseMap} from '@carto/api-client';
 
 const METADATA = {
@@ -104,8 +104,16 @@ describe('parseMap', () => {
       },
     };
 
+    const mockConsoleError = vi
+      .spyOn(console, 'error')
+      .mockReturnValue(undefined);
+
     const map = parseMap({...METADATA, datasets: DATASETS, keplerMapConfig});
     expect(map.layers).toEqual([undefined]);
+
+    expect(mockConsoleError).toHaveBeenCalledWith(
+      'No dataset matching dataId: DATA_ID'
+    );
   });
 
   test('missing dataset', () => {
@@ -128,8 +136,16 @@ describe('parseMap', () => {
       },
     };
 
+    const mockConsoleError = vi
+      .spyOn(console, 'error')
+      .mockReturnValue(undefined);
+
     const map = parseMap({...METADATA, datasets: DATASETS, keplerMapConfig});
     expect(map.layers).toEqual([undefined]);
+
+    expect(mockConsoleError).toHaveBeenCalledWith(
+      'No dataset matching dataId: MISSING_DATA_ID'
+    );
   });
 
   test('popupSettings are exported', () => {
