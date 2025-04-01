@@ -1552,15 +1552,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mapbox/tile-cover@npm:3.0.1":
-  version: 3.0.1
-  resolution: "@mapbox/tile-cover@npm:3.0.1"
-  dependencies:
-    tilebelt: "npm:^1.0.1"
-  checksum: 10c0/dd66725282ab6570280e91485b66846c4a3f18d71a53e43b2449c77691853ca6a0f6f03174b4ea00eade7d32376e13ad4f5a077399c97c105ef9348c080a38a7
-  languageName: node
-  linkType: hard
-
 "@mapbox/tiny-sdf@npm:^2.0.5, @mapbox/tiny-sdf@npm:^2.0.6":
   version: 2.0.6
   resolution: "@mapbox/tiny-sdf@npm:2.0.6"
@@ -5281,22 +5272,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"quadbin@npm:^0.4.0":
-  version: 0.4.0
-  resolution: "quadbin@npm:0.4.0"
-  dependencies:
-    "@mapbox/tile-cover": "npm:3.0.1"
-    "@math.gl/web-mercator": "npm:^4.1.0"
-  checksum: 10c0/24a49abadd820cbdd0187b6c16604401c6df9b3cfe1a5ac2cd02acf500de9f93cfd5a857f5882bfd8ce3e4bf9176512d9b6fe879158c7003ebca951b1b39457d
-  languageName: node
-  linkType: hard
-
-"quadbin@npm:^0.4.1-alpha.0":
-  version: 0.4.1-alpha.0
-  resolution: "quadbin@npm:0.4.1-alpha.0"
+"quadbin@npm:^0.4.0, quadbin@npm:^0.4.1-alpha.0":
+  version: 0.4.2
+  resolution: "quadbin@npm:0.4.2"
   dependencies:
     "@math.gl/web-mercator": "npm:^4.1.0"
-  checksum: 10c0/8cfbca16fdf97836d2616af24ca15e4822a6e9dc6ea71fabf15d5c2aef5e876330449b932a40b954953d37714fcdbaeb888d8d4407c8ca670acaaa4fb2f40859
+  checksum: 10c0/40ad1efa7146762e3cf6d9abfe47d452e69cceb0a72b5caec27e8bdf66d1e4522d6a1bde7e643015d9651eaa9f12611208f073856662fb6266263dcbf72d6dd8
   languageName: node
   linkType: hard
 
@@ -5868,13 +5849,6 @@ __metadata:
   dependencies:
     any-promise: "npm:^1.0.0"
   checksum: 10c0/f375aeb2b05c100a456a30bc3ed07ef03a39cbdefe02e0403fb714b8c7e57eeaad1a2f5c4ecfb9ce554ce3db9c2b024eba144843cd9e344566d9fcee73b04767
-  languageName: node
-  linkType: hard
-
-"tilebelt@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "tilebelt@npm:1.0.1"
-  checksum: 10c0/40d05eb7b84eabd5155347cdbfa3cbe459c634fa76a0c442c8c339b4e443e03f5f8576da37e373645305891bb49f6ba993bfe8ceb89093cae1e13053244c66c5
   languageName: node
   linkType: hard
 
