@@ -1261,7 +1261,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@luma.gl/constants@npm:9.1.5, @luma.gl/constants@npm:^9.1.5":
+"@luma.gl/constants@npm:9.1.7":
+  version: 9.1.7
+  resolution: "@luma.gl/constants@npm:9.1.7"
+  checksum: 10c0/1df76ffb257d114efa13c6a969695a9060ff392a5a94bd6796d024a722f19ec5707b5939c07a4e9b333d0174ac29770be6efc9f98566701f4729f06b8f7d5108
+  languageName: node
+  linkType: hard
+
+"@luma.gl/constants@npm:^9.1.5":
   version: 9.1.5
   resolution: "@luma.gl/constants@npm:9.1.5"
   checksum: 10c0/713ddd4c9ced9e2f3c04c841df04b9f1a49ef0a636d88a091de25aa2c8fe903764953f1cd773a341df5bfe20365fb98e08d73ea2bc70609ca37a7e05cb410850
@@ -1269,21 +1276,21 @@ __metadata:
   linkType: hard
 
 "@luma.gl/core@npm:^9.1.5, @luma.gl/core@npm:~9.1.5":
-  version: 9.1.5
-  resolution: "@luma.gl/core@npm:9.1.5"
+  version: 9.1.7
+  resolution: "@luma.gl/core@npm:9.1.7"
   dependencies:
     "@math.gl/types": "npm:^4.1.0"
     "@probe.gl/env": "npm:^4.0.8"
     "@probe.gl/log": "npm:^4.0.8"
     "@probe.gl/stats": "npm:^4.0.8"
     "@types/offscreencanvas": "npm:^2019.6.4"
-  checksum: 10c0/54fe2999c17c530dc1d9544e0e41be4e231f3f3b9d44533fee31bd385dd849a71c05778f5af7b15db123cb6980fbbd39df056a053e14be4674350a7dec73d0c5
+  checksum: 10c0/3d2234c1e50a641d537c3909499b6a797e1be68d572e929a12a3f9cc83698c7fba9b4c2a4f1ff11e554fe7e6d36070e893d4ba59117389cbc78513fa0e3f4f8d
   languageName: node
   linkType: hard
 
 "@luma.gl/engine@npm:^9.1.5, @luma.gl/engine@npm:~9.1.5":
-  version: 9.1.5
-  resolution: "@luma.gl/engine@npm:9.1.5"
+  version: 9.1.7
+  resolution: "@luma.gl/engine@npm:9.1.7"
   dependencies:
     "@math.gl/core": "npm:^4.1.0"
     "@math.gl/types": "npm:^4.1.0"
@@ -1292,7 +1299,7 @@ __metadata:
   peerDependencies:
     "@luma.gl/core": ^9.1.0
     "@luma.gl/shadertools": ^9.1.0
-  checksum: 10c0/4cf9dc10a5863b0954a962342c0804bba53f15222188cb1f13a6b8c63315bd4500dba2a313cc6dfad649cdb6b1ae64d7976668b3a67ad77b70798f92081af705
+  checksum: 10c0/3f5dc3afca0e1b35133f95a6bf3175b769ad68ee250426efb53e49fbc5d880ea564c293f879fdc2f3195890ad0c66159e674a68967c50cfbbd7e8497ce8c00d0
   languageName: node
   linkType: hard
 
@@ -1312,28 +1319,28 @@ __metadata:
   linkType: hard
 
 "@luma.gl/shadertools@npm:^9.1.5, @luma.gl/shadertools@npm:~9.1.5":
-  version: 9.1.5
-  resolution: "@luma.gl/shadertools@npm:9.1.5"
+  version: 9.1.7
+  resolution: "@luma.gl/shadertools@npm:9.1.7"
   dependencies:
     "@math.gl/core": "npm:^4.1.0"
     "@math.gl/types": "npm:^4.1.0"
-    wgsl_reflect: "npm:^1.0.1"
+    wgsl_reflect: "npm:^1.2.0"
   peerDependencies:
     "@luma.gl/core": ^9.1.0
-  checksum: 10c0/badb9779b0ccdb4407d34cd34d3bf0497aef84381a3db7950f9f9a0d5f50a665d18ba98a5ff19205fab7ef7fdebb0672f3d312c92c0e5af52f30ceeaeaf46128
+  checksum: 10c0/bf6ad02b9ddbf3aee46cf43f5273d788aa762e2415ae6aabac9e979b3a6b7080c8d11047854ead570864d10255033dbed590b57e8a8da72fe548981d57d65cf8
   languageName: node
   linkType: hard
 
 "@luma.gl/webgl@npm:^9.1.5, @luma.gl/webgl@npm:~9.1.5":
-  version: 9.1.5
-  resolution: "@luma.gl/webgl@npm:9.1.5"
+  version: 9.1.7
+  resolution: "@luma.gl/webgl@npm:9.1.7"
   dependencies:
-    "@luma.gl/constants": "npm:9.1.5"
+    "@luma.gl/constants": "npm:9.1.7"
     "@math.gl/types": "npm:^4.1.0"
     "@probe.gl/env": "npm:^4.0.8"
   peerDependencies:
     "@luma.gl/core": ^9.1.0
-  checksum: 10c0/b64fe292ee7810f517eef5f7e44c23c9e8bb068cfed9268b0fc8efd9e821a286575c748cd82938b607ef833c6a84724ccaf138ebb444c669fe388cec7f9f984a
+  checksum: 10c0/ce77e0d3dbd4b9d587465eb2e54bea2d8bbcdc752553d3571e409e0851ec2eb325ccb93c337bf0aa7b2c9ba5df714e3281bf03037f12b492961109d487dbece6
   languageName: node
   linkType: hard
 
@@ -6092,10 +6099,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wgsl_reflect@npm:^1.0.1":
-  version: 1.0.12
-  resolution: "wgsl_reflect@npm:1.0.12"
-  checksum: 10c0/bd0373aa8f427846241494d112c8601b5c5561e76a7ccfe2a8df6a97b75b6522081fb9223733ff452d7981bc559e8c2d9c991cb26220d00b22dd4bfbc7b643f9
+"wgsl_reflect@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "wgsl_reflect@npm:1.2.0"
+  checksum: 10c0/1e8439b3f9b660775a21ccc68db918b69485df0f82870e75952e718e62cc58ebbe8f4c190256c6bce940fd6a8652c85f56ec66ab18d82488378178f4d84792f4
   languageName: node
   linkType: hard
 
