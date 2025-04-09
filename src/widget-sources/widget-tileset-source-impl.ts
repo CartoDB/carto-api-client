@@ -387,15 +387,15 @@ function assertColumn(
   features: FeatureData[],
   ...columnArgs: string[] | string[][]
 ) {
-  // TODO(cleanup): Can drop support for multiple column shapes here?
-
   // Due to the multiple column shape, we normalise it as an array with normalizeColumns
   const columns = Array.from(new Set(columnArgs.map(normalizeColumns).flat()));
 
   const featureKeys = Object.keys(features[0]);
 
+  // For backward compatibility, '' should pass column validation. For example,
+  // operation='count',operationColumn='' is accepted.
   const invalidColumns = columns.filter(
-    (column) => !featureKeys.includes(column)
+    (column) => column && !featureKeys.includes(column)
   );
 
   if (invalidColumns.length) {
