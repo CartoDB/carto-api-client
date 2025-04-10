@@ -16,7 +16,12 @@ import {
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
 } from './types.js';
-import {InvalidColumnError, assert, getApplicableFilters} from '../utils.js';
+import {
+  InvalidColumnError,
+  assert,
+  assignOptional,
+  getApplicableFilters,
+} from '../utils.js';
 import {Filter, SpatialFilter, Tile} from '../types.js';
 import {
   TileFeatureExtractOptions,
@@ -84,8 +89,7 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
     }
 
     this._features = tileFeatures({
-      ...this.props,
-      ...this._tileFeatureExtractOptions,
+      ...assignOptional({}, this.props, this._tileFeatureExtractOptions),
       tiles: this._tiles,
       spatialFilter,
     });

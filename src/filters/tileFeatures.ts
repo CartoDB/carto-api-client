@@ -23,6 +23,8 @@ export type TileFeatures = {
 /** @privateRemarks Source: @carto/react-core */
 export type TileFeatureExtractOptions = {
   storeGeometry?: boolean;
+  spatialDataType?: SpatialDataType;
+  spatialDataColumn?: string;
   uniqueIdProperty?: string;
 };
 
