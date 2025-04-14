@@ -1,6 +1,6 @@
 import {LayerType, SCALE_TYPE} from './layer-map.js';
 import {Format, MapType, ProviderType, QueryParameters} from '../types.js';
-import {TilejsonResult, GeojsonResult, JsonResult} from '../sources/types.js';
+import {TilejsonResult} from '../sources/types.js';
 
 export type VisualChannelField = {
   name: string;
@@ -208,7 +208,7 @@ export type Dataset = {
   cache?: number;
   connectionName: string;
   geoColumn: string;
-  data: TilejsonResult | GeojsonResult | JsonResult;
+  data: TilejsonResult;
   columns: string[];
   format: Format;
   aggregationExp: string;

@@ -7,8 +7,6 @@ import {DEFAULT_MAX_LENGTH_URL} from '../constants-internal.js';
 import {buildSourceUrl} from '../api/endpoints.js';
 import {requestWithParameters} from '../api/request-with-parameters.js';
 import type {
-  GeojsonResult,
-  JsonResult,
   SourceOptionalOptions,
   SourceRequiredOptions,
   TilejsonMapInstantiation,
@@ -29,7 +27,7 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
   endpoint: MapType,
   options: Partial<SourceOptionalOptions> & SourceRequiredOptions,
   urlParameters: UrlParameters
-): Promise<TilejsonResult | GeojsonResult | JsonResult> {
+): Promise<TilejsonResult> {
   const {accessToken, connectionName, cache, ...optionalOptions} = options;
   const mergedOptions = {
     ...SOURCE_DEFAULTS,
@@ -77,22 +75,7 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
   }
   errorContext.requestType = 'Map data';
 
-  if (format === 'tilejson') {
-    const json = await requestWithParameters<TilejsonResult>({
-      baseUrl: dataUrl,
-      parameters: {client: clientId},
-      headers,
-      errorContext,
-      maxLengthURL,
-      localCache,
-    });
-    if (accessToken) {
-      json.accessToken = accessToken;
-    }
-    return json;
-  }
-
-  return await requestWithParameters<GeojsonResult | JsonResult>({
+  const json = await requestWithParameters<TilejsonResult>({
     baseUrl: dataUrl,
     parameters: {client: clientId},
     headers,
@@ -100,4 +83,8 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
     maxLengthURL,
     localCache,
   });
+  if (accessToken) {
+    json.accessToken = accessToken;
+  }
+  return json;
 }
