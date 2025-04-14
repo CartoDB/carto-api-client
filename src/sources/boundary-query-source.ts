@@ -52,5 +52,5 @@ export const boundaryQuerySource = async function (
     'boundary',
     options,
     urlParameters
-  ) as Promise<BoundaryQuerySourceResponse>;
+  );
 };

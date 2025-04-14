@@ -40,5 +40,5 @@ export const boundaryTableSource = async function (
     'boundary',
     options,
     urlParameters
-  ) as Promise<BoundaryTableSourceResponse>;
+  );
 };

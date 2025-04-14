@@ -28,10 +28,10 @@ export const h3TilesetSource = async function (
 
   return baseSource<UrlParameters>('tileset', options, urlParameters).then(
     (result) => ({
-      ...(result as TilejsonResult),
+      ...(result),
       widgetSource: new WidgetTilesetSource({
         ...options,
-        tileFormat: getTileFormat(result as TilejsonResult),
+        tileFormat: getTileFormat(result),
         spatialDataColumn,
         spatialDataType: 'h3',
       }),

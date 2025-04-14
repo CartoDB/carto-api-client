@@ -122,7 +122,7 @@ async function fillInTileStats(
         if (
           dataset &&
           dataset.type !== 'tileset' &&
-          (dataset.data as TilejsonResult).tilestats
+          (dataset.data).tilestats
         ) {
           // Only fetch stats for QUERY & TABLE map types
           attributes.push({attribute, dataset});
