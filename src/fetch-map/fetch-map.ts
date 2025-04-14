@@ -1,5 +1,3 @@
-import {TilejsonResult} from '../sources/index.js';
-
 import {DEFAULT_API_BASE_URL} from '../constants.js';
 
 import {

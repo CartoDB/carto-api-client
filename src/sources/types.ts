@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-import type {Feature} from 'geojson';
-import {Filters, Format, QueryParameters} from '../types.js';
+import {Filters, QueryParameters} from '../types.js';
 import {SchemaField} from '../types-internal.js';
 
 export type SourceRequiredOptions = {
