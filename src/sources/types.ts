@@ -38,8 +38,6 @@ export type SourceOptionalOptions = {
   cache?: {value?: number};
 
   clientId: string;
-  /** @deprecated  use `query` instead **/
-  format: Format;
 
   /**
    * Maximum URL character length. Above this limit, requests use POST.

@@ -18,7 +18,6 @@ import {getClient} from '../client.js';
 
 export const SOURCE_DEFAULTS: Omit<SourceOptionalOptions, 'clientId'> = {
   apiBaseUrl: DEFAULT_API_BASE_URL,
-  format: 'tilejson',
   headers: {},
   maxLengthURL: DEFAULT_MAX_LENGTH_URL,
 };
@@ -43,7 +42,7 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
     }
   }
   const baseUrl = buildSourceUrl(mergedOptions);
-  const {clientId, maxLengthURL, format, localCache} = mergedOptions;
+  const {clientId, maxLengthURL, localCache} = mergedOptions;
   const headers = {
     Authorization: `Bearer ${options.accessToken}`,
     ...options.headers,
@@ -66,7 +65,7 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
       localCache,
     });
 
-  const dataUrl = mapInstantiation[format].url[0];
+  const dataUrl = mapInstantiation.tilejson.url[0];
   if (cache) {
     cache.value = parseInt(
       new URL(dataUrl).searchParams.get('cache') || '',
