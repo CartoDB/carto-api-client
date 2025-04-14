@@ -4,7 +4,7 @@
 
 import type {Feature} from 'geojson';
 import {Filters, Format, QueryParameters} from '../types.js';
-import {MapInstantiation} from '../types-internal.js';
+import {SchemaField} from '../types-internal.js';
 
 export type SourceRequiredOptions = {
   /** Carto platform access token. */
@@ -211,7 +211,10 @@ export type SpatialDataType = 'geo' | 'h3' | 'quadbin';
  * */
 export type SpatialFilterPolyfillMode = 'center' | 'intersects' | 'contains';
 
-export type TilejsonMapInstantiation = MapInstantiation & {
+export type TilejsonMapInstantiation = {
+  nrows: number;
+  size?: number;
+  schema: SchemaField[];
   tilejson: {url: string[]};
 };
 

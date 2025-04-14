@@ -39,28 +39,6 @@ export interface SchemaField {
   type: SchemaFieldType; // Field type in the CARTO stack, common for all providers
 }
 
-/**
- * @privateRemarks Source: @deck.gl/carto
- * @internal
- */
-export interface MapInstantiation extends MapInstantiationFormats {
-  nrows: number;
-  size?: number;
-  schema: SchemaField[];
-}
-
-/**
- * @privateRemarks Source: @deck.gl/carto
- * @internal
- */
-type MapInstantiationFormats = Record<
-  Format,
-  {
-    url: string[];
-    error?: any;
-  }
->;
-
 /******************************************************************************
  * LOCAL CALCULATIONS
  */
