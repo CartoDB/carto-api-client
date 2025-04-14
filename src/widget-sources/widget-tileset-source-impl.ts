@@ -271,7 +271,11 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
     }
 
     // Search.
+    // TODO(v0.6): Remove "searchFilterText" and "searchFilterColumn".
     if (searchFilterColumn && searchFilterText) {
+      console.warn(
+        'WidgetTilesetSource: "searchFilterText" is deprecated, use "filters" and FilterType.STRING_SEARCH instead.'
+      );
       filteredFeatures = filteredFeatures.filter(
         (row) =>
           row[searchFilterColumn] &&

@@ -117,9 +117,9 @@ export interface TableRequestOptions extends BaseRequestOptions {
   sortByColumnType?: SortColumnType;
   offset?: number;
   limit?: number;
-  /** Local only. */
+  /** @deprecated Supported for tilesets only. Prefer `filters` (for all sources) instead. */
   searchFilterColumn?: string;
-  /** Local only. */
+  /** @deprecated Supported for tilesets only. Prefer `filters` (for all sources) instead. */
   searchFilterText?: string;
 }
 
