@@ -36,9 +36,5 @@ export const boundaryTableSource = async function (
     urlParameters.filters = filters;
   }
 
-  return baseSource<UrlParameters>(
-    'boundary',
-    options,
-    urlParameters
-  ) as Promise<BoundaryTableSourceResponse>;
+  return baseSource<UrlParameters>('boundary', options, urlParameters);
 };

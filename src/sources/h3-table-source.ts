@@ -62,7 +62,7 @@ export const h3TableSource = async function (
 
   return baseSource<UrlParameters>('table', options, urlParameters).then(
     (result) => ({
-      ...(result as TilejsonResult),
+      ...result,
       widgetSource: new WidgetTableSource({
         ...options,
         // NOTE: Parameters with default values above must be explicitly passed here.

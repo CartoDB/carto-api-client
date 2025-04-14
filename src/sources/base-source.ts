@@ -7,8 +7,6 @@ import {DEFAULT_MAX_LENGTH_URL} from '../constants-internal.js';
 import {buildSourceUrl} from '../api/endpoints.js';
 import {requestWithParameters} from '../api/request-with-parameters.js';
 import type {
-  GeojsonResult,
-  JsonResult,
   SourceOptionalOptions,
   SourceRequiredOptions,
   TilejsonMapInstantiation,
@@ -20,7 +18,6 @@ import {getClient} from '../client.js';
 
 export const SOURCE_DEFAULTS: Omit<SourceOptionalOptions, 'clientId'> = {
   apiBaseUrl: DEFAULT_API_BASE_URL,
-  format: 'tilejson',
   headers: {},
   maxLengthURL: DEFAULT_MAX_LENGTH_URL,
 };
@@ -29,7 +26,7 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
   endpoint: MapType,
   options: Partial<SourceOptionalOptions> & SourceRequiredOptions,
   urlParameters: UrlParameters
-): Promise<TilejsonResult | GeojsonResult | JsonResult> {
+): Promise<TilejsonResult> {
   const {accessToken, connectionName, cache, ...optionalOptions} = options;
   const mergedOptions = {
     ...SOURCE_DEFAULTS,
@@ -45,7 +42,7 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
     }
   }
   const baseUrl = buildSourceUrl(mergedOptions);
-  const {clientId, maxLengthURL, format, localCache} = mergedOptions;
+  const {clientId, maxLengthURL, localCache} = mergedOptions;
   const headers = {
     Authorization: `Bearer ${options.accessToken}`,
     ...options.headers,
@@ -68,7 +65,7 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
       localCache,
     });
 
-  const dataUrl = mapInstantiation[format].url[0];
+  const dataUrl = mapInstantiation.tilejson.url[0];
   if (cache) {
     cache.value = parseInt(
       new URL(dataUrl).searchParams.get('cache') || '',
@@ -77,22 +74,7 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
   }
   errorContext.requestType = 'Map data';
 
-  if (format === 'tilejson') {
-    const json = await requestWithParameters<TilejsonResult>({
-      baseUrl: dataUrl,
-      parameters: {client: clientId},
-      headers,
-      errorContext,
-      maxLengthURL,
-      localCache,
-    });
-    if (accessToken) {
-      json.accessToken = accessToken;
-    }
-    return json;
-  }
-
-  return await requestWithParameters<GeojsonResult | JsonResult>({
+  const json = await requestWithParameters<TilejsonResult>({
     baseUrl: dataUrl,
     parameters: {client: clientId},
     headers,
@@ -100,4 +82,8 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
     maxLengthURL,
     localCache,
   });
+  if (accessToken) {
+    json.accessToken = accessToken;
+  }
+  return json;
 }

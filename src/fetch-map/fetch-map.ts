@@ -1,5 +1,3 @@
-import {TilejsonResult} from '../sources/index.js';
-
 import {DEFAULT_API_BASE_URL} from '../constants.js';
 
 import {
@@ -119,11 +117,7 @@ async function fillInTileStats(
       const attribute = layer.visualChannels[channel]?.name;
       if (attribute) {
         const dataset = datasets.find((d) => d.id === layer.config.dataId);
-        if (
-          dataset &&
-          dataset.type !== 'tileset' &&
-          (dataset.data as TilejsonResult).tilestats
-        ) {
+        if (dataset && dataset.type !== 'tileset' && dataset.data.tilestats) {
           // Only fetch stats for QUERY & TABLE map types
           attributes.push({attribute, dataset});
         }

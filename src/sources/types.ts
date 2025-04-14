@@ -2,9 +2,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-import type {Feature} from 'geojson';
-import {Filters, Format, QueryParameters} from '../types.js';
-import {MapInstantiation} from '../types-internal.js';
+import {Filters, QueryParameters} from '../types.js';
+import {SchemaField} from '../types-internal.js';
 
 export type SourceRequiredOptions = {
   /** Carto platform access token. */
@@ -38,8 +37,6 @@ export type SourceOptionalOptions = {
   cache?: {value?: number};
 
   clientId: string;
-  /** @deprecated  use `query` instead **/
-  format: Format;
 
   /**
    * Maximum URL character length. Above this limit, requests use POST.
@@ -213,7 +210,10 @@ export type SpatialDataType = 'geo' | 'h3' | 'quadbin';
  * */
 export type SpatialFilterPolyfillMode = 'center' | 'intersects' | 'contains';
 
-export type TilejsonMapInstantiation = MapInstantiation & {
+export type TilejsonMapInstantiation = {
+  nrows: number;
+  size?: number;
+  schema: SchemaField[];
   tilejson: {url: string[]};
 };
 
@@ -415,8 +415,6 @@ export type RasterMetadata = {
 };
 
 export type TilejsonResult = Tilejson & {accessToken: string};
-export type GeojsonResult = {type: 'FeatureCollection'; features: Feature[]};
-export type JsonResult = any[];
 export type QueryResult = {
   meta: {cacheHit: boolean; location: string; totalBytesProcessed: string};
   rows: Record<string, any>[];

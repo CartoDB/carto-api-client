@@ -76,7 +76,7 @@ export const vectorQuerySource = async function (
 
   return baseSource<UrlParameters>('query', options, urlParameters).then(
     (result) => ({
-      ...(result as TilejsonResult),
+      ...result,
       widgetSource: new WidgetQuerySource({
         ...options,
         // NOTE: Parameters with default values above must be explicitly passed here.

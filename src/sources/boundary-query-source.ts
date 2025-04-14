@@ -48,9 +48,5 @@ export const boundaryQuerySource = async function (
     urlParameters.queryParameters = queryParameters;
   }
 
-  return baseSource<UrlParameters>(
-    'boundary',
-    options,
-    urlParameters
-  ) as Promise<BoundaryQuerySourceResponse>;
+  return baseSource<UrlParameters>('boundary', options, urlParameters);
 };
