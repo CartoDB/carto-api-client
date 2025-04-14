@@ -37,13 +37,13 @@ export const rasterSource = async function (
 
   return baseSource<UrlParameters>('raster', options, urlParameters).then(
     (result) => ({
-      ...(result),
+      ...result,
       widgetSource: new WidgetRasterSource({
         ...options,
         tileFormat: getTileFormat(result),
         spatialDataColumn: 'quadbin',
         spatialDataType: 'quadbin',
-        rasterMetadata: (result).raster_metadata!,
+        rasterMetadata: result.raster_metadata!,
       }),
     })
   ) as Promise<RasterSourceResponse>;

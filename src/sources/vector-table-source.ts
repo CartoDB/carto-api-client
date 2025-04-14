@@ -71,7 +71,7 @@ export const vectorTableSource = async function (
 
   return baseSource<UrlParameters>('table', options, urlParameters).then(
     (result) => ({
-      ...(result),
+      ...result,
       widgetSource: new WidgetTableSource({
         ...options,
         // NOTE: Parameters with default values above must be explicitly passed here.

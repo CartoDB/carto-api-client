@@ -28,7 +28,7 @@ export const h3TilesetSource = async function (
 
   return baseSource<UrlParameters>('tileset', options, urlParameters).then(
     (result) => ({
-      ...(result),
+      ...result,
       widgetSource: new WidgetTilesetSource({
         ...options,
         tileFormat: getTileFormat(result),
