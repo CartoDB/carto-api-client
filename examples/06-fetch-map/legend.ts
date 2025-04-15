@@ -6,9 +6,11 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
   container.style.top = '10px';
   container.style.right = '10px';
   container.style.width = '200px';
+  container.style.maxHeight = '400px';
+  container.style.overflowY = 'auto';
   container.style.background = 'white';
-  container.style.padding = '10px';
-  container.style.borderRadius = '4px';
+  container.style.padding = '16px';
+  container.style.borderRadius = '8px';
   container.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
   container.style.zIndex = '1000';
 
@@ -25,65 +27,68 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
 
     const nameDiv = document.createElement('div');
     nameDiv.style.fontWeight = 'bold';
+    nameDiv.style.marginBottom = '12px';
     nameDiv.textContent = layer.props.cartoLabel;
     layerDiv.appendChild(nameDiv);
 
     const columnDiv = document.createElement('div');
-    columnDiv.textContent = `Color based on: ${dataColumn}`;
+    columnDiv.style.color = '#6c757d';
+    columnDiv.style.fontSize = '12px';
+    columnDiv.style.marginBottom = '8px';
+    columnDiv.textContent = `COLOR BASED ON`;
     layerDiv.appendChild(columnDiv);
 
-    // Add min/max values from tilestats
+    const dataColumnDiv = document.createElement('div');
+    dataColumnDiv.style.marginBottom = '16px';
+    dataColumnDiv.textContent = dataColumn;
+    layerDiv.appendChild(dataColumnDiv);
+
+    // Add color ranges
     const tilestats = layer.props.data?.tilestats?.layers[0]?.attributes?.find(
       (a: any) => a.attribute === dataColumn
     );
-    if (tilestats) {
-      const rangeDiv = document.createElement('div');
-      if (tilestats.type === 'Number' && tilestats.min !== undefined) {
-        rangeDiv.textContent = `Range: ${tilestats.min} - ${tilestats.max}`;
-        layerDiv.appendChild(rangeDiv);
+    if (tilestats && tilestats.type === 'Number' && tilestats.min !== undefined) {
+      // Create 6 ranges like in the screenshot
+      const numRanges = 6;
+      const min = tilestats.min;
+      const max = tilestats.max;
+      const step = (max - min) / numRanges;
 
-        // Create color bar
-        const colorBar = document.createElement('div');
-        colorBar.style.display = 'flex';
-        colorBar.style.marginTop = '5px';
-        colorBar.style.height = '20px';
-        colorBar.style.width = '100%';
-        colorBar.style.borderRadius = '4px';
-        colorBar.style.overflow = 'hidden';
-
-        // Create 5 color stops
-        const numStops = 5;
-        for (let i = 0; i < numStops; i++) {
-          const value = tilestats.min + (tilestats.max - tilestats.min) * (i / (numStops - 1));
-          const color = typeof layer.props.getFillColor !== 'function' ? layer.props.getFillColor : layer.props.getFillColor({properties: {[dataColumn]: value}});
-          const stop = document.createElement('div');
-          stop.style.flex = '1';
-          stop.style.backgroundColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
-          colorBar.appendChild(stop);
-        }
-
-        layerDiv.appendChild(colorBar);
-
-        // Add labels
-        const labels = document.createElement('div');
-        labels.style.display = 'flex';
-        labels.style.justifyContent = 'space-between';
-        labels.style.fontSize = '10px';
-        labels.style.marginTop = '2px';
+      for (let i = 0; i < numRanges; i++) {
+        const rangeStart = min + (step * i);
+        const rangeEnd = i === numRanges - 1 ? max : min + (step * (i + 1));
         
-        const minLabel = document.createElement('div');
-        minLabel.textContent = tilestats.min.toFixed(0);
-        labels.appendChild(minLabel);
+        const rangeDiv = document.createElement('div');
+        rangeDiv.style.display = 'flex';
+        rangeDiv.style.alignItems = 'center';
+        rangeDiv.style.marginBottom = '8px';
         
-        const maxLabel = document.createElement('div');
-        maxLabel.textContent = tilestats.max.toFixed(0);
-        labels.appendChild(maxLabel);
+        const colorSwatch = document.createElement('div');
+        colorSwatch.style.width = '20px';
+        colorSwatch.style.height = '20px';
+        colorSwatch.style.borderRadius = '50%';
+        colorSwatch.style.marginRight = '8px';
+        colorSwatch.style.flexShrink = '0';
         
-        layerDiv.appendChild(labels);
-      } else if (tilestats.type === 'String' && tilestats.categories) {
-        rangeDiv.textContent = `Categories: ${tilestats.categories.length}`;
+        const value = (rangeStart + rangeEnd) / 2;
+        const color = typeof layer.props.getFillColor !== 'function' ? 
+          layer.props.getFillColor : 
+          layer.props.getFillColor({properties: {[dataColumn]: value}});
+        colorSwatch.style.backgroundColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+        
+        const rangeLabel = document.createElement('div');
+        rangeLabel.style.fontSize = '12px';
+        rangeLabel.style.whiteSpace = 'nowrap';
+        rangeLabel.textContent = `${rangeStart.toFixed(2)} – ${rangeEnd.toFixed(2)}`;
+        
+        rangeDiv.appendChild(colorSwatch);
+        rangeDiv.appendChild(rangeLabel);
         layerDiv.appendChild(rangeDiv);
       }
+    } else if (tilestats?.type === 'String' && tilestats.categories) {
+      const categoriesDiv = document.createElement('div');
+      categoriesDiv.textContent = `Categories: ${tilestats.categories.length}`;
+      layerDiv.appendChild(categoriesDiv);
     }
 
     container.appendChild(layerDiv);
