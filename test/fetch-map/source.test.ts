@@ -29,8 +29,11 @@ describe('getColumnNameFromGeoColumn', () => {
 });
 
 describe('getSpatialIndexFromGeoColumn', () => {
-  test('should return H3 for h3 prefix', () => {
-    expect(getSpatialIndexFromGeoColumn('h3:geom')).toBe(SpatialIndex.H3);
+  test('should return H3 for all H3 variants', () => {
+    const variants = ['h3', 'hex', 'h3id', 'hex_id', 'h3hex'];
+    variants.forEach(variant => {
+      expect(getSpatialIndexFromGeoColumn(`${variant}:geom`)).toBe(SpatialIndex.H3);
+    });
   });
 
   test('should return QUADBIN for quadbin prefix', () => {
