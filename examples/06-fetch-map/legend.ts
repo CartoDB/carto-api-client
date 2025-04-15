@@ -5,6 +5,7 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
   container.style.position = 'absolute';
   container.style.top = '10px';
   container.style.right = '10px';
+  container.style.width = '200px';
   container.style.background = 'white';
   container.style.padding = '10px';
   container.style.borderRadius = '4px';
@@ -30,6 +31,16 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
     const columnDiv = document.createElement('div');
     columnDiv.textContent = `Data column: ${dataColumn}`;
     layerDiv.appendChild(columnDiv);
+
+    // Add min/max values from tilestats
+    const tilestats = layer.props.data?.tilestats?.layers[0]?.attributes?.find(
+      (a: any) => a.attribute === dataColumn
+    );
+    if (tilestats) {
+      const rangeDiv = document.createElement('div');
+      rangeDiv.textContent = `Range: ${tilestats.min} - ${tilestats.max}`;
+      layerDiv.appendChild(rangeDiv);
+    }
 
     container.appendChild(layerDiv);
   });
