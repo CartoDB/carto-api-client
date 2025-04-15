@@ -159,28 +159,28 @@ describe('parseMap', () => {
         mapStyle: {},
         legendSettings: {
           layers: {
-            'abcd1234': {
+            abcd1234: {
               active: true,
               entries: [],
-              shouldDisplayEntries: true
+              shouldDisplayEntries: true,
             },
-            'wxyz5678': {
+            wxyz5678: {
               active: true,
               entries: [
                 {
                   hash: '041fefde86682c870543f0be4637fc81',
                   visualChannel: 'color',
-                  customColorLabels: ['Meteorites']
-                }
+                  customColorLabels: ['Meteorites'],
+                },
               ],
-              shouldDisplayEntries: true
-            }
+              shouldDisplayEntries: true,
+            },
           },
           expanded: {
             '0': true,
-            '1': false
+            '1': false,
           },
-          baseMapSelector: false
+          baseMapSelector: false,
         },
         popupSettings: {
           enabled: true,
