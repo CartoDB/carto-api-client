@@ -31,13 +31,17 @@ describe('getColumnNameFromGeoColumn', () => {
 describe('getSpatialIndexFromGeoColumn', () => {
   test('should return H3 for all H3 variants', () => {
     const variants = ['h3', 'hex', 'h3id', 'hex_id', 'h3hex'];
-    variants.forEach(variant => {
-      expect(getSpatialIndexFromGeoColumn(`${variant}:geom`)).toBe(SpatialIndex.H3);
+    variants.forEach((variant) => {
+      expect(getSpatialIndexFromGeoColumn(`${variant}:geom`)).toBe(
+        SpatialIndex.H3
+      );
     });
   });
 
   test('should return QUADBIN for quadbin prefix', () => {
-    expect(getSpatialIndexFromGeoColumn('quadbin:geom')).toBe(SpatialIndex.QUADBIN);
+    expect(getSpatialIndexFromGeoColumn('quadbin:geom')).toBe(
+      SpatialIndex.QUADBIN
+    );
   });
 
   test('should return null for unknown prefix', () => {
@@ -65,4 +69,4 @@ describe('scaleAggregationResLevel', () => {
   test('should scale the resolution level correctly for 0.125 tile resolution', () => {
     expect(scaleAggregationResLevel(5, 0.125)).toBe(3);
   });
-}); 
+});

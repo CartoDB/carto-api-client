@@ -217,7 +217,9 @@ export function scaleAggregationResLevel(
 /**
  * @internal
  */
-export function getColumnNameFromGeoColumn(geoColumn: string | null | undefined) {
+export function getColumnNameFromGeoColumn(
+  geoColumn: string | null | undefined
+) {
   if (!geoColumn) {
     return geoColumn;
   }
