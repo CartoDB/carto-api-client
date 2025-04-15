@@ -57,7 +57,7 @@ export function parseMap(json: any) {
   const {keplerMapConfig, datasets, token} = json;
   assert(keplerMapConfig.version === 'v1', 'Only support Kepler v1');
   const config = keplerMapConfig.config as KeplerMapConfig;
-  const {filters, mapState, mapStyle, popupSettings} = config;
+  const {filters, mapState, mapStyle, popupSettings, legendSettings} = config;
   const {layers, layerBlending, interactionConfig} = config.visState;
 
   return {
@@ -70,6 +70,7 @@ export function parseMap(json: any) {
     /** @deprecated Use `basemap`. */
     mapStyle,
     popupSettings,
+    legendSettings,
     token,
     layers: layers
       .reverse()
