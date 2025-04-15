@@ -1,0 +1,87 @@
+.legend-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+.legend-container {
+  margin: 10px;
+  width: 200px;
+  max-height: calc(100% - 20px);
+  overflow-y: auto;
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  z-index: 1000;
+  font-family: Inter, sans-serif;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+.legend-layer {
+  margin-bottom: 10px;
+}
+
+.legend-title {
+  margin: 0;
+  font-family: Inter, sans-serif;
+  font-weight: 400;
+  font-size: 0.8125rem;
+  line-height: 1.538;
+  letter-spacing: 0;
+  color: rgb(44, 48, 50);
+  margin-bottom: 12px;
+}
+
+.legend-header {
+  color: #6c757d;
+  font-size: 10px;
+  margin-bottom: 4px;
+}
+
+.legend-column {
+  margin: 0;
+  font-family: Inter, sans-serif;
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 1.538;
+  letter-spacing: 0;
+  color: rgb(44, 48, 50);
+  margin-bottom: 12px;
+}
+
+.legend-range {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.legend-color-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+.legend-range-label {
+  margin: 0;
+  font-family: Inter, sans-serif;
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 1.538;
+  letter-spacing: 0;
+  color: rgb(44, 48, 50);
+  white-space: nowrap;
+}
+
+.legend-categories {
+  font-size: 0.75rem;
+} 

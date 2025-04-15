@@ -1,19 +1,12 @@
 import {LayerDescriptor} from '@carto/api-client';
+import './legend.css';
 
 export function createLegend(layers: LayerDescriptor[]): HTMLElement {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'legend-wrapper';
+
   const container = document.createElement('div');
-  container.style.position = 'absolute';
-  container.style.top = '10px';
-  container.style.right = '10px';
-  container.style.width = '200px';
-  container.style.maxHeight = '400px';
-  container.style.overflowY = 'auto';
-  container.style.background = 'white';
-  container.style.padding = '16px';
-  container.style.borderRadius = '8px';
-  container.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
-  container.style.zIndex = '1000';
-  container.style.fontFamily = 'Inter, sans-serif';
+  container.className = 'legend-container';
 
   layers.forEach((layer, index) => {
     const widgetSource = layer.props.data?.widgetSource?.props;
@@ -24,36 +17,20 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
     if (!dataColumn) return;
 
     const layerDiv = document.createElement('div');
-    layerDiv.style.marginBottom = '10px';
+    layerDiv.className = 'legend-layer';
 
     const nameDiv = document.createElement('div');
-    nameDiv.style.margin = '0px';
-    nameDiv.style.fontFamily = 'Inter, sans-serif';
-    nameDiv.style.fontWeight = '400';
-    nameDiv.style.fontSize = '0.8125rem';
-    nameDiv.style.lineHeight = '1.538';
-    nameDiv.style.letterSpacing = '0px';
-    nameDiv.style.color = 'rgb(44, 48, 50)';
-    nameDiv.style.marginBottom = '12px';
+    nameDiv.className = 'legend-title';
     nameDiv.textContent = layer.props.cartoLabel;
     layerDiv.appendChild(nameDiv);
 
     const columnDiv = document.createElement('div');
-    columnDiv.style.color = '#6c757d';
-    columnDiv.style.fontSize = '10px';
-    columnDiv.style.marginBottom = '4px';
+    columnDiv.className = 'legend-header';
     columnDiv.textContent = `COLOR BASED ON`;
     layerDiv.appendChild(columnDiv);
 
     const dataColumnDiv = document.createElement('div');
-    dataColumnDiv.style.margin = '0px';
-    dataColumnDiv.style.fontFamily = 'Inter, sans-serif';
-    dataColumnDiv.style.fontWeight = '400';
-    dataColumnDiv.style.fontSize = '0.75rem';
-    dataColumnDiv.style.lineHeight = '1.538';
-    dataColumnDiv.style.letterSpacing = '0px';
-    dataColumnDiv.style.color = 'rgb(44, 48, 50)';
-    dataColumnDiv.style.marginBottom = '12px';
+    dataColumnDiv.className = 'legend-column';
     dataColumnDiv.textContent = dataColumn;
     layerDiv.appendChild(dataColumnDiv);
 
@@ -65,29 +42,15 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
     
     if (isConstantColor) {
       const rangeDiv = document.createElement('div');
-      rangeDiv.style.display = 'flex';
-      rangeDiv.style.alignItems = 'center';
-      rangeDiv.style.marginBottom = '6px';
+      rangeDiv.className = 'legend-range';
       
       const colorSwatch = document.createElement('div');
-      colorSwatch.style.width = '12px';
-      colorSwatch.style.height = '12px';
-      colorSwatch.style.borderRadius = '50%';
-      colorSwatch.style.marginRight = '6px';
-      colorSwatch.style.flexShrink = '0';
-      
+      colorSwatch.className = 'legend-color-swatch';
       const color = layer.props.getFillColor;
       colorSwatch.style.backgroundColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
       
       const rangeLabel = document.createElement('div');
-      rangeLabel.style.margin = '0px';
-      rangeLabel.style.fontFamily = 'Inter, sans-serif';
-      rangeLabel.style.fontWeight = '400';
-      rangeLabel.style.fontSize = '0.75rem';
-      rangeLabel.style.lineHeight = '1.538';
-      rangeLabel.style.letterSpacing = '0px';
-      rangeLabel.style.color = 'rgb(44, 48, 50)';
-      rangeLabel.style.whiteSpace = 'nowrap';
+      rangeLabel.className = 'legend-range-label';
       rangeLabel.textContent = 'All values';
       
       rangeDiv.appendChild(colorSwatch);
@@ -104,30 +67,17 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
         const rangeEnd = i === numRanges - 1 ? max : min + (step * (i + 1));
         
         const rangeDiv = document.createElement('div');
-        rangeDiv.style.display = 'flex';
-        rangeDiv.style.alignItems = 'center';
-        rangeDiv.style.marginBottom = '6px';
+        rangeDiv.className = 'legend-range';
         
         const colorSwatch = document.createElement('div');
-        colorSwatch.style.width = '12px';
-        colorSwatch.style.height = '12px';
-        colorSwatch.style.borderRadius = '50%';
-        colorSwatch.style.marginRight = '6px';
-        colorSwatch.style.flexShrink = '0';
+        colorSwatch.className = 'legend-color-swatch';
         
         const value = (rangeStart + rangeEnd) / 2;
         const color = layer.props.getFillColor({properties: {[dataColumn]: value}});
         colorSwatch.style.backgroundColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
         
         const rangeLabel = document.createElement('div');
-        rangeLabel.style.margin = '0px';
-        rangeLabel.style.fontFamily = 'Inter, sans-serif';
-        rangeLabel.style.fontWeight = '400';
-        rangeLabel.style.fontSize = '0.75rem';
-        rangeLabel.style.lineHeight = '1.538';
-        rangeLabel.style.letterSpacing = '0px';
-        rangeLabel.style.color = 'rgb(44, 48, 50)';
-        rangeLabel.style.whiteSpace = 'nowrap';
+        rangeLabel.className = 'legend-range-label';
         rangeLabel.textContent = `${rangeStart.toFixed(2)} – ${rangeEnd.toFixed(2)}`;
         
         rangeDiv.appendChild(colorSwatch);
@@ -136,7 +86,7 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
       }
     } else if (tilestats?.type === 'String' && tilestats.categories) {
       const categoriesDiv = document.createElement('div');
-      categoriesDiv.style.fontSize = '0.75rem';
+      categoriesDiv.className = 'legend-categories';
       categoriesDiv.textContent = `Categories: ${tilestats.categories.length}`;
       layerDiv.appendChild(categoriesDiv);
     }
@@ -144,5 +94,6 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
     container.appendChild(layerDiv);
   });
 
-  return container;
+  wrapper.appendChild(container);
+  return wrapper;
 } 
