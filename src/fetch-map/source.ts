@@ -201,11 +201,12 @@ function getDynamicTileResolution(
 }
 
 /**
+ * @internal
  * State of `aggregationResLevel` in the UI and backend config is based on an assumption of
  * 512x512px tiles. Because we may change tile resolution for performance goals, the
  * `aggregationResLevel` passed to the deck.gl layer must be scaled with tile resolution.
  */
-function scaleAggregationResLevel(
+export function scaleAggregationResLevel(
   aggregationResLevel: number,
   tileResolution: number
 ): number | undefined {
@@ -213,7 +214,12 @@ function scaleAggregationResLevel(
   return aggregationResLevel - Math.log2(0.5 / tileResolution);
 }
 
-function getColumnNameFromGeoColumn(geoColumn: string | null | undefined) {
+/**
+ * @internal
+ */
+export function getColumnNameFromGeoColumn(
+  geoColumn: string | null | undefined
+) {
   if (!geoColumn) {
     return geoColumn;
   }
@@ -221,7 +227,10 @@ function getColumnNameFromGeoColumn(geoColumn: string | null | undefined) {
   return parts.length === 1 ? parts[0] : parts.length === 2 ? parts[1] : null;
 }
 
-function getSpatialIndexFromGeoColumn(geoColumn: string) {
+/**
+ * @internal
+ */
+export function getSpatialIndexFromGeoColumn(geoColumn: string) {
   const spatialIndexToSearch = geoColumn.split(':')[0];
 
   for (const index of Object.values(SpatialIndex)) {
