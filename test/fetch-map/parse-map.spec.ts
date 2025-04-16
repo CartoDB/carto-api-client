@@ -148,37 +148,62 @@ describe('parseMap', () => {
     );
   });
 
-  test('popupSettings are exported', () => {
-    // Mock input with popupSettings
-    const mockInput = {
-      id: 'test-map',
-      title: 'Test Map',
-      keplerMapConfig: {
-        version: 'v1',
-        config: {
-          mapState: {},
-          mapStyle: {},
-          popupSettings: {
-            enabled: true,
-            fields: ['field1', 'field2'],
+  // Mock input with popupSettings and legendSettings
+  const mockInput = {
+    id: 'test-map',
+    title: 'Test Map',
+    keplerMapConfig: {
+      version: 'v1',
+      config: {
+        mapState: {},
+        mapStyle: {},
+        legendSettings: {
+          layers: {
+            abcd1234: {
+              active: true,
+              entries: [],
+              shouldDisplayEntries: true,
+            },
+            wxyz5678: {
+              active: true,
+              entries: [
+                {
+                  hash: '041fefde86682c870543f0be4637fc81',
+                  visualChannel: 'color',
+                  customColorLabels: ['Meteorites'],
+                },
+              ],
+              shouldDisplayEntries: true,
+            },
           },
-          visState: {
-            layers: [],
-            layerBlending: 'normal',
-            interactionConfig: {},
+          expanded: {
+            '0': true,
+            '1': false,
           },
+          baseMapSelector: false,
+        },
+        popupSettings: {
+          enabled: true,
+          fields: ['field1', 'field2'],
+        },
+        visState: {
+          layers: [],
+          layerBlending: 'normal',
+          interactionConfig: {},
         },
       },
-      datasets: [],
-      token: 'test-token',
-    };
-
+    },
+    datasets: [],
+    token: 'test-token',
+  };
+  test('popupSettings and legendSettings are exported', () => {
     const result = parseMap(mockInput);
+    const config = mockInput.keplerMapConfig.config;
 
     expect(result.popupSettings).toBeDefined();
-    expect(result.popupSettings).toEqual({
-      enabled: true,
-      fields: ['field1', 'field2'],
-    });
+    expect(result.popupSettings).toEqual(config.popupSettings);
+
+    expect(result.legendSettings).toBeDefined();
+    expect(result.legendSettings).toEqual(config.legendSettings);
   });
 });

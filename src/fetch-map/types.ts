@@ -117,6 +117,7 @@ export type KeplerMapConfig = {
     styleType: string;
     visibleLayerGroups: Record<string, boolean>;
   };
+  legendSettings?: any;
   popupSettings: any;
   visState: {
     layers: MapConfigLayer[];
