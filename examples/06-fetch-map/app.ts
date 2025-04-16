@@ -13,8 +13,6 @@ import {DataFilterExtension} from '@deck.gl/extensions';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import {Loader} from '@googlemaps/js-api-loader';
-
-type FetchMapResult = any; // TODO: fix type
 import {GoogleMapsOverlay} from '@deck.gl/google-maps';
 import {MapboxOverlay} from '@deck.gl/mapbox';
 import {
@@ -25,6 +23,9 @@ import {
   QuadbinTileLayer,
   RasterTileLayer,
 } from '@deck.gl/carto';
+import {createLegend} from './legend.js';
+
+type FetchMapResult = any; // TODO: fix type
 
 // Get proper API key to be able to render Google basemaps, otherwise we
 // render on maplibre/positron style
@@ -121,6 +122,10 @@ async function createMap(cartoMapId: string) {
 
   // Get map info from CARTO and update deck
   const result = await fetchMap(options);
+
+  // Add legend to the page
+  const legend = createLegend(result.layers);
+  document.getElementById('container')!.appendChild(legend);
 
   if (GOOGLE_MAPS_API_KEY && result.basemap?.type === 'google-maps') {
     deck = await createMapWithGoogleMapsOverlay(result);
