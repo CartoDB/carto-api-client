@@ -100,3 +100,30 @@ export const isObject: (x: unknown) => boolean = (x) =>
 /** @internal */
 export const isPureObject: (x: any) => boolean = (x) =>
   isObject(x) && x.constructor === {}.constructor;
+
+/**
+ * Merges one or more source objects into a target object. Unlike `Object.assign`, does not
+ * assign properties with undefined values. Null values will overwrite existing properties.
+ */
+export function assignOptional<T extends object, U, V>(
+  target: T,
+  source1: U,
+  source2: V
+): T & U & V;
+export function assignOptional<T extends object, U>(
+  target: T,
+  source: U
+): T & U;
+export function assignOptional<T extends object, U>(
+  target: T,
+  ...sources: any[]
+): any {
+  for (const source of sources) {
+    for (const key in source) {
+      if (source[key] !== undefined) {
+        (target as Record<string, unknown>)[key] = source[key];
+      }
+    }
+  }
+  return target as T & U;
+}

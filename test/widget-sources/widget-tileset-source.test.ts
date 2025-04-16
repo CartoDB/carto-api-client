@@ -30,15 +30,48 @@ describe('getCategories', () => {
   it('counts features in categories', async () => {
     expect(
       await source.getCategories({
-        operation: 'count',
         column: 'storetype',
-        joinOperation: undefined,
+        operation: 'count',
         spatialFilter: MOCK_SPATIAL_FILTER,
       })
     ).toEqual([
       {
         name: 'Drugstore',
         value: 6,
+      },
+    ]);
+  });
+
+  it('counts features in categories - operationColumn=""', async () => {
+    expect(
+      await source.getCategories({
+        column: 'storetype',
+        operation: 'count',
+        // For backward compatibility, '' should pass column validation. For
+        // operations other than 'count', its behavior is undefined.
+        operationColumn: '',
+        spatialFilter: MOCK_SPATIAL_FILTER,
+      })
+    ).toEqual([
+      {
+        name: 'Drugstore',
+        value: 6,
+      },
+    ]);
+  });
+
+  it('computes max in categories', async () => {
+    expect(
+      await source.getCategories({
+        column: 'storetype',
+        operation: 'max',
+        operationColumn: 'revenue',
+        spatialFilter: MOCK_SPATIAL_FILTER,
+      })
+    ).toEqual([
+      {
+        name: 'Drugstore',
+        value: 1876776,
       },
     ]);
   });

@@ -16,7 +16,12 @@ import {
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
 } from './types.js';
-import {InvalidColumnError, assert, getApplicableFilters} from '../utils.js';
+import {
+  InvalidColumnError,
+  assert,
+  assignOptional,
+  getApplicableFilters,
+} from '../utils.js';
 import {Filter, SpatialFilter, Tile} from '../types.js';
 import {
   TileFeatureExtractOptions,
@@ -84,8 +89,7 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
     }
 
     this._features = tileFeatures({
-      ...this.props,
-      ...this._tileFeatureExtractOptions,
+      ...assignOptional({}, this.props, this._tileFeatureExtractOptions),
       tiles: this._tiles,
       spatialFilter,
     });
@@ -267,7 +271,11 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
     }
 
     // Search.
+    // TODO(v0.6): Remove "searchFilterText" and "searchFilterColumn".
     if (searchFilterColumn && searchFilterText) {
+      console.warn(
+        'WidgetTilesetSource: "searchFilterText" is deprecated, use "filters" and FilterType.STRING_SEARCH instead.'
+      );
       filteredFeatures = filteredFeatures.filter(
         (row) =>
           row[searchFilterColumn] &&
@@ -387,15 +395,15 @@ function assertColumn(
   features: FeatureData[],
   ...columnArgs: string[] | string[][]
 ) {
-  // TODO(cleanup): Can drop support for multiple column shapes here?
-
   // Due to the multiple column shape, we normalise it as an array with normalizeColumns
   const columns = Array.from(new Set(columnArgs.map(normalizeColumns).flat()));
 
   const featureKeys = Object.keys(features[0]);
 
+  // For backward compatibility, '' should pass column validation. For example,
+  // operation='count',operationColumn='' is accepted.
   const invalidColumns = columns.filter(
-    (column) => !featureKeys.includes(column)
+    (column) => column && !featureKeys.includes(column)
   );
 
   if (invalidColumns.length) {

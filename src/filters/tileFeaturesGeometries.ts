@@ -23,7 +23,9 @@ import {
   BinaryAttribute,
   BinaryFeature,
   BinaryGeometryType,
+  BinaryLineFeature,
   BinaryPointFeature,
+  BinaryPolygonFeature,
   TypedArrayConstructor,
 } from '@loaders.gl/schema';
 
@@ -88,8 +90,6 @@ export function tileFeaturesGeometries({
       tileFormat === TileFormat.MVT
         ? transformToTileCoords(clippedGeometryToIntersect.geometry, bbox)
         : clippedGeometryToIntersect.geometry;
-
-    createIndicesForPoints(tile.data.points!);
 
     calculateFeatures({
       map,
@@ -214,7 +214,7 @@ function addIntersectedFeaturesInTile({
   uniqueIdProperty?: string;
   options?: TileFeatureExtractOptions;
 }) {
-  const indices = getIndices(data);
+  const indices = getIndices(data, type);
   const storeGeometry = options?.storeGeometry || false;
 
   for (let i = 0; i < indices.length - 1; i++) {
@@ -235,21 +235,24 @@ function addIntersectedFeaturesInTile({
   }
 }
 
-function getIndices(data: BinaryFeature) {
+// Despite TypeScript, 'data.type' is OPTIONAL. So 'type' must be passed in
+// separately. Observed missing .type for Redshift tilesets, 2025-04-09.
+function getIndices(data: BinaryFeature, type: BinaryGeometryType) {
   let indices: BinaryAttribute;
-  switch (data.type) {
-    case 'Point':
-      // @ts-expect-error Missing or changed types?
-      indices = data.pointIndices;
+  switch (type) {
+    case 'Polygon':
+      indices = (data as BinaryPolygonFeature).primitivePolygonIndices;
       break;
     case 'LineString':
-      indices = data.pathIndices;
+      indices = (data as BinaryLineFeature).pathIndices;
       break;
-    case 'Polygon':
-      indices = data.primitivePolygonIndices;
+    case 'Point':
+      indices = createIndicesForPoints(data as BinaryPointFeature);
       break;
     default:
-      throw new Error(`Unexpected type, "${(data as BinaryFeature).type}"`);
+      throw new Error(
+        `Unsupported geometry type: ${type as unknown as string}`
+      );
   }
   return indices.value;
 }
@@ -408,7 +411,7 @@ function addAllFeaturesInTile({
   uniqueIdProperty?: string;
   options?: TileFeatureExtractOptions;
 }) {
-  const indices = getIndices(data);
+  const indices = getIndices(data, type);
   const storeGeometry = options?.storeGeometry || false;
   for (let i = 0; i < indices.length - 1; i++) {
     const startIndex = indices[i];
@@ -427,7 +430,11 @@ function addAllFeaturesInTile({
   }
 }
 
-function createIndicesForPoints(data: BinaryPointFeature) {
+/**
+ * BinaryPointFeature does not include indices, so we generate in-memory
+ * indices to allow processing points similarly to other topologies.
+ */
+function createIndicesForPoints(data: BinaryPointFeature): BinaryAttribute {
   const featureIds = data.featureIds.value;
   const lastFeatureId = featureIds[featureIds.length - 1];
   const PointIndicesArray = featureIds.constructor as TypedArrayConstructor;
@@ -438,7 +445,5 @@ function createIndicesForPoints(data: BinaryPointFeature) {
   };
   pointIndices.value.set(featureIds);
   pointIndices.value.set([lastFeatureId + 1], featureIds.length);
-
-  // @ts-expect-error Missing or changed types?
-  data.pointIndices = pointIndices;
+  return pointIndices;
 }
