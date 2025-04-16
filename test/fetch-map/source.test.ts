@@ -40,7 +40,9 @@ describe('getSpatialIndexFromGeoColumn', () => {
       // Test standalone column
       expect(getSpatialIndexFromGeoColumn(variant)).toBe(SpatialIndex.H3);
       // Test with prefix
-      expect(getSpatialIndexFromGeoColumn(`h3:${variant}`)).toBe(SpatialIndex.H3);
+      expect(getSpatialIndexFromGeoColumn(`h3:${variant}`)).toBe(
+        SpatialIndex.H3
+      );
     });
   });
 
@@ -48,7 +50,9 @@ describe('getSpatialIndexFromGeoColumn', () => {
     // Test standalone column
     expect(getSpatialIndexFromGeoColumn('quadbin')).toBe(SpatialIndex.QUADBIN);
     // Test with prefix
-    expect(getSpatialIndexFromGeoColumn('quadbin:h3')).toBe(SpatialIndex.QUADBIN);
+    expect(getSpatialIndexFromGeoColumn('quadbin:h3')).toBe(
+      SpatialIndex.QUADBIN
+    );
   });
 
   test('should return null for unknown prefix', () => {
