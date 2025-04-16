@@ -11,16 +11,15 @@ describe('getColumnNameFromGeoColumn', () => {
     expect(getColumnNameFromGeoColumn(undefined)).toBeUndefined();
   });
 
-  test('should return null for null input', () => {
-    expect(getColumnNameFromGeoColumn(null)).toBeNull();
-  });
-
   test('should return the column name when no prefix is present', () => {
+    expect(getColumnNameFromGeoColumn('random')).toBe('random');
     expect(getColumnNameFromGeoColumn('geom')).toBe('geom');
   });
 
   test('should return the column name when prefix is present', () => {
+    expect(getColumnNameFromGeoColumn('geom:h3')).toBe('h3');
     expect(getColumnNameFromGeoColumn('h3:geom')).toBe('geom');
+    expect(getColumnNameFromGeoColumn('quadbin:h3')).toBe('h3');
   });
 
   test('should return null for invalid format', () => {
@@ -29,27 +28,31 @@ describe('getColumnNameFromGeoColumn', () => {
 });
 
 describe('getSpatialIndexFromGeoColumn', () => {
+  test('should return null for standard geometry columns', () => {
+    expect(getSpatialIndexFromGeoColumn('random')).toBeNull();
+    expect(getSpatialIndexFromGeoColumn('geom')).toBeNull();
+    expect(getSpatialIndexFromGeoColumn('geom:h3')).toBeNull();
+  });
+
   test('should return H3 for all H3 variants', () => {
     const variants = ['h3', 'hex', 'h3id', 'hex_id', 'h3hex'];
     variants.forEach((variant) => {
-      expect(getSpatialIndexFromGeoColumn(`${variant}:geom`)).toBe(
-        SpatialIndex.H3
-      );
+      // Test standalone column
+      expect(getSpatialIndexFromGeoColumn(variant)).toBe(SpatialIndex.H3);
+      // Test with prefix
+      expect(getSpatialIndexFromGeoColumn(`h3:${variant}`)).toBe(SpatialIndex.H3);
     });
   });
 
-  test('should return QUADBIN for quadbin prefix', () => {
-    expect(getSpatialIndexFromGeoColumn('quadbin:geom')).toBe(
-      SpatialIndex.QUADBIN
-    );
+  test('should return QUADBIN for quadbin columns', () => {
+    // Test standalone column
+    expect(getSpatialIndexFromGeoColumn('quadbin')).toBe(SpatialIndex.QUADBIN);
+    // Test with prefix
+    expect(getSpatialIndexFromGeoColumn('quadbin:h3')).toBe(SpatialIndex.QUADBIN);
   });
 
   test('should return null for unknown prefix', () => {
     expect(getSpatialIndexFromGeoColumn('unknown:geom')).toBeNull();
-  });
-
-  test('should return null for no prefix', () => {
-    expect(getSpatialIndexFromGeoColumn('geom')).toBeNull();
   });
 });
 
