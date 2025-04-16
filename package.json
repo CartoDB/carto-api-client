@@ -39,7 +39,7 @@
   "scripts": {
     "build": "tsup",
     "build:watch": "tsup --watch",
-    "dev": "concurrently \"yarn build:watch\" \"vite --config examples/vite.config.ts --open\"",
+    "dev": "yarn build && concurrently --names tsup,vite \"yarn build:watch\" \"vite --config examples/vite.config.ts --open\"",
     "test": "vitest run --typecheck",
     "test:watch": "vitest watch --typecheck",
     "coverage": "vitest run --coverage.enabled --coverage.all false",
