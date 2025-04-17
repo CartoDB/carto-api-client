@@ -1,8 +1,13 @@
 # CHANGELOG
 
-## 0.5 (Unreleased)
+## 0.5
 
-### 0.5.0 (Unreleased)
+### 0.5.1
+
+- chore(types): Cleanup for tilesets, rasters, and backward-compatibility (#150)
+- fetchMap: Export legendSettings (#153)
+
+### 0.5.0
 
 - BREAKING CHANGE: Replace 'abortController' with 'signal' parameter (#110)
 - feat: Add widget calculations for tileset sources (#50)
