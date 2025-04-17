@@ -5,7 +5,7 @@
 ### 0.5.1
 
 - chore(types): Cleanup for tilesets, rasters, and backward-compatibility (#150)
-- fetchMap: Export legendSettings (#153)
+- feat(fetchMap): Export legendSettings (#153)
 
 ### 0.5.0
 
