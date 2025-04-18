@@ -13,7 +13,17 @@
   "publishConfig": {
     "access": "public"
   },
+  "main": "./build/api-client.cjs",
+  "module": "./build/api-client.js",
+  "types": "./build/api-client.d.ts",
   "type": "module",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./build/api-client.d.ts"
+      ]
+    }
+  },
   "sideEffects": false,
   "exports": {
     ".": {
