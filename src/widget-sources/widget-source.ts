@@ -1,4 +1,4 @@
-import {
+import type {
   CategoryRequestOptions,
   CategoryResponse,
   FeaturesRequestOptions,
@@ -16,9 +16,9 @@ import {
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
 } from './types.js';
-import {FilterLogicalOperator, Filter} from '../types.js';
+import type {FilterLogicalOperator, Filter} from '../types.js';
 import {getClient} from '../client.js';
-import {SourceOptions} from '../sources/index.js';
+import type {SourceOptions} from '../sources/index.js';
 import {ApiVersion, DEFAULT_API_BASE_URL} from '../constants.js';
 
 export interface WidgetSourceProps extends Omit<SourceOptions, 'filters'> {

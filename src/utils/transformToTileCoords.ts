@@ -1,5 +1,5 @@
 import {lngLatToWorld} from '@math.gl/web-mercator';
-import {BBox, GeoJsonGeometryTypes, Geometry, Position} from 'geojson';
+import type {BBox, GeoJsonGeometryTypes, Geometry, Position} from 'geojson';
 
 type TransformFn = (coordinates: any[], bbox: Position[]) => any[];
 

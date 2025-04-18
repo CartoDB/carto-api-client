@@ -1,7 +1,7 @@
-import {RasterMetadata} from '../sources/index.js';
+import type {RasterMetadata} from '../sources/index.js';
 import {
   WidgetTilesetSource,
-  WidgetTilesetSourceProps,
+  type WidgetTilesetSourceProps,
 } from './widget-tileset-source.js';
 
 export type WidgetRasterSourceProps = WidgetTilesetSourceProps & {

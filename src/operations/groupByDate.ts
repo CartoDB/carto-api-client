@@ -1,7 +1,7 @@
-import {AggregationType, GroupDateType} from '../types.js';
+import type {AggregationType, GroupDateType} from '../types.js';
 import {getUTCMonday} from '../utils/dateUtils.js';
 import {aggregate, aggregationFunctions} from './aggregation.js';
-import {GroupByFeature} from './groupBy.js';
+import type {GroupByFeature} from './groupBy.js';
 
 const GROUP_KEY_FN_MAPPING: Record<GroupDateType, (date: Date) => number> = {
   year: (date: Date) => Date.UTC(date.getUTCFullYear()),

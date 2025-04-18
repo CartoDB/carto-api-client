@@ -7,7 +7,7 @@ import {DEFAULT_GEO_COLUMN} from '../constants-internal.js';
 import {getTileFormat} from '../utils/getTileFormat.js';
 import {
   WidgetTilesetSource,
-  WidgetTilesetSourceResult,
+  type WidgetTilesetSourceResult,
 } from '../widget-sources/index.js';
 import type {
   SourceOptions,

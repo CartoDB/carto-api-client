@@ -1,4 +1,4 @@
-import {
+import type {
   CategoryRequestOptions,
   CategoryResponse,
   FeaturesResponse,
@@ -15,13 +15,13 @@ import {
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
 } from './types.js';
-import {SpatialFilter, Tile} from '../types.js';
-import {TileFeatureExtractOptions} from '../filters/index.js';
-import {FeatureCollection} from 'geojson';
-import {WidgetSource, WidgetSourceProps} from './widget-source.js';
+import type {SpatialFilter, Tile} from '../types.js';
+import type {TileFeatureExtractOptions} from '../filters/index.js';
+import type {FeatureCollection} from 'geojson';
+import {WidgetSource, type WidgetSourceProps} from './widget-source.js';
 import {Method} from '../workers/constants.js';
-import {WorkerRequest, WorkerResponse} from '../workers/types.js';
-import {SpatialDataType, TilesetSourceOptions} from '../sources/types.js';
+import type {WorkerRequest, WorkerResponse} from '../workers/types.js';
+import type {SpatialDataType, TilesetSourceOptions} from '../sources/types.js';
 import {TileFormat} from '../constants.js';
 import {WidgetTilesetSourceImpl} from './widget-tileset-source-impl.js';
 

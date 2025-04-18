@@ -6,8 +6,8 @@ import {
   getStyleUrl,
   someLayerGroupsDisabled,
 } from './basemap-styles.js';
-import {Basemap, KeplerMapConfig, MapLibreBasemapProps} from './types.js';
-import {APIErrorContext} from '../api/index.js';
+import type {Basemap, KeplerMapConfig, MapLibreBasemapProps} from './types.js';
+import type {APIErrorContext} from '../api/index.js';
 
 const CUSTOM_STYLE_ID_PREFIX = 'custom:';
 const DEFAULT_CARTO_STYLE = 'positron';

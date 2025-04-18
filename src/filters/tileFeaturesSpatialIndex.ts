@@ -1,11 +1,11 @@
 import {SpatialIndex} from '../constants.js';
 import {getResolution as quadbinGetResolution, geometryToCells} from 'quadbin';
 import bboxClip from '@turf/bbox-clip';
-import {SpatialFilter, SpatialIndexTile} from '../types.js';
-import {BBox, Feature} from 'geojson';
+import type {SpatialFilter, SpatialIndexTile} from '../types.js';
+import type {BBox, Feature} from 'geojson';
 import {getResolution as h3GetResolution, polygonToCells} from 'h3-js';
-import {FeatureData} from '../types-internal.js';
-import {SpatialDataType} from '../sources/types.js';
+import type {FeatureData} from '../types-internal.js';
+import type {SpatialDataType} from '../sources/types.js';
 
 export type TileFeaturesSpatialIndexOptions = {
   tiles: SpatialIndexTile[];

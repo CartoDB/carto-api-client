@@ -1,5 +1,5 @@
 import {TileFormat} from '../constants.js';
-import {Tilejson} from '../sources/types.js';
+import type {Tilejson} from '../sources/types.js';
 
 export function getTileFormat(tilejson: Tilejson): TileFormat {
   const tileParams = new URL(tilejson.tiles[0]).searchParams;

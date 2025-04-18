@@ -3,11 +3,11 @@
 // Copyright (c) vis.gl contributors
 
 import {isPureObject} from '../utils.js';
-import {CartoAPIError, APIErrorContext} from './carto-api-error.js';
+import {CartoAPIError, type APIErrorContext} from './carto-api-error.js';
 import {V3_MINOR_VERSION} from '../constants-internal.js';
 import {DEFAULT_MAX_LENGTH_URL} from '../constants-internal.js';
 import {getClient} from '../client.js';
-import {LocalCacheOptions} from '../sources/types.js';
+import type {LocalCacheOptions} from '../sources/types.js';
 
 const DEFAULT_HEADERS = {
   Accept: 'application/json',

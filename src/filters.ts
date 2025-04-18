@@ -1,5 +1,5 @@
 import {FilterType} from './constants.js';
-import {Filter} from './types.js';
+import type {Filter} from './types.js';
 import {isEmptyObject} from './utils.js';
 
 type FilterTypeOptions<T extends FilterType> = {

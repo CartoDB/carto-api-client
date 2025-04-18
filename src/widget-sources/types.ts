@@ -1,5 +1,8 @@
-import {SpatialFilterPolyfillMode, TileResolution} from '../sources/types.js';
-import {
+import type {
+  SpatialFilterPolyfillMode,
+  TileResolution,
+} from '../sources/types.js';
+import type {
   Filters,
   GroupDateType,
   SortColumnType,
