@@ -1,7 +1,7 @@
 import intersects from '@turf/boolean-intersects';
-import {FeatureCollection} from 'geojson';
-import {FeatureData} from '../types-internal.js';
-import {SpatialFilter} from '../types.js';
+import type {FeatureCollection} from 'geojson';
+import type {FeatureData} from '../types-internal.js';
+import type {SpatialFilter} from '../types.js';
 
 export function geojsonFeatures({
   geojson,

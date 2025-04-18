@@ -1,6 +1,6 @@
-import {LayerType, SCALE_TYPE} from './layer-map.js';
-import {Format, MapType, ProviderType, QueryParameters} from '../types.js';
-import {TilejsonResult} from '../sources/types.js';
+import type {LayerType, SCALE_TYPE} from './layer-map.js';
+import type {Format, MapType, ProviderType, QueryParameters} from '../types.js';
+import type {TilejsonResult} from '../sources/types.js';
 
 export type VisualChannelField = {
   name: string;

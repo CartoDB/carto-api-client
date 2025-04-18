@@ -1,6 +1,6 @@
-import {Dataset} from './types.js';
+import type {Dataset} from './types.js';
 import {SpatialIndex, SpatialIndexColumn} from '../constants.js';
-import {
+import type {
   QuerySourceOptions,
   TableSourceOptions,
   TilejsonResult,
@@ -15,22 +15,22 @@ import {
 } from '../constants-internal.js';
 import {
   h3QuerySource,
-  H3QuerySourceOptions,
+  type H3QuerySourceOptions,
   h3TableSource,
-  H3TableSourceOptions,
+  type H3TableSourceOptions,
   quadbinQuerySource,
-  QuadbinQuerySourceOptions,
+  type QuadbinQuerySourceOptions,
   quadbinTableSource,
-  QuadbinTableSourceOptions,
+  type QuadbinTableSourceOptions,
   rasterSource,
   vectorQuerySource,
-  VectorQuerySourceOptions,
+  type VectorQuerySourceOptions,
   vectorTableSource,
-  VectorTableSourceOptions,
+  type VectorTableSourceOptions,
   vectorTilesetSource,
-  VectorTilesetSourceOptions,
+  type VectorTilesetSourceOptions,
 } from '../sources/index.js';
-import {Filter} from '../types.js';
+import type {Filter} from '../types.js';
 
 type FetchDatasetOptions = {
   accessToken: string;

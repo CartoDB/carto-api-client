@@ -5,7 +5,7 @@
 import {DEFAULT_AGGREGATION_RES_LEVEL_H3} from '../constants-internal.js';
 import {
   WidgetQuerySource,
-  WidgetQuerySourceResult,
+  type WidgetQuerySourceResult,
 } from '../widget-sources/index.js';
 import {baseSource} from './base-source.js';
 import type {

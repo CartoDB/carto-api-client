@@ -4,8 +4,8 @@
 
 export {
   CartoAPIError,
-  APIErrorContext,
-  APIRequestType,
+  type APIErrorContext,
+  type APIRequestType,
 } from './carto-api-error.js';
 // Internal, but required for fetchMap().
 export {buildPublicMapUrl, buildStatsUrl} from './endpoints.js';

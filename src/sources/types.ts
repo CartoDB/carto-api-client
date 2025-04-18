@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-import {Filters, QueryParameters} from '../types.js';
-import {SchemaField} from '../types-internal.js';
+import type {SchemaField} from '../types-internal.js';
+import type {Filters, QueryParameters} from '../types.js';
 
 export type SourceRequiredOptions = {
   /** Carto platform access token. */

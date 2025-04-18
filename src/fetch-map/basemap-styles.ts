@@ -1,5 +1,5 @@
-import {CartoAPIError, APIErrorContext} from '../api/index.js';
-import {GoogleBasemapProps} from './types.js';
+import {CartoAPIError, type APIErrorContext} from '../api/index.js';
+import type {GoogleBasemapProps} from './types.js';
 
 const cartoStyleUrlTemplate =
   'https://basemaps.cartocdn.com/gl/{basemap}-gl-style/style.json';

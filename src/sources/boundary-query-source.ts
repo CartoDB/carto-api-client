@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-import {QueryParameters} from '../types.js';
+import type {QueryParameters} from '../types.js';
 import {baseSource} from './base-source.js';
 import type {FilterOptions, SourceOptions, TilejsonResult} from './types.js';
 
