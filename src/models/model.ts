@@ -1,5 +1,5 @@
 import {DEFAULT_GEO_COLUMN} from '../constants-internal.js';
-import {
+import type {
   Filter,
   FilterLogicalOperator,
   MapType,
@@ -7,9 +7,12 @@ import {
   SpatialFilter,
 } from '../types.js';
 import {assert, isPureObject} from '../utils.js';
-import {ModelRequestOptions, makeCall} from './common.js';
+import {type ModelRequestOptions, makeCall} from './common.js';
 import {ApiVersion} from '../constants.js';
-import {SpatialDataType, SpatialFilterPolyfillMode} from '../sources/types.js';
+import type {
+  SpatialDataType,
+  SpatialFilterPolyfillMode,
+} from '../sources/types.js';
 
 /** @privateRemarks Source: @carto/react-api */
 const AVAILABLE_MODELS = [

@@ -1,8 +1,8 @@
-import {Feature} from 'geojson';
-import {FilterLogicalOperator, Filters} from '../types.js';
+import type {Feature} from 'geojson';
+import type {FilterLogicalOperator, Filters} from '../types.js';
 import {FilterType} from '../constants.js';
 import {_buildFeatureFilter} from '../filters/index.js';
-import {FeatureData} from '../types-internal.js';
+import type {FeatureData} from '../types-internal.js';
 
 type TimeFilter = Filters['string'][FilterType.TIME] & {
   params?: {offsetBy?: number};

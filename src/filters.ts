@@ -1,5 +1,5 @@
 import {FilterType} from './constants.js';
-import {Filter} from './types.js';
+import type {Filter} from './types.js';
 import {isEmptyObject} from './utils.js';
 
 const FILTER_TYPES = new Set(Object.values(FilterType));

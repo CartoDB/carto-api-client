@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/require-await */
-import {
+import type {
   CategoryRequestOptions,
   CategoryResponse,
   FeaturesResponse,
@@ -17,9 +17,10 @@ import {
   TimeSeriesResponse,
 } from './types.js';
 import {InvalidColumnError, assert, assignOptional} from '../utils.js';
-import {Filter, SpatialFilter, Tile} from '../types.js';
+import type {Filter, SpatialFilter, Tile} from '../types.js';
+
 import {
-  TileFeatureExtractOptions,
+  type TileFeatureExtractOptions,
   applyFilters,
   geojsonFeatures,
   tileFeatures,
@@ -32,8 +33,8 @@ import {
   histogram,
   scatterPlot,
 } from '../operations/index.js';
-import {FeatureData} from '../types-internal.js';
-import {FeatureCollection} from 'geojson';
+import type {FeatureData} from '../types-internal.js';
+import type {FeatureCollection} from 'geojson';
 import {WidgetSource} from './widget-source.js';
 import {booleanEqual} from '@turf/boolean-equal';
 import type {WidgetTilesetSourceProps} from './widget-tileset-source.js';
