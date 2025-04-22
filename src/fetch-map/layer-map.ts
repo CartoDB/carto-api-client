@@ -272,9 +272,9 @@ function findAccessorKey(keys: string[], properties: any): string[] {
     }
   }
 
-  throw new Error(
-    `Could not find property for any accessor key: ${keys.join(', ')}`
-  );
+  // If data doesn't contain any valid keys, return all keys to run search
+  // on next feature
+  return keys;
 }
 
 export function getColorValueAccessor(
