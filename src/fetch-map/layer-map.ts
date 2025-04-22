@@ -118,7 +118,8 @@ const customMarkersPropsMap = {
 const heatmapTilePropsMap = {
   visConfig: {
     colorRange: (x: any) => ({colorRange: x.colors.map(hexToRGBA)}),
-    radius: 'radiusPixels',
+    radius: (radius: number) => ({radiusPixels: 20 + radius}),
+    opacity: 'opacity',
   },
 };
 
