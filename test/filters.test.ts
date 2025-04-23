@@ -6,6 +6,8 @@ import {
   removeFilter,
   getFilter,
   hasFilter,
+  getApplicableFilters,
+  Filters,
 } from '@carto/api-client';
 
 test('addFilter', () => {
@@ -230,4 +232,22 @@ test('hasFilter', () => {
 
   expect(hasFilter(filters, {column: 'column_b', owner: 'owner-3'})).toBe(true);
   expect(hasFilter(filters, {column: 'column_b', owner: 'owner-2'})).toBe(true);
+});
+
+test('getApplicableFilters', () => {
+  const filters: Filters = {
+    column_a: {
+      [FilterType.IN]: {values: [1, 2]},
+    },
+    column_b: {
+      [FilterType.IN]: {values: ['a', 'b'], owner: 'owner-3'},
+      [FilterType.BETWEEN]: {values: [[3, 4]], owner: 'owner-2'},
+    },
+  };
+
+  expect(getApplicableFilters('', filters)).toMatchObject(filters);
+  expect(getApplicableFilters('owner-2', filters)).toMatchObject({
+    column_a: {[FilterType.IN]: {values: [1, 2]}},
+    column_b: {[FilterType.IN]: {values: ['a', 'b'], owner: 'owner-3'}},
+  });
 });
