@@ -5,7 +5,7 @@ import intersect from '@turf/intersect';
 import {transformToTileCoords} from '../utils/transformToTileCoords.js';
 import {transformTileCoordsToWGS84} from '../utils/transformTileCoordsToWGS84.js';
 import {TileFormat} from '../constants.js';
-import {
+import type {
   BBox,
   Feature,
   Geometry,
@@ -15,11 +15,11 @@ import {
   Polygon,
   Position,
 } from 'geojson';
-import {SpatialFilter, Tile} from '../types.js';
-import {TileFeatureExtractOptions} from './tileFeatures.js';
+import type {SpatialFilter, Tile} from '../types.js';
+import type {TileFeatureExtractOptions} from './tileFeatures.js';
 import {featureCollection} from '@turf/helpers';
-import {FeatureData} from '../types-internal.js';
-import {
+import type {FeatureData} from '../types-internal.js';
+import type {
   BinaryAttribute,
   BinaryFeature,
   BinaryGeometryType,

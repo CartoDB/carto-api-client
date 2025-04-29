@@ -12,8 +12,8 @@ import type {
   TilejsonMapInstantiation,
   TilejsonResult,
 } from './types.js';
-import {MapType} from '../types.js';
-import {APIErrorContext} from '../api/index.js';
+import type {MapType} from '../types.js';
+import type {APIErrorContext} from '../api/index.js';
 import {getClient} from '../client.js';
 
 export const SOURCE_DEFAULTS: Omit<SourceOptionalOptions, 'clientId'> = {

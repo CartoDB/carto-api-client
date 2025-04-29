@@ -4,9 +4,9 @@ import {
   geometryToCells,
   getResolution,
 } from 'quadbin';
-import {RasterTile, SpatialFilter, Tile} from '../types.js';
-import {FeatureData} from '../types-internal.js';
-import {
+import type {RasterTile, SpatialFilter, Tile} from '../types.js';
+import type {FeatureData} from '../types-internal.js';
+import type {
   RasterMetadata,
   RasterMetadataBand,
   SpatialDataType,

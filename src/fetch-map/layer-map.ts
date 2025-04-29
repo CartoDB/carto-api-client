@@ -23,7 +23,7 @@ export type LayerType =
   | 'tileset';
 
 import {createBinaryProxy, scaleIdentity} from './utils.js';
-import {
+import type {
   CustomMarkersRange,
   Dataset,
   MapLayerConfig,

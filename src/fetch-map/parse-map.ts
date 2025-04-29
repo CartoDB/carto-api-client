@@ -11,12 +11,12 @@ import {
   getIconUrlAccessor,
   negateAccessor,
   getMaxMarkerSize,
-  LayerType,
+  type LayerType,
 } from './layer-map.js';
 
 import {assert, isEmptyObject} from '../utils.js';
-import {Filters} from '../types.js';
-import {
+import type {Filters} from '../types.js';
+import type {
   KeplerMapConfig,
   MapLayerConfig,
   VisualChannels,

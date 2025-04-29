@@ -1,19 +1,19 @@
 import {DEFAULT_API_BASE_URL} from '../constants.js';
 
 import {
-  APIErrorContext,
+  type APIErrorContext,
   CartoAPIError,
   buildPublicMapUrl,
   buildStatsUrl,
   requestWithParameters,
 } from '../api/index.js';
 
-import {ParseMapResult, parseMap} from './parse-map.js';
+import {type ParseMapResult, parseMap} from './parse-map.js';
 import {assert} from '../utils.js';
 import type {Basemap, Dataset, KeplerMapConfig} from './types.js';
 import {fetchBasemapProps} from './basemap.js';
 import {configureSource} from './source.js';
-import {Filters} from '../types.js';
+import type {Filters} from '../types.js';
 import {isRemoteCalculationSupported} from './utils.js';
 
 /* global clearInterval, setInterval, URL */

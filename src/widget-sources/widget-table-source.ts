@@ -1,14 +1,14 @@
-import {
+import type {
   H3TableSourceOptions,
   QuadbinTableSourceOptions,
   VectorTableSourceOptions,
 } from '../sources/index.js';
 import {
   WidgetRemoteSource,
-  WidgetRemoteSourceProps,
+  type WidgetRemoteSourceProps,
 } from './widget-remote-source.js';
-import {ModelSource} from '../models/model.js';
-import {Filters} from '../types.js';
+import type {ModelSource} from '../models/model.js';
+import type {Filters} from '../types.js';
 
 type LayerTableSourceOptions =
   | Omit<VectorTableSourceOptions, 'filters'>

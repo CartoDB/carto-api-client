@@ -7,6 +7,7 @@
       "@carto/api-client": ["../"]
     },
     "jsx": "react",
-    "declaration": false
+    "declaration": false,
+    "verbatimModuleSyntax": false
   }
 }
