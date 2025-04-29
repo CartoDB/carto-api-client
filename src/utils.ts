@@ -1,38 +1,3 @@
-import {Filter} from './types.js';
-import {FilterType} from './constants.js';
-
-const FILTER_TYPES = new Set(Object.values(FilterType));
-const isFilterType = (type: string): type is FilterType =>
-  FILTER_TYPES.has(type as FilterType);
-
-/**
- * @privateRemarks Source: @carto/react-widgets
- * @internal
- */
-export function getApplicableFilters(
-  owner?: string,
-  filters?: Record<string, Filter>
-): Record<string, Filter> {
-  if (!filters) return {};
-
-  const applicableFilters: Record<string, Filter> = {};
-
-  for (const column in filters) {
-    for (const type in filters[column]) {
-      if (!isFilterType(type)) continue;
-
-      const filter = filters[column][type];
-      const isApplicable = !owner || !filter?.owner || filter?.owner !== owner;
-      if (filter && isApplicable) {
-        applicableFilters[column] ||= {};
-        (applicableFilters[column][type] as typeof filter) = filter;
-      }
-    }
-  }
-
-  return applicableFilters;
-}
-
 type Row<T> = Record<string, T> | Record<string, T>[] | T[] | T;
 
 /**

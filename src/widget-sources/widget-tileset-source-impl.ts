@@ -16,12 +16,7 @@ import {
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
 } from './types.js';
-import {
-  InvalidColumnError,
-  assert,
-  assignOptional,
-  getApplicableFilters,
-} from '../utils.js';
+import {InvalidColumnError, assert, assignOptional} from '../utils.js';
 import {Filter, SpatialFilter, Tile} from '../types.js';
 import {
   TileFeatureExtractOptions,
@@ -42,6 +37,7 @@ import {FeatureCollection} from 'geojson';
 import {WidgetSource} from './widget-source.js';
 import {booleanEqual} from '@turf/boolean-equal';
 import type {WidgetTilesetSourceProps} from './widget-tileset-source.js';
+import {getApplicableFilters} from '../filters.js';
 
 // TODO(cleanup): Parameter defaults in source functions and widget API calls are
 // currently duplicated and possibly inconsistent. Consider consolidating and

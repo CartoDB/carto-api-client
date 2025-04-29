@@ -17,11 +17,12 @@ import {
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
 } from './types.js';
-import {getApplicableFilters, normalizeObjectKeys} from '../utils.js';
+import {normalizeObjectKeys} from '../utils.js';
 import {DEFAULT_TILE_RESOLUTION} from '../constants-internal.js';
 import {WidgetSource, WidgetSourceProps} from './widget-source.js';
 import {Filters} from '../types.js';
 import {ApiVersion} from '../constants.js';
+import {getApplicableFilters} from '../filters.js';
 
 export type WidgetRemoteSourceProps = WidgetSourceProps;
 

@@ -2,6 +2,10 @@ import {FilterType} from './constants.js';
 import {Filter} from './types.js';
 import {isEmptyObject} from './utils.js';
 
+const FILTER_TYPES = new Set(Object.values(FilterType));
+const isFilterType = (type: string): type is FilterType =>
+  FILTER_TYPES.has(type as FilterType);
+
 type FilterTypeOptions<T extends FilterType> = {
   type: T;
   column: string;
@@ -53,7 +57,7 @@ export function removeFilter(
   }
 
   if (owner) {
-    for (const type of Object.values(FilterType)) {
+    for (const type of FILTER_TYPES) {
       if (owner === filter[type as FilterType]?.owner) {
         delete filter[type as FilterType];
       }
@@ -97,7 +101,7 @@ export function hasFilter(
     return true;
   }
 
-  for (const type of Object.values(FilterType)) {
+  for (const type of FILTER_TYPES) {
     if (owner === filter[type as FilterType]?.owner) {
       return true;
     }
@@ -126,4 +130,35 @@ export function getFilter<T extends FilterType>(
   }
 
   return null;
+}
+
+/**
+ * Given all filters for a dataset, returns the subset of filters that are not
+ * attributable to the given owner. Typically used to allow filterable widgets
+ * to affect other widgets *without* filtering themselves.
+ *
+ * @privateRemarks Source: @carto/react-widgets
+ */
+export function getApplicableFilters(
+  owner?: string,
+  filters?: Record<string, Filter>
+): Record<string, Filter> {
+  if (!filters) return {};
+
+  const applicableFilters: Record<string, Filter> = {};
+
+  for (const column in filters) {
+    for (const type in filters[column]) {
+      if (!isFilterType(type)) continue;
+
+      const filter = filters[column][type];
+      const isApplicable = !owner || !filter?.owner || filter?.owner !== owner;
+      if (filter && isApplicable) {
+        applicableFilters[column] ||= {};
+        (applicableFilters[column][type] as typeof filter) = filter;
+      }
+    }
+  }
+
+  return applicableFilters;
 }
