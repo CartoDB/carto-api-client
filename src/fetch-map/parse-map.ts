@@ -1,5 +1,8 @@
 import type {ColorParameters} from '@luma.gl/core';
 import {
+  calculateClusterRadius,
+  calculateClusterTextFontSize,
+  getDefaultAggregationExpColumnAliasForLayerType,
   getLayerProps,
   getColorAccessor,
   getColorValueAccessor,
@@ -18,7 +21,7 @@ import {
 } from './layer-map.js';
 
 import {assert, isEmptyObject} from '../utils.js';
-import type {Filters, ProviderType} from '../types.js';
+import type {Filters} from '../types.js';
 import type {
   KeplerMapConfig,
   MapLayerConfig,
@@ -28,7 +31,6 @@ import type {
   Dataset,
 } from './types.js';
 import {isRemoteCalculationSupported} from './utils.js';
-import {DEFAULT_AGGREGATION_EXP_ALIAS} from '../constants-internal.js';
 
 export type LayerDescriptor = {
   type: LayerType;
@@ -288,7 +290,7 @@ function createChannelProps(
     };
 
     result.getPointRadius = (d: any, info: any) => {
-      return calculateRadius(
+      return calculateClusterRadius(
         d.properties,
         info.data.attributes.stats,
         visConfig.radiusRange as [number, number],
@@ -313,13 +315,13 @@ function createChannelProps(
     result.textSizeUnits = 'pixels';
 
     result.getTextSize = (d: any, info: any) => {
-      const radius = calculateRadius(
+      const radius = calculateClusterRadius(
         d.properties,
         info.data.attributes.stats,
         visConfig.radiusRange as [number, number],
         aggregationExpAlias
       );
-      return calculateTextFontSize(radius);
+      return calculateClusterTextFontSize(radius);
     };
   }
 
@@ -486,64 +488,3 @@ function createLoadOptions(accessToken: string) {
     loadOptions: {fetch: {headers: {Authorization: `Bearer ${accessToken}`}}},
   };
 }
-
-function calculateRadius(
-  properties: {[column: string]: number},
-  stats: Record<string, {min: number; max: number}>,
-  radiusRange: [number, number],
-  column: string
-): number {
-  const {min, max} = stats[column];
-  const value = properties[column];
-
-  // When there's a single cluster on the screen, min and max are equivalent, so we should return the maximum radius
-  if (min === max) return radiusRange[1];
-
-  const normalizedValue = (value - min) / (max - min);
-  return radiusRange[0] + normalizedValue * (radiusRange[1] - radiusRange[0]);
-}
-
-/** @privateRemarks Source: Builder */
-function getDefaultAggregationExpColumnAliasForLayerType(
-  layerType: LayerType,
-  provider: ProviderType,
-  columns: string[]
-): string {
-  if (columns && layerType === 'clusterTile') {
-    return getColumnAliasForAggregationExp(
-      getDefaultColumnFromSchemaForAggregationExp(columns),
-      'count',
-      provider
-    );
-  } else {
-    return DEFAULT_AGGREGATION_EXP_ALIAS;
-  }
-}
-
-/** @privateRemarks Source: Builder */
-function getColumnAliasForAggregationExp(
-  name: string,
-  aggregation: string,
-  provider: ProviderType
-) {
-  const columnAlias = `${name}_${aggregation}`;
-  return provider === 'snowflake' ? columnAlias.toUpperCase() : columnAlias;
-}
-
-/** @privateRemarks Source: Builder */
-function getDefaultColumnFromSchemaForAggregationExp(
-  columns: string[]
-): string {
-  return columns ? columns[0] : '';
-}
-
-/** @privateRemarks Source: Builder */
-const calculateTextFontSize = (radius: number) => {
-  if (radius >= 80) return 24;
-  if (radius >= 72) return 24;
-  if (radius >= 56) return 20;
-  if (radius >= 40) return 16;
-  if (radius >= 24) return 13;
-  if (radius >= 8) return 11;
-  return 11;
-};

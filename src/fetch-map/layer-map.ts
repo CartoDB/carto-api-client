@@ -31,6 +31,8 @@ import type {
   VisualChannelField,
   VisualChannels,
 } from './types.js';
+import {ProviderType} from '../types.js';
+import {DEFAULT_AGGREGATION_EXP_ALIAS} from '../constants-internal.js';
 
 const SCALE_FUNCS: Record<string, () => any> = {
   linear: scaleLinear,
@@ -471,3 +473,65 @@ export function getTextAccessor({name, type}: VisualChannelField, data: any) {
 }
 
 export {domainFromValues as _domainFromValues};
+
+/** @privateRemarks Source: Builder */
+export function calculateClusterRadius(
+  properties: {[column: string]: number},
+  stats: Record<string, {min: number; max: number}>,
+  radiusRange: [number, number],
+  column: string
+): number {
+  const {min, max} = stats[column];
+  const value = properties[column];
+
+  // When there's a single cluster on the screen, min and max are equivalent, so we should return the maximum radius
+  if (min === max) return radiusRange[1];
+
+  const normalizedValue = (value - min) / (max - min);
+  return radiusRange[0] + normalizedValue * (radiusRange[1] - radiusRange[0]);
+}
+
+/** @privateRemarks Source: Builder */
+export function getDefaultAggregationExpColumnAliasForLayerType(
+  layerType: LayerType,
+  provider: ProviderType,
+  columns: string[]
+): string {
+  if (columns && layerType === 'clusterTile') {
+    return getColumnAliasForAggregationExp(
+      getDefaultColumnFromSchemaForAggregationExp(columns),
+      'count',
+      provider
+    );
+  } else {
+    return DEFAULT_AGGREGATION_EXP_ALIAS;
+  }
+}
+
+/** @privateRemarks Source: Builder */
+function getColumnAliasForAggregationExp(
+  name: string,
+  aggregation: string,
+  provider: ProviderType
+) {
+  const columnAlias = `${name}_${aggregation}`;
+  return provider === 'snowflake' ? columnAlias.toUpperCase() : columnAlias;
+}
+
+/** @privateRemarks Source: Builder */
+function getDefaultColumnFromSchemaForAggregationExp(
+  columns: string[]
+): string {
+  return columns ? columns[0] : '';
+}
+
+/** @privateRemarks Source: Builder */
+export function calculateClusterTextFontSize(radius: number): number {
+  if (radius >= 80) return 24;
+  if (radius >= 72) return 24;
+  if (radius >= 56) return 20;
+  if (radius >= 40) return 16;
+  if (radius >= 24) return 13;
+  if (radius >= 8) return 11;
+  return 11;
+}
