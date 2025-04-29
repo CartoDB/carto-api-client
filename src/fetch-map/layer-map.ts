@@ -147,6 +147,17 @@ const deprecatedLayerTypes = [
   'point',
 ];
 
+/** @privateRemarks Source: Builder */
+export const TEXT_LABEL_INDEX = 0;
+
+/** @privateRemarks Source: Builder */
+export const TEXT_OUTLINE_OPACITY = 64;
+
+export const TEXT_NUMBER_FORMATTER = new Intl.NumberFormat('en-US', {
+  maximumFractionDigits: 2,
+  notation: 'compact',
+});
+
 export function getLayerProps(
   type: LayerType,
   config: MapLayerConfig,

@@ -75,6 +75,10 @@ export type VisConfig = {
   heightAggregation?: any;
 
   weightAggregation?: any;
+
+  // type = clusterTile
+  clusterLevel?: number;
+  isTextVisible?: boolean;
 };
 
 export type TextLabel = {
