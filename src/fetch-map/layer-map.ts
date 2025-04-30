@@ -31,7 +31,7 @@ import type {
   VisualChannelField,
   VisualChannels,
 } from './types.js';
-import {ProviderType} from '../types.js';
+import type {ProviderType} from '../types.js';
 import {DEFAULT_AGGREGATION_EXP_ALIAS} from '../constants-internal.js';
 
 const SCALE_FUNCS: Record<string, () => any> = {
