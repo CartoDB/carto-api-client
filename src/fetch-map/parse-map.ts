@@ -1,17 +1,23 @@
 import type {ColorParameters} from '@luma.gl/core';
 import {
-  AGGREGATION,
+  calculateClusterRadius,
+  calculateClusterTextFontSize,
+  getDefaultAggregationExpColumnAliasForLayerType,
   getLayerProps,
   getColorAccessor,
   getColorValueAccessor,
   getSizeAccessor,
   getTextAccessor,
-  OPACITY_MAP,
   opacityToAlpha,
   getIconUrlAccessor,
   negateAccessor,
   getMaxMarkerSize,
   type LayerType,
+  AGGREGATION,
+  OPACITY_MAP,
+  TEXT_NUMBER_FORMATTER,
+  TEXT_LABEL_INDEX,
+  TEXT_OUTLINE_OPACITY,
 } from './layer-map.js';
 
 import {assert, isEmptyObject} from '../utils.js';
@@ -100,7 +106,14 @@ export function parseMap(json: any) {
               ...defaultProps,
               ...createInteractionProps(interactionConfig),
               ...styleProps,
-              ...createChannelProps(id, type, config, visualChannels, data), // Must come after style
+              ...createChannelProps(
+                id,
+                type,
+                config,
+                visualChannels,
+                data,
+                dataset
+              ), // Must come after style
               ...createParametersProp(
                 layerBlending,
                 styleProps.parameters || {}
@@ -197,7 +210,8 @@ function createChannelProps(
   type: string,
   config: MapLayerConfig,
   visualChannels: VisualChannels,
-  data: any
+  data: any,
+  dataset: Dataset
 ) {
   const {
     colorField,
@@ -259,6 +273,56 @@ function createChannelProps(
         return data;
       };
     }
+  }
+
+  if (type === 'clusterTile') {
+    const aggregationExpAlias = getDefaultAggregationExpColumnAliasForLayerType(
+      type,
+      dataset.providerId,
+      dataset.columns
+    );
+
+    result.pointType = visConfig.isTextVisible ? 'circle+text' : 'circle';
+    result.clusterLevel = visConfig.clusterLevel;
+
+    result.getWeight = (d: any) => {
+      return d.properties[aggregationExpAlias];
+    };
+
+    result.getPointRadius = (d: any, info: any) => {
+      return calculateClusterRadius(
+        d.properties,
+        info.data.attributes.stats,
+        visConfig.radiusRange as [number, number],
+        aggregationExpAlias
+      );
+    };
+
+    result.textCharacterSet = 'auto';
+    result.textFontFamily = 'Inter, sans';
+    result.textFontSettings = {sdf: true};
+    result.textFontWeight = 600;
+
+    result.getText = (d: any) =>
+      TEXT_NUMBER_FORMATTER.format(d.properties[aggregationExpAlias]);
+
+    result.getTextColor = config.textLabel[TEXT_LABEL_INDEX].color;
+    result.textOutlineColor = [
+      ...(config.textLabel[TEXT_LABEL_INDEX].outlineColor as number[]),
+      TEXT_OUTLINE_OPACITY,
+    ];
+    result.textOutlineWidth = 5;
+    result.textSizeUnits = 'pixels';
+
+    result.getTextSize = (d: any, info: any) => {
+      const radius = calculateClusterRadius(
+        d.properties,
+        info.data.attributes.stats,
+        visConfig.radiusRange as [number, number],
+        aggregationExpAlias
+      );
+      return calculateClusterTextFontSize(radius);
+    };
   }
 
   if (radiusField || sizeField) {
