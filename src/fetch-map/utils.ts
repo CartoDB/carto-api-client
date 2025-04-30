@@ -67,3 +67,21 @@ export function isRemoteCalculationSupported(dataset: Dataset) {
 
   return true;
 }
+
+const DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
+  year: '2-digit',
+  month: 'numeric',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+  second: 'numeric',
+  timeZone: 'UTC',
+});
+
+export function formatDate(value: string | number | Date): string {
+  return DATE_FORMATTER.format(new Date(value));
+}
+
+export function formatTimestamp(value: string | number | Date): string {
+  return String(Math.floor(new Date(value).getTime() / 1000));
+}
