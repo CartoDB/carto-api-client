@@ -33,6 +33,7 @@ import type {
 } from './types.js';
 import type {ProviderType} from '../types.js';
 import {DEFAULT_AGGREGATION_EXP_ALIAS} from '../constants-internal.js';
+import type {SchemaField} from '../types-internal.js';
 
 const SCALE_FUNCS: Record<string, () => any> = {
   linear: scaleLinear,
@@ -495,11 +496,11 @@ export function calculateClusterRadius(
 export function getDefaultAggregationExpColumnAliasForLayerType(
   layerType: LayerType,
   provider: ProviderType,
-  columns: string[]
+  schema: SchemaField[]
 ): string {
-  if (columns && layerType === 'clusterTile') {
+  if (schema && layerType === 'clusterTile') {
     return getColumnAliasForAggregationExp(
-      getDefaultColumnFromSchemaForAggregationExp(columns),
+      getDefaultColumnFromSchemaForAggregationExp(schema),
       'count',
       provider
     );
@@ -520,9 +521,9 @@ function getColumnAliasForAggregationExp(
 
 /** @privateRemarks Source: Builder */
 function getDefaultColumnFromSchemaForAggregationExp(
-  columns: string[]
+  schema: SchemaField[]
 ): string {
-  return columns ? columns[0] : '';
+  return schema ? schema[0].name : '';
 }
 
 /** @privateRemarks Source: Builder */

@@ -279,7 +279,7 @@ function createChannelProps(
     const aggregationExpAlias = getDefaultAggregationExpColumnAliasForLayerType(
       type,
       dataset.providerId,
-      dataset.columns
+      data.schema
     );
 
     result.pointType = visConfig.isTextVisible ? 'circle+text' : 'circle';

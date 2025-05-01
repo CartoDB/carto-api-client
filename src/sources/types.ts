@@ -414,7 +414,11 @@ export type RasterMetadata = {
   pixel_resolution: number;
 };
 
-export type TilejsonResult = Tilejson & {accessToken: string};
+export type TilejsonResult = Tilejson & {
+  accessToken: string;
+  schema: SchemaField[];
+};
+
 export type QueryResult = {
   meta: {cacheHit: boolean; location: string; totalBytesProcessed: string};
   rows: Record<string, any>[];
