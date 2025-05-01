@@ -2,6 +2,13 @@
 
 ## 0.5
 
+### 0.5.2
+
+- feat(filters): Export getApplicableFilters (#162)
+- fix(fetchmap): Bug fixes (#161, #163)
+- fix(widgets): Fix error computing min/max for large datasets (#164)
+- chore(build): Improve package compatibility (#158, #160)
+
 ### 0.5.1
 
 - chore(types): Cleanup for tilesets, rasters, and backward-compatibility (#150)
@@ -18,7 +25,7 @@
 
 ### 0.4.10
 
-- Add fetchMap: (#126, #132, #133, #135, #136, #137, #138, #139)
+- feat: Add fetchMap() (#126, #132, #133, #135, #136, #137, #138, #139)
 - chore(widgets,deps): Clean up dataResolution references, examples, deps (#134)
 
 ### 0.4.9
