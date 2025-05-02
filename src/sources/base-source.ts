@@ -55,7 +55,7 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
     type: endpoint,
     source: JSON.stringify(parameters, undefined, 2),
   };
-  const mapInstantiation =
+  const {tilejson, schema} =
     await requestWithParameters<TilejsonMapInstantiation>({
       baseUrl,
       parameters,
@@ -65,7 +65,7 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
       localCache,
     });
 
-  const dataUrl = mapInstantiation.tilejson.url[0];
+  const dataUrl = tilejson.url[0];
   if (cache) {
     cache.value = parseInt(
       new URL(dataUrl).searchParams.get('cache') || '',
@@ -84,6 +84,9 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
   });
   if (accessToken) {
     json.accessToken = accessToken;
+  }
+  if (schema) {
+    json.schema = schema;
   }
   return json;
 }
