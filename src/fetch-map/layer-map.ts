@@ -11,7 +11,6 @@ import {
   scaleThreshold,
 } from 'd3-scale';
 import {format as d3Format} from 'd3-format';
-import moment from 'moment-timezone';
 
 export type LayerType =
   | 'clusterTile'
@@ -22,7 +21,12 @@ export type LayerType =
   | 'raster'
   | 'tileset';
 
-import {createBinaryProxy, scaleIdentity} from './utils.js';
+import {
+  createBinaryProxy,
+  formatDate,
+  formatTimestamp,
+  scaleIdentity,
+} from './utils.js';
 import type {
   CustomMarkersRange,
   Dataset,
@@ -457,10 +461,10 @@ export function getSizeAccessor(
 }
 
 const FORMATS: Record<string, (value: any) => string> = {
-  date: (s) => moment.utc(s).format('MM/DD/YY HH:mm:ssa'),
+  date: formatDate,
   integer: d3Format('i'),
   float: d3Format('.5f'),
-  timestamp: (s) => moment.utc(s).format('X'),
+  timestamp: formatTimestamp,
   default: String,
 };
 
