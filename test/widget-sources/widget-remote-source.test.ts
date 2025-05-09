@@ -121,7 +121,8 @@ test('getCategories', async () => {
 
   const actualCategories = await widgetSource.getCategories({
     column: 'store_type',
-    operation: 'count',
+    operation: 'custom',
+    operationExp: 'count(store_type) / 2',
   });
 
   expect(mockFetch).toHaveBeenCalledOnce();
@@ -133,7 +134,8 @@ test('getCategories', async () => {
     source: 'test-data',
     params: JSON.stringify({
       column: 'store_type',
-      operation: 'count',
+      operation: 'custom',
+      operationExp: 'count(store_type) / 2',
       operationColumn: 'store_type',
     }),
     queryParameters: '',
@@ -623,7 +625,8 @@ test('getTimeSeries', async () => {
   const actualTimeSeries = await widgetSource.getTimeSeries({
     column: 'date',
     stepSize: 'month',
-    operation: 'count',
+    operation: 'custom',
+    operationExp: 'count(purchases) * 2',
     operationColumn: 'purchases',
   });
 
@@ -638,7 +641,8 @@ test('getTimeSeries', async () => {
       column: 'date',
       stepSize: 'month',
       operationColumn: 'purchases',
-      operation: 'count',
+      operation: 'custom',
+      operationExp: 'count(purchases) * 2',
     }),
     queryParameters: '',
     filters: JSON.stringify({}),

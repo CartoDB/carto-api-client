@@ -329,6 +329,10 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
     }
 
     assertColumn(this._features, column, operationColumn as string);
+    assert(
+      operation !== 'custom',
+      'Custom operation not supported for tilesets'
+    );
 
     const rows =
       groupValuesByDateColumn({
