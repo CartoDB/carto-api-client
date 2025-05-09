@@ -33,7 +33,8 @@ export interface BaseRequestOptions {
 /** Options for {@link WidgetRemoteSource#getCategories}. */
 export interface CategoryRequestOptions extends BaseRequestOptions {
   column: string;
-  operation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
+  operation?: 'count' | 'avg' | 'min' | 'max' | 'sum' | 'custom';
+  operationExp?: string;
   operationColumn?: string;
   /** Local only. */
   joinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
@@ -131,7 +132,8 @@ export interface TimeSeriesRequestOptions extends BaseRequestOptions {
   column: string;
   stepSize: GroupDateType;
   stepMultiplier?: number;
-  operation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
+  operation?: 'count' | 'avg' | 'min' | 'max' | 'sum' | 'custom';
+  operationExp?: string;
   operationColumn?: string;
   joinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
   splitByCategory?: string;
