@@ -6,7 +6,7 @@ import {baseSource} from './base-source.js';
 import {getTileFormat} from '../utils/getTileFormat.js';
 import {
   WidgetRasterSource,
-  WidgetRasterSourceResult,
+  type WidgetRasterSourceResult,
 } from '../widget-sources/index.js';
 
 import type {

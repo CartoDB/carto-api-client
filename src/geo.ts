@@ -4,7 +4,7 @@ import union from '@turf/union';
 import {getType} from '@turf/invariant';
 import {polygon, multiPolygon, feature, featureCollection} from '@turf/helpers';
 import type {BBox, Geometry, MultiPolygon, Polygon, Position} from 'geojson';
-import {SpatialFilter} from './types.js';
+import type {SpatialFilter} from './types.js';
 
 /**
  * Returns a {@link SpatialFilter} for a given viewport, typically obtained

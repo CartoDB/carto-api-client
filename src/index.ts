@@ -10,10 +10,10 @@ export * from './widget-sources/index.js';
 export * from './types.js';
 
 export {
-  APIErrorContext,
-  APIRequestType,
+  type APIErrorContext,
+  type APIRequestType,
   CartoAPIError,
-  QueryOptions,
+  type QueryOptions,
   buildPublicMapUrl, // Internal, but required for fetchMap().
   buildStatsUrl, // Internal, but required for fetchMap().
   query,

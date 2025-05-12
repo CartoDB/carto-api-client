@@ -1,10 +1,15 @@
-import {RasterTile, SpatialFilter, SpatialIndexTile, Tile} from '../types.js';
+import type {
+  RasterTile,
+  SpatialFilter,
+  SpatialIndexTile,
+  Tile,
+} from '../types.js';
 import {tileFeaturesGeometries} from './tileFeaturesGeometries.js';
 import {tileFeaturesSpatialIndex} from './tileFeaturesSpatialIndex.js';
 import {TileFormat} from '../constants.js';
 import {DEFAULT_GEO_COLUMN} from '../constants-internal.js';
-import {FeatureData} from '../types-internal.js';
-import {RasterMetadata, SpatialDataType} from '../sources/types.js';
+import type {FeatureData} from '../types-internal.js';
+import type {RasterMetadata, SpatialDataType} from '../sources/types.js';
 import {isRasterTile, tileFeaturesRaster} from './tileFeaturesRaster.js';
 import {assert} from '../utils.js';
 

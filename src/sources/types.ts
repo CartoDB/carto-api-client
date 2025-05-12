@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-import {Filters, QueryParameters} from '../types.js';
-import {SchemaField} from '../types-internal.js';
+import type {SchemaField} from '../types-internal.js';
+import type {Filters, QueryParameters} from '../types.js';
 
 export type SourceRequiredOptions = {
   /** Carto platform access token. */
@@ -414,7 +414,11 @@ export type RasterMetadata = {
   pixel_resolution: number;
 };
 
-export type TilejsonResult = Tilejson & {accessToken: string};
+export type TilejsonResult = Tilejson & {
+  accessToken: string;
+  schema: SchemaField[];
+};
+
 export type QueryResult = {
   meta: {cacheHit: boolean; location: string; totalBytesProcessed: string};
   rows: Record<string, any>[];

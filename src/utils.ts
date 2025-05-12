@@ -1,4 +1,4 @@
-import {Filter} from './types.js';
+import type {Filter} from './types.js';
 import {FilterType} from './constants.js';
 
 const FILTER_TYPES = new Set(Object.values(FilterType));

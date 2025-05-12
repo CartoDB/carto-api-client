@@ -1,5 +1,5 @@
-import {executeModel, ModelSource} from '../models/index.js';
-import {
+import {executeModel, type ModelSource} from '../models/index.js';
+import type {
   CategoryRequestOptions,
   CategoryResponse,
   FeaturesRequestOptions,
@@ -17,11 +17,12 @@ import {
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
 } from './types.js';
-import {getApplicableFilters, normalizeObjectKeys} from '../utils.js';
+import {normalizeObjectKeys} from '../utils.js';
 import {DEFAULT_TILE_RESOLUTION} from '../constants-internal.js';
-import {WidgetSource, WidgetSourceProps} from './widget-source.js';
-import {Filters} from '../types.js';
+import {WidgetSource, type WidgetSourceProps} from './widget-source.js';
+import type {Filters} from '../types.js';
 import {ApiVersion} from '../constants.js';
+import {getApplicableFilters} from '../filters.js';
 
 export type WidgetRemoteSourceProps = WidgetSourceProps;
 

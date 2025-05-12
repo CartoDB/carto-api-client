@@ -11,7 +11,6 @@ import {
   scaleThreshold,
 } from 'd3-scale';
 import {format as d3Format} from 'd3-format';
-import moment from 'moment-timezone';
 
 export type LayerType =
   | 'clusterTile'
@@ -22,8 +21,13 @@ export type LayerType =
   | 'raster'
   | 'tileset';
 
-import {createBinaryProxy, scaleIdentity} from './utils.js';
 import {
+  createBinaryProxy,
+  formatDate,
+  formatTimestamp,
+  scaleIdentity,
+} from './utils.js';
+import type {
   CustomMarkersRange,
   Dataset,
   MapLayerConfig,
@@ -31,6 +35,9 @@ import {
   VisualChannelField,
   VisualChannels,
 } from './types.js';
+import type {ProviderType} from '../types.js';
+import {DEFAULT_AGGREGATION_EXP_ALIAS} from '../constants-internal.js';
+import type {SchemaField} from '../types-internal.js';
 
 const SCALE_FUNCS: Record<string, () => any> = {
   linear: scaleLinear,
@@ -118,7 +125,8 @@ const customMarkersPropsMap = {
 const heatmapTilePropsMap = {
   visConfig: {
     colorRange: (x: any) => ({colorRange: x.colors.map(hexToRGBA)}),
-    radius: 'radiusPixels',
+    radius: (radius: number) => ({radiusPixels: 20 + radius}),
+    opacity: 'opacity',
   },
 };
 
@@ -145,6 +153,17 @@ const deprecatedLayerTypes = [
   'hexagonId',
   'point',
 ];
+
+/** @privateRemarks Source: Builder */
+export const TEXT_LABEL_INDEX = 0;
+
+/** @privateRemarks Source: Builder */
+export const TEXT_OUTLINE_OPACITY = 64;
+
+export const TEXT_NUMBER_FORMATTER = new Intl.NumberFormat('en-US', {
+  maximumFractionDigits: 2,
+  notation: 'compact',
+});
 
 export function getLayerProps(
   type: LayerType,
@@ -272,9 +291,9 @@ function findAccessorKey(keys: string[], properties: any): string[] {
     }
   }
 
-  throw new Error(
-    `Could not find property for any accessor key: ${keys.join(', ')}`
-  );
+  // If data doesn't contain any valid keys, return all keys to run search
+  // on next feature
+  return keys;
 }
 
 export function getColorValueAccessor(
@@ -443,10 +462,10 @@ export function getSizeAccessor(
 }
 
 const FORMATS: Record<string, (value: any) => string> = {
-  date: (s) => moment.utc(s).format('MM/DD/YY HH:mm:ssa'),
+  date: formatDate,
   integer: d3Format('i'),
   float: d3Format('.5f'),
-  timestamp: (s) => moment.utc(s).format('X'),
+  timestamp: formatTimestamp,
   default: String,
 };
 
@@ -459,3 +478,65 @@ export function getTextAccessor({name, type}: VisualChannelField, data: any) {
 }
 
 export {domainFromValues as _domainFromValues};
+
+/** @privateRemarks Source: Builder */
+export function calculateClusterRadius(
+  properties: {[column: string]: number},
+  stats: Record<string, {min: number; max: number}>,
+  radiusRange: [number, number],
+  column: string
+): number {
+  const {min, max} = stats[column];
+  const value = properties[column];
+
+  // When there's a single cluster on the screen, min and max are equivalent, so we should return the maximum radius
+  if (min === max) return radiusRange[1];
+
+  const normalizedValue = (value - min) / (max - min);
+  return radiusRange[0] + normalizedValue * (radiusRange[1] - radiusRange[0]);
+}
+
+/** @privateRemarks Source: Builder */
+export function getDefaultAggregationExpColumnAliasForLayerType(
+  layerType: LayerType,
+  provider: ProviderType,
+  schema: SchemaField[]
+): string {
+  if (schema && layerType === 'clusterTile') {
+    return getColumnAliasForAggregationExp(
+      getDefaultColumnFromSchemaForAggregationExp(schema),
+      'count',
+      provider
+    );
+  } else {
+    return DEFAULT_AGGREGATION_EXP_ALIAS;
+  }
+}
+
+/** @privateRemarks Source: Builder */
+function getColumnAliasForAggregationExp(
+  name: string,
+  aggregation: string,
+  provider: ProviderType
+) {
+  const columnAlias = `${name}_${aggregation}`;
+  return provider === 'snowflake' ? columnAlias.toUpperCase() : columnAlias;
+}
+
+/** @privateRemarks Source: Builder */
+function getDefaultColumnFromSchemaForAggregationExp(
+  schema: SchemaField[]
+): string {
+  return schema ? schema[0].name : '';
+}
+
+/** @privateRemarks Source: Builder */
+export function calculateClusterTextFontSize(radius: number): number {
+  if (radius >= 80) return 24;
+  if (radius >= 72) return 24;
+  if (radius >= 56) return 20;
+  if (radius >= 40) return 16;
+  if (radius >= 24) return 13;
+  if (radius >= 8) return 11;
+  return 11;
+}

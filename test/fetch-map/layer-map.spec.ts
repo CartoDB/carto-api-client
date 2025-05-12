@@ -98,7 +98,7 @@ describe('layer-map', () => {
       {
         textLabelField: {name: 'date', type: 'date'},
         data: {date: '2021-10-29T13:25:01.067Z'},
-        expected: '10/29/21 13:25:01pm',
+        expected: '10/29/21, 1:25:01 PM',
       },
       {
         textLabelField: {name: 'field', type: 'integer'},

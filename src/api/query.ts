@@ -10,7 +10,7 @@ import type {
 } from '../sources/types.js';
 import {buildQueryUrl} from './endpoints.js';
 import {requestWithParameters} from './request-with-parameters.js';
-import {APIErrorContext} from './carto-api-error.js';
+import type {APIErrorContext} from './carto-api-error.js';
 import {getClient} from '../client.js';
 
 export type QueryOptions = SourceOptions & QuerySourceOptions;

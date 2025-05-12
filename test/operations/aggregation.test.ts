@@ -33,6 +33,18 @@ describe('aggregation', () => {
           expect(func(VALUES)).toEqual(result);
         });
       });
+
+      test('many features', () => {
+        // Recursion throws "Maximum call stack size exceeded" for >125K values, avoid implicit
+        // recursion like `Math.max(...values)`. https://stackoverflow.com/q/18308700.
+        const MANY_VALUES = Array.from(
+          {length: 250_000 + 1},
+          (_, i) => i / 1000
+        );
+        expect(aggregationFunctions['min'](MANY_VALUES)).toEqual(0);
+        expect(aggregationFunctions['avg'](MANY_VALUES)).toEqual(125);
+        expect(aggregationFunctions['max'](MANY_VALUES)).toEqual(250);
+      });
     });
 
     describe('by features', () => {

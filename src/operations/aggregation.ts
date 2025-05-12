@@ -1,5 +1,5 @@
-import {AggregationType} from '../types.js';
-import {FeatureData} from '../types-internal.js';
+import type {AggregationType} from '../types.js';
+import type {FeatureData} from '../types-internal.js';
 
 /** @privateRemarks Source: @carto/react-core */
 export type AggregationFunction = (
@@ -122,7 +122,12 @@ function min(
       Infinity
     );
   }
-  return Math.min(...(values as number[]));
+
+  let min = Number.POSITIVE_INFINITY;
+  for (const value of values as number[]) {
+    min = Math.min(min, value);
+  }
+  return min;
 }
 
 function max(
@@ -138,7 +143,12 @@ function max(
       -Infinity
     );
   }
-  return Math.max(...(values as number[]));
+
+  let max = Number.NEGATIVE_INFINITY;
+  for (const value of values as number[]) {
+    max = Math.max(max, value);
+  }
+  return max;
 }
 
 // Aux
