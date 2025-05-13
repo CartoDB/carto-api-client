@@ -222,7 +222,7 @@ __metadata:
     "@types/geojson": "npm:^7946.0.16"
     d3-format: "npm:^3.1.0"
     d3-scale: "npm:^4.0.2"
-    h3-js: "npm:4.2.1"
+    h3-js: "npm:^4.1.0"
     quadbin: "npm:^0.4.1-alpha.0"
   languageName: node
   linkType: soft
@@ -274,7 +274,7 @@ __metadata:
     d3-scale: "npm:^4.0.2"
     echarts: "npm:^5.6.0"
     eslint: "npm:^9.22.0"
-    h3-js: "npm:4.2.1"
+    h3-js: "npm:^4.1.0"
     lit: "npm:^3.2.1"
     lit-analyzer: "npm:^2.0.3"
     maplibre-gl: "npm:^5.2.0"
@@ -3758,13 +3758,6 @@ __metadata:
   version: 1.4.0
   resolution: "graphemer@npm:1.4.0"
   checksum: 10c0/e951259d8cd2e0d196c72ec711add7115d42eb9a8146c8eeda5b8d3ac91e5dd816b9cd68920726d9fd4490368e7ed86e9c423f40db87e2d8dfafa00fa17c3a31
-  languageName: node
-  linkType: hard
-
-"h3-js@npm:4.2.1":
-  version: 4.2.1
-  resolution: "h3-js@npm:4.2.1"
-  checksum: 10c0/3c72c51149e4e6f9920cd47ff1b9a2ac4cdc1a1d8e41072e31b10db60ba9e264009dc833a30d06d421c083605495d14eca848bd25d85c7840a467c4db95bc50a
   languageName: node
   linkType: hard
 
