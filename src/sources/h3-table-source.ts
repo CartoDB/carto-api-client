@@ -3,6 +3,7 @@
 // Copyright (c) vis.gl contributors
 
 import {DEFAULT_AGGREGATION_RES_LEVEL_H3} from '../constants-internal.js';
+import {getWidgetSpatialDataType} from '../utils.js';
 import {
   WidgetTableSource,
   type WidgetTableSourceResult,
@@ -67,7 +68,11 @@ export const h3TableSource = async function (
         ...options,
         // NOTE: Parameters with default values above must be explicitly passed here.
         spatialDataColumn,
-        spatialDataType,
+        spatialDataType: getWidgetSpatialDataType(
+          spatialDataType,
+          spatialDataColumn,
+          result.schema
+        ),
       }),
     })
   );
