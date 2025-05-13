@@ -441,7 +441,7 @@ export function getSizeAccessor(
   aggregation: string | null | undefined,
   range: Iterable<Range> | null | undefined,
   data: any
-) {
+): { accessor: any, scale: any } {
   const scale = scaleType ? SCALE_FUNCS[scaleType as any]() : identity;
   if (scaleType) {
     if (aggregation !== 'count') {
@@ -458,7 +458,7 @@ export function getSizeAccessor(
     const propertyValue = properties[accessorKeys[0]];
     return scale(propertyValue);
   };
-  return normalizeAccessor(accessor, data);
+  return {accessor: normalizeAccessor(accessor, data), scale};
 }
 
 const FORMATS: Record<string, (value: any) => string> = {

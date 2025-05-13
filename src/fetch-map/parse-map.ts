@@ -231,6 +231,7 @@ function createChannelProps(
   }
   const {textLabel, visConfig} = config;
   const result: Record<string, any> = {};
+  result.scales = {};
 
   if (type === 'grid' || type === 'hexagon') {
     result.colorScaleType = colorScale;
@@ -326,7 +327,7 @@ function createChannelProps(
   }
 
   if (radiusField || sizeField) {
-    result.getPointRadius = getSizeAccessor(
+    const {accessor, scale} = getSizeAccessor(
       // @ts-ignore
       radiusField || sizeField,
       // @ts-ignore
@@ -335,6 +336,8 @@ function createChannelProps(
       visConfig.radiusRange || visConfig.sizeRange,
       data
     );
+    result.getPointRadius = accessor;
+    result.scales.pointRadius = scale;
   }
 
   if (strokeColorField) {
@@ -356,7 +359,7 @@ function createChannelProps(
     );
   }
   if (heightField && visConfig.enable3d) {
-    result.getElevation = getSizeAccessor(
+    const {accessor, scale} = getSizeAccessor(
       heightField,
       // @ts-ignore
       heightScale,
@@ -364,16 +367,20 @@ function createChannelProps(
       visConfig.heightRange || visConfig.sizeRange,
       data
     );
+    result.getElevation = accessor;
+    result.scales.elevation = scale;
   }
 
   if (weightField) {
-    result.getWeight = getSizeAccessor(
+    const {accessor, scale} = getSizeAccessor(
       weightField,
       undefined,
       visConfig.weightAggregation,
       undefined,
       data
     );
+    result.getWeight = accessor;
+    result.scales.weight = scale;
   }
 
   if (visConfig.customMarkers) {
@@ -416,15 +423,14 @@ function createChannelProps(
     }
 
     if (visualChannels.rotationField) {
-      result.getIconAngle = negateAccessor(
-        getSizeAccessor(
-          visualChannels.rotationField,
-          undefined,
-          null,
-          undefined,
-          data
-        )
+      const {accessor, scale} = getSizeAccessor(
+        visualChannels.rotationField,
+        undefined,
+        null,
+        undefined,
+        data
       );
+      result.getIconAngle = negateAccessor(accessor);
     }
   } else if (type === 'point' || type === 'tileset') {
     result.pointType = 'circle';
