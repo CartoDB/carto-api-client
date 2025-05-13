@@ -3,6 +3,33 @@ import type {Polygon, MultiPolygon, Feature} from 'geojson';
 import type {BinaryFeature, BinaryFeatureCollection} from '@loaders.gl/schema';
 
 /******************************************************************************
+ * MAP INSTANTIATION
+ */
+
+/**
+ * @privateRemarks Source: @deck.gl/carto
+ */
+export enum SchemaFieldType {
+  Number = 'number',
+  Bigint = 'bigint',
+  String = 'string',
+  Geometry = 'geometry',
+  Timestamp = 'timestamp',
+  Object = 'object',
+  Boolean = 'boolean',
+  Variant = 'variant',
+  Unknown = 'unknown',
+}
+
+/**
+ * @privateRemarks Source: @deck.gl/carto
+ */
+export interface SchemaField {
+  name: string;
+  type: SchemaFieldType; // Field type in the CARTO stack, common for all providers
+}
+
+/******************************************************************************
  * MAPS AND TILES
  */
 

@@ -35,9 +35,8 @@ import type {
   VisualChannelField,
   VisualChannels,
 } from './types.js';
-import type {ProviderType} from '../types.js';
+import type {ProviderType, SchemaField} from '../types.js';
 import {DEFAULT_AGGREGATION_EXP_ALIAS} from '../constants-internal.js';
-import type {SchemaField} from '../types-internal.js';
 
 const SCALE_FUNCS: Record<string, () => any> = {
   linear: scaleLinear,
