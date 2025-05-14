@@ -2,11 +2,41 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-import {Mock, vi} from 'vitest';
+import {vi} from 'vitest';
 
-/* global Headers */
+export const MOCK_INIT_RESPONSE = {
+  tilejson: {url: [`https://xyz.com?format=tilejson`]},
+};
 
-const BINARY_TILE = new Uint8Array().buffer;
+export const MOCK_TILESET_RESPONSE = {
+  tilejson: '2.2.0',
+  tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
+  tilestats: {layers: []},
+  schema: [],
+};
+
+/**
+ * Stubs global 'fetch' with a mock intended for the two (2) requests
+ * required to create a layer source. Initialization or tilejson response
+ * may optionally be customized. Additional requests will fail.
+ */
+export function stubGlobalFetchForSource(
+  initResponse = MOCK_INIT_RESPONSE,
+  tilesetResponse = MOCK_TILESET_RESPONSE
+) {
+  const mockFetch = vi
+    .fn()
+    .mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(initResponse),
+    })
+    .mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(tilesetResponse),
+    });
+  vi.stubGlobal('fetch', mockFetch);
+  return mockFetch;
+}
 
 const fetch = globalThis.fetch;
 
@@ -17,96 +47,14 @@ type MockFetchCall = {
   body?: string;
 };
 
-export const TILEJSON_RESPONSE = {
-  tilejson: '2.2.0',
-  tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
-  tilestats: {
-    layers: [
-      {
-        attributes: [
-          {attribute: 'population', type: 'integer'},
-          {attribute: 'category', type: 'string'},
-        ],
-      },
-    ],
-  },
-};
-
-export const GEOJSON_RESPONSE = {
-  type: 'FeatureCollection',
-  features: [
-    {
-      type: 'Feature',
-      properties: {},
-      geometry: {
-        type: 'Point',
-        coordinates: [-6.7531585693359375, 37.57505900514996],
-      },
-    },
-  ],
-};
-
-export const TILESTATS_RESPONSE = {
-  attribute: 'population',
-  avg: 10,
-  min: 1,
-  max: 20,
-  quantiles: [],
-  sum: 100,
-  type: 'Number',
-};
-
-export const QUERY_RESPONSE = [{id: 1, value: 'string'}];
-
-const createDefaultResponse = (
+type MockResponseFactory = (
   url: string,
   headers: HeadersInit,
   cacheKey?: string
-): Promise<unknown> => {
-  return Promise.resolve({
-    json: () => {
-      if (url.indexOf('format=tilejson') !== -1) {
-        return TILEJSON_RESPONSE;
-      }
-      if (url.indexOf('format=geojson') !== -1) {
-        return GEOJSON_RESPONSE;
-      }
-
-      if (url.indexOf('tileset') !== -1) {
-        return {
-          tilejson: {
-            url: [`https://xyz.com?format=tilejson&cache=${cacheKey}`],
-          },
-        };
-      }
-      if (url.indexOf('stats') !== -1) {
-        return TILESTATS_RESPONSE;
-      }
-      if (url.indexOf('sql') !== -1) {
-        return QUERY_RESPONSE;
-      }
-      if (url.indexOf('query') !== -1 || url.indexOf('table')) {
-        return {
-          tilejson: {
-            url: [`https://xyz.com?format=tilejson&cache=${cacheKey}`],
-          },
-          geojson: {
-            url: [`https://xyz.com?format=geojson&cache=${cacheKey}`],
-          },
-        };
-      }
-      return null;
-    },
-    arrayBuffer: () => BINARY_TILE,
-    text: () => null, // Required to get loaders.gl to use arrayBuffer()
-    ok: true,
-    url,
-    headers: new Headers(headers),
-  });
-};
+) => Promise<unknown>;
 
 function setupMockFetchMapsV3(
-  responseFunc = createDefaultResponse,
+  responseFunc: MockResponseFactory,
   cacheKey = btoa(Math.random().toFixed(4))
 ): MockFetchCall[] {
   const calls: MockFetchCall[] = [];
@@ -131,46 +79,14 @@ function teardownMockFetchMaps() {
   globalThis.fetch = fetch;
 }
 
+/** @deprecated Legacy fetch mock for basemap.spec.ts. */
 export async function withMockFetchMapsV3(
   testFunc: (calls: MockFetchCall[]) => Promise<void>,
-  responseFunc: (
-    url: string,
-    headers: HeadersInit,
-    cacheKey?: string
-  ) => Promise<unknown> = createDefaultResponse
+  responseFunc: MockResponseFactory
 ): Promise<void> {
   try {
     await testFunc(setupMockFetchMapsV3(responseFunc));
   } finally {
     teardownMockFetchMaps();
   }
-}
-
-export const MOCK_INIT_RESPONSE = {
-  tilejson: {url: [`https://xyz.com?format=tilejson`]},
-};
-
-export const MOCK_TILESET_RESPONSE = {
-  tilejson: '2.2.0',
-  tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
-  tilestats: {layers: []},
-  schema: [],
-};
-
-export function stubGlobalFetchForSource(
-  initResponse = MOCK_INIT_RESPONSE,
-  tilesetResponse = MOCK_TILESET_RESPONSE
-) {
-  const mockFetch = vi
-    .fn()
-    .mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(initResponse),
-    })
-    .mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(tilesetResponse),
-    });
-  vi.stubGlobal('fetch', mockFetch);
-  return mockFetch;
 }
