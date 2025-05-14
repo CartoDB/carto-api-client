@@ -9,13 +9,8 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
   container.className = 'legend-container';
 
   layers.forEach((layer) => {
-    const widgetSource = layer.props.data?.widgetSource?.props;
-    if (!widgetSource) return;
-
-    const {columns, spatialDataColumn} = widgetSource;
-    const dataColumn = columns?.find(
-      (col: string) => col !== spatialDataColumn
-    );
+    const scaleInfo = layer.props.scales.lineColor || layer.props.scales.fillColor;
+    const dataColumn = scaleInfo?.field?.name;
     if (!dataColumn) return;
 
     const layerDiv = document.createElement('div');
@@ -40,7 +35,6 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
       (a: any) => a.attribute === dataColumn
     );
 
-    const scaleInfo = layer.props.scales.lineColor || layer.props.scales.fillColor;
     const isConstantColor = !scaleInfo || !scaleInfo.domain || !scaleInfo.range;
 
     if (isConstantColor) {
