@@ -1,36 +1,11 @@
-import {h3TilesetSource} from '@carto/api-client';
-import {describe, vi, test, expect, beforeEach} from 'vitest';
-
-const CACHE = 'h3-tileset-source-test';
-
-const INIT_RESPONSE = {
-  tilejson: {url: [`https://xyz.com?format=tilejson&cache=${CACHE}`]},
-};
-
-const TILESET_RESPONSE = {
-  tilejson: '2.2.0',
-  tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
-  tilestats: {layers: []},
-};
+import {h3TilesetSource, WidgetTilesetSource} from '@carto/api-client';
+import {describe, vi, test, expect} from 'vitest';
+import {stubGlobalFetchForSource} from '../__mock-fetch.js';
 
 describe('h3TilesetSource', () => {
-  beforeEach(() => {
-    const mockFetch = vi
-      .fn()
-      .mockReturnValueOnce(
-        Promise.resolve({ok: true, json: () => Promise.resolve(INIT_RESPONSE)})
-      )
-      .mockReturnValueOnce(
-        Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve(TILESET_RESPONSE),
-        })
-      );
-
-    vi.stubGlobal('fetch', mockFetch);
-  });
-
   test('default', async () => {
+    stubGlobalFetchForSource();
+
     const tilejson = await h3TilesetSource({
       connectionName: 'carto_dw',
       accessToken: '<token>',
@@ -44,12 +19,24 @@ describe('h3TilesetSource', () => {
     expect(initURL).toMatch(/v3\/maps\/carto_dw\/tileset/);
     expect(initURL).toMatch(/name=a.b.h3_tileset/);
 
-    expect(tilesetURL).toMatch(/^https:\/\/xyz\.com\/\?format=tilejson&cache=/);
+    expect(tilesetURL).toMatch(/^https:\/\/xyz\.com\/\?format=tilejson/);
 
     expect(tilejson).toBeTruthy();
     expect(tilejson.tiles).toEqual([
       'https://xyz.com/{z}/{x}/{y}?formatTiles=binary',
     ]);
     expect(tilejson.accessToken).toBe('<token>');
+  });
+
+  test('widgetSource', async () => {
+    stubGlobalFetchForSource();
+
+    const {widgetSource} = await h3TilesetSource({
+      accessToken: '<token>',
+      connectionName: 'carto_dw',
+      tableName: 'a.b.h3_tileset',
+    });
+
+    expect(widgetSource).toBeInstanceOf(WidgetTilesetSource);
   });
 });

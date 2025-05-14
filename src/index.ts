@@ -18,6 +18,7 @@ export {
   buildStatsUrl, // Internal, but required for fetchMap().
   query,
   requestWithParameters,
+  clearDefaultRequestCache, // Internal, for unit testing.
 } from './api/index.js';
 
 export {_getHexagonResolution} from './spatial-index.js';

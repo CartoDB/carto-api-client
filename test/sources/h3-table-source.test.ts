@@ -1,37 +1,15 @@
 import {WidgetTableSource, h3TableSource} from '@carto/api-client';
-import {describe, vi, test, expect, beforeEach} from 'vitest';
-
-const CACHE = 'h3-table-source-test';
-
-const INIT_RESPONSE = {
-  tilejson: {url: [`https://xyz.com?format=tilejson&cache=${CACHE}`]},
-};
-
-const TILESET_RESPONSE = {
-  tilejson: '2.2.0',
-  tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
-  tilestats: {layers: []},
-  schema: [],
-};
+import {describe, vi, test, expect} from 'vitest';
+import {
+  MOCK_INIT_RESPONSE,
+  MOCK_TILESET_RESPONSE,
+  stubGlobalFetchForSource,
+} from '../__mock-fetch.js';
 
 describe('h3TableSource', () => {
-  beforeEach(() => {
-    const mockFetch = vi
-      .fn()
-      .mockReturnValueOnce(
-        Promise.resolve({ok: true, json: () => Promise.resolve(INIT_RESPONSE)})
-      )
-      .mockReturnValueOnce(
-        Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve(TILESET_RESPONSE),
-        })
-      );
-
-    vi.stubGlobal('fetch', mockFetch);
-  });
-
   test('default', async () => {
+    stubGlobalFetchForSource();
+
     const tilejson = await h3TableSource({
       connectionName: 'carto_dw',
       clientId: 'CUSTOM_CLIENT',
@@ -51,7 +29,7 @@ describe('h3TableSource', () => {
     expect(initURL).toMatch(/name=a.b.h3_table/);
     expect(initURL).toMatch(/client=CUSTOM_CLIENT/);
 
-    expect(tilesetURL).toMatch(/^https:\/\/xyz\.com\/\?format=tilejson&cache=/);
+    expect(tilesetURL).toMatch(/^https:\/\/xyz\.com\/\?format=tilejson/);
 
     expect(tilejson).toBeTruthy();
     expect(tilejson.tiles).toEqual([
@@ -61,6 +39,8 @@ describe('h3TableSource', () => {
   });
 
   test('widgetSource', async () => {
+    stubGlobalFetchForSource();
+
     const {widgetSource} = await h3TableSource({
       accessToken: '<token>',
       connectionName: 'carto_dw',
@@ -69,5 +49,24 @@ describe('h3TableSource', () => {
     });
 
     expect(widgetSource).toBeInstanceOf(WidgetTableSource);
+  });
+
+  test('widgetSource + dynamic point aggregation', async () => {
+    stubGlobalFetchForSource(MOCK_INIT_RESPONSE, {
+      ...MOCK_TILESET_RESPONSE,
+      schema: [{name: 'geom', type: 'geometry'}],
+    });
+
+    const {widgetSource} = await h3TableSource({
+      localCache: {cacheControl: ['no-cache']}, // prevent caching schema
+      accessToken: '<token>',
+      connectionName: 'carto_dw',
+      tableName: 'my-table',
+      aggregationExp: 'COUNT (*)',
+      spatialDataColumn: 'geom',
+    });
+
+    expect(widgetSource).toBeInstanceOf(WidgetTableSource);
+    expect(widgetSource.props.spatialDataType).toBe('geo'); // not 'h3'
   });
 });

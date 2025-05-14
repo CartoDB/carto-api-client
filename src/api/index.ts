@@ -11,4 +11,7 @@ export {
 export {buildPublicMapUrl, buildStatsUrl} from './endpoints.js';
 export {query} from './query.js';
 export type {QueryOptions} from './query.js';
-export {requestWithParameters} from './request-with-parameters.js';
+export {
+  requestWithParameters,
+  clearDefaultRequestCache,
+} from './request-with-parameters.js';

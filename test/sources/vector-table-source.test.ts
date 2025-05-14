@@ -1,38 +1,11 @@
 import {WidgetTableSource, vectorTableSource} from '@carto/api-client';
-import {describe, afterEach, vi, test, expect, beforeEach} from 'vitest';
-
-const CACHE = 'vector-table-source-test';
-
-const INIT_RESPONSE = {
-  tilejson: {url: [`https://xyz.com?format=tilejson&cache=${CACHE}`]},
-};
-
-const TILESET_RESPONSE = {
-  tilejson: '2.2.0',
-  tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
-  tilestats: {layers: []},
-};
+import {describe, vi, test, expect} from 'vitest';
+import {stubGlobalFetchForSource} from '../__mock-fetch.js';
 
 describe('vectorTableSource', () => {
-  beforeEach(() => {
-    const mockFetch = vi
-      .fn()
-      .mockReturnValueOnce(
-        Promise.resolve({ok: true, json: () => Promise.resolve(INIT_RESPONSE)})
-      )
-      .mockReturnValueOnce(
-        Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve(TILESET_RESPONSE),
-        })
-      );
-
-    vi.stubGlobal('fetch', mockFetch);
-  });
-
-  afterEach(() => void vi.restoreAllMocks());
-
   test('default', async () => {
+    stubGlobalFetchForSource();
+
     const tilejson = await vectorTableSource({
       connectionName: 'carto_dw',
       accessToken: '<token>',
@@ -52,7 +25,7 @@ describe('vectorTableSource', () => {
     expect(initURL).toMatch(/spatialDataColumn=mygeom/);
     expect(initURL).toMatch(/spatialDataType=geo/);
     expect(initURL).toMatch(/aggregationExp=SUM%28revenue%29/);
-    expect(tilesetURL).toMatch(/^https:\/\/xyz\.com\/\?format=tilejson&cache=/);
+    expect(tilesetURL).toMatch(/^https:\/\/xyz\.com\/\?format=tilejson/);
 
     expect(tilejson).toBeTruthy();
     expect(tilejson.tiles).toEqual([
@@ -62,6 +35,8 @@ describe('vectorTableSource', () => {
   });
 
   test('when aggregationExp is not provided', async () => {
+    stubGlobalFetchForSource();
+
     await vectorTableSource({
       connectionName: 'carto_dw',
       accessToken: '<token>',
@@ -75,6 +50,8 @@ describe('vectorTableSource', () => {
   });
 
   test('widgetSource', async () => {
+    stubGlobalFetchForSource();
+
     const {widgetSource} = await vectorTableSource({
       accessToken: '<token>',
       connectionName: 'carto_dw',

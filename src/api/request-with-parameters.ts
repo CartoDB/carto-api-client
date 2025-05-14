@@ -164,3 +164,11 @@ function excludeURLParameters(baseUrlString: string, parameters: string[]) {
   }
   return baseUrl.toString();
 }
+
+/**
+ * Clears the HTTP response cache for all requests using the default cache.
+ * @internal
+ */
+export function clearDefaultRequestCache() {
+  DEFAULT_REQUEST_CACHE.clear();
+}

@@ -2,11 +2,14 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
+import {Mock, vi} from 'vitest';
+
 /* global Headers */
 
 const BINARY_TILE = new Uint8Array().buffer;
 
 const fetch = globalThis.fetch;
+
 type MockFetchCall = {
   url: string;
   headers: Record<string, unknown>;
@@ -141,4 +144,33 @@ export async function withMockFetchMapsV3(
   } finally {
     teardownMockFetchMaps();
   }
+}
+
+export const MOCK_INIT_RESPONSE = {
+  tilejson: {url: [`https://xyz.com?format=tilejson`]},
+};
+
+export const MOCK_TILESET_RESPONSE = {
+  tilejson: '2.2.0',
+  tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
+  tilestats: {layers: []},
+  schema: [],
+};
+
+export function stubGlobalFetchForSource(
+  initResponse = MOCK_INIT_RESPONSE,
+  tilesetResponse = MOCK_TILESET_RESPONSE
+) {
+  const mockFetch = vi
+    .fn()
+    .mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(initResponse),
+    })
+    .mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(tilesetResponse),
+    });
+  vi.stubGlobal('fetch', mockFetch);
+  return mockFetch;
 }
