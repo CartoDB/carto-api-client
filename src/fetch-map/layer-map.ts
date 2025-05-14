@@ -312,7 +312,7 @@ export function getColorAccessor(
   {aggregation, range}: {aggregation: string; range: any},
   opacity: number | undefined,
   data: any
-) {
+): { accessor: any, scale: any } {
   const scale = calculateLayerScale(
     colorColumn || name,
     scaleType,
@@ -330,7 +330,7 @@ export function getColorAccessor(
     const {r, g, b} = rgb(scale(propertyValue));
     return [r, g, b, propertyValue === null ? 0 : alpha];
   };
-  return normalizeAccessor(accessor, data);
+  return {accessor: normalizeAccessor(accessor, data), scale};
 }
 
 function calculateLayerScale(

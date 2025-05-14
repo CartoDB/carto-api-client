@@ -249,7 +249,7 @@ function createChannelProps(
     }
   } else if (colorField) {
     const {colorAggregation: aggregation, colorRange: range} = visConfig;
-    result.getFillColor = getColorAccessor(
+    const {accessor, scale} = getColorAccessor(
       colorField,
       // @ts-ignore
       colorScale,
@@ -257,6 +257,8 @@ function createChannelProps(
       visConfig.opacity,
       data
     );
+    result.getFillColor = accessor;
+    result.scales.fillColor = {scale, field: colorField, type: colorScale};
   }
 
   if (type === 'point') {
@@ -337,7 +339,7 @@ function createChannelProps(
       data
     );
     result.getPointRadius = accessor;
-    result.scales.pointRadius = scale;
+    result.scales.pointRadius = {scale, field: radiusField || sizeField, type: radiusScale || sizeScale};
   }
 
   if (strokeColorField) {
@@ -348,7 +350,7 @@ function createChannelProps(
         : fallbackOpacity;
     const {strokeColorAggregation: aggregation, strokeColorRange: range} =
       visConfig;
-    result.getLineColor = getColorAccessor(
+    const {accessor, scale} = getColorAccessor(
       strokeColorField,
       // @ts-ignore
       strokeColorScale,
@@ -357,6 +359,8 @@ function createChannelProps(
       opacity,
       data
     );
+    result.getLineColor = accessor;
+    result.scales.lineColor = {scale, field: strokeColorField, type: strokeColorScale};
   }
   if (heightField && visConfig.enable3d) {
     const {accessor, scale} = getSizeAccessor(
@@ -368,7 +372,7 @@ function createChannelProps(
       data
     );
     result.getElevation = accessor;
-    result.scales.elevation = scale;
+    result.scales.elevation = {scale, field: heightField, type: heightScale};
   }
 
   if (weightField) {
@@ -380,7 +384,7 @@ function createChannelProps(
       data
     );
     result.getWeight = accessor;
-    result.scales.weight = scale;
+    result.scales.weight = {scale, field: weightField, type: 'identity'};
   }
 
   if (visConfig.customMarkers) {
@@ -484,6 +488,16 @@ function createChannelProps(
         }),
       },
     };
+  }
+
+  for (const key of Object.keys(result.scales)) {
+    const {field, scale, type} = result.scales[key];
+    result.scales[key] = {
+      field,
+      domain: scale.domain(),
+      range: scale.range(),
+      type,
+    }
   }
 
   return result;
