@@ -1,5 +1,6 @@
-import type {Filter} from './types.js';
+import {SchemaFieldType, type Filter, type SchemaField} from './types.js';
 import {FilterType} from './constants.js';
+import type {SpatialDataType} from './sources/types.js';
 
 const FILTER_TYPES = new Set(Object.values(FilterType));
 const isFilterType = (type: string): type is FilterType =>
@@ -126,4 +127,22 @@ export function assignOptional<T extends object, U>(
     }
   }
   return target as T & U;
+}
+
+/**
+ * Returns the spatialDataType expected for widget operations, given layer source props. The
+ * spatialDataType used in widget operations may be different from that of the layer. For
+ * dynamically aggregated point datasets, widgets use type 'geo', not the aggregation type.
+ */
+export function getWidgetSpatialDataType(
+  spatialDataType: SpatialDataType,
+  spatialDataColumn: string,
+  schema: SchemaField[]
+): SpatialDataType {
+  const field = schema.find((field) => field.name === spatialDataColumn);
+  if (field && field.type === SchemaFieldType.Geometry) {
+    return 'geo';
+  }
+
+  return spatialDataType;
 }

@@ -11,6 +11,7 @@ const TILESET_RESPONSE = {
   tilejson: '2.2.0',
   tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
   tilestats: {layers: []},
+  schema: [],
 };
 
 describe('h3QuerySource', () => {

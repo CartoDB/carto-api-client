@@ -3,6 +3,7 @@
 // Copyright (c) vis.gl contributors
 
 import {DEFAULT_AGGREGATION_RES_LEVEL_QUADBIN} from '../constants-internal.js';
+import {getWidgetSpatialDataType} from '../utils.js';
 import {
   WidgetTableSource,
   type WidgetTableSourceResult,
@@ -68,7 +69,11 @@ export const quadbinTableSource = async function (
         ...options,
         // NOTE: Parameters with default values above must be explicitly passed here.
         spatialDataColumn,
-        spatialDataType,
+        spatialDataType: getWidgetSpatialDataType(
+          spatialDataType,
+          spatialDataColumn,
+          result.schema
+        ),
       }),
     })
   );
