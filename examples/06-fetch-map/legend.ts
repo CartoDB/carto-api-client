@@ -69,8 +69,15 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
 
             const rangeLabel = document.createElement('div');
             rangeLabel.className = 'legend-range-label';
-            const start = domain[i];
-            const end = domain[i + 1];
+            let start: number;
+            let end: number;
+            if (type === 'custom') {
+              start = domain[i - 1] || 0;
+              end = domain[i] || Infinity;
+            } else {
+              start = domain[i];
+              end = domain[i + 1];
+            }
             if (end === null || end === undefined) {
               rangeLabel.textContent = `${start}+`;
             } else {
