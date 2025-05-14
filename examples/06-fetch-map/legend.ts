@@ -78,10 +78,10 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
               start = domain[i];
               end = domain[i + 1];
             }
-            if (end === null || end === undefined) {
-              rangeLabel.textContent = `${start}+`;
+            if (end === null || end === undefined || end === Infinity) {
+              rangeLabel.textContent = `>${start.toFixed(1)}`;
             } else {
-              rangeLabel.textContent = `${start} – ${end}`;
+              rangeLabel.textContent = `${start.toFixed(1)} – ${end.toFixed(1)}`;
             }
 
             rangeDiv.appendChild(colorSwatch);
@@ -124,7 +124,7 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
 
             const rangeLabel = document.createElement('div');
             rangeLabel.className = 'legend-range-label';
-            rangeLabel.textContent = `${rangeStart.toFixed(2)} – ${rangeEnd.toFixed(2)}`;
+            rangeLabel.textContent = `${rangeStart.toFixed(1)} – ${rangeEnd.toFixed(1)}`;
 
             rangeDiv.appendChild(colorSwatch);
             rangeDiv.appendChild(rangeLabel);
