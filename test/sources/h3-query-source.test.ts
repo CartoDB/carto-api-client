@@ -58,7 +58,6 @@ describe('h3QuerySource', () => {
     });
 
     const {widgetSource} = await h3QuerySource({
-      localCache: {cacheControl: ['no-cache']}, // prevent caching schema
       accessToken: '<token>',
       connectionName: 'carto_dw',
       sqlQuery: 'SELECT *',

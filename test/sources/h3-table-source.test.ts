@@ -58,7 +58,6 @@ describe('h3TableSource', () => {
     });
 
     const {widgetSource} = await h3TableSource({
-      localCache: {cacheControl: ['no-cache']}, // prevent caching schema
       accessToken: '<token>',
       connectionName: 'carto_dw',
       tableName: 'my-table',

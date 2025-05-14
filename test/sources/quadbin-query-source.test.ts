@@ -56,7 +56,6 @@ describe('quadbinQuerySource', () => {
     });
 
     const {widgetSource} = await quadbinQuerySource({
-      localCache: {cacheControl: ['no-cache']}, // prevent caching schema
       accessToken: '<token>',
       connectionName: 'carto_dw',
       sqlQuery: 'SELECT *',

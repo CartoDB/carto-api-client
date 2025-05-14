@@ -56,7 +56,6 @@ describe('quadbinTableSource', () => {
     });
 
     const {widgetSource} = await quadbinTableSource({
-      localCache: {cacheControl: ['no-cache']}, // prevent caching schema
       accessToken: '<token>',
       connectionName: 'carto_dw',
       tableName: 'my-table',
