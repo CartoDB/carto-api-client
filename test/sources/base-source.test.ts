@@ -4,12 +4,10 @@ import {MOCK_INIT_RESPONSE} from '../__mock-fetch.js';
 
 describe('baseSource', () => {
   beforeEach(() => {
-    const mockFetch = vi
-      .fn()
-      .mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve(MOCK_INIT_RESPONSE),
-      });
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(MOCK_INIT_RESPONSE),
+    });
 
     vi.stubGlobal('fetch', mockFetch);
   });
