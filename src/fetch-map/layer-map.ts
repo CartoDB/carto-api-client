@@ -312,7 +312,7 @@ export function getColorAccessor(
   {aggregation, range}: {aggregation: string; range: any},
   opacity: number | undefined,
   data: any
-): { accessor: any, scale: any } {
+): {accessor: any; scale: any} {
   const scale = calculateLayerScale(
     colorColumn || name,
     scaleType,
@@ -441,7 +441,7 @@ export function getSizeAccessor(
   aggregation: string | null | undefined,
   range: Iterable<Range> | null | undefined,
   data: any
-): { accessor: any, scale: any } {
+): {accessor: any; scale: any} {
   const scale = scaleType ? SCALE_FUNCS[scaleType as any]() : identity;
   if (scaleType) {
     if (aggregation !== 'count') {

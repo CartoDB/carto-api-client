@@ -33,9 +33,10 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
       dataColumnDiv.textContent = dataColumn;
       layerDiv.appendChild(dataColumnDiv);
 
-      const tilestats = layer.props.data?.tilestats?.layers[0]?.attributes?.find(
-        (a: any) => a.attribute === dataColumn
-      );
+      const tilestats =
+        layer.props.data?.tilestats?.layers[0]?.attributes?.find(
+          (a: any) => a.attribute === dataColumn
+        );
 
       // Numeric or categorical scale
       const isConstantColor = !scaleInfo.domain || !scaleInfo.range;
@@ -55,8 +56,14 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
         rangeDiv.appendChild(colorSwatch);
         rangeDiv.appendChild(rangeLabel);
         layerDiv.appendChild(rangeDiv);
-      } else if (scaleInfo && scaleInfo.domain && scaleInfo.range && Array.isArray(scaleInfo.domain) && Array.isArray(scaleInfo.range)) {
-        const {domain, range, field, type} = scaleInfo;
+      } else if (
+        scaleInfo &&
+        scaleInfo.domain &&
+        scaleInfo.range &&
+        Array.isArray(scaleInfo.domain) &&
+        Array.isArray(scaleInfo.range)
+      ) {
+        const {domain, range, type} = scaleInfo;
         if (type === 'custom' || type === 'quantile') {
           // Custom threshold scale: domain is [start1, start2, ..., null], range is colors
           for (let i = 0; i < range.length; i++) {
@@ -88,7 +95,11 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
             rangeDiv.appendChild(rangeLabel);
             layerDiv.appendChild(rangeDiv);
           }
-        } else if (type === 'ordinal' || type === 'point' || (typeof domain[0] === 'string')) {
+        } else if (
+          type === 'ordinal' ||
+          type === 'point' ||
+          typeof domain[0] === 'string'
+        ) {
           for (let i = 0; i < domain.length; i++) {
             const rangeDiv = document.createElement('div');
             rangeDiv.className = 'legend-range';
@@ -105,7 +116,11 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
             rangeDiv.appendChild(rangeLabel);
             layerDiv.appendChild(rangeDiv);
           }
-        } else if (typeof domain[0] === 'number' && typeof domain[1] === 'number' && range.length > 1) {
+        } else if (
+          typeof domain[0] === 'number' &&
+          typeof domain[1] === 'number' &&
+          range.length > 1
+        ) {
           const numRanges = range.length;
           const min = domain[0];
           const max = domain[1];

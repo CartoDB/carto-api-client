@@ -339,7 +339,11 @@ function createChannelProps(
       data
     );
     result.getPointRadius = accessor;
-    result.scales.pointRadius = {scale, field: radiusField || sizeField, type: radiusScale || sizeScale};
+    result.scales.pointRadius = {
+      scale,
+      field: radiusField || sizeField,
+      type: radiusScale || sizeScale,
+    };
   }
 
   if (strokeColorField) {
@@ -360,7 +364,11 @@ function createChannelProps(
       data
     );
     result.getLineColor = accessor;
-    result.scales.lineColor = {scale, field: strokeColorField, type: strokeColorScale};
+    result.scales.lineColor = {
+      scale,
+      field: strokeColorField,
+      type: strokeColorScale,
+    };
   }
   if (heightField && visConfig.enable3d) {
     const {accessor, scale} = getSizeAccessor(
@@ -427,7 +435,7 @@ function createChannelProps(
     }
 
     if (visualChannels.rotationField) {
-      const {accessor, scale} = getSizeAccessor(
+      const {accessor} = getSizeAccessor(
         visualChannels.rotationField,
         undefined,
         null,
@@ -497,7 +505,7 @@ function createChannelProps(
       domain: scale.domain(),
       range: scale.range(),
       type,
-    }
+    };
   }
 
   return result;

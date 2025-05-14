@@ -163,7 +163,7 @@ const examples = [
 
   // Legend
   '26bce5fe-29d4-48dc-914f-14355971f143',
-  '856f0f80-5b71-4578-a68b-c7d9d74430a2'
+  '856f0f80-5b71-4578-a68b-c7d9d74430a2',
 ];
 const params = new URLSearchParams(location.search.slice(1));
 const id = params.has('id') ? params.get('id')! : examples[0];
