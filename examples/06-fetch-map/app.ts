@@ -143,7 +143,6 @@ const examples = [
   '8edfb83d-ede2-480d-bb56-42bba198d214', // Vector - Table - 6k lines Galapagos contour
   '542c40c5-2b15-46c7-933b-2586630af6ac', // Vector - Table - 35k points with multiple labels airports
   '84c3ad7a-1d46-4fce-a999-2812426c3015', // Vector - Table - 42k polygons NYC extruded buildings
-  'b8abc46c-3c7f-489f-b16f-0664872ad82a', // Vector - Table - Snowflake - 74k bike accidents France
   'c638e42a-a305-4a48-8f7c-b9aa86b31be1', // Vector - Table - Redshift - 45 store points size based on revenue
   '4f5f8894-b895-460c-809d-769ae4e3fd30', // Vector - Tileset - 362M points COVID vaccination custom palette
   'fee28800-ae52-4972-be85-ffdae877a61e', // Vector - Aggregated Geometries
@@ -162,6 +161,10 @@ const examples = [
   // Filtering
   'be57ed8b-f6ca-41ba-bc38-6864a83c621f', // Server-side filtering
   '879da3c7-363f-43b5-a9b4-b0abc1b866bc', // Client-side filtering
+
+  // Legend
+  '26bce5fe-29d4-48dc-914f-14355971f143',
+  '856f0f80-5b71-4578-a68b-c7d9d74430a2'
 ];
 const params = new URLSearchParams(location.search.slice(1));
 const id = params.has('id') ? params.get('id')! : examples[0];
