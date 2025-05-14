@@ -3,6 +3,7 @@ import type {
   TileResolution,
 } from '../sources/types.js';
 import type {
+  AggregationType,
   Filters,
   GroupDateType,
   SortColumnType,
@@ -33,7 +34,8 @@ export interface BaseRequestOptions {
 /** Options for {@link WidgetRemoteSource#getCategories}. */
 export interface CategoryRequestOptions extends BaseRequestOptions {
   column: string;
-  operation?: 'count' | 'avg' | 'min' | 'max' | 'sum' | 'custom';
+  operation?: AggregationType
+  /** Remote only. Only valid if operation is 'custom' */
   operationExp?: string;
   operationColumn?: string;
   /** Local only. */
@@ -86,7 +88,8 @@ export interface FeaturesRequestOptions extends BaseRequestOptions {
 /** Options for {@link WidgetRemoteSource#getFormula}. */
 export interface FormulaRequestOptions extends BaseRequestOptions {
   column: string;
-  operation?: 'count' | 'avg' | 'min' | 'max' | 'sum' | 'custom';
+  operation?: AggregationType
+  /** Remote only. Only valid if operation is 'custom' */
   operationExp?: string;
   joinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
 }
@@ -132,7 +135,8 @@ export interface TimeSeriesRequestOptions extends BaseRequestOptions {
   column: string;
   stepSize: GroupDateType;
   stepMultiplier?: number;
-  operation?: 'count' | 'avg' | 'min' | 'max' | 'sum' | 'custom';
+  operation?: AggregationType
+  /** Remote only. Only valid if operation is 'custom' */
   operationExp?: string;
   operationColumn?: string;
   joinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
