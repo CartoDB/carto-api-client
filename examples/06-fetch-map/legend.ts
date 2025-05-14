@@ -1,5 +1,5 @@
-import {LayerDescriptor} from '@carto/api-client';
 import './legend.css';
+import {LayerDescriptor} from '@carto/api-client';
 
 export function createLegend(layers: LayerDescriptor[]): HTMLElement {
   const wrapper = document.createElement('div');
@@ -57,15 +57,9 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
         layerDiv.appendChild(rangeDiv);
       } else if (scaleInfo && scaleInfo.domain && scaleInfo.range && Array.isArray(scaleInfo.domain) && Array.isArray(scaleInfo.range)) {
         const {domain, range, field, type} = scaleInfo;
-        if (typeof domain[0] === 'number' && typeof domain[1] === 'number' && range.length > 1) {
-          const numRanges = range.length;
-          const min = domain[0];
-          const max = domain[1];
-          const step = (max - min) / numRanges;
-          for (let i = 0; i < numRanges; i++) {
-            const rangeStart = min + step * i;
-            const rangeEnd = i === numRanges - 1 ? max : min + step * (i + 1);
-
+        if (type === 'custom') {
+          // Custom threshold scale: domain is [start1, start2, ..., null], range is colors
+          for (let i = 0; i < range.length; i++) {
             const rangeDiv = document.createElement('div');
             rangeDiv.className = 'legend-range';
 
@@ -75,7 +69,13 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
 
             const rangeLabel = document.createElement('div');
             rangeLabel.className = 'legend-range-label';
-            rangeLabel.textContent = `${rangeStart.toFixed(2)} – ${rangeEnd.toFixed(2)}`;
+            const start = domain[i];
+            const end = domain[i + 1];
+            if (end === null || end === undefined) {
+              rangeLabel.textContent = `${start}+`;
+            } else {
+              rangeLabel.textContent = `${start} – ${end}`;
+            }
 
             rangeDiv.appendChild(colorSwatch);
             rangeDiv.appendChild(rangeLabel);
@@ -93,6 +93,31 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
             const rangeLabel = document.createElement('div');
             rangeLabel.className = 'legend-range-label';
             rangeLabel.textContent = domain[i];
+
+            rangeDiv.appendChild(colorSwatch);
+            rangeDiv.appendChild(rangeLabel);
+            layerDiv.appendChild(rangeDiv);
+          }
+        } else if (typeof domain[0] === 'number' && typeof domain[1] === 'number' && range.length > 1) {
+          const numRanges = range.length;
+          const min = domain[0];
+          const max = domain[1];
+          console.log('legend domain', domain);
+          const step = (max - min) / numRanges;
+          for (let i = 0; i < numRanges; i++) {
+            const rangeStart = min + step * i;
+            const rangeEnd = i === numRanges - 1 ? max : min + step * (i + 1);
+
+            const rangeDiv = document.createElement('div');
+            rangeDiv.className = 'legend-range';
+
+            const colorSwatch = document.createElement('div');
+            colorSwatch.className = 'legend-color-swatch';
+            colorSwatch.style.backgroundColor = range[i];
+
+            const rangeLabel = document.createElement('div');
+            rangeLabel.className = 'legend-range-label';
+            rangeLabel.textContent = `${rangeStart.toFixed(2)} – ${rangeEnd.toFixed(2)}`;
 
             rangeDiv.appendChild(colorSwatch);
             rangeDiv.appendChild(rangeLabel);
