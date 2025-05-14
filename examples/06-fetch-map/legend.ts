@@ -57,7 +57,7 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
         layerDiv.appendChild(rangeDiv);
       } else if (scaleInfo && scaleInfo.domain && scaleInfo.range && Array.isArray(scaleInfo.domain) && Array.isArray(scaleInfo.range)) {
         const {domain, range, field, type} = scaleInfo;
-        if (type === 'custom') {
+        if (type === 'custom' || type === 'quantile') {
           // Custom threshold scale: domain is [start1, start2, ..., null], range is colors
           for (let i = 0; i < range.length; i++) {
             const rangeDiv = document.createElement('div');
