@@ -119,7 +119,7 @@ describe('viewport features with binary mode', () => {
         spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
-        options: {storeGeometry: true},
+        storeGeometry: true,
       });
 
       expect(properties).toEqual(
@@ -176,7 +176,7 @@ describe('viewport features with binary mode', () => {
         spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
-        options: {storeGeometry: true},
+        storeGeometry: true,
       });
 
       expect(properties).toEqual(
@@ -233,7 +233,7 @@ describe('viewport features with binary mode', () => {
         spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
-        options: {storeGeometry: true},
+        storeGeometry: true,
       });
       expect(properties).toEqual(
         expectedProperties.map((expected, i) => ({
@@ -291,7 +291,7 @@ describe('viewport features with binary mode', () => {
         spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
-        options: {storeGeometry: true},
+        storeGeometry: true,
       });
       expect(properties).toEqual(
         expectedProperties.map((expected, i) => ({
@@ -343,7 +343,7 @@ describe('viewport features with binary mode', () => {
         spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
-        options: {storeGeometry: true},
+        storeGeometry: true,
       });
       expect(properties).toEqual(
         expectedProperties.map((expected, i) => ({
@@ -391,7 +391,7 @@ describe('viewport features with binary mode', () => {
         spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
-        options: {storeGeometry: true},
+        storeGeometry: true,
       });
       expect(properties).toEqual(
         expectedProperties.map((expected, i) => ({
@@ -441,7 +441,7 @@ describe('viewport features with binary mode', () => {
         spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
-        options: {storeGeometry: true},
+        storeGeometry: true,
       });
       expect(properties).toEqual(
         expectedProperties.map((expected, i) => ({
@@ -492,7 +492,7 @@ describe('viewport features with binary mode', () => {
         spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
-        options: {storeGeometry: true},
+        storeGeometry: true,
       });
       expect(properties).toEqual(
         expectedProperties.map((expected, i) => ({
@@ -543,7 +543,7 @@ describe('viewport features with binary mode', () => {
         spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'cartodb_id',
-        options: {storeGeometry: true},
+        storeGeometry: true,
       });
       expect(properties).toEqual(
         expectedProperties.map((expected, i) => ({
@@ -617,7 +617,7 @@ describe('viewport features with binary mode', () => {
           spatialDataType: 'geo',
           spatialFilter,
           uniqueIdProperty: undefined,
-          options: {storeGeometry: true},
+          storeGeometry: true,
         });
         expect(properties).toEqual(
           expectedProperties.map((expected, i) => ({
@@ -670,7 +670,7 @@ describe('viewport features with binary mode', () => {
           spatialDataType: 'geo',
           spatialFilter,
           uniqueIdProperty: undefined,
-          options: {storeGeometry: true},
+          storeGeometry: true,
         });
         expect(properties).toEqual(
           expectedProperties.map((expected, i) => ({
@@ -723,7 +723,7 @@ describe('viewport features with binary mode', () => {
           spatialDataType: 'geo',
           spatialFilter,
           uniqueIdProperty: undefined,
-          options: {storeGeometry: true},
+          storeGeometry: true,
         });
         expect(properties).toEqual(
           expectedProperties.map((expected, i) => ({
@@ -775,7 +775,7 @@ describe('viewport features with binary mode', () => {
           spatialDataType: 'geo',
           spatialFilter,
           uniqueIdProperty: undefined,
-          options: {storeGeometry: true},
+          storeGeometry: true,
         });
         expect(properties).toEqual(
           expectedProperties.map((expected, i) => ({
@@ -830,7 +830,7 @@ describe('viewport features with binary mode', () => {
         spatialDataType: 'geo',
         spatialFilter,
         uniqueIdProperty: 'user_id',
-        options: {storeGeometry: true},
+        storeGeometry: true,
       });
 
       expect(properties).toEqual(
@@ -900,7 +900,7 @@ describe('viewport features with binary mode', () => {
         tileFormat: TileFormat.GEOJSON,
         spatialDataType: 'geo',
         spatialFilter,
-        options: {storeGeometry: true},
+        storeGeometry: true,
       });
       expect(transformTileCoordsToWGS84Spy).toHaveBeenCalledTimes(0);
 
@@ -909,7 +909,7 @@ describe('viewport features with binary mode', () => {
         tileFormat: TileFormat.BINARY,
         spatialDataType: 'geo',
         spatialFilter,
-        options: {storeGeometry: true},
+        storeGeometry: true,
       });
       expect(transformTileCoordsToWGS84Spy).toHaveBeenCalledTimes(0);
 
@@ -926,7 +926,7 @@ describe('viewport features with binary mode', () => {
         tileFormat: TileFormat.MVT,
         spatialDataType: 'geo',
         spatialFilter,
-        options: {storeGeometry: true},
+        storeGeometry: true,
       });
       expect(transformTileCoordsToWGS84Spy).toHaveBeenCalled();
 

@@ -22,7 +22,7 @@ export type TileFeatures = {
   spatialFilter: SpatialFilter;
   uniqueIdProperty?: string;
   rasterMetadata?: RasterMetadata;
-  options?: TileFeatureExtractOptions;
+  storeGeometry?: boolean;
 };
 
 /** @privateRemarks Source: @carto/react-core */
@@ -42,7 +42,7 @@ export function tileFeatures({
   spatialDataColumn = DEFAULT_GEO_COLUMN,
   spatialDataType,
   rasterMetadata,
-  options = {},
+  storeGeometry = false,
 }: TileFeatures): FeatureData[] {
   if (spatialDataType === 'geo') {
     return tileFeaturesGeometries({
@@ -50,7 +50,7 @@ export function tileFeatures({
       tileFormat,
       spatialFilter,
       uniqueIdProperty,
-      options,
+      options: {storeGeometry},
     });
   }
 

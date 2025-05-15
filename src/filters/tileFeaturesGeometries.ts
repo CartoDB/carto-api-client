@@ -16,7 +16,6 @@ import type {
   Position,
 } from 'geojson';
 import type {SpatialFilter, Tile} from '../types.js';
-import type {TileFeatureExtractOptions} from './tileFeatures.js';
 import {featureCollection} from '@turf/helpers';
 import type {FeatureData} from '../types-internal.js';
 import type {
@@ -39,6 +38,10 @@ type TileDataInternal = {
   numericProps: Record<string, number>;
 };
 
+type GeometryExtractOptions = {
+  storeGeometry?: boolean;
+};
+
 export function tileFeaturesGeometries({
   tiles,
   tileFormat,
@@ -50,7 +53,7 @@ export function tileFeaturesGeometries({
   tileFormat?: TileFormat;
   spatialFilter: SpatialFilter;
   uniqueIdProperty?: string;
-  options?: {storeGeometry?: boolean};
+  options?: GeometryExtractOptions;
 }): FeatureData[] {
   const map = new Map();
 
@@ -212,7 +215,7 @@ function addIntersectedFeaturesInTile({
   bbox: BBox;
   tileFormat?: TileFormat;
   uniqueIdProperty?: string;
-  options?: TileFeatureExtractOptions;
+  options?: GeometryExtractOptions;
 }) {
   const indices = getIndices(data, type);
   const storeGeometry = options?.storeGeometry || false;
@@ -364,7 +367,7 @@ function calculateFeatures({
   bbox: BBox;
   tileFormat?: TileFormat;
   uniqueIdProperty?: string;
-  options?: TileFeatureExtractOptions;
+  options?: GeometryExtractOptions;
 }) {
   if (!data?.properties.length) {
     return;
@@ -409,7 +412,7 @@ function addAllFeaturesInTile({
   bbox: BBox;
   tileFormat?: TileFormat;
   uniqueIdProperty?: string;
-  options?: TileFeatureExtractOptions;
+  options?: GeometryExtractOptions;
 }) {
   const indices = getIndices(data, type);
   const storeGeometry = options?.storeGeometry || false;
