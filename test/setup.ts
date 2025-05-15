@@ -1,4 +1,8 @@
-import {getClient, setClient} from '@carto/api-client';
+import {
+  getClient,
+  setClient,
+  clearDefaultRequestCache,
+} from '@carto/api-client';
 import {afterEach, vi} from 'vitest';
 
 // NOTE: By default Vitest runs each test file in isolation, but sometimes we
@@ -11,6 +15,7 @@ const DEFAULT_CLIENT_ID = getClient();
 
 afterEach(() => {
   setClient(DEFAULT_CLIENT_ID);
+  clearDefaultRequestCache();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });

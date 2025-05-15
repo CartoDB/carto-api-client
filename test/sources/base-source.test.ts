@@ -1,19 +1,13 @@
 import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest';
 import {setClient, vectorTableSource} from '@carto/api-client';
-
-const CACHE = 'base-source-test';
-
-const INIT_RESPONSE = {
-  tilejson: {url: [`https://xyz.com?format=tilejson&cache=${CACHE}`]},
-};
+import {MOCK_INIT_RESPONSE} from '../__mock-fetch.js';
 
 describe('baseSource', () => {
   beforeEach(() => {
-    const mockFetch = vi
-      .fn()
-      .mockReturnValue(
-        Promise.resolve({ok: true, json: () => Promise.resolve(INIT_RESPONSE)})
-      );
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(MOCK_INIT_RESPONSE),
+    });
 
     vi.stubGlobal('fetch', mockFetch);
   });
