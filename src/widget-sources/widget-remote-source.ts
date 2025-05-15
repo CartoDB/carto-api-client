@@ -17,7 +17,7 @@ import type {
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
 } from './types.js';
-import {normalizeObjectKeys} from '../utils.js';
+import {assert, normalizeObjectKeys} from '../utils.js';
 import {DEFAULT_TILE_RESOLUTION} from '../constants-internal.js';
 import {WidgetSource, type WidgetSourceProps} from './widget-source.js';
 import type {Filters} from '../types.js';
@@ -74,7 +74,11 @@ export abstract class WidgetRemoteSource<
       spatialFiltersMode,
       ...params
     } = options;
-    const {column, operation, operationColumn} = params;
+    const {column, operation, operationColumn, operationExp} = params;
+
+    if (operation === 'custom') {
+      assert(operationExp, 'operationExp is required for custom operation');
+    }
 
     type CategoriesModelResponse = {rows: {name: string; value: number}[]};
 
@@ -88,6 +92,7 @@ export abstract class WidgetRemoteSource<
       params: {
         column,
         operation,
+        operationExp,
         operationColumn: operationColumn || column,
       },
       opts: {signal, headers: this.props.headers},
@@ -142,6 +147,10 @@ export abstract class WidgetRemoteSource<
     const {column, operation} = params;
 
     type FormulaModelResponse = {rows: {value: number}[]};
+
+    if (operation === 'custom') {
+      assert(operationExp, 'operationExp is required for custom operation');
+    }
 
     return executeModel({
       model: 'formula',
@@ -314,12 +323,17 @@ export abstract class WidgetRemoteSource<
       operationColumn,
       joinOperation,
       operation,
+      operationExp,
       stepSize,
       stepMultiplier,
       splitByCategory,
       splitByCategoryLimit,
       splitByCategoryValues,
     } = params;
+
+    if (operation === 'custom') {
+      assert(operationExp, 'operationExp is required for custom operation');
+    }
 
     type TimeSeriesModelResponse = {
       rows: {name: string; value: number}[];
@@ -340,6 +354,7 @@ export abstract class WidgetRemoteSource<
         operationColumn: operationColumn || column,
         joinOperation,
         operation,
+        operationExp,
         splitByCategory,
         splitByCategoryLimit,
         splitByCategoryValues,

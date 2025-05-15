@@ -3,6 +3,7 @@ import type {
   TileResolution,
 } from '../sources/types.js';
 import type {
+  AggregationType,
   Filters,
   GroupDateType,
   SortColumnType,
@@ -30,10 +31,31 @@ export interface BaseRequestOptions {
   filterOwner?: string;
 }
 
-/** Options for {@link WidgetRemoteSource#getCategories}. */
+/**
+ * Examples:
+ *   * population by state
+ *      * column: 'state'
+ *      * operation: 'sum'
+ *      * operationColumn: 'population'
+ *   * average salary by department
+ *      * column: 'department'
+ *      * operation: 'avg'
+ *      * operationColumn: 'salary'
+ *   * custom aggregation by storetype
+ *      * column: 'storetype'
+ *      * operation: 'custom'
+ *      * operationExp: 'sum(sales)/sum(area)'
+ *
+ * Options for {@link WidgetRemoteSource#getCategories}.
+ */
 export interface CategoryRequestOptions extends BaseRequestOptions {
+  /** The column that to categorize by. */
   column: string;
-  operation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
+  /** The type of aggregation to apply on data in scope of each category. */
+  operation: AggregationType;
+  /** Remote only. Only valid if operation is 'custom' */
+  operationExp?: string;
+  /** The aggregated column per each category. */
   operationColumn?: string;
   /** Local only. */
   joinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
@@ -82,11 +104,28 @@ export interface FeaturesRequestOptions extends BaseRequestOptions {
   tileResolution?: TileResolution;
 }
 
-/** Options for {@link WidgetRemoteSource#getFormula}. */
+/**
+ * Examples:
+ *   * sum of all sales
+ *      * column: 'sales'
+ *      * operation: 'sum'
+ *   * average salary
+ *      * column: 'salary'
+ *      * operation: 'avg'
+ *   * custom aggregation over all rows
+ *      * operation: 'custom'
+ *      * operationExp: 'sum(sales)/sum(area)'
+ *
+ * Options for {@link WidgetRemoteSource#getFormula}.
+ */
 export interface FormulaRequestOptions extends BaseRequestOptions {
-  column: string;
-  operation?: 'count' | 'avg' | 'min' | 'max' | 'sum' | 'custom';
+  /** The column to apply the aggregation operation on. Not needed for 'custom' operation. */
+  column?: string;
+  /** The type of aggregation to apply on data. */
+  operation: AggregationType;
+  /** Remote only. Only valid if operation is 'custom' */
   operationExp?: string;
+  /** Local only. */
   joinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
 }
 
@@ -126,12 +165,25 @@ export interface TableRequestOptions extends BaseRequestOptions {
   searchFilterText?: string;
 }
 
-/** Options for {@link WidgetRemoteSource#getTimeSeries}. */
+/**
+ * Examples:
+ *   * sum of all sales by month
+ *      * column: 'sales'
+ *      * stepSize: 'month'
+ *      * operation: 'sum'
+ *   * average salary by year
+ *      * column: 'salary'
+ *      * stepSize: 'year'
+ *      * operation: 'avg'
+ * Options for {@link WidgetRemoteSource#getTimeSeries}.
+ */
 export interface TimeSeriesRequestOptions extends BaseRequestOptions {
   column: string;
   stepSize: GroupDateType;
   stepMultiplier?: number;
-  operation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
+  operation: AggregationType;
+  /** Remote only. Only valid if operation is 'custom' */
+  operationExp?: string;
   operationColumn?: string;
   joinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
   splitByCategory?: string;
