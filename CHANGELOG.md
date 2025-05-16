@@ -2,6 +2,16 @@
 
 ## 0.5
 
+### 0.5.4
+
+- fix(widgets): Fix support for 'storeGeometry' on tileset widgets (#181)
+- fix(widgets): Fix inference of 'spatialDataType' for dynamic point aggregation sources (#178)
+
+### 0.5.3
+
+- chore(deps): Unpin h3-js dependency (#176)
+- chore(types): Export missing types used in public API (#159)
+
 ### 0.5.2
 
 - feat(filters): Export getApplicableFilters (#162)
