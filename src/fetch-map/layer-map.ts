@@ -65,13 +65,6 @@ function identity<T>(v: T): T {
 
 const UNKNOWN_COLOR = '#868d91';
 
-export const AGGREGATION: Record<string, string> = {
-  average: 'MEAN',
-  maximum: 'MAX',
-  minimum: 'MIN',
-  sum: 'SUM',
-};
-
 export const OPACITY_MAP: Record<string, string> = {
   getFillColor: 'opacity',
   getLineColor: 'strokeOpacity',
@@ -301,16 +294,6 @@ function findAccessorKey(keys: string[], properties: any): string[] {
   // If data doesn't contain any valid keys, return all keys to run search
   // on next feature
   return keys;
-}
-
-export function getColorValueAccessor(
-  {name}: VisualChannelField,
-  colorAggregation: string,
-  data: any
-) {
-  const aggregator = AGGREGATION_FUNC[colorAggregation];
-  const accessor = (values: any) => aggregator(values, (p: any) => p[name]);
-  return normalizeAccessor(accessor, data);
 }
 
 export function getColorAccessor(
