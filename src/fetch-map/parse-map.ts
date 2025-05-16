@@ -226,7 +226,7 @@ function domainAndRangeFromScale(scale: D3Scale): Pick<Scale, 'domain' | 'range'
 
 function createChannelProps(
   id: string,
-  type: string,
+  layerType: LayerType,
   config: MapLayerConfig,
   visualChannels: VisualChannels,
   data: any,
@@ -247,21 +247,7 @@ function createChannelProps(
 
   const scales: Record<string, Scale> = {};
 
-  if (type === 'grid' || type === 'hexagon') {
-    result.colorScaleType = colorScale;
-    if (colorField) {
-      const {colorAggregation} = config.visConfig;
-      if (!AGGREGATION[colorAggregation]) {
-        result.getColorValue = getColorValueAccessor(
-          colorField,
-          colorAggregation,
-          data
-        );
-      } else {
-        result.getColorWeight = (d: any) => d[colorField.name];
-      }
-    }
-  } else if (colorField) {
+  if (colorField) {
     const {colorAggregation: aggregation, colorRange: range} = visConfig;
     const {accessor, scale} = getColorAccessor(
       colorField,
@@ -274,26 +260,9 @@ function createChannelProps(
     scales.fillColor = {field: colorField, type: colorScale!, ...domainAndRangeFromScale(scale)};
   }
 
-  if (type === 'point') {
-    const altitude = config.columns?.altitude;
-    if (altitude) {
-      result.dataTransform = (data: any) => {
-        data.features.forEach(
-          ({geometry, properties}: {geometry: any; properties: any}) => {
-            const {type, coordinates} = geometry;
-            if (type === 'Point') {
-              coordinates[2] = properties[altitude];
-            }
-          }
-        );
-        return data;
-      };
-    }
-  }
-
-  if (type === 'clusterTile') {
+  if (layerType === 'clusterTile') {
     const aggregationExpAlias = getDefaultAggregationExpColumnAliasForLayerType(
-      type,
+      layerType,
       dataset.providerId,
       data.schema
     );
@@ -358,11 +327,10 @@ function createChannelProps(
   }
 
   if (strokeColorField) {
-    const fallbackOpacity = type === 'point' ? visConfig.opacity : 1;
     const opacity =
       visConfig.strokeOpacity !== undefined
         ? visConfig.strokeOpacity
-        : fallbackOpacity;
+        : 1;
     const {strokeColorAggregation: aggregation, strokeColorRange: range} =
       visConfig;
     const {accessor, scale} = getColorAccessor(
@@ -460,7 +428,7 @@ function createChannelProps(
       );
       result.getIconAngle = negateAccessor(accessor);
     }
-  } else if (type === 'point' || type === 'tileset') {
+  } else if (layerType === 'tileset') {
     result.pointType = 'circle';
   }
 
