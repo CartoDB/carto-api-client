@@ -46,7 +46,8 @@ export type D3Scale = {
 } & ((d: any) => any);
 type D3ScaleFactory = () => D3Scale;
 
-const SCALE_FUNCS: Record<string, D3ScaleFactory> = {
+export type SCALE_TYPE = 'linear' | 'ordinal' | 'log' | 'point' | 'quantile' | 'quantize' | 'sqrt' | 'custom' | 'identity';
+const SCALE_FUNCS: Record<SCALE_TYPE, D3ScaleFactory> = {
   linear: scaleLinear,
   ordinal: scaleOrdinal,
   log: scaleLog,
@@ -57,7 +58,6 @@ const SCALE_FUNCS: Record<string, D3ScaleFactory> = {
   custom: scaleThreshold,
   identity: scaleIdentity,
 };
-export type SCALE_TYPE = keyof typeof SCALE_FUNCS;
 
 function identity<T>(v: T): T {
   return v;
@@ -421,7 +421,7 @@ export function getSizeAccessor(
   range: Iterable<Range> | null | undefined,
   data: any
 ): {accessor: any; scale: any} {
-  const scale = scaleType ? SCALE_FUNCS[scaleType as any]() : identity;
+  const scale = scaleType ? SCALE_FUNCS[scaleType]() : identity;
   if (scaleType) {
     if (aggregation !== 'count') {
       (scale as D3Scale).domain(calculateDomain(data, name, scaleType));

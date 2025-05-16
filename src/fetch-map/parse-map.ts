@@ -17,6 +17,7 @@ import {
   TEXT_LABEL_INDEX,
   TEXT_OUTLINE_OPACITY,
   type D3Scale,
+  type SCALE_TYPE,
 } from './layer-map.js';
 
 import {assert, isEmptyObject} from '../utils.js';
@@ -36,7 +37,7 @@ export type Scale = {
   field: VisualChannelField;
   domain: (string | number)[];
   range: string[];
-  type: string;
+  type: SCALE_TYPE;
 };
 
 export type LayerDescriptor = {
@@ -224,6 +225,8 @@ function domainAndRangeFromScale(
   };
 }
 
+type ScaleKey = 'fillColor' | 'pointRadius' | 'lineColor' | 'elevation' | 'weight';
+
 function createChannelProps(
   id: string,
   layerType: LayerType,
@@ -231,7 +234,7 @@ function createChannelProps(
   visualChannels: VisualChannels,
   data: any,
   dataset: Dataset
-): {channelProps: Record<string, any>; scales: Record<string, any>} {
+): {channelProps: Record<string, any>; scales: Record<ScaleKey, Scale>} {
   const {
     colorField,
     colorScale,
