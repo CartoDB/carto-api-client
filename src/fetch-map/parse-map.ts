@@ -18,6 +18,7 @@ import {
   TEXT_NUMBER_FORMATTER,
   TEXT_LABEL_INDEX,
   TEXT_OUTLINE_OPACITY,
+  type D3Scale,
 } from './layer-map.js';
 
 import {assert, isEmptyObject} from '../utils.js';
@@ -216,6 +217,13 @@ function createStyleProps(config: MapLayerConfig, mapping: any) {
   return result;
 }
 
+function domainAndRangeFromScale(scale: D3Scale): Pick<Scale, 'domain' | 'range'> {
+  return {
+    domain: scale.domain(),
+    range: scale.range(),
+  };
+}
+
 function createChannelProps(
   id: string,
   type: string,
@@ -229,20 +237,15 @@ function createChannelProps(
     colorScale,
     radiusField,
     radiusScale,
-    sizeField,
-    sizeScale,
     strokeColorField,
     strokeColorScale,
     weightField,
   } = visualChannels;
   let {heightField, heightScale} = visualChannels;
-  if (type === 'hexagonId') {
-    heightField = sizeField;
-    heightScale = sizeScale;
-  }
   const {textLabel, visConfig} = config;
   const result: Record<string, any> = {};
-  result.scales = {};
+
+  const scales: Record<string, Scale> = {};
 
   if (type === 'grid' || type === 'hexagon') {
     result.colorScaleType = colorScale;
@@ -262,14 +265,13 @@ function createChannelProps(
     const {colorAggregation: aggregation, colorRange: range} = visConfig;
     const {accessor, scale} = getColorAccessor(
       colorField,
-      // @ts-ignore
-      colorScale,
+      colorScale!,
       {aggregation, range},
       visConfig.opacity,
       data
     );
     result.getFillColor = accessor;
-    result.scales.fillColor = {scale, field: colorField, type: colorScale};
+    scales.fillColor = {field: colorField, type: colorScale!, ...domainAndRangeFromScale(scale)};
   }
 
   if (type === 'point') {
@@ -339,21 +341,19 @@ function createChannelProps(
     };
   }
 
-  if (radiusField || sizeField) {
+  if (radiusField) {
     const {accessor, scale} = getSizeAccessor(
-      // @ts-ignore
-      radiusField || sizeField,
-      // @ts-ignore
-      radiusScale || sizeScale,
+      radiusField,
+      radiusScale,
       visConfig.sizeAggregation,
       visConfig.radiusRange || visConfig.sizeRange,
       data
     );
     result.getPointRadius = accessor;
-    result.scales.pointRadius = {
-      scale,
-      field: radiusField || sizeField,
-      type: radiusScale || sizeScale,
+    scales.pointRadius = {
+      field: radiusField,
+      type: radiusScale || 'identity',
+      ...domainAndRangeFromScale(scale),
     };
   }
 
@@ -367,31 +367,32 @@ function createChannelProps(
       visConfig;
     const {accessor, scale} = getColorAccessor(
       strokeColorField,
-      // @ts-ignore
-      strokeColorScale,
-      // @ts-ignore
+      strokeColorScale!,
       {aggregation, range},
       opacity,
       data
     );
     result.getLineColor = accessor;
-    result.scales.lineColor = {
-      scale,
+    scales.lineColor = {
       field: strokeColorField,
-      type: strokeColorScale,
+      type: strokeColorScale!,
+      ...domainAndRangeFromScale(scale),
     };
   }
   if (heightField && visConfig.enable3d) {
     const {accessor, scale} = getSizeAccessor(
       heightField,
-      // @ts-ignore
       heightScale,
       visConfig.heightAggregation,
       visConfig.heightRange || visConfig.sizeRange,
       data
     );
     result.getElevation = accessor;
-    result.scales.elevation = {scale, field: heightField, type: heightScale};
+    scales.elevation = {
+      field: heightField,
+      type: heightScale || 'identity',
+      ...domainAndRangeFromScale(scale),
+    };
   }
 
   if (weightField) {
@@ -403,7 +404,11 @@ function createChannelProps(
       data
     );
     result.getWeight = accessor;
-    result.scales.weight = {scale, field: weightField, type: 'identity'};
+    scales.weight = {
+      field: weightField,
+      type: 'identity',
+      ...domainAndRangeFromScale(scale),
+    };
   }
 
   if (visConfig.customMarkers) {
@@ -509,18 +514,7 @@ function createChannelProps(
     };
   }
 
-  for (const key of Object.keys(result.scales)) {
-    const {field, scale, type} = result.scales[key];
-    result.scales[key] = {
-      field,
-      domain: scale.domain(),
-      range: scale.range(),
-      type,
-    };
-  }
-
-  const {scales, ...channelProps} = result;
-  return {channelProps, scales};
+  return {channelProps: result, scales};
 }
 
 function createLoadOptions(accessToken: string) {

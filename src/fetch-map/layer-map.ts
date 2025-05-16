@@ -1,4 +1,4 @@
-import {deviation, extent, groupSort, median, variance} from 'd3-array';
+import {deviation, extent, groupSort, median, quantile, variance} from 'd3-array';
 import {rgb} from 'd3-color';
 import {
   scaleLinear,
@@ -39,7 +39,14 @@ import type {ProviderType} from '../types.js';
 import {DEFAULT_AGGREGATION_EXP_ALIAS} from '../constants-internal.js';
 import type {SchemaField} from '../types-internal.js';
 
-const SCALE_FUNCS: Record<string, () => any> = {
+export type D3Scale = {
+  domain: (d?: any) => any[];
+  range: (d?: any) => any[];
+  unknown?: (d?: string) => any;
+} & ((d: any) => any);
+type D3ScaleFactory = () => D3Scale;
+
+const SCALE_FUNCS: Record<string, D3ScaleFactory> = {
   linear: scaleLinear,
   ordinal: scaleOrdinal,
   log: scaleLog,
@@ -363,7 +370,7 @@ function calculateLayerScale(
 
   scale.domain(domain);
   scale.range(scaleColor);
-  scale.unknown(UNKNOWN_COLOR);
+  scale.unknown!(UNKNOWN_COLOR);
 
   return scale;
 }
@@ -445,9 +452,9 @@ export function getSizeAccessor(
   const scale = scaleType ? SCALE_FUNCS[scaleType as any]() : identity;
   if (scaleType) {
     if (aggregation !== 'count') {
-      scale.domain(calculateDomain(data, name, scaleType));
+      (scale as D3Scale).domain(calculateDomain(data, name, scaleType));
     }
-    scale.range(range);
+    (scale as D3Scale).range(range);
   }
 
   let accessorKeys = getAccessorKeys(name, aggregation);
