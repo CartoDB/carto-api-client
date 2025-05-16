@@ -2,11 +2,8 @@ import './legend.css';
 import {LayerDescriptor} from '@carto/api-client';
 
 export function createLegend(layers: LayerDescriptor[]): HTMLElement {
-  const wrapper = document.createElement('div');
-  wrapper.className = 'legend-wrapper';
-
-  const container = document.createElement('div');
-  container.className = 'legend-container';
+  const wrapper = div('legend-wrapper');
+  const container = div('legend-container');
 
   layers.forEach((layer) => {
     const scales = layer.scales || {};
@@ -25,17 +22,12 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
       // Numeric or categorical scale
       const isConstantColor = !scaleInfo.domain || !scaleInfo.range;
       if (isConstantColor) {
-        const rangeDiv = document.createElement('div');
-        rangeDiv.className = 'legend-range';
-
-        const colorSwatch = document.createElement('div');
-        colorSwatch.className = 'legend-color-swatch';
+        const rangeDiv = div('legend-range');
+        const colorSwatch = div('legend-color-swatch');
         const color = layer.props.getFillColor;
         colorSwatch.style.backgroundColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
 
-        const rangeLabel = document.createElement('div');
-        rangeLabel.className = 'legend-range-label';
-        rangeLabel.textContent = 'All values';
+        const rangeLabel = div('legend-range-label', 'All values');
 
         rangeDiv.appendChild(colorSwatch);
         rangeDiv.appendChild(rangeLabel);
@@ -51,15 +43,10 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
         if (type === 'custom' || type === 'quantile') {
           // Custom threshold scale: domain is [start1, start2, ..., null], range is colors
           for (let i = 0; i < range.length; i++) {
-            const rangeDiv = document.createElement('div');
-            rangeDiv.className = 'legend-range';
-
-            const colorSwatch = document.createElement('div');
-            colorSwatch.className = 'legend-color-swatch';
+            const rangeDiv = div('legend-range');
+            const colorSwatch = div('legend-color-swatch');
             colorSwatch.style.backgroundColor = range[i];
 
-            const rangeLabel = document.createElement('div');
-            rangeLabel.className = 'legend-range-label';
             let start: number;
             let end: number;
             if (type === 'custom') {
@@ -69,11 +56,10 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
               start = domain[i];
               end = domain[i + 1];
             }
-            if (end === null || end === undefined || end === Infinity) {
-              rangeLabel.textContent = `>${start.toFixed(1)}`;
-            } else {
-              rangeLabel.textContent = `${start.toFixed(1)} – ${end.toFixed(1)}`;
-            }
+            const labelText = end === null || end === undefined || end === Infinity
+              ? `>${start.toFixed(1)}`
+              : `${start.toFixed(1)} – ${end.toFixed(1)}`;
+            const rangeLabel = div('legend-range-label', labelText);
 
             rangeDiv.appendChild(colorSwatch);
             rangeDiv.appendChild(rangeLabel);
@@ -85,16 +71,10 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
           typeof domain[0] === 'string'
         ) {
           for (let i = 0; i < domain.length; i++) {
-            const rangeDiv = document.createElement('div');
-            rangeDiv.className = 'legend-range';
-
-            const colorSwatch = document.createElement('div');
-            colorSwatch.className = 'legend-color-swatch';
+            const rangeDiv = div('legend-range');
+            const colorSwatch = div('legend-color-swatch');
             colorSwatch.style.backgroundColor = range[i];
-
-            const rangeLabel = document.createElement('div');
-            rangeLabel.className = 'legend-range-label';
-            rangeLabel.textContent = domain[i];
+            const rangeLabel = div('legend-range-label', domain[i]);
 
             rangeDiv.appendChild(colorSwatch);
             rangeDiv.appendChild(rangeLabel);
@@ -114,16 +94,10 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
             const rangeStart = min + step * i;
             const rangeEnd = i === numRanges - 1 ? max : min + step * (i + 1);
 
-            const rangeDiv = document.createElement('div');
-            rangeDiv.className = 'legend-range';
-
-            const colorSwatch = document.createElement('div');
-            colorSwatch.className = 'legend-color-swatch';
+            const rangeDiv = div('legend-range');
+            const colorSwatch = div('legend-color-swatch');
             colorSwatch.style.backgroundColor = range[i];
-
-            const rangeLabel = document.createElement('div');
-            rangeLabel.className = 'legend-range-label';
-            rangeLabel.textContent = `${rangeStart.toFixed(1)} – ${rangeEnd.toFixed(1)}`;
+            const rangeLabel = div('legend-range-label', `${rangeStart.toFixed(1)} – ${rangeEnd.toFixed(1)}`);
 
             rangeDiv.appendChild(colorSwatch);
             rangeDiv.appendChild(rangeLabel);
@@ -131,9 +105,7 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
           }
         }
       } else if (tilestats?.type === 'String' && tilestats.categories) {
-        const categoriesDiv = document.createElement('div');
-        categoriesDiv.className = 'legend-categories';
-        categoriesDiv.textContent = `Categories: ${tilestats.categories.length}`;
+        const categoriesDiv = div('legend-categories', `Categories: ${tilestats.categories.length}`);
         layerDiv.appendChild(categoriesDiv);
       }
 
