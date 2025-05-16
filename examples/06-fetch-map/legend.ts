@@ -9,7 +9,7 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
   container.className = 'legend-container';
 
   layers.forEach((layer) => {
-    const scales = layer.props.scales || {};
+    const scales = layer.scales || {};
     for (const scaleKey of Object.keys(scales)) {
       const scaleInfo = scales[scaleKey];
       const dataColumn = scaleInfo?.field?.name;

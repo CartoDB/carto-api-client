@@ -36,6 +36,7 @@ export type LayerDescriptor = {
   type: LayerType;
   props: Record<string, any>;
   filters?: Filters;
+  scales: Record<string, any>;
 };
 
 export type ParseMapResult = {
@@ -94,6 +95,14 @@ export function parseMap(json: any) {
 
           const styleProps = createStyleProps(config, propMap);
 
+          const {channelProps, scales} = createChannelProps(
+            id,
+            type,
+            config,
+            visualChannels,
+            data,
+            dataset
+          );
           const layer: LayerDescriptor = {
             type,
             filters:
@@ -106,20 +115,14 @@ export function parseMap(json: any) {
               ...defaultProps,
               ...createInteractionProps(interactionConfig),
               ...styleProps,
-              ...createChannelProps(
-                id,
-                type,
-                config,
-                visualChannels,
-                data,
-                dataset
-              ), // Must come after style
+              ...channelProps,
               ...createParametersProp(
                 layerBlending,
                 styleProps.parameters || {}
               ), // Must come after style
               ...createLoadOptions(token),
             },
+            scales,
           };
           return layer;
         } catch (e: any) {
@@ -212,7 +215,7 @@ function createChannelProps(
   visualChannels: VisualChannels,
   data: any,
   dataset: Dataset
-) {
+): {channelProps: Record<string, any>, scales: Record<string, any>} {
   const {
     colorField,
     colorScale,
@@ -508,7 +511,8 @@ function createChannelProps(
     };
   }
 
-  return result;
+  const {scales, ...channelProps} = result;
+  return {channelProps, scales};
 }
 
 function createLoadOptions(accessToken: string) {
