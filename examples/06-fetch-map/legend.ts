@@ -12,12 +12,7 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
       const dataColumn = scaleInfo?.field?.name;
       if (!dataColumn) continue;
 
-      const layerDiv = createLegendHeader(layer, scaleKey, dataColumn);
-
-      const tilestats =
-        layer.props.data?.tilestats?.layers[0]?.attributes?.find(
-          (a: any) => a.attribute === dataColumn
-        );
+      const layerDiv = createLegendHeader(layer, dataColumn);
 
       // Numeric or categorical scale
       const isConstantColor = !scaleInfo.domain || !scaleInfo.range;
@@ -104,9 +99,6 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
             layerDiv.appendChild(rangeDiv);
           }
         }
-      } else if (tilestats?.type === 'String' && tilestats.categories) {
-        const categoriesDiv = div('legend-categories', `Categories: ${tilestats.categories.length}`);
-        layerDiv.appendChild(categoriesDiv);
       }
 
       container.appendChild(layerDiv);
@@ -117,7 +109,7 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
   return wrapper;
 }
 
-function createLegendHeader(layer: LayerDescriptor, scaleKey: string, dataColumn: string): HTMLElement {
+function createLegendHeader(layer: LayerDescriptor, dataColumn: string): HTMLElement {
   const layerDiv = div('legend-layer');
   layerDiv.appendChild(div('legend-title', layer.props.cartoLabel));
   layerDiv.appendChild(div('legend-header', `COLOR BASED ON`));
