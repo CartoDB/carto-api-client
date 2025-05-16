@@ -85,6 +85,7 @@ export function executeModel(props: {
     filters,
     filtersLogicalOperator = 'and',
     spatialDataType = 'geo',
+    spatialDataColumn = DEFAULT_GEO_COLUMN,
     spatialFiltersMode = 'intersects',
   } = source;
 
@@ -98,26 +99,15 @@ export function executeModel(props: {
     filtersLogicalOperator,
   };
 
-  const spatialDataColumn = source.spatialDataColumn || DEFAULT_GEO_COLUMN;
+  queryParams.spatialDataType = spatialDataType;
+  queryParams.spatialDataColumn = spatialDataColumn;
 
-  // Picking Model API requires 'spatialDataColumn'.
-  if (model === 'pick') {
-    queryParams.spatialDataColumn = spatialDataColumn;
-  }
-
-  // API supports multiple filters, we apply it only to spatialDataColumn
-  const spatialFilters = source.spatialFilter
-    ? {[spatialDataColumn]: source.spatialFilter}
-    : undefined;
-
-  if (spatialFilters) {
-    queryParams.spatialFilters = spatialFilters;
-    queryParams.spatialDataColumn = spatialDataColumn;
-    queryParams.spatialDataType = spatialDataType;
-  }
-
-  if (spatialDataType !== 'geo') {
-    queryParams.spatialFiltersMode = spatialFiltersMode;
+  if (source.spatialFilter) {
+    // API supports multiple filters, we apply it only to spatialDataColumn
+    queryParams.spatialFilters = {[spatialDataColumn]: source.spatialFilter};
+    if (spatialDataType !== 'geo') {
+      queryParams.spatialFiltersMode = spatialFiltersMode;
+    }
   }
 
   const urlWithSearchParams =
