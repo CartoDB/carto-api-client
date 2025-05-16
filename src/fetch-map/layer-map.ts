@@ -46,7 +46,16 @@ export type D3Scale = {
 } & ((d: any) => any);
 type D3ScaleFactory = () => D3Scale;
 
-export type SCALE_TYPE = 'linear' | 'ordinal' | 'log' | 'point' | 'quantile' | 'quantize' | 'sqrt' | 'custom' | 'identity';
+export type SCALE_TYPE =
+  | 'linear'
+  | 'ordinal'
+  | 'log'
+  | 'point'
+  | 'quantile'
+  | 'quantize'
+  | 'sqrt'
+  | 'custom'
+  | 'identity';
 const SCALE_FUNCS: Record<SCALE_TYPE, D3ScaleFactory> = {
   linear: scaleLinear,
   ordinal: scaleOrdinal,

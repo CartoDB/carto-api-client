@@ -225,7 +225,12 @@ function domainAndRangeFromScale(
   };
 }
 
-type ScaleKey = 'fillColor' | 'pointRadius' | 'lineColor' | 'elevation' | 'weight';
+type ScaleKey =
+  | 'fillColor'
+  | 'pointRadius'
+  | 'lineColor'
+  | 'elevation'
+  | 'weight';
 
 function createChannelProps(
   id: string,

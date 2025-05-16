@@ -18,7 +18,11 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
         layerDiv.appendChild(createColorSwatch(rgb, layer.props.cartoLabel));
       } else {
         const {domain, range, type} = scaleInfo;
-        if ( type === 'ordinal' || type === 'point' || typeof domain[0] === 'string') {
+        if (
+          type === 'ordinal' ||
+          type === 'point' ||
+          typeof domain[0] === 'string'
+        ) {
           // Simple one to one mapping
           for (let i = 0; i < domain.length; i++) {
             layerDiv.appendChild(createColorSwatch(range[i], domain[i]));
@@ -35,9 +39,10 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
               start = domain[i];
               end = domain[i + 1];
             }
-            const labelText = end === null || end === undefined || end === Infinity
-              ? `>${start.toFixed(1)}`
-              : `${start.toFixed(1)} – ${end.toFixed(1)}`;
+            const labelText =
+              end === null || end === undefined || end === Infinity
+                ? `>${start.toFixed(1)}`
+                : `${start.toFixed(1)} – ${end.toFixed(1)}`;
             layerDiv.appendChild(createColorSwatch(range[i], labelText));
           }
         } else if (
@@ -71,11 +76,16 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
 function div(className: string, textContent?: string): HTMLElement {
   const div = document.createElement('div');
   div.className = className;
-  if (textContent) { div.textContent = textContent; }
+  if (textContent) {
+    div.textContent = textContent;
+  }
   return div;
 }
 
-function createLegendHeader(layer: LayerDescriptor, dataColumn?: string): HTMLElement {
+function createLegendHeader(
+  layer: LayerDescriptor,
+  dataColumn?: string
+): HTMLElement {
   const layerDiv = div('legend-layer');
   layerDiv.appendChild(div('legend-title', layer.props.cartoLabel));
   if (dataColumn) {
