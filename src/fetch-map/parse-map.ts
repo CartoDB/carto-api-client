@@ -265,6 +265,8 @@ function createChannelProps(
       type: colorScale!,
       ...domainAndRangeFromScale(scale),
     };
+  } else if (visConfig.filled) {
+    scales.fillColor = {} as any;
   }
 
   if (layerType === 'clusterTile') {

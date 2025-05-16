@@ -10,38 +10,17 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
     for (const scaleKey of Object.keys(scales)) {
       const scaleInfo = scales[scaleKey];
       const dataColumn = scaleInfo?.field?.name;
-      if (!dataColumn) continue;
-
       const layerDiv = createLegendHeader(layer, dataColumn);
 
-      // Numeric or categorical scale
-      const isConstantColor = !scaleInfo.domain || !scaleInfo.range;
-      if (isConstantColor) {
-        const rangeDiv = div('legend-range');
-        const colorSwatch = div('legend-color-swatch');
+      if (!dataColumn) {
         const color = layer.props.getFillColor;
-        colorSwatch.style.backgroundColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
-
-        const rangeLabel = div('legend-range-label', 'All values');
-
-        rangeDiv.appendChild(colorSwatch);
-        rangeDiv.appendChild(rangeLabel);
-        layerDiv.appendChild(rangeDiv);
-      } else if (
-        scaleInfo &&
-        scaleInfo.domain &&
-        scaleInfo.range &&
-        Array.isArray(scaleInfo.domain) &&
-        Array.isArray(scaleInfo.range)
-      ) {
+        const rgb = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+        layerDiv.appendChild(createColorSwatch(rgb, layer.props.cartoLabel));
+      } else {
         const {domain, range, type} = scaleInfo;
         if (type === 'custom' || type === 'quantile') {
           // Custom threshold scale: domain is [start1, start2, ..., null], range is colors
           for (let i = 0; i < range.length; i++) {
-            const rangeDiv = div('legend-range');
-            const colorSwatch = div('legend-color-swatch');
-            colorSwatch.style.backgroundColor = range[i];
-
             let start: number;
             let end: number;
             if (type === 'custom') {
@@ -54,11 +33,7 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
             const labelText = end === null || end === undefined || end === Infinity
               ? `>${start.toFixed(1)}`
               : `${start.toFixed(1)} – ${end.toFixed(1)}`;
-            const rangeLabel = div('legend-range-label', labelText);
-
-            rangeDiv.appendChild(colorSwatch);
-            rangeDiv.appendChild(rangeLabel);
-            layerDiv.appendChild(rangeDiv);
+            layerDiv.appendChild(createColorSwatch(range[i], labelText));
           }
         } else if (
           type === 'ordinal' ||
@@ -66,14 +41,7 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
           typeof domain[0] === 'string'
         ) {
           for (let i = 0; i < domain.length; i++) {
-            const rangeDiv = div('legend-range');
-            const colorSwatch = div('legend-color-swatch');
-            colorSwatch.style.backgroundColor = range[i];
-            const rangeLabel = div('legend-range-label', domain[i]);
-
-            rangeDiv.appendChild(colorSwatch);
-            rangeDiv.appendChild(rangeLabel);
-            layerDiv.appendChild(rangeDiv);
+            layerDiv.appendChild(createColorSwatch(range[i], domain[i]));
           }
         } else if (
           typeof domain[0] === 'number' &&
@@ -88,15 +56,8 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
           for (let i = 0; i < numRanges; i++) {
             const rangeStart = min + step * i;
             const rangeEnd = i === numRanges - 1 ? max : min + step * (i + 1);
-
-            const rangeDiv = div('legend-range');
-            const colorSwatch = div('legend-color-swatch');
-            colorSwatch.style.backgroundColor = range[i];
-            const rangeLabel = div('legend-range-label', `${rangeStart.toFixed(1)} – ${rangeEnd.toFixed(1)}`);
-
-            rangeDiv.appendChild(colorSwatch);
-            rangeDiv.appendChild(rangeLabel);
-            layerDiv.appendChild(rangeDiv);
+            const labelText = `${rangeStart.toFixed(1)} – ${rangeEnd.toFixed(1)}`;
+            layerDiv.appendChild(createColorSwatch(range[i], labelText));
           }
         }
       }
@@ -109,17 +70,30 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
   return wrapper;
 }
 
-function createLegendHeader(layer: LayerDescriptor, dataColumn: string): HTMLElement {
-  const layerDiv = div('legend-layer');
-  layerDiv.appendChild(div('legend-title', layer.props.cartoLabel));
-  layerDiv.appendChild(div('legend-header', `COLOR BASED ON`));
-  layerDiv.appendChild(div('legend-column', dataColumn));
-  return layerDiv;
-}
-
+// UI helpers. In a real app, you'd probably use a library like React or Vue.
 function div(className: string, textContent?: string): HTMLElement {
   const div = document.createElement('div');
   div.className = className;
   if (textContent) { div.textContent = textContent; }
   return div;
+}
+
+function createLegendHeader(layer: LayerDescriptor, dataColumn?: string): HTMLElement {
+  const layerDiv = div('legend-layer');
+  layerDiv.appendChild(div('legend-title', layer.props.cartoLabel));
+  if (dataColumn) {
+    layerDiv.appendChild(div('legend-header', `COLOR BASED ON`));
+    layerDiv.appendChild(div('legend-column', dataColumn));
+  }
+  return layerDiv;
+}
+
+function createColorSwatch(color: string, label: string): HTMLElement {
+  const rangeDiv = div('legend-range');
+  const colorSwatch = div('legend-color-swatch');
+  colorSwatch.style.backgroundColor = color;
+  const rangeLabel = div('legend-range-label', label);
+  rangeDiv.appendChild(colorSwatch);
+  rangeDiv.appendChild(rangeLabel);
+  return rangeDiv;
 }
