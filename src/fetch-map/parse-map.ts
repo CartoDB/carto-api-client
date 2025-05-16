@@ -215,7 +215,9 @@ function createStyleProps(config: MapLayerConfig, mapping: any) {
   return result;
 }
 
-function domainAndRangeFromScale(scale: D3Scale): Pick<Scale, 'domain' | 'range'> {
+function domainAndRangeFromScale(
+  scale: D3Scale
+): Pick<Scale, 'domain' | 'range'> {
   return {
     domain: scale.domain(),
     range: scale.range(),
@@ -239,7 +241,7 @@ function createChannelProps(
     strokeColorScale,
     weightField,
   } = visualChannels;
-  let {heightField, heightScale} = visualChannels;
+  const {heightField, heightScale} = visualChannels;
   const {textLabel, visConfig} = config;
   const result: Record<string, any> = {};
 
@@ -255,7 +257,11 @@ function createChannelProps(
       data
     );
     result.getFillColor = accessor;
-    scales.fillColor = {field: colorField, type: colorScale!, ...domainAndRangeFromScale(scale)};
+    scales.fillColor = {
+      field: colorField,
+      type: colorScale!,
+      ...domainAndRangeFromScale(scale),
+    };
   }
 
   if (layerType === 'clusterTile') {
@@ -326,9 +332,7 @@ function createChannelProps(
 
   if (strokeColorField) {
     const opacity =
-      visConfig.strokeOpacity !== undefined
-        ? visConfig.strokeOpacity
-        : 1;
+      visConfig.strokeOpacity !== undefined ? visConfig.strokeOpacity : 1;
     const {strokeColorAggregation: aggregation, strokeColorRange: range} =
       visConfig;
     const {accessor, scale} = getColorAccessor(

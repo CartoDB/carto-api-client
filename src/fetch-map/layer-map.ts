@@ -1,4 +1,4 @@
-import {deviation, extent, groupSort, median, quantile, variance} from 'd3-array';
+import {extent, groupSort} from 'd3-array';
 import {rgb} from 'd3-color';
 import {
   scaleLinear,
@@ -69,17 +69,6 @@ export const OPACITY_MAP: Record<string, string> = {
   getFillColor: 'opacity',
   getLineColor: 'strokeOpacity',
   getTextColor: 'opacity',
-};
-
-const AGGREGATION_FUNC: Record<string, (values: any, accessor: any) => any> = {
-  'count unique': (values: any, accessor: any) =>
-    groupSort(values, (v) => v.length, accessor).length,
-  median,
-  // Unfortunately mode() is only available in d3-array@3+ which is ESM only
-  mode: (values: any, accessor: any) =>
-    groupSort(values, (v) => v.length, accessor).pop(),
-  stddev: deviation,
-  variance,
 };
 
 const hexToRGBA = (c: any) => {
