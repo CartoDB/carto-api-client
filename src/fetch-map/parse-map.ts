@@ -29,14 +29,22 @@ import type {
   VisConfig,
   MapConfigLayer,
   Dataset,
+  VisualChannelField,
 } from './types.js';
 import {isRemoteCalculationSupported} from './utils.js';
+
+export type Scale = {
+  field: VisualChannelField;
+  domain: (string | number)[];
+  range: string[];
+  type: string;
+};
 
 export type LayerDescriptor = {
   type: LayerType;
   props: Record<string, any>;
   filters?: Filters;
-  scales: Record<string, any>;
+  scales: Record<string, Scale>;
 };
 
 export type ParseMapResult = {
@@ -215,7 +223,7 @@ function createChannelProps(
   visualChannels: VisualChannels,
   data: any,
   dataset: Dataset
-): {channelProps: Record<string, any>, scales: Record<string, any>} {
+): {channelProps: Record<string, any>; scales: Record<string, any>} {
   const {
     colorField,
     colorScale,
