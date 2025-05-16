@@ -18,7 +18,12 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
         layerDiv.appendChild(createColorSwatch(rgb, layer.props.cartoLabel));
       } else {
         const {domain, range, type} = scaleInfo;
-        if (type === 'custom' || type === 'quantile') {
+        if ( type === 'ordinal' || type === 'point' || typeof domain[0] === 'string') {
+          // Simple one to one mapping
+          for (let i = 0; i < domain.length; i++) {
+            layerDiv.appendChild(createColorSwatch(range[i], domain[i]));
+          }
+        } else if (type === 'custom' || type === 'quantile') {
           // Custom threshold scale: domain is [start1, start2, ..., null], range is colors
           for (let i = 0; i < range.length; i++) {
             let start: number;
@@ -36,22 +41,14 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
             layerDiv.appendChild(createColorSwatch(range[i], labelText));
           }
         } else if (
-          type === 'ordinal' ||
-          type === 'point' ||
-          typeof domain[0] === 'string'
-        ) {
-          for (let i = 0; i < domain.length; i++) {
-            layerDiv.appendChild(createColorSwatch(range[i], domain[i]));
-          }
-        } else if (
           typeof domain[0] === 'number' &&
           typeof domain[1] === 'number' &&
           range.length > 1
         ) {
+          // Interpolate domain values to get a color for each range
           const numRanges = range.length;
           const min = domain[0];
           const max = domain[1];
-          console.log('legend domain', domain);
           const step = (max - min) / numRanges;
           for (let i = 0; i < numRanges; i++) {
             const rangeStart = min + step * i;
