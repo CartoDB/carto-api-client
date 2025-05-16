@@ -15,23 +15,7 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
       const dataColumn = scaleInfo?.field?.name;
       if (!dataColumn) continue;
 
-      const layerDiv = document.createElement('div');
-      layerDiv.className = 'legend-layer';
-
-      const nameDiv = document.createElement('div');
-      nameDiv.className = 'legend-title';
-      nameDiv.textContent = layer.props.cartoLabel + ` (${scaleKey})`;
-      layerDiv.appendChild(nameDiv);
-
-      const columnDiv = document.createElement('div');
-      columnDiv.className = 'legend-header';
-      columnDiv.textContent = `COLOR BASED ON`;
-      layerDiv.appendChild(columnDiv);
-
-      const dataColumnDiv = document.createElement('div');
-      dataColumnDiv.className = 'legend-column';
-      dataColumnDiv.textContent = dataColumn;
-      layerDiv.appendChild(dataColumnDiv);
+      const layerDiv = createLegendHeader(layer, scaleKey, dataColumn);
 
       const tilestats =
         layer.props.data?.tilestats?.layers[0]?.attributes?.find(
@@ -159,4 +143,19 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
 
   wrapper.appendChild(container);
   return wrapper;
+}
+
+function createLegendHeader(layer: LayerDescriptor, scaleKey: string, dataColumn: string): HTMLElement {
+  const layerDiv = div('legend-layer');
+  layerDiv.appendChild(div('legend-title', layer.props.cartoLabel));
+  layerDiv.appendChild(div('legend-header', `COLOR BASED ON`));
+  layerDiv.appendChild(div('legend-column', dataColumn));
+  return layerDiv;
+}
+
+function div(className: string, textContent?: string): HTMLElement {
+  const div = document.createElement('div');
+  div.className = className;
+  if (textContent) { div.textContent = textContent; }
+  return div;
 }
