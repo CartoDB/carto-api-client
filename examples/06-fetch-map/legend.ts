@@ -135,9 +135,24 @@ function createRadiusScale(domain: number[], range: number[]): HTMLElement {
     const circle = div('legend-radius-circle');
     circle.style.width = `${radius * 2}px`;
     circle.style.height = `${radius * 2}px`;
-    row.appendChild(circle);
     
-    row.appendChild(div('legend-radius-label', domain[i].toFixed(1)));
+    const label = div('legend-radius-label', domain[i].toFixed(1));
+    
+    if (radius > 8) {
+      // For larger circles, position label inside
+      circle.style.position = 'relative';
+      label.style.position = 'absolute';
+      label.style.top = '50%';
+      label.style.left = '50%';
+      label.style.transform = 'translate(-50%, -50%)';
+      circle.appendChild(label);
+      row.appendChild(circle);
+    } else {
+      // For smaller circles, keep label below
+      row.appendChild(circle);
+      row.appendChild(label);
+    }
+    
     container.appendChild(row);
   });
 
