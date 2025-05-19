@@ -16,7 +16,9 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
       if (!dataColumn) {
         const color = layer.props.getFillColor;
         const rgb = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
-        layerDiv.appendChild(createColorSwatch(rgb, layer.props.cartoLabel, isStroke));
+        layerDiv.appendChild(
+          createColorSwatch(rgb, layer.props.cartoLabel, isStroke)
+        );
       } else if (scaleKey === 'pointRadius') {
         const {domain, range} = scaleInfo;
         const numericDomain = domain.map(Number);
@@ -24,13 +26,16 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
         layerDiv.appendChild(createRadiusScale(numericDomain, numericRange));
       } else {
         const {domain, range, type} = scaleInfo;
-        if (
-          type === 'ordinal' ||
-          type === 'point'
-        ) {
+        if (type === 'ordinal' || type === 'point') {
           // Simple one to one mapping
           for (let i = 0; i < domain.length; i++) {
-            layerDiv.appendChild(createColorSwatch(range[i] as string, domain[i] as string, isStroke));
+            layerDiv.appendChild(
+              createColorSwatch(
+                range[i] as string,
+                domain[i] as string,
+                isStroke
+              )
+            );
           }
         } else if (type === 'custom' || type === 'quantile') {
           // Custom threshold scale: domain is [start1, start2, ..., null], range is colors
@@ -38,8 +43,8 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
             let start: number;
             let end: number;
             if (type === 'custom') {
-              start = domain[i - 1] as number || 0;
-              end = domain[i] as number || Infinity;
+              start = (domain[i - 1] as number) || 0;
+              end = (domain[i] as number) || Infinity;
             } else {
               start = domain[i] as number;
               end = domain[i + 1] as number;
@@ -48,10 +53,14 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
               end === null || end === undefined || end === Infinity
                 ? `>${start.toFixed(1)}`
                 : `${start.toFixed(1)} – ${end.toFixed(1)}`;
-            layerDiv.appendChild(createColorSwatch(range[i] as string, labelText, isStroke));
+            layerDiv.appendChild(
+              createColorSwatch(range[i] as string, labelText, isStroke)
+            );
           }
         } else if (
-          type === 'linear' || type === 'quantize' || type === 'sqrt'
+          type === 'linear' ||
+          type === 'quantize' ||
+          type === 'sqrt'
         ) {
           // Interpolate domain values to get a color for each range
           const numRanges = range.length;
@@ -62,7 +71,9 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
             const rangeStart = min + step * i;
             const rangeEnd = i === numRanges - 1 ? max : min + step * (i + 1);
             const labelText = `${rangeStart.toFixed(1)} – ${rangeEnd.toFixed(1)}`;
-            layerDiv.appendChild(createColorSwatch(range[i] as string, labelText, isStroke));
+            layerDiv.appendChild(
+              createColorSwatch(range[i] as string, labelText, isStroke)
+            );
           }
         } else {
           throw new Error(`Unsupported scale type: ${type}`);
@@ -93,12 +104,12 @@ const HEADER_MAP: Record<ScaleKey, string> = {
   lineColor: 'STROKE COLOR BASED ON',
   elevation: 'ELEVATION BASED ON',
   weight: 'WEIGHT BASED ON',
-}
+};
 
 function createLegendHeader(
   layer: LayerDescriptor,
   scaleKey: ScaleKey,
-  dataColumn?: string,
+  dataColumn?: string
 ): HTMLElement {
   const layerDiv = div('legend-layer');
   layerDiv.appendChild(div('legend-title', layer.props.cartoLabel));
@@ -109,7 +120,11 @@ function createLegendHeader(
   return layerDiv;
 }
 
-function createColorSwatch(color: string, label: string, stroke?: boolean): HTMLElement {
+function createColorSwatch(
+  color: string,
+  label: string,
+  stroke?: boolean
+): HTMLElement {
   const rangeDiv = div('legend-range');
   const colorSwatch = div('legend-color-swatch');
   if (stroke) {
@@ -127,7 +142,7 @@ function createColorSwatch(color: string, label: string, stroke?: boolean): HTML
 
 function createRadiusScale(domain: number[], range: number[]): HTMLElement {
   const container = div('legend-radius-scale');
-  
+
   // Create a circle for each value in the range
   range.forEach((radius, i) => {
     const row = div('legend-radius-row');
@@ -135,9 +150,9 @@ function createRadiusScale(domain: number[], range: number[]): HTMLElement {
     const circle = div('legend-radius-circle');
     circle.style.width = `${radius * 2}px`;
     circle.style.height = `${radius * 2}px`;
-    
+
     const label = div('legend-radius-label', domain[i].toFixed(1));
-    
+
     if (radius > 8) {
       // For larger circles, position label inside
       circle.style.position = 'relative';
@@ -152,7 +167,7 @@ function createRadiusScale(domain: number[], range: number[]): HTMLElement {
       row.appendChild(circle);
       row.appendChild(label);
     }
-    
+
     container.appendChild(row);
   });
 
