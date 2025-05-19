@@ -1,4 +1,4 @@
-import {deviation, extent, groupSort, median, variance} from 'd3-array';
+import {extent, groupSort} from 'd3-array';
 import {rgb} from 'd3-color';
 import {
   scaleLinear,
@@ -38,7 +38,24 @@ import type {
 import type {ProviderType, SchemaField} from '../types.js';
 import {DEFAULT_AGGREGATION_EXP_ALIAS} from '../constants-internal.js';
 
-const SCALE_FUNCS: Record<string, () => any> = {
+export type D3Scale = {
+  domain: (d?: any) => any[];
+  range: (d?: any) => any[];
+  unknown?: (d?: string) => any;
+} & ((d: any) => any);
+type D3ScaleFactory = () => D3Scale;
+
+export type ScaleType =
+  | 'linear'
+  | 'ordinal'
+  | 'log'
+  | 'point'
+  | 'quantile'
+  | 'quantize'
+  | 'sqrt'
+  | 'custom'
+  | 'identity';
+const SCALE_FUNCS: Record<ScaleType, D3ScaleFactory> = {
   linear: scaleLinear,
   ordinal: scaleOrdinal,
   log: scaleLog,
@@ -49,7 +66,6 @@ const SCALE_FUNCS: Record<string, () => any> = {
   custom: scaleThreshold,
   identity: scaleIdentity,
 };
-export type SCALE_TYPE = keyof typeof SCALE_FUNCS;
 
 function identity<T>(v: T): T {
   return v;
@@ -57,28 +73,10 @@ function identity<T>(v: T): T {
 
 const UNKNOWN_COLOR = '#868d91';
 
-export const AGGREGATION: Record<string, string> = {
-  average: 'MEAN',
-  maximum: 'MAX',
-  minimum: 'MIN',
-  sum: 'SUM',
-};
-
 export const OPACITY_MAP: Record<string, string> = {
   getFillColor: 'opacity',
   getLineColor: 'strokeOpacity',
   getTextColor: 'opacity',
-};
-
-const AGGREGATION_FUNC: Record<string, (values: any, accessor: any) => any> = {
-  'count unique': (values: any, accessor: any) =>
-    groupSort(values, (v) => v.length, accessor).length,
-  median,
-  // Unfortunately mode() is only available in d3-array@3+ which is ESM only
-  mode: (values: any, accessor: any) =>
-    groupSort(values, (v) => v.length, accessor).pop(),
-  stddev: deviation,
-  variance,
 };
 
 const hexToRGBA = (c: any) => {
@@ -197,7 +195,7 @@ export function getLayerProps(
 
 function domainFromAttribute(
   attribute: any,
-  scaleType: SCALE_TYPE,
+  scaleType: ScaleType,
   scaleLength: number
 ) {
   if (scaleType === 'ordinal' || scaleType === 'point') {
@@ -219,7 +217,7 @@ function domainFromAttribute(
   return [min, attribute.max];
 }
 
-function domainFromValues(values: any, scaleType: SCALE_TYPE) {
+function domainFromValues(values: any, scaleType: ScaleType) {
   if (scaleType === 'ordinal' || scaleType === 'point') {
     return groupSort(
       values,
@@ -238,7 +236,7 @@ function domainFromValues(values: any, scaleType: SCALE_TYPE) {
 function calculateDomain(
   data: any,
   name: any,
-  scaleType: SCALE_TYPE,
+  scaleType: ScaleType,
   scaleLength?: number
 ) {
   if (data.tilestats) {
@@ -295,23 +293,13 @@ function findAccessorKey(keys: string[], properties: any): string[] {
   return keys;
 }
 
-export function getColorValueAccessor(
-  {name}: VisualChannelField,
-  colorAggregation: string,
-  data: any
-) {
-  const aggregator = AGGREGATION_FUNC[colorAggregation];
-  const accessor = (values: any) => aggregator(values, (p: any) => p[name]);
-  return normalizeAccessor(accessor, data);
-}
-
 export function getColorAccessor(
   {name, colorColumn}: VisualChannelField,
-  scaleType: SCALE_TYPE,
+  scaleType: ScaleType,
   {aggregation, range}: {aggregation: string; range: any},
   opacity: number | undefined,
   data: any
-) {
+): {accessor: any; scale: any} {
   const scale = calculateLayerScale(
     colorColumn || name,
     scaleType,
@@ -329,12 +317,12 @@ export function getColorAccessor(
     const {r, g, b} = rgb(scale(propertyValue));
     return [r, g, b, propertyValue === null ? 0 : alpha];
   };
-  return normalizeAccessor(accessor, data);
+  return {accessor: normalizeAccessor(accessor, data), scale};
 }
 
 function calculateLayerScale(
   name: any,
-  scaleType: SCALE_TYPE,
+  scaleType: ScaleType,
   range: any,
   data: any
 ) {
@@ -362,7 +350,7 @@ function calculateLayerScale(
 
   scale.domain(domain);
   scale.range(scaleColor);
-  scale.unknown(UNKNOWN_COLOR);
+  scale.unknown!(UNKNOWN_COLOR);
 
   return scale;
 }
@@ -436,17 +424,17 @@ export function negateAccessor(accessor: Accessor): Accessor {
 
 export function getSizeAccessor(
   {name}: VisualChannelField,
-  scaleType: SCALE_TYPE | undefined,
+  scaleType: ScaleType | undefined,
   aggregation: string | null | undefined,
   range: Iterable<Range> | null | undefined,
   data: any
-) {
-  const scale = scaleType ? SCALE_FUNCS[scaleType as any]() : identity;
+): {accessor: any; scale: any} {
+  const scale = scaleType ? SCALE_FUNCS[scaleType]() : identity;
   if (scaleType) {
     if (aggregation !== 'count') {
-      scale.domain(calculateDomain(data, name, scaleType));
+      (scale as D3Scale).domain(calculateDomain(data, name, scaleType));
     }
-    scale.range(range);
+    (scale as D3Scale).range(range);
   }
 
   let accessorKeys = getAccessorKeys(name, aggregation);
@@ -457,7 +445,7 @@ export function getSizeAccessor(
     const propertyValue = properties[accessorKeys[0]];
     return scale(propertyValue);
   };
-  return normalizeAccessor(accessor, data);
+  return {accessor: normalizeAccessor(accessor, data), scale};
 }
 
 const FORMATS: Record<string, (value: any) => string> = {

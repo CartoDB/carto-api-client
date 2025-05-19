@@ -5,7 +5,6 @@ import {
   getDefaultAggregationExpColumnAliasForLayerType,
   getLayerProps,
   getColorAccessor,
-  getColorValueAccessor,
   getSizeAccessor,
   getTextAccessor,
   opacityToAlpha,
@@ -13,11 +12,12 @@ import {
   negateAccessor,
   getMaxMarkerSize,
   type LayerType,
-  AGGREGATION,
   OPACITY_MAP,
   TEXT_NUMBER_FORMATTER,
   TEXT_LABEL_INDEX,
   TEXT_OUTLINE_OPACITY,
+  type D3Scale,
+  type ScaleType,
 } from './layer-map.js';
 
 import {assert, isEmptyObject} from '../utils.js';
@@ -29,13 +29,22 @@ import type {
   VisConfig,
   MapConfigLayer,
   Dataset,
+  VisualChannelField,
 } from './types.js';
 import {isRemoteCalculationSupported} from './utils.js';
+
+export type Scale = {
+  field: VisualChannelField;
+  domain: string[] | number[];
+  range: string[] | number[];
+  type: ScaleType;
+};
 
 export type LayerDescriptor = {
   type: LayerType;
   props: Record<string, any>;
   filters?: Filters;
+  scales: Record<ScaleKey, Scale>;
 };
 
 export type ParseMapResult = {
@@ -94,6 +103,14 @@ export function parseMap(json: any) {
 
           const styleProps = createStyleProps(config, propMap);
 
+          const {channelProps, scales} = createChannelProps(
+            id,
+            type,
+            config,
+            visualChannels,
+            data,
+            dataset
+          );
           const layer: LayerDescriptor = {
             type,
             filters:
@@ -106,20 +123,14 @@ export function parseMap(json: any) {
               ...defaultProps,
               ...createInteractionProps(interactionConfig),
               ...styleProps,
-              ...createChannelProps(
-                id,
-                type,
-                config,
-                visualChannels,
-                data,
-                dataset
-              ), // Must come after style
+              ...channelProps,
               ...createParametersProp(
                 layerBlending,
                 styleProps.parameters || {}
               ), // Must come after style
               ...createLoadOptions(token),
             },
+            scales,
           };
           return layer;
         } catch (e: any) {
@@ -205,79 +216,67 @@ function createStyleProps(config: MapLayerConfig, mapping: any) {
   return result;
 }
 
+function domainAndRangeFromScale(
+  scale: D3Scale
+): Pick<Scale, 'domain' | 'range'> {
+  return {
+    domain: scale.domain(),
+    range: scale.range(),
+  };
+}
+
+export type ScaleKey =
+  | 'fillColor'
+  | 'pointRadius'
+  | 'lineColor'
+  | 'elevation'
+  | 'weight';
+
 function createChannelProps(
   id: string,
-  type: string,
+  layerType: LayerType,
   config: MapLayerConfig,
   visualChannels: VisualChannels,
   data: any,
   dataset: Dataset
-) {
+): {channelProps: Record<string, any>; scales: Record<ScaleKey, Scale>} {
   const {
     colorField,
     colorScale,
     radiusField,
     radiusScale,
-    sizeField,
-    sizeScale,
     strokeColorField,
     strokeColorScale,
     weightField,
   } = visualChannels;
-  let {heightField, heightScale} = visualChannels;
-  if (type === 'hexagonId') {
-    heightField = sizeField;
-    heightScale = sizeScale;
-  }
+  const {heightField, heightScale} = visualChannels;
   const {textLabel, visConfig} = config;
   const result: Record<string, any> = {};
 
-  if (type === 'grid' || type === 'hexagon') {
-    result.colorScaleType = colorScale;
-    if (colorField) {
-      const {colorAggregation} = config.visConfig;
-      if (!AGGREGATION[colorAggregation]) {
-        result.getColorValue = getColorValueAccessor(
-          colorField,
-          colorAggregation,
-          data
-        );
-      } else {
-        result.getColorWeight = (d: any) => d[colorField.name];
-      }
-    }
-  } else if (colorField) {
+  const scales: Record<string, Scale> = {};
+
+  if (colorField) {
     const {colorAggregation: aggregation, colorRange: range} = visConfig;
-    result.getFillColor = getColorAccessor(
+    const {accessor, scale} = getColorAccessor(
       colorField,
-      // @ts-ignore
-      colorScale,
+      colorScale!,
       {aggregation, range},
       visConfig.opacity,
       data
     );
+    result.getFillColor = accessor;
+    scales.fillColor = {
+      field: colorField,
+      type: colorScale!,
+      ...domainAndRangeFromScale(scale),
+    };
+  } else if (visConfig.filled) {
+    scales.fillColor = {} as any;
   }
 
-  if (type === 'point') {
-    const altitude = config.columns?.altitude;
-    if (altitude) {
-      result.dataTransform = (data: any) => {
-        data.features.forEach(
-          ({geometry, properties}: {geometry: any; properties: any}) => {
-            const {type, coordinates} = geometry;
-            if (type === 'Point') {
-              coordinates[2] = properties[altitude];
-            }
-          }
-        );
-        return data;
-      };
-    }
-  }
-
-  if (type === 'clusterTile') {
+  if (layerType === 'clusterTile') {
     const aggregationExpAlias = getDefaultAggregationExpColumnAliasForLayerType(
-      type,
+      layerType,
       dataset.providerId,
       data.schema
     );
@@ -325,55 +324,71 @@ function createChannelProps(
     };
   }
 
-  if (radiusField || sizeField) {
-    result.getPointRadius = getSizeAccessor(
-      // @ts-ignore
-      radiusField || sizeField,
-      // @ts-ignore
-      radiusScale || sizeScale,
+  if (radiusField) {
+    const {accessor, scale} = getSizeAccessor(
+      radiusField,
+      radiusScale,
       visConfig.sizeAggregation,
       visConfig.radiusRange || visConfig.sizeRange,
       data
     );
+    result.getPointRadius = accessor;
+    scales.pointRadius = {
+      field: radiusField,
+      type: radiusScale || 'identity',
+      ...domainAndRangeFromScale(scale),
+    };
   }
 
   if (strokeColorField) {
-    const fallbackOpacity = type === 'point' ? visConfig.opacity : 1;
     const opacity =
-      visConfig.strokeOpacity !== undefined
-        ? visConfig.strokeOpacity
-        : fallbackOpacity;
+      visConfig.strokeOpacity !== undefined ? visConfig.strokeOpacity : 1;
     const {strokeColorAggregation: aggregation, strokeColorRange: range} =
       visConfig;
-    result.getLineColor = getColorAccessor(
+    const {accessor, scale} = getColorAccessor(
       strokeColorField,
-      // @ts-ignore
-      strokeColorScale,
-      // @ts-ignore
+      strokeColorScale!,
       {aggregation, range},
       opacity,
       data
     );
+    result.getLineColor = accessor;
+    scales.lineColor = {
+      field: strokeColorField,
+      type: strokeColorScale!,
+      ...domainAndRangeFromScale(scale),
+    };
   }
   if (heightField && visConfig.enable3d) {
-    result.getElevation = getSizeAccessor(
+    const {accessor, scale} = getSizeAccessor(
       heightField,
-      // @ts-ignore
       heightScale,
       visConfig.heightAggregation,
       visConfig.heightRange || visConfig.sizeRange,
       data
     );
+    result.getElevation = accessor;
+    scales.elevation = {
+      field: heightField,
+      type: heightScale || 'identity',
+      ...domainAndRangeFromScale(scale),
+    };
   }
 
   if (weightField) {
-    result.getWeight = getSizeAccessor(
+    const {accessor, scale} = getSizeAccessor(
       weightField,
       undefined,
       visConfig.weightAggregation,
       undefined,
       data
     );
+    result.getWeight = accessor;
+    scales.weight = {
+      field: weightField,
+      type: 'identity',
+      ...domainAndRangeFromScale(scale),
+    };
   }
 
   if (visConfig.customMarkers) {
@@ -416,17 +431,16 @@ function createChannelProps(
     }
 
     if (visualChannels.rotationField) {
-      result.getIconAngle = negateAccessor(
-        getSizeAccessor(
-          visualChannels.rotationField,
-          undefined,
-          null,
-          undefined,
-          data
-        )
+      const {accessor} = getSizeAccessor(
+        visualChannels.rotationField,
+        undefined,
+        null,
+        undefined,
+        data
       );
+      result.getIconAngle = negateAccessor(accessor);
     }
-  } else if (type === 'point' || type === 'tileset') {
+  } else if (layerType === 'tileset') {
     result.pointType = 'circle';
   }
 
@@ -480,7 +494,7 @@ function createChannelProps(
     };
   }
 
-  return result;
+  return {channelProps: result, scales};
 }
 
 function createLoadOptions(accessToken: string) {
