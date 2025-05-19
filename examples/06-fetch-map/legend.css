@@ -84,4 +84,31 @@
 
 .legend-categories {
   font-size: 0.75rem;
+}
+
+/* Radius scale specific styles */
+.legend-radius-scale {
+  margin: 8px 0;
+}
+
+.legend-radius-row {
+  display: flex;
+  align-items: center;
+  margin: 6px 0;
+}
+
+.legend-radius-circle {
+  border: 1px solid #666;
+  border-radius: 50%;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+.legend-radius-label {
+  font-family: Inter, sans-serif;
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 1.538;
+  color: rgb(44, 48, 50);
+  white-space: nowrap;
 } 
