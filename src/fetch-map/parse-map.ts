@@ -44,7 +44,7 @@ export type LayerDescriptor = {
   type: LayerType;
   props: Record<string, any>;
   filters?: Filters;
-  scales: Record<string, Scale>;
+  scales: Record<ScaleKey, Scale>;
 };
 
 export type ParseMapResult = {
@@ -225,7 +225,7 @@ function domainAndRangeFromScale(
   };
 }
 
-type ScaleKey =
+export type ScaleKey =
   | 'fillColor'
   | 'pointRadius'
   | 'lineColor'

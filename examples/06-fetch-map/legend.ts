@@ -1,5 +1,5 @@
 import './legend.css';
-import {LayerDescriptor} from '@carto/api-client';
+import {LayerDescriptor, ScaleKey} from '@carto/api-client';
 
 export function createLegend(layers: LayerDescriptor[]): HTMLElement {
   const wrapper = div('legend-wrapper');
@@ -7,10 +7,10 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
 
   layers.forEach((layer) => {
     const scales = layer.scales || {};
-    for (const scaleKey of Object.keys(scales)) {
+    for (const scaleKey of Object.keys(scales) as ScaleKey[]) {
       const scaleInfo = scales[scaleKey];
       const dataColumn = scaleInfo?.field?.name;
-      const layerDiv = createLegendHeader(layer, dataColumn);
+      const layerDiv = createLegendHeader(layer, scaleKey, dataColumn);
 
       if (!dataColumn) {
         const color = layer.props.getFillColor;
@@ -86,14 +86,23 @@ function div(className: string, textContent?: string): HTMLElement {
   return div;
 }
 
+const HEADER_MAP: Record<ScaleKey, string> = {
+  fillColor: 'COLOR BASED ON',
+  pointRadius: 'RADIUS RANGE BY',
+  lineColor: 'STROKE COLOR BASED ON',
+  elevation: 'ELEVATION BASED ON',
+  weight: 'WEIGHT BASED ON',
+}
+
 function createLegendHeader(
   layer: LayerDescriptor,
-  dataColumn?: string
+  scaleKey: ScaleKey,
+  dataColumn?: string,
 ): HTMLElement {
   const layerDiv = div('legend-layer');
   layerDiv.appendChild(div('legend-title', layer.props.cartoLabel));
   if (dataColumn) {
-    layerDiv.appendChild(div('legend-header', `COLOR BASED ON`));
+    layerDiv.appendChild(div('legend-header', HEADER_MAP[scaleKey]));
     layerDiv.appendChild(div('legend-column', dataColumn));
   }
   return layerDiv;
