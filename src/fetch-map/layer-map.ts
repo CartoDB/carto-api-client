@@ -46,7 +46,7 @@ export type D3Scale = {
 } & ((d: any) => any);
 type D3ScaleFactory = () => D3Scale;
 
-export type SCALE_TYPE =
+export type ScaleType =
   | 'linear'
   | 'ordinal'
   | 'log'
@@ -56,7 +56,7 @@ export type SCALE_TYPE =
   | 'sqrt'
   | 'custom'
   | 'identity';
-const SCALE_FUNCS: Record<SCALE_TYPE, D3ScaleFactory> = {
+const SCALE_FUNCS: Record<ScaleType, D3ScaleFactory> = {
   linear: scaleLinear,
   ordinal: scaleOrdinal,
   log: scaleLog,
@@ -196,7 +196,7 @@ export function getLayerProps(
 
 function domainFromAttribute(
   attribute: any,
-  scaleType: SCALE_TYPE,
+  scaleType: ScaleType,
   scaleLength: number
 ) {
   if (scaleType === 'ordinal' || scaleType === 'point') {
@@ -218,7 +218,7 @@ function domainFromAttribute(
   return [min, attribute.max];
 }
 
-function domainFromValues(values: any, scaleType: SCALE_TYPE) {
+function domainFromValues(values: any, scaleType: ScaleType) {
   if (scaleType === 'ordinal' || scaleType === 'point') {
     return groupSort(
       values,
@@ -237,7 +237,7 @@ function domainFromValues(values: any, scaleType: SCALE_TYPE) {
 function calculateDomain(
   data: any,
   name: any,
-  scaleType: SCALE_TYPE,
+  scaleType: ScaleType,
   scaleLength?: number
 ) {
   if (data.tilestats) {
@@ -296,7 +296,7 @@ function findAccessorKey(keys: string[], properties: any): string[] {
 
 export function getColorAccessor(
   {name, colorColumn}: VisualChannelField,
-  scaleType: SCALE_TYPE,
+  scaleType: ScaleType,
   {aggregation, range}: {aggregation: string; range: any},
   opacity: number | undefined,
   data: any
@@ -323,7 +323,7 @@ export function getColorAccessor(
 
 function calculateLayerScale(
   name: any,
-  scaleType: SCALE_TYPE,
+  scaleType: ScaleType,
   range: any,
   data: any
 ) {
@@ -425,7 +425,7 @@ export function negateAccessor(accessor: Accessor): Accessor {
 
 export function getSizeAccessor(
   {name}: VisualChannelField,
-  scaleType: SCALE_TYPE | undefined,
+  scaleType: ScaleType | undefined,
   aggregation: string | null | undefined,
   range: Iterable<Range> | null | undefined,
   data: any

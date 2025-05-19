@@ -1,4 +1,4 @@
-import type {LayerType, SCALE_TYPE} from './layer-map.js';
+import type {LayerType, ScaleType} from './layer-map.js';
 import type {Format, MapType, ProviderType, QueryParameters} from '../types.js';
 import type {TilejsonResult} from '../sources/types.js';
 
@@ -10,25 +10,25 @@ export type VisualChannelField = {
 
 export type VisualChannels = {
   colorField?: VisualChannelField;
-  colorScale?: SCALE_TYPE;
+  colorScale?: ScaleType;
 
   customMarkersField?: VisualChannelField;
-  customMarkersScale?: SCALE_TYPE;
+  customMarkersScale?: ScaleType;
 
   radiusField?: VisualChannelField;
-  radiusScale?: SCALE_TYPE;
+  radiusScale?: ScaleType;
 
-  rotationScale?: SCALE_TYPE;
+  rotationScale?: ScaleType;
   rotationField?: VisualChannelField;
 
   sizeField?: VisualChannelField;
-  sizeScale?: SCALE_TYPE;
+  sizeScale?: ScaleType;
 
   strokeColorField?: VisualChannelField;
-  strokeColorScale?: SCALE_TYPE;
+  strokeColorScale?: ScaleType;
 
   heightField?: VisualChannelField;
-  heightScale?: SCALE_TYPE;
+  heightScale?: ScaleType;
 
   weightField?: VisualChannelField;
 };

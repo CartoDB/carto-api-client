@@ -17,7 +17,7 @@ import {
   TEXT_LABEL_INDEX,
   TEXT_OUTLINE_OPACITY,
   type D3Scale,
-  type SCALE_TYPE,
+  type ScaleType,
 } from './layer-map.js';
 
 import {assert, isEmptyObject} from '../utils.js';
@@ -35,9 +35,9 @@ import {isRemoteCalculationSupported} from './utils.js';
 
 export type Scale = {
   field: VisualChannelField;
-  domain: (string | number)[];
-  range: string[];
-  type: SCALE_TYPE;
+  domain: string[] | number[];
+  range: string[] | number[];
+  type: ScaleType;
 };
 
 export type LayerDescriptor = {
