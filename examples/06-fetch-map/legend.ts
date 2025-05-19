@@ -11,11 +11,12 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
       const scaleInfo = scales[scaleKey];
       const dataColumn = scaleInfo?.field?.name;
       const layerDiv = createLegendHeader(layer, scaleKey, dataColumn);
+      const isStroke = scaleKey === 'lineColor';
 
       if (!dataColumn) {
         const color = layer.props.getFillColor;
         const rgb = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
-        layerDiv.appendChild(createColorSwatch(rgb, layer.props.cartoLabel));
+        layerDiv.appendChild(createColorSwatch(rgb, layer.props.cartoLabel, isStroke));
       } else if (scaleKey === 'pointRadius') {
         const {domain, range} = scaleInfo;
         const numericDomain = domain.map(Number);
@@ -29,7 +30,7 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
         ) {
           // Simple one to one mapping
           for (let i = 0; i < domain.length; i++) {
-            layerDiv.appendChild(createColorSwatch(range[i] as string, domain[i] as string));
+            layerDiv.appendChild(createColorSwatch(range[i] as string, domain[i] as string, isStroke));
           }
         } else if (type === 'custom' || type === 'quantile') {
           // Custom threshold scale: domain is [start1, start2, ..., null], range is colors
@@ -47,7 +48,7 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
               end === null || end === undefined || end === Infinity
                 ? `>${start.toFixed(1)}`
                 : `${start.toFixed(1)} – ${end.toFixed(1)}`;
-            layerDiv.appendChild(createColorSwatch(range[i] as string, labelText));
+            layerDiv.appendChild(createColorSwatch(range[i] as string, labelText, isStroke));
           }
         } else if (
           type === 'linear' || type === 'quantize' || type === 'sqrt'
@@ -61,7 +62,7 @@ export function createLegend(layers: LayerDescriptor[]): HTMLElement {
             const rangeStart = min + step * i;
             const rangeEnd = i === numRanges - 1 ? max : min + step * (i + 1);
             const labelText = `${rangeStart.toFixed(1)} – ${rangeEnd.toFixed(1)}`;
-            layerDiv.appendChild(createColorSwatch(range[i] as string, labelText));
+            layerDiv.appendChild(createColorSwatch(range[i] as string, labelText, isStroke));
           }
         } else {
           throw new Error(`Unsupported scale type: ${type}`);
@@ -108,10 +109,16 @@ function createLegendHeader(
   return layerDiv;
 }
 
-function createColorSwatch(color: string, label: string): HTMLElement {
+function createColorSwatch(color: string, label: string, stroke?: boolean): HTMLElement {
   const rangeDiv = div('legend-range');
   const colorSwatch = div('legend-color-swatch');
-  colorSwatch.style.backgroundColor = color;
+  if (stroke) {
+    colorSwatch.style.borderColor = color;
+    colorSwatch.style.backgroundColor = 'transparent';
+  } else {
+    colorSwatch.style.backgroundColor = color;
+    colorSwatch.style.border = 'none';
+  }
   const rangeLabel = div('legend-range-label', label);
   rangeDiv.appendChild(colorSwatch);
   rangeDiv.appendChild(rangeLabel);
