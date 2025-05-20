@@ -5,6 +5,7 @@
 ### 0.5.5
 
 - feat(fetchmap): Expose legend info from fetchMap (#179)
+- fix(widgets): Fix inference of 'spatialDataColumn' in some table and query widgets (#183)
 
 ### 0.5.4
 
