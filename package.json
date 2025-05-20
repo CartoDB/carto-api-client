@@ -128,5 +128,6 @@
   "resolutions": {
     "@carto/api-client": "portal:./",
     "rollup": "^4.20.0"
-  }
+  },
+  "stableVersion": "0.5.4"
 }
