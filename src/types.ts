@@ -95,7 +95,7 @@ export type Raster = {
  */
 
 /**
- * Enum for the different types of aggregations available for widgets.
+ * Enum type for the different types of aggregations available for widgets.
  *
  * @privateRemarks Source: @carto/constants
  * @privateRemarks Converted from enum to type union, for improved declarative API.
@@ -107,6 +107,20 @@ export type AggregationType =
   | 'max'
   | 'sum'
   | 'custom';
+
+/**
+ * Enum like container for all types of aggregations available for widgets.
+ *
+ * @privateRemarks Source: @carto/constants
+ */
+export const AggregationTypes: Record<AggregationType, AggregationType> = {
+  count: 'count' as const,
+  avg: 'avg' as const,
+  min: 'min' as const,
+  max: 'max' as const,
+  sum: 'sum' as const,
+  custom: 'custom' as const,
+} as const;
 
 /******************************************************************************
  * FILTERS
