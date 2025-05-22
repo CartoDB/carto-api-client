@@ -99,13 +99,19 @@ export class WidgetTilesetSource<
       return this._workerImpl;
     }
 
-    this._workerImpl = new Worker(
-      new URL('@carto/api-client/worker', import.meta.url),
-      {
-        type: 'module',
-        name: 'cartowidgettileset',
-      }
-    );
+    const workerOptions: WorkerOptions = {
+      type: 'module',
+      name: 'cartowidgettileset',
+    };
+
+    if (this.props.widgetWorkerUrl) {
+      this._workerImpl = new Worker(this.props.widgetWorkerUrl, workerOptions);
+    } else {
+      this._workerImpl = new Worker(
+        new URL('@carto/api-client/worker', import.meta.url),
+        workerOptions
+      );
+    }
 
     this._workerImpl.postMessage({
       method: Method.INIT,
