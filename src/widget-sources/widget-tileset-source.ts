@@ -99,17 +99,20 @@ export class WidgetTilesetSource<
       return this._workerImpl;
     }
 
-    const workerOptions: WorkerOptions = {
-      type: 'module',
-      name: 'cartowidgettileset',
-    };
-
+    // For Vite (and perhaps other bundlers) to parse WorkerOptions, it
+    // must be a static, inline object – duplicated below.
     if (this.props.widgetWorkerUrl) {
-      this._workerImpl = new Worker(this.props.widgetWorkerUrl, workerOptions);
+      this._workerImpl = new Worker(this.props.widgetWorkerUrl, {
+        type: 'module',
+        name: 'cartowidgettileset',
+      });
     } else {
       this._workerImpl = new Worker(
         new URL('@carto/api-client/worker', import.meta.url),
-        workerOptions
+        {
+          type: 'module',
+          name: 'cartowidgettileset',
+        }
       );
     }
 
