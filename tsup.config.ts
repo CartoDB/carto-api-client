@@ -25,4 +25,11 @@ export default defineConfig([
     entry: {'api-client': 'src/index.ts'},
     shims: true, // replace 'import.meta' references
   },
+  {
+    ...commonConfig,
+    format: 'iife',
+    entry: {
+      worker: 'src/workers/widget-tileset-worker.ts',
+    },
+  }
 ]);
