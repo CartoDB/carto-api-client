@@ -188,6 +188,14 @@ export type TilesetSourceOptions = {
    * are used by default if the runtime environment supports ES Module Workers.
    */
   widgetWorker?: boolean;
+
+  /**
+   * Script URL used to create Web Workers for local widget calculations. In
+   * most cases a custom URL is not needed; bundlers will resolve the worker
+   * URL from a `@carto/api-client/worker` import internally. Advanced uses
+   * may require deploying the script manually and providing a custom URL.
+   */
+  widgetWorkerUrl?: string;
 };
 
 export type ColumnsOption = {
