@@ -116,6 +116,10 @@ export class WidgetTilesetSource<
       );
     }
 
+    this._workerImpl.addEventListener('error', (e) => {
+      console.error('widget-tileset-source worker error', e);
+    });
+
     this._workerImpl.postMessage({
       method: Method.INIT,
       params: [this.props],

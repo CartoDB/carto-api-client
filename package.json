@@ -30,6 +30,9 @@
     "./worker": {
       "types": "./build/worker.d.ts",
       "default": "./build/worker.js"
+    },
+    "./worker.global": {
+      "default": "./build/worker.global.js"
     }
   },
   "browserslist": [
