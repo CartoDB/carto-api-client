@@ -31,5 +31,5 @@ export default defineConfig([
     entry: {
       worker: 'src/workers/widget-tileset-worker.ts',
     },
-  }
+  },
 ]);
