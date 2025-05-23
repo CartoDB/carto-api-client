@@ -103,7 +103,7 @@ export class WidgetTilesetSource<
     // must be a static, inline object – duplicated below.
     if (this.props.widgetWorkerUrl) {
       this._workerImpl = new Worker(this.props.widgetWorkerUrl, {
-        type: 'module',
+        // type: 'module',
         name: 'cartowidgettileset',
       });
     } else {
