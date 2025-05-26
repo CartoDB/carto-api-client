@@ -2,6 +2,12 @@
 
 ## 0.5
 
+### 0.5.6
+
+- feat(worker): Distribute worker script as standalone JS bundle (#189)
+- feat(widgets): Add widgetWorkerUrl option (#188)
+- feat(widgets): WidgetRemoteSource: custom aggregations for category, timeseries models (#174)
+
 ### 0.5.5
 
 - feat(fetchmap): Expose legend info from fetchMap (#179)
