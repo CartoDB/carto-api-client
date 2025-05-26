@@ -28,8 +28,13 @@ export default defineConfig([
   {
     ...commonConfig,
     format: 'iife',
+    outExtension() {
+      return {
+        js: `.js`,
+      };
+    },
     entry: {
-      worker: 'src/workers/widget-tileset-worker.ts',
+      'worker-compat': 'src/workers/widget-tileset-worker.ts',
     },
   },
 ]);
