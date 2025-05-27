@@ -37,7 +37,7 @@ import type {
 } from './types.js';
 import type {ProviderType, SchemaField} from '../types.js';
 import {DEFAULT_AGGREGATION_EXP_ALIAS} from '../constants-internal.js';
-import { AggregationTypes } from '../constants.js';
+import {AggregationTypes} from '../constants.js';
 
 export type D3Scale = {
   domain: (d?: any) => any[];

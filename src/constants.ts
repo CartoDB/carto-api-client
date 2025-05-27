@@ -63,7 +63,6 @@ export const SpatialIndexColumn = Object.freeze({
 
 /**
  * Enum like container for all types of aggregations available for widgets.
-
  */
 export const AggregationTypes = {
   Count: 'count' as const,

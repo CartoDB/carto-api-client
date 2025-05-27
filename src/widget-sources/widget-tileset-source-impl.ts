@@ -39,7 +39,7 @@ import {WidgetSource} from './widget-source.js';
 import {booleanEqual} from '@turf/boolean-equal';
 import type {WidgetTilesetSourceProps} from './widget-tileset-source.js';
 import {getApplicableFilters} from '../filters.js';
-import { AggregationTypes } from '../constants.js';
+import {AggregationTypes} from '../constants.js';
 
 // TODO(cleanup): Parameter defaults in source functions and widget API calls are
 // currently duplicated and possibly inconsistent. Consider consolidating and
