@@ -108,19 +108,6 @@ export type AggregationType =
   | 'sum'
   | 'custom';
 
-/**
- * Enum like container for all types of aggregations available for widgets.
- *
- * @privateRemarks Source: @carto/constants
- */
-export const AggregationTypes: Record<AggregationType, AggregationType> = {
-  count: 'count' as const,
-  avg: 'avg' as const,
-  min: 'min' as const,
-  max: 'max' as const,
-  sum: 'sum' as const,
-  custom: 'custom' as const,
-} as const;
 
 /******************************************************************************
  * FILTERS

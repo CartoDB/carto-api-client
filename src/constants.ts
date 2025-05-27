@@ -1,3 +1,5 @@
+import type { AggregationType } from "./types.js";
+
 /**
  * Defines a comparator used when matching a column's values against given filter values.
  *
@@ -60,3 +62,16 @@ export const SpatialIndexColumn = Object.freeze({
   [SpatialIndex.H3]: ['h3', 'hex', 'h3id', 'hex_id', 'h3hex'],
   [SpatialIndex.QUADBIN]: ['quadbin'],
 });
+
+/**
+ * Enum like container for all types of aggregations available for widgets.
+
+ */
+export const AggregationTypes = {
+  Count: 'count' as const,
+  Avg: 'avg' as const,
+  Min: 'min' as const,
+  Max: 'max' as const,
+  Sum: 'sum' as const,
+  Custom: 'custom' as const,
+} as const;
