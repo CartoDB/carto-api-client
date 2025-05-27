@@ -9,7 +9,9 @@ export default defineConfig({
     setupFiles: ['test/setup.ts'],
     coverage: {
       provider: 'istanbul',
-      include: ['src/**/*', 'build/**/*'],
+      include: ['src', 'build'],
+      exclude: ['test', 'node_modules'],
+      excludeAfterRemap: true,
     },
   },
 });
