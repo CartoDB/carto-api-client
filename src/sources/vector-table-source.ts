@@ -72,13 +72,23 @@ export const vectorTableSource = async function (
   return baseSource<UrlParameters>('table', options, urlParameters).then(
     (result) => ({
       ...result,
-      widgetSource: new WidgetTableSource({
-        ...options,
-        // NOTE: Parameters with default values above must be explicitly passed here.
-        spatialDataColumn,
-        spatialDataType,
-        tileResolution,
-      }),
+      widgetSource: vectorTableWidgetSource(options),
     })
   );
 };
+
+export function vectorTableWidgetSource(
+  options: VectorTableSourceOptions
+): WidgetTableSource {
+  const spatialDataType = 'geo';
+  const {
+    spatialDataColumn = DEFAULT_GEO_COLUMN,
+    tileResolution = DEFAULT_TILE_RESOLUTION,
+  } = options;
+  return new WidgetTableSource({
+    ...options,
+    spatialDataColumn,
+    spatialDataType,
+    tileResolution,
+  });
+}

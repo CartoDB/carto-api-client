@@ -80,13 +80,13 @@ export type {
   QuadbinTilesetSourceResponse,
 } from './quadbin-tileset-source.js';
 
-export {vectorQuerySource} from './vector-query-source.js';
+export {vectorQuerySource, vectorQueryWidgetSource} from './vector-query-source.js';
 export type {
   VectorQuerySourceOptions,
   VectorQuerySourceResponse,
 } from './vector-query-source.js';
 
-export {vectorTableSource} from './vector-table-source.js';
+export {vectorTableSource, vectorTableWidgetSource} from './vector-table-source.js';
 export type {
   VectorTableSourceOptions,
   VectorTableSourceResponse,

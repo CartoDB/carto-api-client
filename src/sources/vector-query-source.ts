@@ -77,13 +77,23 @@ export const vectorQuerySource = async function (
   return baseSource<UrlParameters>('query', options, urlParameters).then(
     (result) => ({
       ...result,
-      widgetSource: new WidgetQuerySource({
-        ...options,
-        // NOTE: Parameters with default values above must be explicitly passed here.
-        spatialDataColumn,
-        spatialDataType,
-        tileResolution,
-      }),
+      widgetSource: vectorQueryWidgetSource(options),
     })
   );
 };
+
+export function vectorQueryWidgetSource(
+  options: VectorQuerySourceOptions
+): WidgetQuerySource {
+  const spatialDataType = 'geo';
+  const {
+    spatialDataColumn = DEFAULT_GEO_COLUMN,
+    tileResolution = DEFAULT_TILE_RESOLUTION,
+  } = options;
+  return new WidgetQuerySource({
+    ...options,
+    spatialDataColumn,
+    spatialDataType,
+    tileResolution,
+  });
+}
