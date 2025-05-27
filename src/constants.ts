@@ -1,5 +1,3 @@
-import type { AggregationType } from "./types.js";
-
 /**
  * Defines a comparator used when matching a column's values against given filter values.
  *
