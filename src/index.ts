@@ -28,4 +28,5 @@ export * from './filters/index.js';
 export * from './operations/index.js';
 export * from './utils/makeIntervalComplete.js';
 export * from './utils/transformToTileCoords.js';
+export * from './utils/CellSet.js';
 export * from './fetch-map/source.js';
