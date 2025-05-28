@@ -8,7 +8,7 @@
   "homepage": "https://github.com/CartoDB/carto-api-client#readme",
   "author": "Don McCurdy <donmccurdy@carto.com>",
   "packageManager": "yarn@4.3.1",
-  "version": "0.5.6-alpha.1",
+  "version": "0.5.6-alpha.bundle.4",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -30,6 +30,9 @@
     "./worker": {
       "types": "./build/worker.d.ts",
       "default": "./build/worker.js"
+    },
+    "./worker-compat": {
+      "default": "./build/worker-compat.js"
     }
   },
   "browserslist": [
