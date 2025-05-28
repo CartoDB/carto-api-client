@@ -39,6 +39,7 @@ import {WidgetSource} from './widget-source.js';
 import {booleanEqual} from '@turf/boolean-equal';
 import type {WidgetTilesetSourceProps} from './widget-tileset-source.js';
 import {getApplicableFilters} from '../filters.js';
+import {AggregationTypes} from '../constants.js';
 
 // TODO(cleanup): Parameter defaults in source functions and widget API calls are
 // currently duplicated and possibly inconsistent. Consider consolidating and
@@ -120,7 +121,7 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
 
   async getFormula({
     column = '*',
-    operation = 'count',
+    operation = AggregationTypes.Count,
     joinOperation,
     filters,
     filterOwner,
@@ -132,16 +133,16 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       filterOwner
     );
 
-    if (filteredFeatures.length === 0 && operation !== 'count') {
+    if (filteredFeatures.length === 0 && operation !== AggregationTypes.Count) {
       return {value: null};
     }
 
-    if (operation === 'custom') {
+    if (operation === AggregationTypes.Custom) {
       throw new Error('Custom aggregation not supported for tilesets');
     }
 
     // Column is required except when operation is 'count'.
-    if ((column && column !== '*') || operation !== 'count') {
+    if ((column && column !== '*') || operation !== AggregationTypes.Count) {
       assertColumn(this._features, column);
     }
 
@@ -152,7 +153,7 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
   }
 
   override async getHistogram({
-    operation = 'count',
+    operation = AggregationTypes.Count,
     ticks,
     column,
     joinOperation,
@@ -183,7 +184,7 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
 
   override async getCategories({
     column,
-    operation = 'count',
+    operation = AggregationTypes.Count,
     operationColumn,
     joinOperation,
     filters,

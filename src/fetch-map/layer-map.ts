@@ -37,6 +37,7 @@ import type {
 } from './types.js';
 import type {ProviderType, SchemaField} from '../types.js';
 import {DEFAULT_AGGREGATION_EXP_ALIAS} from '../constants-internal.js';
+import {AggregationTypes} from '../constants.js';
 
 export type D3Scale = {
   domain: (d?: any) => any[];
@@ -431,7 +432,7 @@ export function getSizeAccessor(
 ): {accessor: any; scale: any} {
   const scale = scaleType ? SCALE_FUNCS[scaleType]() : identity;
   if (scaleType) {
-    if (aggregation !== 'count') {
+    if (aggregation !== AggregationTypes.Count) {
       (scale as D3Scale).domain(calculateDomain(data, name, scaleType));
     }
     (scale as D3Scale).range(range);

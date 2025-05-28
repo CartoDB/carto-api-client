@@ -95,7 +95,7 @@ export type Raster = {
  */
 
 /**
- * Enum for the different types of aggregations available for widgets.
+ * Enum type for the different types of aggregations available for widgets.
  *
  * @privateRemarks Source: @carto/constants
  * @privateRemarks Converted from enum to type union, for improved declarative API.

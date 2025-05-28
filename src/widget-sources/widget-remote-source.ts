@@ -21,7 +21,7 @@ import {assert, normalizeObjectKeys} from '../utils.js';
 import {DEFAULT_TILE_RESOLUTION} from '../constants-internal.js';
 import {WidgetSource, type WidgetSourceProps} from './widget-source.js';
 import type {Filters} from '../types.js';
-import {ApiVersion} from '../constants.js';
+import {AggregationTypes, ApiVersion} from '../constants.js';
 import {getApplicableFilters} from '../filters.js';
 
 export type WidgetRemoteSourceProps = WidgetSourceProps;
@@ -76,7 +76,7 @@ export abstract class WidgetRemoteSource<
     } = options;
     const {column, operation, operationColumn, operationExp} = params;
 
-    if (operation === 'custom') {
+    if (operation === AggregationTypes.Custom) {
       assert(operationExp, 'operationExp is required for custom operation');
     }
 
@@ -148,7 +148,7 @@ export abstract class WidgetRemoteSource<
 
     type FormulaModelResponse = {rows: {value: number}[]};
 
-    if (operation === 'custom') {
+    if (operation === AggregationTypes.Custom) {
       assert(operationExp, 'operationExp is required for custom operation');
     }
 
@@ -161,7 +161,7 @@ export abstract class WidgetRemoteSource<
       },
       params: {
         column: column ?? '*',
-        operation: operation ?? 'count',
+        operation: operation ?? AggregationTypes.Count,
         operationExp,
       },
       opts: {signal, headers: this.props.headers},
@@ -331,7 +331,7 @@ export abstract class WidgetRemoteSource<
       splitByCategoryValues,
     } = params;
 
-    if (operation === 'custom') {
+    if (operation === AggregationTypes.Custom) {
       assert(operationExp, 'operationExp is required for custom operation');
     }
 
