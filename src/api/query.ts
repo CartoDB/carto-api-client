@@ -39,7 +39,7 @@ export const query = async function (
     Authorization: `Bearer ${options.accessToken}`,
     ...options.headers,
   };
-  const parameters = {client: clientId, ...urlParameters};
+  const parameters = {client: clientId, ...options.tags, ...urlParameters};
 
   const errorContext: APIErrorContext = {
     requestType: 'SQL',

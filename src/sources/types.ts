@@ -75,6 +75,9 @@ export type SourceOptionalOptions = {
    * By default, local in-memory caching is enabled.
    */
   localCache?: LocalCacheOptions;
+
+  /** Additional tags appended to the request url that can be used to track calls for security purposes. */
+  tags?: Record<string, string>;
 };
 
 export type LocalCacheOptions = {
