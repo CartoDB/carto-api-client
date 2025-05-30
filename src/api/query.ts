@@ -13,7 +13,9 @@ import {requestWithParameters} from './request-with-parameters.js';
 import type {APIErrorContext} from './carto-api-error.js';
 import {getClient} from '../client.js';
 
-export type QueryOptions = SourceOptions & QuerySourceOptions;
+export type QueryOptions = SourceOptions & QuerySourceOptions & {
+  additionalParameters?: Record<string, string | boolean | number>;
+};
 type UrlParameters = {q: string; queryParameters?: string};
 
 export const query = async function (
@@ -27,6 +29,7 @@ export const query = async function (
     connectionName,
     sqlQuery,
     queryParameters,
+    additionalParameters,
   } = options;
   const urlParameters: UrlParameters = {q: sqlQuery};
 
@@ -39,7 +42,11 @@ export const query = async function (
     Authorization: `Bearer ${options.accessToken}`,
     ...options.headers,
   };
-  const parameters = {client: clientId, ...options.tags, ...urlParameters};
+  const parameters = {
+    client: clientId,
+    ...additionalParameters,
+    ...urlParameters,
+  };
 
   const errorContext: APIErrorContext = {
     requestType: 'SQL',
