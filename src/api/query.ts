@@ -14,6 +14,7 @@ import type {APIErrorContext} from './carto-api-error.js';
 import {getClient} from '../client.js';
 
 export type QueryOptions = SourceOptions & QuerySourceOptions & {
+  /** Used to append additional parameters to the SQL API request for features specific to providers or integrations. */
   additionalParameters?: Record<string, string | boolean | number>;
 };
 type UrlParameters = {q: string; queryParameters?: string};
