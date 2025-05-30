@@ -76,7 +76,7 @@ export type SourceOptionalOptions = {
    */
   localCache?: LocalCacheOptions;
 
-  /** Additional tags appended to HTTP request urls, available for analytics and audits. */
+  /** Additional tags appended to HTTP requests, available for analytics and audits. */
   tags?: Record<string, string>;
 };
 
