@@ -3762,9 +3762,9 @@ __metadata:
   linkType: hard
 
 "h3-js@npm:^4.1.0":
-  version: 4.1.0
-  resolution: "h3-js@npm:4.1.0"
-  checksum: 10c0/58adb7c7a19ff6e6959ef97a60b383bb06c560ffd12826ce603470b25bb34bb26b9bedee6e406591b97017fb888a6194b4043d16abd0d100e6cb51d449e9c3d1
+  version: 4.2.1
+  resolution: "h3-js@npm:4.2.1"
+  checksum: 10c0/3c72c51149e4e6f9920cd47ff1b9a2ac4cdc1a1d8e41072e31b10db60ba9e264009dc833a30d06d421c083605495d14eca848bd25d85c7840a467c4db95bc50a
   languageName: node
   linkType: hard
 
