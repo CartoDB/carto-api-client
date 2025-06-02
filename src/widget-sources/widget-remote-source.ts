@@ -80,7 +80,7 @@ export abstract class WidgetRemoteSource<
       assert(operationExp, 'operationExp is required for custom operation');
     }
 
-    type CategoriesModelResponse = {rows: {name: string; value: number}[]};
+    type CategoriesModelResponse = { rows: { name: string; value: number;  count?: number}[]};
 
     return executeModel({
       model: 'category',

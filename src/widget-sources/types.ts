@@ -206,7 +206,12 @@ export type FeaturesResponse = {rows: Record<string, unknown>[]};
 export type FormulaResponse = {value: number | null};
 
 /** Response from {@link WidgetRemoteSource#getCategories}. */
-export type CategoryResponse = {name: string; value: number}[];
+export type CategoryResponse = {
+  name: string;
+  value: number;
+  /** Number of features in category. Included only for 'avg' aggregation. */
+  count?: number
+}[];
 
 /** Response from {@link WidgetRemoteSource#getRange}. */
 export type RangeResponse = {min: number; max: number} | null;

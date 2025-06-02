@@ -37,8 +37,8 @@ describe('groupValuesByColumn', () => {
         {name: 'Category 1', value: 2},
       ],
       avg: [
-        {name: 'Category 2', value: 3},
-        {name: 'Category 1', value: 3},
+        {name: 'Category 2', value: 3, count: 3},
+        {name: 'Category 1', value: 3, count: 2},
       ],
       min: [
         {name: 'Category 2', value: 1},
@@ -71,11 +71,11 @@ describe('groupValuesByColumn', () => {
 
     describe('multiple valuesColumns', () => {
       const RESULTS_FOR_MULTIPLE = Object.entries(RESULTS).reduce(
-        (acc, [operation, result], idx) => {
-          acc[operation] = result.map(({name, value}) => ({
+        (acc, [operation, result]) => {
+          acc[operation] = result.map(({name, value, ...rest}) => ({
             name,
-            // === 0 is AggregationTypes.COUNT
-            value: value * (idx === 0 ? 1 : 2),
+            value: value * (operation === 'count' ? 1 : 2),
+            ...rest
           }));
           return acc;
         },

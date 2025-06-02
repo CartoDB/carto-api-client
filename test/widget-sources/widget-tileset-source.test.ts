@@ -75,6 +75,23 @@ describe('getCategories', () => {
       },
     ]);
   });
+
+  it('computes avg in categories, with counts', async () => {
+    expect(
+      await source.getCategories({
+        column: 'storetype',
+        operation: 'avg',
+        operationColumn: 'revenue',
+        spatialFilter: MOCK_SPATIAL_FILTER,
+      })
+    ).toEqual([
+      {
+        name: 'Drugstore',
+        value: 1565826.5,
+        count: 6
+      },
+    ]);
+  });
 });
 
 describe('getFeatures', () => {

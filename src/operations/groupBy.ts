@@ -6,6 +6,8 @@ import type {FeatureData} from '../types-internal.js';
 export type GroupByFeature = {
   name: string;
   value: number;
+  /* Included only for 'avg' aggregation type. */
+  count?: number;
 }[];
 
 /** @privateRemarks Source: @carto/react-core */
@@ -52,6 +54,7 @@ export function groupValuesByColumn({
     return Array.from(groups).map(([name, value]) => ({
       name,
       value: targetOperation(value),
+      ...(operation === 'avg' && {count: value.length})
     }));
   }
 
