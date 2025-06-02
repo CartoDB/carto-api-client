@@ -59,8 +59,12 @@ export interface CategoryRequestOptions extends BaseRequestOptions {
   operationColumn?: string;
   /** Local only. */
   joinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
-  /** Maximum number of items to return. Backend calculates also __carto_others category. Remote only. */
-  maxItems?: number;
+  /** Calculate __carto_others category for all non-main categories. Remote only. */
+  calculateOthers?: boolean;
+  /** Number of main categories to calculate. Backend calculates also __carto_others category for the rest.
+   * @default 5
+   * Remote only. */
+  mainCategoriesCount?: number;
 }
 
 /**

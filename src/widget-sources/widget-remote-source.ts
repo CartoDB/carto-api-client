@@ -74,7 +74,14 @@ export abstract class WidgetRemoteSource<
       spatialFiltersMode,
       ...params
     } = options;
-    const {column, operation, operationColumn, operationExp, maxItems} = params;
+    const {
+      column,
+      operation,
+      operationColumn,
+      operationExp,
+      calculateOthers,
+      mainCategoriesCount,
+    } = params;
 
     if (operation === AggregationTypes.Custom) {
       assert(operationExp, 'operationExp is required for custom operation');
@@ -94,7 +101,8 @@ export abstract class WidgetRemoteSource<
         operation,
         operationExp,
         operationColumn: operationColumn || column,
-        maxItems,
+        calculateOthers,
+        mainCategoriesCount,
       },
       opts: {signal, headers: this.props.headers},
     }).then((res: CategoriesModelResponse) => normalizeObjectKeys(res.rows));
