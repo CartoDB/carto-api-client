@@ -3,4 +3,4 @@
  *
  * See `WidgetSource.getCategories` for more information.
  */
-export const OTHERS_CATEGORY_NAME = '_carto_others'
+export const OTHERS_CATEGORY_NAME = '_carto_others';
