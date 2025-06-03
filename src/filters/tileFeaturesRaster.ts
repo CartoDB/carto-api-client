@@ -14,7 +14,7 @@ import type {
 } from '../sources/types.js';
 import booleanWithin from '@turf/boolean-within';
 import intersect from '@turf/intersect';
-import { feature, featureCollection } from '@turf/helpers';
+import {feature, featureCollection} from '@turf/helpers';
 
 export type TileFeaturesRasterOptions = {
   tiles: RasterTile[];
@@ -52,16 +52,29 @@ export function tileFeaturesRaster({
   for (const tile of tiles as Required<RasterTile>[]) {
     const parent = tile.index.q;
 
+    // If tile is partially overlapping with the spatial filter, compute a quadbin covering for the
+    // spatial filter + tile intersection, at cell resolution. If tile is fully inside or outside
+    // the spatial filter, computing a covering can be skipped. Avoid computing a quadbin covering
+    // for the _entire_ spatial filter, which may contain far too many cells (e.g. at zoom=3 and
+    // resolution=14, we have ~18,000,000 cells in the viewport.)
     const tilePolygon = cellToBoundary(parent);
-    const tileIntersection = intersect(featureCollection([feature(tilePolygon), feature(options.spatialFilter)]));
-    const needsSpatialFilter = tileIntersection && !booleanWithin(tilePolygon, options.spatialFilter);
-    const tileSpatialFilterCells = needsSpatialFilter ? new Set(geometryToCells(tileIntersection.geometry, cellResolution)) : null;
+    const tileFilter = intersect(
+      featureCollection([feature(tilePolygon), feature(options.spatialFilter)])
+    );
+    const needsFilter = tileFilter
+      ? !booleanWithin(tilePolygon, options.spatialFilter)
+      : false;
+    const tileFilterCells = needsFilter
+      ? new Set(geometryToCells(tileFilter!.geometry, cellResolution))
+      : null;
     const tileSortedCells = cellToChildrenSorted(parent, cellResolution);
 
     // For each pixel/cell within the spatial filter, create a FeatureData.
     // Order is row-major, starting from NW and ending at SE.
     for (let i = 0; i < tileSortedCells.length; i++) {
-      if (needsSpatialFilter && !tileSpatialFilterCells!.has(tileSortedCells[i])) continue;
+      if (needsFilter && !tileFilterCells!.has(tileSortedCells[i])) {
+        continue;
+      }
 
       const cellData: FeatureData = {};
       let cellDataExists = false;
