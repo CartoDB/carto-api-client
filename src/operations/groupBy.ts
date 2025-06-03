@@ -60,10 +60,8 @@ export function groupValuesByColumn({
     value: targetOperation(value),
   }));
 
-  // TODO: we'll need to accept sorting options in future
   allCategories.sort((a, b) => b.value - a.value);
 
-  console.log('allCategories', allCategories);
   if (othersThreshold && allCategories.length > othersThreshold) {
     const otherNames = allCategories
       .map((entry) => entry.name)
