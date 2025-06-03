@@ -115,7 +115,7 @@ describe('groupValuesByColumn', () => {
           {name: 'FL', value: 400},
           {name: 'CA', value: 200},
           {name: 'NY', value: 100},
-          {name: '_carto_others', value: 700}
+          {name: '_carto_others', value: 700},
         ]);
       });
       test('should support othersThreshold with count', () => {
@@ -132,7 +132,7 @@ describe('groupValuesByColumn', () => {
           {name: 'NY', value: 1},
           {name: 'CA', value: 1},
           {name: 'FL', value: 1},
-          {name: '_carto_others', value: 2}
+          {name: '_carto_others', value: 2},
         ]);
       });
     });

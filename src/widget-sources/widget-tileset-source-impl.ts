@@ -210,7 +210,7 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       joinOperation,
       keysColumn: column,
       operation,
-      othersThreshold
+      othersThreshold,
     });
 
     return groups || [];
