@@ -1,5 +1,6 @@
 import {
   cellToChildren as _cellToChildren,
+  cellToBoundary,
   cellToTile,
   geometryToCells,
   getResolution,
@@ -11,7 +12,9 @@ import type {
   RasterMetadataBand,
   SpatialDataType,
 } from '../sources/types.js';
-import {CellSet} from '../utils/CellSet.js';
+import booleanWithin from '@turf/boolean-within';
+import intersect from '@turf/intersect';
+import { feature, featureCollection } from '@turf/helpers';
 
 export type TileFeaturesRasterOptions = {
   tiles: RasterTile[];
@@ -44,23 +47,21 @@ export function tileFeaturesRaster({
   const tileBlockSize = tiles[0].data!.blockSize;
   const cellResolution = tileResolution + BigInt(Math.log2(tileBlockSize));
 
-  // Compute covering cells for the spatial filter, at same resolution as the
-  // raster pixels, to be used as a mask.
-  const spatialFilterCells = new CellSet(
-    geometryToCells(options.spatialFilter, cellResolution)
-  );
-
   const data = new Map<bigint, FeatureData>();
 
   for (const tile of tiles as Required<RasterTile>[]) {
     const parent = tile.index.q;
 
-    const children = cellToChildrenSorted(parent, cellResolution);
+    const tilePolygon = cellToBoundary(parent);
+    const tileIntersection = intersect(featureCollection([feature(tilePolygon), feature(options.spatialFilter)]));
+    const needsSpatialFilter = tileIntersection && !booleanWithin(tilePolygon, options.spatialFilter);
+    const tileSpatialFilterCells = needsSpatialFilter ? new Set(geometryToCells(tileIntersection.geometry, cellResolution)) : null;
+    const tileSortedCells = cellToChildrenSorted(parent, cellResolution);
 
     // For each pixel/cell within the spatial filter, create a FeatureData.
     // Order is row-major, starting from NW and ending at SE.
-    for (let i = 0; i < children.length; i++) {
-      if (!spatialFilterCells.has(children[i])) continue;
+    for (let i = 0; i < tileSortedCells.length; i++) {
+      if (needsSpatialFilter && !tileSpatialFilterCells!.has(tileSortedCells[i])) continue;
 
       const cellData: FeatureData = {};
       let cellDataExists = false;
@@ -76,7 +77,7 @@ export function tileFeaturesRaster({
       }
 
       if (cellDataExists) {
-        data.set(children[i], cellData);
+        data.set(tileSortedCells[i], cellData);
       }
     }
   }
