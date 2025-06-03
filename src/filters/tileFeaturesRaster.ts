@@ -11,6 +11,7 @@ import type {
   RasterMetadataBand,
   SpatialDataType,
 } from '../sources/types.js';
+import {CellSet} from '../utils/CellSet.js';
 
 export type TileFeaturesRasterOptions = {
   tiles: RasterTile[];
@@ -45,7 +46,7 @@ export function tileFeaturesRaster({
 
   // Compute covering cells for the spatial filter, at same resolution as the
   // raster pixels, to be used as a mask.
-  const spatialFilterCells = new Set(
+  const spatialFilterCells = new CellSet(
     geometryToCells(options.spatialFilter, cellResolution)
   );
 
