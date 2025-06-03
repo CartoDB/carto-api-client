@@ -1,4 +1,5 @@
 import {aggregationFunctions, aggregate} from './aggregation.js';
+import {OTHERS_CATEGORY_NAME} from '../widget-sources/constants.js';
 import type {AggregationType} from '../types.js';
 import type {FeatureData} from '../types-internal.js';
 
@@ -15,12 +16,14 @@ export function groupValuesByColumn({
   joinOperation,
   keysColumn,
   operation,
+  othersThreshold,
 }: {
   data: FeatureData[];
   valuesColumns?: string[];
   joinOperation?: AggregationType;
   keysColumn: string;
   operation: AggregationType;
+  othersThreshold?: number;
 }): GroupByFeature | null {
   if (Array.isArray(data) && data.length === 0) {
     return null;
@@ -48,12 +51,29 @@ export function groupValuesByColumn({
   const targetOperation =
     aggregationFunctions[operation as Exclude<AggregationType, 'custom'>];
 
-  if (targetOperation) {
-    return Array.from(groups).map(([name, value]) => ({
-      name,
-      value: targetOperation(value),
-    }));
+  if (!targetOperation) {
+    return [];
   }
 
-  return [];
+  const allCategories = Array.from(groups).map(([name, value]) => ({
+    name,
+    value: targetOperation(value),
+  }));
+
+  // TODO: we'll need to accept sorting options in future
+  allCategories.sort((a, b) => b.value - a.value);
+
+  console.log('allCategories', allCategories);
+  if (othersThreshold && allCategories.length > othersThreshold) {
+    const otherNames = allCategories
+      .map((entry) => entry.name)
+      .slice(othersThreshold);
+    const otherValue = otherNames.flatMap((name) => groups.get(name));
+    allCategories.push({
+      name: OTHERS_CATEGORY_NAME,
+      value: targetOperation(otherValue),
+    });
+  }
+
+  return allCategories;
 }
