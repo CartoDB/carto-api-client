@@ -41,8 +41,8 @@ describe('groupValuesByColumn', () => {
         {name: 'Category 1', value: 3},
       ],
       min: [
-        {name: 'Category 2', value: 1},
         {name: 'Category 1', value: 2},
+        {name: 'Category 2', value: 1},
       ],
       max: [
         {name: 'Category 2', value: 5},
@@ -99,6 +99,43 @@ describe('groupValuesByColumn', () => {
         });
       });
     });
+
+    describe('othersThreshold', () => {
+      test('should support othersThreshold with sum', () => {
+        const groups = groupValuesByColumn({
+          data: dataForOthersTests,
+          valuesColumns: [`value`],
+          keysColumn: `state`,
+          othersThreshold: 2,
+          operation: 'sum',
+        });
+        expect(groups).toEqual([
+          {name: 'TX', value: 1600},
+          {name: 'IL', value: 500},
+          {name: 'FL', value: 400},
+          {name: 'CA', value: 200},
+          {name: 'NY', value: 100},
+          {name: '_carto_others', value: 700}
+        ]);
+      });
+      test('should support othersThreshold with count', () => {
+        const groups = groupValuesByColumn({
+          data: dataForOthersTests,
+          valuesColumns: [`state`],
+          keysColumn: `state`,
+          othersThreshold: 3,
+          operation: 'count',
+        });
+        expect(groups).toEqual([
+          {name: 'TX', value: 3},
+          {name: 'IL', value: 2},
+          {name: 'NY', value: 1},
+          {name: 'CA', value: 1},
+          {name: 'FL', value: 1},
+          {name: '_carto_others', value: 2}
+        ]);
+      });
+    });
   });
 
   describe('invalid features', () => {
@@ -141,6 +178,16 @@ describe('groupValuesByColumn', () => {
   });
 });
 
+const dataForOthersTests = [
+  {state: 'NY', value: 100},
+  {state: 'CA', value: 200},
+  {state: 'FL', value: 400},
+  {state: 'IL', value: 400},
+  {state: 'IL', value: 100},
+  {state: 'TX', value: 300},
+  {state: 'TX', value: 600},
+  {state: 'TX', value: 700},
+];
 // Aux
 
 function buildValidData(columnName) {

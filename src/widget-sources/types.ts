@@ -59,8 +59,8 @@ export interface CategoryRequestOptions extends BaseRequestOptions {
   operationColumn?: string;
   /** Local only. */
   joinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
-  /** Calculate `_carto_others` category for all categories after first N (N is threshold). Remote only. */
-  othersThreshold?: boolean;
+  /** Calculate `_carto_others` category for all categories after first N (N is threshold). */
+  othersThreshold?: number;
 }
 
 /**

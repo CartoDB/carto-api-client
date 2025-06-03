@@ -190,6 +190,7 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
     filters,
     filterOwner,
     spatialFilter,
+    othersThreshold,
   }: CategoryRequestOptions): Promise<CategoryResponse> {
     const filteredFeatures = this._getFilteredFeatures(
       spatialFilter,
@@ -209,6 +210,7 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       joinOperation,
       keysColumn: column,
       operation,
+      othersThreshold
     });
 
     return groups || [];
