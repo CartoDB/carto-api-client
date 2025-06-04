@@ -7,7 +7,7 @@ import {
   LayerDescriptor,
   MapLibreBasemap,
 } from '@carto/api-client';
-import {_ConstructorOf, Deck, Layer} from '@deck.gl/core';
+import {Deck} from '@deck.gl/core';
 import {DataFilterExtension} from '@deck.gl/extensions';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
