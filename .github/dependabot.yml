@@ -4,8 +4,6 @@ updates:
     directory: '/'
     schedule:
       interval: 'monthly'
-    reviewers:
-      - 'CartoDB/app-dev-builder-team'
     groups:
       deck-gl:
         patterns:
