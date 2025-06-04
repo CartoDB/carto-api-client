@@ -32,10 +32,10 @@ export interface BaseRequestOptions {
 }
 
 export type CategoryOrderBy =
-  | 'frequency_asc' // sort by aggregate value ascending
-  | 'frequency_desc' // sort by aggregate value descending
-  | 'alphabetical_asc' // sort by category name ascending
-  | 'alphabetical_desc'; // sort by category name descending
+  | 'frequency_asc' // sort by aggregate value ascending, then by name ascending
+  | 'frequency_desc' // sort by aggregate value descending, then by name ascending
+  | 'alphabetical_asc' // sort by category name ascending, then by value descending
+  | 'alphabetical_desc'; // sort by category name descending, then by value descending
 
 /**
  * Examples:
