@@ -59,6 +59,8 @@ export interface CategoryRequestOptions extends BaseRequestOptions {
   operationColumn?: string;
   /** Local only. */
   joinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
+  /** Calculate `_carto_others` category for all categories after first N (N is threshold). */
+  othersThreshold?: number;
 }
 
 /**
@@ -206,7 +208,7 @@ export type FeaturesResponse = {rows: Record<string, unknown>[]};
 export type FormulaResponse = {value: number | null};
 
 /** Response from {@link WidgetRemoteSource#getCategories}. */
-export type CategoryResponse = {name: string; value: number}[];
+export type CategoryResponse = {name: string | null; value: number}[];
 
 /** Response from {@link WidgetRemoteSource#getRange}. */
 export type RangeResponse = {min: number; max: number} | null;
