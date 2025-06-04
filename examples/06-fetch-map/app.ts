@@ -34,7 +34,10 @@ function createLayers(layers: LayerDescriptor[]) {
         ...getDataFilterExtensionProps(filters),
         extensions: [new DataFilterExtension({filterSize: 4})],
       };
-      return LayerFactory({...descriptor, props: {...descriptor.props, ...filterProps}});
+      return LayerFactory({
+        ...descriptor,
+        props: {...descriptor.props, ...filterProps},
+      });
     })
     .filter(Boolean);
 }
