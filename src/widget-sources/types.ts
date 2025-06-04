@@ -31,6 +31,12 @@ export interface BaseRequestOptions {
   filterOwner?: string;
 }
 
+export type CategoryOrderBy =
+  | 'frequency_asc' // sort by aggregate value ascending, then by name ascending
+  | 'frequency_desc' // sort by aggregate value descending, then by name ascending
+  | 'alphabetical_asc' // sort by category name ascending, then by value descending
+  | 'alphabetical_desc'; // sort by category name descending, then by value descending
+
 /**
  * Examples:
  *   * population by state
@@ -61,6 +67,11 @@ export interface CategoryRequestOptions extends BaseRequestOptions {
   joinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
   /** Calculate `_carto_others` category for all categories after first N (N is threshold). */
   othersThreshold?: number;
+  /**
+   * Order categories by frequency or alphabetically.
+   * @default 'frequency_desc'
+   */
+  orderBy?: CategoryOrderBy;
 }
 
 /**
@@ -207,8 +218,11 @@ export type FeaturesResponse = {rows: Record<string, unknown>[]};
 /** Response from {@link WidgetRemoteSource#getFormula}. */
 export type FormulaResponse = {value: number | null};
 
+/** Entry in the category widget response, see  {@link WidgetRemoteSource#getCategories}. */
+export type CategoryResponseEntry = {name: string | null; value: number};
+
 /** Response from {@link WidgetRemoteSource#getCategories}. */
-export type CategoryResponse = {name: string | null; value: number}[];
+export type CategoryResponse = CategoryResponseEntry[];
 
 /** Response from {@link WidgetRemoteSource#getRange}. */
 export type RangeResponse = {min: number; max: number} | null;
