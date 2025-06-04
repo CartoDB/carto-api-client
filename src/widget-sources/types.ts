@@ -31,6 +31,12 @@ export interface BaseRequestOptions {
   filterOwner?: string;
 }
 
+export type CategoryOrderBy =
+  | 'frequency_asc' // sort by aggregate value ascending
+  | 'frequency_desc' // sort by aggregate value descending
+  | 'alphabetical_asc' // sort by category name ascending
+  | 'alphabetical_desc'; // sort by category name descending
+
 /**
  * Examples:
  *   * population by state
@@ -65,11 +71,7 @@ export interface CategoryRequestOptions extends BaseRequestOptions {
    * Order categories by frequency or alphabetically.
    * @default 'frequency_desc'
    */
-  orderBy?:
-    | 'frequency_asc' // sort by aggregate value ascending
-    | 'frequency_desc' // sort by aggregate value descending
-    | 'alphabetical_asc' // sort by category name ascending
-    | 'alphabetical_desc'; // sort by category name descending
+  orderBy?: CategoryOrderBy;
   /** Return raw result (CategoryResponseRaw). */
   rawResult?: boolean;
 }
@@ -218,6 +220,7 @@ export type FeaturesResponse = {rows: Record<string, unknown>[]};
 /** Response from {@link WidgetRemoteSource#getFormula}. */
 export type FormulaResponse = {value: number | null};
 
+/** Entry in the category widget response, see  {@link WidgetRemoteSource#getCategories}. */
 export type CategoryResponseEntry = {name: string | null; value: number};
 /** Response from {@link WidgetRemoteSource#getCategories}. */
 export type CategoryResponse = CategoryResponseEntry[];
