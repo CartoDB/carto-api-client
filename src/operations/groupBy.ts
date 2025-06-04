@@ -1,7 +1,11 @@
 import {aggregationFunctions, aggregate} from './aggregation.js';
 import type {AggregationType} from '../types.js';
 import type {FeatureData} from '../types-internal.js';
-import type {CategoryResponseRaw} from '../widget-sources/types.js';
+import type {
+  CategoryOrderBy,
+  CategoryResponseEntry,
+  CategoryResponseRaw,
+} from '../widget-sources/types.js';
 
 /** @privateRemarks Source: @carto/react-core */
 export function groupValuesByColumn({
@@ -11,6 +15,7 @@ export function groupValuesByColumn({
   keysColumn,
   operation,
   othersThreshold,
+  orderBy = 'frequency_desc',
 }: {
   data: FeatureData[];
   valuesColumns?: string[];
@@ -18,6 +23,7 @@ export function groupValuesByColumn({
   keysColumn: string;
   operation: AggregationType;
   othersThreshold?: number;
+  orderBy?: CategoryOrderBy;
 }): CategoryResponseRaw | null {
   if (Array.isArray(data) && data.length === 0) {
     return {rows: null};
@@ -54,7 +60,7 @@ export function groupValuesByColumn({
       name,
       value: targetOperation(value),
     }))
-    .sort((a, b) => b.value - a.value);
+    .sort(getCategorySorter(orderBy));
 
   if (othersThreshold && allCategories.length > othersThreshold) {
     const otherValue = allCategories
@@ -71,4 +77,26 @@ export function groupValuesByColumn({
   return {
     rows: allCategories,
   };
+}
+
+const localeCompare = (a: string | null, b: string | null) =>
+  (a || 'null').localeCompare(b || 'null');
+
+export function getCategorySorter(
+  orderBy: CategoryOrderBy
+): (a: CategoryResponseEntry, b: CategoryResponseEntry) => number {
+  switch (orderBy) {
+    case 'frequency_asc':
+      // 'value ASC, name ASC'
+      return (a, b) => a.value - b.value || localeCompare(a.name, b.name);
+    case 'frequency_desc':
+      // 'value DESC, name ASC'
+      return (a, b) => b.value - a.value || localeCompare(a.name, b.name);
+    case 'alphabetical_asc':
+      // 'name ASC, value DESC'
+      return (a, b) => localeCompare(a.name, b.name) || b.value - a.value;
+    case 'alphabetical_desc':
+      // 'name DESC, value DESC'
+      return (a, b) => localeCompare(b.name, a.name) || b.value - a.value;
+  }
 }

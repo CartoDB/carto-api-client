@@ -37,8 +37,8 @@ describe('groupValuesByColumn', () => {
         {name: 'Category 1', value: 2},
       ],
       avg: [
-        {name: 'Category 2', value: 3},
         {name: 'Category 1', value: 3},
+        {name: 'Category 2', value: 3},
       ],
       min: [
         {name: 'Category 1', value: 2},
@@ -134,14 +134,89 @@ describe('groupValuesByColumn', () => {
           rows: [
             {name: 'TX', value: 3},
             {name: 'IL', value: 2},
-            {name: 'NY', value: 1},
             {name: 'CA', value: 1},
             {name: 'FL', value: 1},
+            {name: 'NY', value: 1},
           ],
           metadata: {
             others: 2,
           },
         });
+      });
+      test('should support othersThreshold with and orderBy', () => {
+        const groups = groupValuesByColumn({
+          data: dataForOthersTests,
+          valuesColumns: [`state`],
+          keysColumn: `state`,
+          othersThreshold: 3,
+          operation: 'count',
+          orderBy: 'alphabetical_asc',
+        });
+        expect(groups).toEqual({
+          rows: [
+            {name: 'CA', value: 1},
+            {name: 'FL', value: 1},
+            {name: 'IL', value: 2},
+            {name: 'NY', value: 1},
+            {name: 'TX', value: 3},
+          ],
+          metadata: {
+            others: 4,
+          },
+        });
+      });
+    });
+
+    describe('orderBy', () => {
+      const defaultParams = {
+        data: dataForOthersTests,
+        valuesColumns: [`value`],
+        keysColumn: `state`,
+        operation: 'count',
+      };
+      test('should support alphabetical_asc', () => {
+        expect(
+          groupValuesByColumn({...defaultParams, orderBy: 'alphabetical_asc'}).rows
+        ).toEqual([
+          {name: 'CA', value: 1},
+          {name: 'FL', value: 1},
+          {name: 'IL', value: 2},
+          {name: 'NY', value: 1},
+          {name: 'TX', value: 3},
+        ]);
+      });
+      test('should support alphabetical_desc', () => {
+        expect(
+          groupValuesByColumn({...defaultParams, orderBy: 'alphabetical_desc'}).rows
+        ).toEqual([
+          {name: 'TX', value: 3},
+          {name: 'NY', value: 1},
+          {name: 'IL', value: 2},
+          {name: 'FL', value: 1},
+          {name: 'CA', value: 1},
+        ]);
+      });
+      test('should support frequency_asc', () => {
+        expect(
+          groupValuesByColumn({...defaultParams, orderBy: 'frequency_asc'}).rows
+        ).toEqual([
+          {name: 'CA', value: 1},
+          {name: 'FL', value: 1},
+          {name: 'NY', value: 1},
+          {name: 'IL', value: 2},
+          {name: 'TX', value: 3},
+        ]);
+      });
+      test('should support frequency_desc', () => {
+        expect(
+          groupValuesByColumn({...defaultParams, orderBy: 'frequency_desc'}).rows
+        ).toEqual([
+          {name: 'TX', value: 3},
+          {name: 'IL', value: 2},
+          {name: 'CA', value: 1},
+          {name: 'FL', value: 1},
+          {name: 'NY', value: 1},
+        ]);
       });
     });
   });

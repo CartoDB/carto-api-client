@@ -191,7 +191,8 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
     filterOwner,
     spatialFilter,
     othersThreshold,
-    rawResult,
+    orderBy = 'frequency_desc',
+    rawResult
   }: CategoryRequestOptions): Promise<CategoryResponse> {
     const filteredFeatures = this._getFilteredFeatures(
       spatialFilter,
@@ -212,6 +213,7 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       keysColumn: column,
       operation,
       othersThreshold,
+      orderBy,
     });
 
     if (rawResult) {
