@@ -61,6 +61,15 @@ export interface CategoryRequestOptions extends BaseRequestOptions {
   joinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
   /** Calculate `_carto_others` category for all categories after first N (N is threshold). */
   othersThreshold?: number;
+  /**
+   * Order categories by frequency or alphabetically.
+   * @default 'frequency_desc'
+   */
+  orderBy?:
+    | 'frequency_asc' // sort by aggregate value ascending
+    | 'frequency_desc' // sort by aggregate value descending
+    | 'alphabetical_asc' // sort by category name ascending
+    | 'alphabetical_desc'; // sort by category name descending
   /** Return raw result (CategoryResponseRaw). */
   rawResult?: boolean;
 }
