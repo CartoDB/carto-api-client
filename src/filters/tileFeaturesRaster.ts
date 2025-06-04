@@ -1,5 +1,6 @@
 import {
   cellToChildren as _cellToChildren,
+  cellToBoundary,
   cellToTile,
   geometryToCells,
   getResolution,
@@ -11,7 +12,9 @@ import type {
   RasterMetadataBand,
   SpatialDataType,
 } from '../sources/types.js';
-import {CellSet} from '../utils/CellSet.js';
+import booleanWithin from '@turf/boolean-within';
+import intersect from '@turf/intersect';
+import {feature, featureCollection} from '@turf/helpers';
 
 export type TileFeaturesRasterOptions = {
   tiles: RasterTile[];
@@ -44,23 +47,34 @@ export function tileFeaturesRaster({
   const tileBlockSize = tiles[0].data!.blockSize;
   const cellResolution = tileResolution + BigInt(Math.log2(tileBlockSize));
 
-  // Compute covering cells for the spatial filter, at same resolution as the
-  // raster pixels, to be used as a mask.
-  const spatialFilterCells = new CellSet(
-    geometryToCells(options.spatialFilter, cellResolution)
-  );
-
   const data = new Map<bigint, FeatureData>();
 
   for (const tile of tiles as Required<RasterTile>[]) {
     const parent = tile.index.q;
 
-    const children = cellToChildrenSorted(parent, cellResolution);
+    // If tile is partially overlapping with the spatial filter, compute a quadbin covering for the
+    // spatial filter + tile intersection, at cell resolution. If tile is fully inside or outside
+    // the spatial filter, computing a covering can be skipped. Avoid computing a quadbin covering
+    // for the _entire_ spatial filter, which may contain far too many cells (e.g. at zoom=3 and
+    // resolution=14, we have ~18,000,000 cells in the viewport.)
+    const tilePolygon = cellToBoundary(parent);
+    const tileFilter = intersect(
+      featureCollection([feature(tilePolygon), feature(options.spatialFilter)])
+    );
+    const needsFilter = tileFilter
+      ? !booleanWithin(tilePolygon, options.spatialFilter)
+      : false;
+    const tileFilterCells = needsFilter
+      ? new Set(geometryToCells(tileFilter!.geometry, cellResolution))
+      : null;
+    const tileSortedCells = cellToChildrenSorted(parent, cellResolution);
 
     // For each pixel/cell within the spatial filter, create a FeatureData.
     // Order is row-major, starting from NW and ending at SE.
-    for (let i = 0; i < children.length; i++) {
-      if (!spatialFilterCells.has(children[i])) continue;
+    for (let i = 0; i < tileSortedCells.length; i++) {
+      if (needsFilter && !tileFilterCells!.has(tileSortedCells[i])) {
+        continue;
+      }
 
       const cellData: FeatureData = {};
       let cellDataExists = false;
@@ -76,7 +90,7 @@ export function tileFeaturesRaster({
       }
 
       if (cellDataExists) {
-        data.set(children[i], cellData);
+        data.set(tileSortedCells[i], cellData);
       }
     }
   }
