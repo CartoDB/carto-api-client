@@ -55,18 +55,17 @@ export function groupValuesByColumn({
     return [];
   }
 
-  const allCategories = Array.from(groups).map(([name, value]) => ({
-    name,
-    value: targetOperation(value),
-  }));
-
-  allCategories.sort((a, b) => b.value - a.value);
+  const allCategories = Array.from(groups)
+    .map(([name, value]) => ({
+      name,
+      value: targetOperation(value),
+    }))
+    .sort((a, b) => b.value - a.value);
 
   if (othersThreshold && allCategories.length > othersThreshold) {
-    const otherNames = allCategories
-      .map((entry) => entry.name)
-      .slice(othersThreshold);
-    const otherValue = otherNames.flatMap((name) => groups.get(name));
+    const otherValue = allCategories
+      .slice(othersThreshold)
+      .flatMap(({name}) => groups.get(name));
     allCategories.push({
       name: OTHERS_CATEGORY_NAME,
       value: targetOperation(otherValue),
