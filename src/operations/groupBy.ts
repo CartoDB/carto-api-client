@@ -60,7 +60,7 @@ export function groupValuesByColumn({
       name,
       value: targetOperation(value),
     }))
-    .sort(getCategorySorter(orderBy));
+    .sort(getSorter(orderBy));
 
   if (othersThreshold && allCategories.length > othersThreshold) {
     const otherValue = allCategories
@@ -82,7 +82,7 @@ export function groupValuesByColumn({
 const localeCompare = (a: string | null, b: string | null) =>
   (a || 'null').localeCompare(b || 'null');
 
-export function getCategorySorter(
+export function getSorter(
   orderBy: CategoryOrderBy
 ): (a: CategoryResponseEntry, b: CategoryResponseEntry) => number {
   switch (orderBy) {
