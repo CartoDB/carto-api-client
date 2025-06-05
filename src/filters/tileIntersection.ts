@@ -20,8 +20,8 @@ import bboxClip from '@turf/bbox-clip';
 // for pre-filtering each tile's features before performing widget calculations.
 //
 // Return types:
-// - 'true': All features in tile are within spatial filter.
-// - 'false': No features in tile are within spatial filter; skip tile.
+// - true: All features in tile are within spatial filter.
+// - false: No features in tile are within spatial filter; skip tile.
 // - SpatialFilter/Set: Requires a more detailed per-feature check for each
 //    feature in the tile. Provides a clipped spatial filter local to the tile
 //    or, for spatial indexes, a set of indices ("covering set").

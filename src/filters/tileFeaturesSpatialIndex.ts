@@ -53,7 +53,7 @@ export function tileFeaturesSpatialIndex({
     if (!intersection) continue;
 
     tile.data.forEach((d: Feature) => {
-      // @ts-expect-error Types need deeper corrections.
+      // @ts-expect-error Mixed types for cell indices.
       if (intersection === true || intersection.has(d.id as bigint | string)) {
         map.set(d.id, {...d.properties, [spatialIndexIDName]: d.id});
       }
@@ -67,7 +67,7 @@ function getTileIndex(
   spatialIndex: SpatialIndex
 ): bigint | string {
   if (spatialIndex === SpatialIndex.QUADBIN) {
-    // @ts-expect-error TODO
+    // @ts-expect-error Missing types for quadbin tile indices.
     return tile.index.q;
   }
   return tile.id;
