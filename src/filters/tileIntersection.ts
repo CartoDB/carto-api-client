@@ -19,12 +19,12 @@ import bboxClip from '@turf/bbox-clip';
 // Computes intersections between spatial filters and tiles in various formats,
 // for pre-filtering each tile's features before performing widget calculations.
 //
-// - FILTER INTERSECTS TILE: Requires a more detailed per-feature check for each
-//    feature in the tile. Compute a clipped spatial filter local to the tile or,
-//    for spatial indexes, a covering (set of indices).
-// - FILTER FULLY CONTAINS TILE: Process all features in tile, no more checks.
-// - NO FILTER: Process all features in tile, no more checks.
-// - NO OVERLAP: If tile and spatial filter do not overlap, exclude all features.
+// Return types:
+// - 'true': All features in tile are within spatial filter.
+// - 'false': No features in tile are within spatial filter; skip tile.
+// - SpatialFilter/Set: Requires a more detailed per-feature check for each
+//    feature in the tile. Provides a clipped spatial filter local to the tile
+//    or, for spatial indexes, a set of indices ("covering set").
 //
 // Computing a covering set for spatial indexes may be very expensive for large
 // spatial filters and small cell resolutions. For example, a viewport at z=3
