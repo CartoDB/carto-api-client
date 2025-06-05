@@ -19,7 +19,7 @@ export type TileFeatures = {
   tileFormat: TileFormat;
   spatialDataType: SpatialDataType;
   spatialDataColumn?: string;
-  spatialFilter: SpatialFilter;
+  spatialFilter?: SpatialFilter;
   uniqueIdProperty?: string;
   rasterMetadata?: RasterMetadata;
   storeGeometry?: boolean;

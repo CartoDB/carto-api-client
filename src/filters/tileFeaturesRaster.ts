@@ -1,8 +1,6 @@
 import {
   cellToChildren as _cellToChildren,
-  cellToBoundary,
   cellToTile,
-  geometryToCells,
   getResolution,
 } from 'quadbin';
 import type {RasterTile, SpatialFilter, Tile} from '../types.js';
@@ -12,13 +10,11 @@ import type {
   RasterMetadataBand,
   SpatialDataType,
 } from '../sources/types.js';
-import booleanWithin from '@turf/boolean-within';
-import intersect from '@turf/intersect';
-import {feature, featureCollection} from '@turf/helpers';
+import {intersectTileRaster} from './tileIntersection.js';
 
 export type TileFeaturesRasterOptions = {
   tiles: RasterTile[];
-  spatialFilter: SpatialFilter;
+  spatialFilter?: SpatialFilter;
   spatialDataColumn: string;
   spatialDataType: SpatialDataType;
   rasterMetadata: RasterMetadata;
@@ -52,27 +48,20 @@ export function tileFeaturesRaster({
   for (const tile of tiles as Required<RasterTile>[]) {
     const parent = tile.index.q;
 
-    // If tile is partially overlapping with the spatial filter, compute a quadbin covering for the
-    // spatial filter + tile intersection, at cell resolution. If tile is fully inside or outside
-    // the spatial filter, computing a covering can be skipped. Avoid computing a quadbin covering
-    // for the _entire_ spatial filter, which may contain far too many cells (e.g. at zoom=3 and
-    // resolution=14, we have ~18,000,000 cells in the viewport.)
-    const tilePolygon = cellToBoundary(parent);
-    const tileFilter = intersect(
-      featureCollection([feature(tilePolygon), feature(options.spatialFilter)])
+    const intersection = intersectTileRaster(
+      parent,
+      cellResolution,
+      options.spatialFilter
     );
-    const needsFilter = tileFilter
-      ? !booleanWithin(tilePolygon, options.spatialFilter)
-      : false;
-    const tileFilterCells = needsFilter
-      ? new Set(geometryToCells(tileFilter!.geometry, cellResolution))
-      : null;
+
+    if (intersection === false) continue;
+
     const tileSortedCells = cellToChildrenSorted(parent, cellResolution);
 
     // For each pixel/cell within the spatial filter, create a FeatureData.
     // Order is row-major, starting from NW and ending at SE.
     for (let i = 0; i < tileSortedCells.length; i++) {
-      if (needsFilter && !tileFilterCells!.has(tileSortedCells[i])) {
+      if (intersection !== true && !intersection.has(tileSortedCells[i])) {
         continue;
       }
 

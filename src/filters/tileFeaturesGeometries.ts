@@ -1,22 +1,15 @@
-import bboxPolygon from '@turf/bbox-polygon';
 import intersects from '@turf/boolean-intersects';
-import booleanWithin from '@turf/boolean-within';
-import intersect from '@turf/intersect';
-import {transformToTileCoords} from '../utils/transformToTileCoords.js';
 import {transformTileCoordsToWGS84} from '../utils/transformTileCoordsToWGS84.js';
 import {TileFormat} from '../constants.js';
 import type {
   BBox,
-  Feature,
   Geometry,
   LineString,
-  MultiPolygon,
   Point,
   Polygon,
   Position,
 } from 'geojson';
 import type {SpatialFilter, Tile} from '../types.js';
-import {featureCollection} from '@turf/helpers';
 import type {FeatureData} from '../types-internal.js';
 import type {
   BinaryAttribute,
@@ -27,6 +20,7 @@ import type {
   BinaryPolygonFeature,
   TypedArrayConstructor,
 } from '@loaders.gl/schema';
+import {intersectTileGeometry} from './tileIntersection.js';
 
 export const FEATURE_GEOM_PROPERTY = '__geomValue';
 
@@ -51,7 +45,7 @@ export function tileFeaturesGeometries({
 }: {
   tiles: Tile[];
   tileFormat?: TileFormat;
-  spatialFilter: SpatialFilter;
+  spatialFilter?: SpatialFilter;
   uniqueIdProperty?: string;
   options?: GeometryExtractOptions;
 }): FeatureData[] {
@@ -64,65 +58,50 @@ export function tileFeaturesGeometries({
       continue;
     }
 
-    const bbox = [
+    const tileBbox = [
       tile.bbox.west,
       tile.bbox.south,
       tile.bbox.east,
       tile.bbox.north,
     ] as BBox;
-    const bboxToGeom = bboxPolygon(bbox);
-    const tileIsFullyVisible = booleanWithin(bboxToGeom, spatialFilter);
 
-    // Clip the geometry to intersect with the tile
-    const spatialFilterFeature: Feature<Polygon | MultiPolygon> = {
-      type: 'Feature',
-      geometry: spatialFilter,
-      properties: {},
-    };
-    const clippedGeometryToIntersect = intersect(
-      featureCollection([bboxToGeom, spatialFilterFeature])
+    const intersection = intersectTileGeometry(
+      tileBbox,
+      tileFormat,
+      spatialFilter
     );
 
-    if (!clippedGeometryToIntersect) {
-      continue;
-    }
+    if (intersection === false) continue;
 
-    // We assume that MVT tileFormat uses local coordinates so we transform the geometry to intersect to tile coordinates [0..1],
-    // while in the case of 'geojson' or binary, the geometries are already in WGS84
-    const transformedGeometryToIntersect =
-      tileFormat === TileFormat.MVT
-        ? transformToTileCoords(clippedGeometryToIntersect.geometry, bbox)
-        : clippedGeometryToIntersect.geometry;
+    const transformedSpatialFilter =
+      intersection === true ? undefined : intersection;
 
     calculateFeatures({
       map,
-      tileIsFullyVisible,
-      geometryIntersection: transformedGeometryToIntersect,
+      spatialFilter: transformedSpatialFilter,
       data: tile.data.points!,
       type: 'Point',
-      bbox,
+      bbox: tileBbox,
       tileFormat,
       uniqueIdProperty,
       options,
     });
     calculateFeatures({
       map,
-      tileIsFullyVisible,
-      geometryIntersection: transformedGeometryToIntersect,
+      spatialFilter: transformedSpatialFilter,
       data: tile.data.lines!,
       type: 'LineString',
-      bbox,
+      bbox: tileBbox,
       tileFormat,
       uniqueIdProperty,
       options,
     });
     calculateFeatures({
       map,
-      tileIsFullyVisible,
-      geometryIntersection: transformedGeometryToIntersect,
+      spatialFilter: transformedSpatialFilter,
       data: tile.data.polygons!,
       type: 'Polygon',
-      bbox,
+      bbox: tileBbox,
       tileFormat,
       uniqueIdProperty,
       options,
@@ -141,7 +120,7 @@ function processTileFeatureProperties({
   tileFormat,
   uniqueIdProperty,
   storeGeometry,
-  geometryIntersection,
+  spatialFilter,
 }: {
   map: TileMap;
   data: BinaryFeature;
@@ -152,7 +131,7 @@ function processTileFeatureProperties({
   tileFormat?: TileFormat;
   uniqueIdProperty?: string;
   storeGeometry: boolean;
-  geometryIntersection?: Geometry;
+  spatialFilter?: Geometry;
 }) {
   const tileProps = getPropertiesFromTile(data, startIndex);
   const uniquePropertyValue = getUniquePropertyValue(
@@ -167,7 +146,7 @@ function processTileFeatureProperties({
   let geometry: Geometry | null = null;
 
   // Only calculate geometry if necessary
-  if (storeGeometry || geometryIntersection) {
+  if (storeGeometry || spatialFilter) {
     const {positions} = data;
     const ringCoordinates = getRingCoordinatesFor(
       startIndex,
@@ -178,11 +157,7 @@ function processTileFeatureProperties({
   }
 
   // If intersection is required, check before proceeding
-  if (
-    geometry &&
-    geometryIntersection &&
-    !intersects(geometry, geometryIntersection)
-  ) {
+  if (geometry && spatialFilter && !intersects(geometry, spatialFilter)) {
     return;
   }
 
@@ -201,7 +176,7 @@ function processTileFeatureProperties({
 function addIntersectedFeaturesInTile({
   map,
   data,
-  geometryIntersection,
+  spatialFilter,
   type,
   bbox,
   tileFormat,
@@ -210,7 +185,7 @@ function addIntersectedFeaturesInTile({
 }: {
   map: TileMap;
   data: BinaryFeature;
-  geometryIntersection: Geometry;
+  spatialFilter: Geometry;
   type: BinaryGeometryType;
   bbox: BBox;
   tileFormat?: TileFormat;
@@ -233,7 +208,7 @@ function addIntersectedFeaturesInTile({
       tileFormat,
       uniqueIdProperty,
       storeGeometry,
-      geometryIntersection,
+      spatialFilter,
     });
   }
 }
@@ -350,8 +325,7 @@ function getRingCoordinatesFor(
 
 function calculateFeatures({
   map,
-  tileIsFullyVisible,
-  geometryIntersection,
+  spatialFilter,
   data,
   type,
   bbox,
@@ -360,8 +334,7 @@ function calculateFeatures({
   options,
 }: {
   map: TileMap;
-  tileIsFullyVisible: boolean;
-  geometryIntersection: SpatialFilter;
+  spatialFilter?: SpatialFilter;
   data: BinaryFeature;
   type: BinaryGeometryType;
   bbox: BBox;
@@ -373,7 +346,7 @@ function calculateFeatures({
     return;
   }
 
-  if (tileIsFullyVisible) {
+  if (!spatialFilter) {
     addAllFeaturesInTile({
       map,
       data,
@@ -387,7 +360,7 @@ function calculateFeatures({
     addIntersectedFeaturesInTile({
       map,
       data,
-      geometryIntersection,
+      spatialFilter,
       type,
       bbox,
       tileFormat,
