@@ -8,7 +8,7 @@
   "homepage": "https://github.com/CartoDB/carto-api-client#readme",
   "author": "Don McCurdy <donmccurdy@carto.com>",
   "packageManager": "yarn@4.3.1",
-  "version": "0.5.7-alpha-optional-spatial-filter.1",
+  "version": "0.5.7",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -131,6 +131,5 @@
   "resolutions": {
     "@carto/api-client": "portal:./",
     "rollup": "^4.20.0"
-  },
-  "stableVersion": "0.5.4"
+  }
 }
