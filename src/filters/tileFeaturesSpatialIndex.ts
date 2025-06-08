@@ -31,24 +31,26 @@ export function tileFeaturesSpatialIndex({
     return [];
   }
 
+  let intersection: undefined | boolean | Set<bigint | string>;
+
+  // Compute H3 intersection globally, Quadbin intersection per-tile. See tileIntersection.ts.
+  if (spatialIndex === SpatialIndex.H3) {
+    intersection = intersectTileH3(cellResolution as number, spatialFilter);
+  }
+
   for (const tile of tiles) {
     if (tile.isVisible === false || !tile.data) {
       continue;
     }
 
-    const parent = getTileIndex(tile, spatialIndex);
-    const intersection =
-      spatialIndex === SpatialIndex.QUADBIN
-        ? intersectTileQuadbin(
-            parent as bigint,
-            cellResolution as bigint,
-            spatialFilter
-          )
-        : intersectTileH3(
-            parent as string,
-            cellResolution as number,
-            spatialFilter
-          );
+    if (spatialIndex === SpatialIndex.QUADBIN) {
+      const parent = getTileIndex(tile, spatialIndex);
+      intersection = intersectTileQuadbin(
+        parent as bigint,
+        cellResolution as bigint,
+        spatialFilter
+      );
+    }
 
     if (!intersection) continue;
 

@@ -1,4 +1,4 @@
-import type {BBox, Polygon} from 'geojson';
+import type {BBox} from 'geojson';
 import type {SpatialFilter} from '../types.js';
 import bboxPolygon from '@turf/bbox-polygon';
 import booleanWithin from '@turf/boolean-within';
@@ -10,10 +10,7 @@ import {
   cellToBoundary as quadbinCellToBoundary,
   geometryToCells as quadbinGeometryToCells,
 } from 'quadbin';
-import {
-  cellToBoundary as h3CellToBoundary,
-  polygonToCells as h3PolygonToCells,
-} from 'h3-js';
+import {polygonToCells as h3PolygonToCells} from 'h3-js';
 import bboxClip from '@turf/bbox-clip';
 
 // Computes intersections between spatial filters and tiles in various formats,
@@ -29,8 +26,13 @@ import bboxClip from '@turf/bbox-clip';
 // Computing a covering set for spatial indexes may be very expensive for large
 // spatial filters and small cell resolutions. For example, a viewport at z=3
 // would contain ~18,000,000 raster cells at resolution=14. To avoid ever
-// creating a covering set of this size, do filtering per-tile, not globally,
-// and skip the covering for tiles fully inside or outside the spatial filter.
+// creating a covering set of this size, compute per-tile (not global) coverings
+// when possible. For tiles fully inside or outside the spatial filter, creating
+// a covering set can be skipped.
+//
+// H3 is currently a special case where coverage must be computed for the entire
+// spatial filter; per-tile coverage would return a different result, because
+// H3 child cells are not fully contained within their parents.
 
 ///////////////////////////////////////////////////////////////////////////////
 // GEOMETRY
@@ -113,33 +115,28 @@ const BBOX_EAST: BBox = [0, -90, 180, 90];
 
 /** @internal */
 export function intersectTileH3(
-  parent: string,
   cellResolution: number,
   spatialFilter?: SpatialFilter
-): boolean | Set<string> {
-  const tilePolygon: Polygon = {
-    type: 'Polygon',
-    coordinates: [h3CellToBoundary(parent, true)],
-  };
-
-  if (!spatialFilter || booleanWithin(tilePolygon, spatialFilter)) {
+): true | Set<string> {
+  if (!spatialFilter) {
     return true;
   }
 
-  const clippedSpatialFilter = intersect(
-    featureCollection([feature(tilePolygon), feature(spatialFilter)])
-  );
+  // Unlike quadbin and raster tiles, H3 children do not align to the parent's
+  // boundaries. Per-tile coverage with `h3PolygonToCells` would return only
+  // cells with _centers_ inside the clipped polygon — fewer cells. So for H3
+  // we compute the coverage set for the entire spatial filter (more expensive).
+  // In the future this could be replaced with `polygonToCellsExperimental`,
+  // which can compute child cells in different modes.
 
-  if (!clippedSpatialFilter) {
-    return false;
-  }
+  const spatialFilterFeature = feature(spatialFilter);
 
   // The current H3 polyfill algorithm can't deal with polygon segments of greater than 180 degrees longitude
   // so we clip the geometry to be sure that none of them is greater than 180 degrees
   // https://github.com/uber/h3-js/issues/24#issuecomment-431893796
 
   const cellsWest = h3PolygonToCells(
-    bboxClip(clippedSpatialFilter, BBOX_WEST).geometry.coordinates as
+    bboxClip(spatialFilterFeature, BBOX_WEST).geometry.coordinates as
       | number[][]
       | number[][][],
     cellResolution,
@@ -147,7 +144,7 @@ export function intersectTileH3(
   );
 
   const cellsEast = h3PolygonToCells(
-    bboxClip(clippedSpatialFilter, BBOX_EAST).geometry.coordinates as
+    bboxClip(spatialFilterFeature, BBOX_EAST).geometry.coordinates as
       | number[][]
       | number[][][],
     cellResolution,
