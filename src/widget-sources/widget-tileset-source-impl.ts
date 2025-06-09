@@ -74,14 +74,13 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
     this._features.length = 0;
   }
 
-  protected _extractTileFeatures(spatialFilter: SpatialFilter) {
+  protected _extractTileFeatures(spatialFilter?: SpatialFilter) {
     // When spatial filter has not changed, don't redo extraction. If tiles or
     // tile extract options change, features will have been cleared already.
     const prevInputs = this._tileFeatureExtractPreviousInputs;
     if (
       this._features.length &&
-      prevInputs.spatialFilter &&
-      booleanEqual(prevInputs.spatialFilter, spatialFilter)
+      spatialFilterEquals(prevInputs.spatialFilter, spatialFilter)
     ) {
       return;
     }
@@ -383,7 +382,6 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
     filters?: Record<string, Filter>,
     filterOwner?: string
   ): FeatureData[] {
-    assert(spatialFilter, 'spatialFilter required for tilesets');
     this._extractTileFeatures(spatialFilter);
     return applyFilters(
       this._features,
@@ -421,4 +419,10 @@ function normalizeColumns(columns: string | string[]): string[] {
     : typeof columns === 'string'
       ? [columns]
       : [];
+}
+
+function spatialFilterEquals(a?: SpatialFilter, b?: SpatialFilter) {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  return booleanEqual(a, b);
 }
