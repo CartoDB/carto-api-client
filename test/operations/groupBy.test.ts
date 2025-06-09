@@ -172,11 +172,12 @@ describe('groupValuesByColumn', () => {
         data: dataForOthersTests,
         valuesColumns: [`value`],
         keysColumn: `state`,
-        operation: 'count',
+        operation: 'count' as const,
       };
       test('should support alphabetical_asc', () => {
         expect(
-          groupValuesByColumn({...defaultParams, orderBy: 'alphabetical_asc'}).rows
+          groupValuesByColumn({...defaultParams, orderBy: 'alphabetical_asc'})
+            .rows
         ).toEqual([
           {name: 'CA', value: 1},
           {name: 'FL', value: 1},
@@ -187,7 +188,8 @@ describe('groupValuesByColumn', () => {
       });
       test('should support alphabetical_desc', () => {
         expect(
-          groupValuesByColumn({...defaultParams, orderBy: 'alphabetical_desc'}).rows
+          groupValuesByColumn({...defaultParams, orderBy: 'alphabetical_desc'})
+            .rows
         ).toEqual([
           {name: 'TX', value: 3},
           {name: 'NY', value: 1},
@@ -209,7 +211,8 @@ describe('groupValuesByColumn', () => {
       });
       test('should support frequency_desc', () => {
         expect(
-          groupValuesByColumn({...defaultParams, orderBy: 'frequency_desc'}).rows
+          groupValuesByColumn({...defaultParams, orderBy: 'frequency_desc'})
+            .rows
         ).toEqual([
           {name: 'TX', value: 3},
           {name: 'IL', value: 2},
