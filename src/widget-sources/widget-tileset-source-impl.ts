@@ -40,6 +40,7 @@ import {booleanEqual} from '@turf/boolean-equal';
 import type {WidgetTilesetSourceProps} from './widget-tileset-source.js';
 import {getApplicableFilters} from '../filters.js';
 import {AggregationTypes} from '../constants.js';
+import {OTHERS_CATEGORY_NAME} from './constants.js';
 
 // TODO(cleanup): Parameter defaults in source functions and widget API calls are
 // currently duplicated and possibly inconsistent. Consider consolidating and
@@ -190,6 +191,7 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
     filterOwner,
     spatialFilter,
     othersThreshold,
+    rawResult,
   }: CategoryRequestOptions): Promise<CategoryResponse> {
     const filteredFeatures = this._getFilteredFeatures(
       spatialFilter,
@@ -203,7 +205,7 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
 
     assertColumn(this._features, column, operationColumn as string);
 
-    const groups = groupValuesByColumn({
+    const result = groupValuesByColumn({
       data: filteredFeatures,
       valuesColumns: normalizeColumns(operationColumn || column),
       joinOperation,
@@ -212,7 +214,18 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       othersThreshold,
     });
 
-    return groups || [];
+    if (rawResult) {
+      return result as unknown as CategoryResponse;
+    }
+
+    if (!othersThreshold) {
+      return result?.rows || [];
+    }
+
+    return [
+      ...(result?.rows || []),
+      {name: OTHERS_CATEGORY_NAME, value: result?.metadata?.others as number},
+    ];
   }
 
   override async getScatter({

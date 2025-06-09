@@ -14,7 +14,7 @@ describe('groupValuesByColumn', () => {
         valuesColumns: [],
         keysColumn: 'any',
         operation: 'count',
-      })
+      }).rows
     ).toEqual(null);
   });
 
@@ -27,7 +27,7 @@ describe('groupValuesByColumn', () => {
           keysColumn: `${COLUMN}_qualitative`,
           // @ts-ignore
           operation: 'pow',
-        })
+        }).rows
       ).toEqual([]);
     });
 
@@ -64,7 +64,7 @@ describe('groupValuesByColumn', () => {
             // @ts-ignore
             operation,
           });
-          expect(groups).toEqual(result);
+          expect(groups?.rows).toEqual(result);
         });
       });
     });
@@ -84,7 +84,7 @@ describe('groupValuesByColumn', () => {
 
       Object.entries(RESULTS_FOR_MULTIPLE).forEach(([operation, result]) => {
         test(operation, () => {
-          const groups = groupValuesByColumn({
+          const rows = groupValuesByColumn({
             data: VALID_DATA,
             valuesColumns: [
               `${COLUMN}_quantitative`,
@@ -94,8 +94,8 @@ describe('groupValuesByColumn', () => {
             keysColumn: `${COLUMN}_qualitative`,
             // @ts-ignore
             operation,
-          });
-          expect(groups).toEqual(result);
+          }).rows;
+          expect(rows).toEqual(result);
         });
       });
     });
@@ -108,7 +108,7 @@ describe('groupValuesByColumn', () => {
           keysColumn: `state`,
           othersThreshold: 2,
           operation: 'sum',
-        });
+        }).rows;
         expect(groups).toEqual([
           {name: 'TX', value: 1600},
           {name: 'IL', value: 500},
@@ -125,7 +125,7 @@ describe('groupValuesByColumn', () => {
           keysColumn: `state`,
           othersThreshold: 3,
           operation: 'count',
-        });
+        }).rows;
         expect(groups).toEqual([
           {name: 'TX', value: 3},
           {name: 'IL', value: 2},
@@ -145,7 +145,7 @@ describe('groupValuesByColumn', () => {
         valuesColumns: [`${COLUMN}_quantitative`],
         keysColumn: `${COLUMN}_qualitative`,
         operation: 'count',
-      });
+      }).rows;
       expect(groups).toEqual([
         {
           name: 'Category 1',
@@ -163,7 +163,7 @@ describe('groupValuesByColumn', () => {
         valuesColumns: [`${COLUMN}_quantitative`],
         keysColumn: `${COLUMN}_qualitative`,
         operation: 'sum',
-      });
+      }).rows;
       expect(groups).toEqual([
         {
           name: 'Category 1',

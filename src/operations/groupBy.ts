@@ -2,12 +2,7 @@ import {aggregationFunctions, aggregate} from './aggregation.js';
 import {OTHERS_CATEGORY_NAME} from '../widget-sources/constants.js';
 import type {AggregationType} from '../types.js';
 import type {FeatureData} from '../types-internal.js';
-
-/** @privateRemarks Source: @carto/react-core */
-export type GroupByFeature = {
-  name: string;
-  value: number;
-}[];
+import type {CategoryResponseRaw} from '../widget-sources/types.js';
 
 /** @privateRemarks Source: @carto/react-core */
 export function groupValuesByColumn({
@@ -24,9 +19,9 @@ export function groupValuesByColumn({
   keysColumn: string;
   operation: AggregationType;
   othersThreshold?: number;
-}): GroupByFeature | null {
+}): CategoryResponseRaw | null {
   if (Array.isArray(data) && data.length === 0) {
-    return null;
+    return {rows: null};
   }
   const groups = data.reduce((accumulator, item) => {
     const group = item[keysColumn];
@@ -52,7 +47,7 @@ export function groupValuesByColumn({
     aggregationFunctions[operation as Exclude<AggregationType, 'custom'>];
 
   if (!targetOperation) {
-    return [];
+    return {rows: []};
   }
 
   const allCategories = Array.from(groups)
@@ -70,7 +65,15 @@ export function groupValuesByColumn({
       name: OTHERS_CATEGORY_NAME,
       value: targetOperation(otherValue),
     });
+    return {
+      rows: allCategories,
+      metadata: {
+        others: targetOperation(otherValue),
+      },
+    };
   }
 
-  return allCategories;
+  return {
+    rows: allCategories,
+  };
 }
