@@ -79,9 +79,6 @@ export function groupValuesByColumn({
   };
 }
 
-const localeCompare = (a: string | null, b: string | null) =>
-  (a || 'null').localeCompare(b || 'null');
-
 export function getSorter(
   orderBy: CategoryOrderBy
 ): (a: CategoryResponseEntry, b: CategoryResponseEntry) => number {
@@ -99,4 +96,8 @@ export function getSorter(
       // 'name DESC, value DESC'
       return (a, b) => localeCompare(b.name, a.name) || b.value - a.value;
   }
+}
+
+function localeCompare(a?: string | null, b?: string | null) {
+  return (a ?? 'null').localeCompare(b ?? 'null');
 }
