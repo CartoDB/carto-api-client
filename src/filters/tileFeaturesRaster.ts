@@ -1,8 +1,4 @@
-import {
-  cellToChildren as _cellToChildren,
-  cellToTile,
-  getResolution,
-} from 'quadbin';
+import {cellToTile, getResolution, tileToCell} from 'quadbin';
 import type {RasterTile, SpatialFilter, Tile} from '../types.js';
 import type {FeatureData} from '../types-internal.js';
 import type {
@@ -56,7 +52,7 @@ export function tileFeaturesRaster({
 
     if (intersection === false) continue;
 
-    const tileSortedCells = cellToChildrenSorted(parent, cellResolution);
+    const tileSortedCells = cellToChildrenRaster(parent, cellResolution);
 
     // For each pixel/cell within the spatial filter, create a FeatureData.
     // Order is row-major, starting from NW and ending at SE.
@@ -100,21 +96,28 @@ function isRasterTileVisible(tile: RasterTile): tile is Required<RasterTile> {
 }
 
 /**
- * For the raster format, children are sorted in row-major order, starting from
- * NW and ending at SE. Order returned by quadbin's cellToChildren() is not
- * defined (and not related to the raster format), so sort explicitly here.
+ * Alternative to `quadbin` module's `cellToChildren()` function, modified to
+ * return cells in row-major order, NW to SE, as stored in CARTO raster tiles.
+ * Sorting after computing cells is too slow.
  */
-function cellToChildrenSorted(parent: bigint, resolution: bigint): bigint[] {
-  return _cellToChildren(parent, resolution).sort(
-    (cellA: bigint, cellB: bigint) => {
-      const tileA = cellToTile(cellA);
-      const tileB = cellToTile(cellB);
-      if (tileA.y !== tileB.y) {
-        return tileA.y > tileB.y ? 1 : -1;
-      }
-      return tileA.x > tileB.x ? 1 : -1;
-    }
-  );
+function cellToChildrenRaster(parent: bigint, resolution: bigint): bigint[] {
+  const parentTile = cellToTile(parent);
+
+  // 1. Calculate x/y/z of upper left pixel in raster tile.
+  const childZ = Number(resolution);
+  const blockSize = 2 ** (childZ - parentTile.z);
+  const childBaseX = parentTile.x * blockSize;
+  const childBaseY = parentTile.y * blockSize;
+
+  // 2. Iterate pixels in raster tile order; compute cell ID from base x/y.
+  const cells: bigint[] = [];
+  for (let i = 0, il = blockSize ** 2; i < il; i++) {
+    const x = childBaseX + (i % blockSize);
+    const y = childBaseY + Math.floor(i / blockSize);
+    cells.push(tileToCell({x, y, z: childZ}));
+  }
+
+  return cells;
 }
 
 /**

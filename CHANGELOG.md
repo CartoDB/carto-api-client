@@ -2,6 +2,8 @@
 
 ## 0.5
 
+- perf(rasters): Improve performance of raster widget spatial filtering (TODO)
+
 ### 0.5.7
 
 - feat(widgets): Allow local widget calculations without spatial filter (#204)
