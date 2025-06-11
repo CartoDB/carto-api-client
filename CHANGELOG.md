@@ -2,7 +2,9 @@
 
 ## 0.5
 
-- perf(rasters): Improve performance of raster widget spatial filtering (TODO)
+### Unreleased
+
+- perf(rasters): Improve performance of raster widget spatial filtering (#207)
 
 ### 0.5.7
 
