@@ -108,15 +108,19 @@ describe('groupValuesByColumn', () => {
           keysColumn: `state`,
           othersThreshold: 2,
           operation: 'sum',
-        }).rows;
-        expect(groups).toEqual([
-          {name: 'TX', value: 1600},
-          {name: 'IL', value: 500},
-          {name: 'FL', value: 400},
-          {name: 'CA', value: 200},
-          {name: 'NY', value: 100},
-          {name: '_carto_others', value: 700},
-        ]);
+        });
+        expect(groups).toEqual({
+          rows: [
+            {name: 'TX', value: 1600},
+            {name: 'IL', value: 500},
+            {name: 'FL', value: 400},
+            {name: 'CA', value: 200},
+            {name: 'NY', value: 100},
+          ],
+          metadata: {
+            others: 700,
+          },
+        });
       });
       test('should support othersThreshold with count', () => {
         const groups = groupValuesByColumn({
@@ -125,15 +129,19 @@ describe('groupValuesByColumn', () => {
           keysColumn: `state`,
           othersThreshold: 3,
           operation: 'count',
-        }).rows;
-        expect(groups).toEqual([
-          {name: 'TX', value: 3},
-          {name: 'IL', value: 2},
-          {name: 'NY', value: 1},
-          {name: 'CA', value: 1},
-          {name: 'FL', value: 1},
-          {name: '_carto_others', value: 2},
-        ]);
+        });
+        expect(groups).toEqual({
+          rows: [
+            {name: 'TX', value: 3},
+            {name: 'IL', value: 2},
+            {name: 'NY', value: 1},
+            {name: 'CA', value: 1},
+            {name: 'FL', value: 1},
+          ],
+          metadata: {
+            others: 2,
+          },
+        });
       });
     });
   });

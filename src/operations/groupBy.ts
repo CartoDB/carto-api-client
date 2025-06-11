@@ -1,5 +1,4 @@
 import {aggregationFunctions, aggregate} from './aggregation.js';
-import {OTHERS_CATEGORY_NAME} from '../widget-sources/constants.js';
 import type {AggregationType} from '../types.js';
 import type {FeatureData} from '../types-internal.js';
 import type {CategoryResponseRaw} from '../widget-sources/types.js';
@@ -61,10 +60,6 @@ export function groupValuesByColumn({
     const otherValue = allCategories
       .slice(othersThreshold)
       .flatMap(({name}) => groups.get(name));
-    allCategories.push({
-      name: OTHERS_CATEGORY_NAME,
-      value: targetOperation(otherValue),
-    });
     return {
       rows: allCategories,
       metadata: {
