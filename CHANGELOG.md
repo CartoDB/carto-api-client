@@ -2,6 +2,10 @@
 
 ## 0.5
 
+### Unreleased
+
+- perf(rasters): Improve performance of raster widget spatial filtering (#207)
+
 ### 0.5.7
 
 - feat(widgets): Allow local widget calculations without spatial filter (#204)
