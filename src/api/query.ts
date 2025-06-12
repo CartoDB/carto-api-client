@@ -13,7 +13,13 @@ import {requestWithParameters} from './request-with-parameters.js';
 import type {APIErrorContext} from './carto-api-error.js';
 import {getClient} from '../client.js';
 
-export type QueryOptions = SourceOptions & QuerySourceOptions;
+export type QueryOptions = SourceOptions &
+  QuerySourceOptions & {
+    /** Used to append additional parameters to the SQL API request for features specific to providers or integrations. */
+    additionalParameters?: Record<string, string | boolean | number>;
+    /** Used to abort the request. */
+    signal?: AbortSignal;
+  };
 type UrlParameters = {q: string; queryParameters?: string};
 
 export const query = async function (
@@ -27,6 +33,7 @@ export const query = async function (
     connectionName,
     sqlQuery,
     queryParameters,
+    additionalParameters,
   } = options;
   const urlParameters: UrlParameters = {q: sqlQuery};
 
@@ -39,7 +46,11 @@ export const query = async function (
     Authorization: `Bearer ${options.accessToken}`,
     ...options.headers,
   };
-  const parameters = {client: clientId, ...urlParameters};
+  const parameters = {
+    client: clientId,
+    ...additionalParameters,
+    ...urlParameters,
+  };
 
   const errorContext: APIErrorContext = {
     requestType: 'SQL',
@@ -54,5 +65,6 @@ export const query = async function (
     errorContext,
     maxLengthURL,
     localCache,
+    signal: options.signal,
   });
 };
