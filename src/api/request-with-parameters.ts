@@ -23,7 +23,7 @@ export async function requestWithParameters<T = any>({
   errorContext,
   maxLengthURL = DEFAULT_MAX_LENGTH_URL,
   localCache,
-  signal
+  signal,
 }: {
   baseUrl: string;
   parameters?: Record<string, unknown>;
