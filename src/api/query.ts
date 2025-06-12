@@ -17,6 +17,8 @@ export type QueryOptions = SourceOptions &
   QuerySourceOptions & {
     /** Used to append additional parameters to the SQL API request for features specific to providers or integrations. */
     additionalParameters?: Record<string, string | boolean | number>;
+    /** Used to abort the request. */
+    signal?: AbortSignal;
   };
 type UrlParameters = {q: string; queryParameters?: string};
 
@@ -63,5 +65,6 @@ export const query = async function (
     errorContext,
     maxLengthURL,
     localCache,
+    signal: options.signal,
   });
 };
