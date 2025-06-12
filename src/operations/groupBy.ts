@@ -1,12 +1,7 @@
 import {aggregationFunctions, aggregate} from './aggregation.js';
 import type {AggregationType} from '../types.js';
 import type {FeatureData} from '../types-internal.js';
-
-/** @privateRemarks Source: @carto/react-core */
-export type GroupByFeature = {
-  name: string;
-  value: number;
-}[];
+import type {CategoryResponseRaw} from '../widget-sources/types.js';
 
 /** @privateRemarks Source: @carto/react-core */
 export function groupValuesByColumn({
@@ -15,15 +10,17 @@ export function groupValuesByColumn({
   joinOperation,
   keysColumn,
   operation,
+  othersThreshold,
 }: {
   data: FeatureData[];
   valuesColumns?: string[];
   joinOperation?: AggregationType;
   keysColumn: string;
   operation: AggregationType;
-}): GroupByFeature | null {
+  othersThreshold?: number;
+}): CategoryResponseRaw | null {
   if (Array.isArray(data) && data.length === 0) {
-    return null;
+    return {rows: null};
   }
   const groups = data.reduce((accumulator, item) => {
     const group = item[keysColumn];
@@ -48,12 +45,30 @@ export function groupValuesByColumn({
   const targetOperation =
     aggregationFunctions[operation as Exclude<AggregationType, 'custom'>];
 
-  if (targetOperation) {
-    return Array.from(groups).map(([name, value]) => ({
-      name,
-      value: targetOperation(value),
-    }));
+  if (!targetOperation) {
+    return {rows: []};
   }
 
-  return [];
+  const allCategories = Array.from(groups)
+    .map(([name, value]) => ({
+      name,
+      value: targetOperation(value),
+    }))
+    .sort((a, b) => b.value - a.value);
+
+  if (othersThreshold && allCategories.length > othersThreshold) {
+    const otherValue = allCategories
+      .slice(othersThreshold)
+      .flatMap(({name}) => groups.get(name));
+    return {
+      rows: allCategories,
+      metadata: {
+        others: targetOperation(otherValue),
+      },
+    };
+  }
+
+  return {
+    rows: allCategories,
+  };
 }

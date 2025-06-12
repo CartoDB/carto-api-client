@@ -14,7 +14,7 @@ describe('groupValuesByColumn', () => {
         valuesColumns: [],
         keysColumn: 'any',
         operation: 'count',
-      })
+      }).rows
     ).toEqual(null);
   });
 
@@ -27,7 +27,7 @@ describe('groupValuesByColumn', () => {
           keysColumn: `${COLUMN}_qualitative`,
           // @ts-ignore
           operation: 'pow',
-        })
+        }).rows
       ).toEqual([]);
     });
 
@@ -41,8 +41,8 @@ describe('groupValuesByColumn', () => {
         {name: 'Category 1', value: 3},
       ],
       min: [
-        {name: 'Category 2', value: 1},
         {name: 'Category 1', value: 2},
+        {name: 'Category 2', value: 1},
       ],
       max: [
         {name: 'Category 2', value: 5},
@@ -64,7 +64,7 @@ describe('groupValuesByColumn', () => {
             // @ts-ignore
             operation,
           });
-          expect(groups).toEqual(result);
+          expect(groups?.rows).toEqual(result);
         });
       });
     });
@@ -84,7 +84,7 @@ describe('groupValuesByColumn', () => {
 
       Object.entries(RESULTS_FOR_MULTIPLE).forEach(([operation, result]) => {
         test(operation, () => {
-          const groups = groupValuesByColumn({
+          const rows = groupValuesByColumn({
             data: VALID_DATA,
             valuesColumns: [
               `${COLUMN}_quantitative`,
@@ -94,8 +94,53 @@ describe('groupValuesByColumn', () => {
             keysColumn: `${COLUMN}_qualitative`,
             // @ts-ignore
             operation,
-          });
-          expect(groups).toEqual(result);
+          }).rows;
+          expect(rows).toEqual(result);
+        });
+      });
+    });
+
+    describe('othersThreshold', () => {
+      test('should support othersThreshold with sum', () => {
+        const groups = groupValuesByColumn({
+          data: dataForOthersTests,
+          valuesColumns: [`value`],
+          keysColumn: `state`,
+          othersThreshold: 2,
+          operation: 'sum',
+        });
+        expect(groups).toEqual({
+          rows: [
+            {name: 'TX', value: 1600},
+            {name: 'IL', value: 500},
+            {name: 'FL', value: 400},
+            {name: 'CA', value: 200},
+            {name: 'NY', value: 100},
+          ],
+          metadata: {
+            others: 700,
+          },
+        });
+      });
+      test('should support othersThreshold with count', () => {
+        const groups = groupValuesByColumn({
+          data: dataForOthersTests,
+          valuesColumns: [`state`],
+          keysColumn: `state`,
+          othersThreshold: 3,
+          operation: 'count',
+        });
+        expect(groups).toEqual({
+          rows: [
+            {name: 'TX', value: 3},
+            {name: 'IL', value: 2},
+            {name: 'NY', value: 1},
+            {name: 'CA', value: 1},
+            {name: 'FL', value: 1},
+          ],
+          metadata: {
+            others: 2,
+          },
         });
       });
     });
@@ -108,7 +153,7 @@ describe('groupValuesByColumn', () => {
         valuesColumns: [`${COLUMN}_quantitative`],
         keysColumn: `${COLUMN}_qualitative`,
         operation: 'count',
-      });
+      }).rows;
       expect(groups).toEqual([
         {
           name: 'Category 1',
@@ -126,7 +171,7 @@ describe('groupValuesByColumn', () => {
         valuesColumns: [`${COLUMN}_quantitative`],
         keysColumn: `${COLUMN}_qualitative`,
         operation: 'sum',
-      });
+      }).rows;
       expect(groups).toEqual([
         {
           name: 'Category 1',
@@ -141,6 +186,16 @@ describe('groupValuesByColumn', () => {
   });
 });
 
+const dataForOthersTests = [
+  {state: 'NY', value: 100},
+  {state: 'CA', value: 200},
+  {state: 'FL', value: 400},
+  {state: 'IL', value: 400},
+  {state: 'IL', value: 100},
+  {state: 'TX', value: 300},
+  {state: 'TX', value: 600},
+  {state: 'TX', value: 700},
+];
 // Aux
 
 function buildValidData(columnName) {
