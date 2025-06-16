@@ -59,6 +59,10 @@ export interface CategoryRequestOptions extends BaseRequestOptions {
   operationColumn?: string;
   /** Local only. */
   joinOperation?: 'count' | 'avg' | 'min' | 'max' | 'sum';
+  /** Calculate `_carto_others` category for all categories after first N (N is threshold). */
+  othersThreshold?: number;
+  /** Return raw result (CategoryResponseRaw). */
+  rawResult?: boolean;
 }
 
 /**
@@ -205,8 +209,16 @@ export type FeaturesResponse = {rows: Record<string, unknown>[]};
 /** Response from {@link WidgetRemoteSource#getFormula}. */
 export type FormulaResponse = {value: number | null};
 
+export type CategoryResponseEntry = {name: string | null; value: number};
 /** Response from {@link WidgetRemoteSource#getCategories}. */
-export type CategoryResponse = {name: string; value: number}[];
+export type CategoryResponse = CategoryResponseEntry[];
+
+export type CategoryResponseRaw = {
+  rows: CategoryResponseEntry[] | null;
+  metadata?: {
+    others?: number;
+  };
+};
 
 /** Response from {@link WidgetRemoteSource#getRange}. */
 export type RangeResponse = {min: number; max: number} | null;

@@ -1,7 +1,12 @@
 import type {AggregationType, GroupDateType} from '../types.js';
 import {getUTCMonday} from '../utils/dateUtils.js';
 import {aggregate, aggregationFunctions} from './aggregation.js';
-import type {GroupByFeature} from './groupBy.js';
+
+/** @privateRemarks Source: @carto/react-core */
+export type GroupByFeature = {
+  name: string;
+  value: number;
+}[];
 
 const GROUP_KEY_FN_MAPPING: Record<GroupDateType, (date: Date) => number> = {
   year: (date: Date) => Date.UTC(date.getUTCFullYear()),
