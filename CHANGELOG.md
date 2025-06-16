@@ -2,8 +2,9 @@
 
 ## 0.5
 
-### Unreleased
+## 0.5.8
 
+- feat(widgets): Add othersThreshold to WidgetSource.getCategories (#194)
 - perf(rasters): Improve performance of raster widget spatial filtering (#207)
 
 ### 0.5.7
