@@ -2,9 +2,19 @@
 
 ## 0.5
 
+## 0.5.8
+
+- feat(widgets): Add othersThreshold to WidgetSource.getCategories (#194)
+- perf(rasters): Improve performance of raster widget spatial filtering (#207)
+
+### 0.5.7
+
+- feat(widgets): Allow local widget calculations without spatial filter (#204)
+- perf(widgets): Improve performance of local widget spatial filtering (#192, #201)
+
 ### 0.5.6
 
-- chore(widgets): add AggregationTypes enum-like definition (#187)
+- chore(widgets): Add AggregationTypes enum-like definition (#187)
 - feat(worker): Distribute worker script as standalone JS bundle (#189)
 - feat(widgets): Add widgetWorkerUrl option (#188)
 - feat(widgets): WidgetRemoteSource: custom aggregations for category, timeseries models (#174)

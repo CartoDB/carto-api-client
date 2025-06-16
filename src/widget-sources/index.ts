@@ -5,3 +5,4 @@ export * from './widget-remote-source.js';
 export * from './widget-table-source.js';
 export * from './widget-tileset-source.js';
 export * from './types.js';
+export * from './constants.js';

@@ -23,6 +23,7 @@ import {WidgetSource, type WidgetSourceProps} from './widget-source.js';
 import type {Filters} from '../types.js';
 import {AggregationTypes, ApiVersion} from '../constants.js';
 import {getApplicableFilters} from '../filters.js';
+import {OTHERS_CATEGORY_NAME} from './constants.js';
 
 export type WidgetRemoteSourceProps = WidgetSourceProps;
 
@@ -73,17 +74,17 @@ export abstract class WidgetRemoteSource<
       filterOwner,
       spatialFilter,
       spatialFiltersMode,
+      rawResult,
       ...params
     } = options;
-    const {column, operation, operationColumn, operationExp} = params;
+    const {column, operation, operationColumn, operationExp, othersThreshold} =
+      params;
 
     if (operation === AggregationTypes.Custom) {
       assert(operationExp, 'operationExp is required for custom operation');
     }
 
-    type CategoriesModelResponse = {rows: {name: string; value: number}[]};
-
-    return executeModel({
+    const result = await executeModel({
       model: 'category',
       source: {
         ...this.getModelSource(filters, filterOwner),
@@ -95,9 +96,24 @@ export abstract class WidgetRemoteSource<
         operation,
         operationExp,
         operationColumn: operationColumn || column,
+        othersThreshold,
       },
       opts: {signal, headers: this.props.headers},
-    }).then((res: CategoriesModelResponse) => normalizeObjectKeys(res.rows));
+    });
+
+    const normalizedRows = normalizeObjectKeys(result.rows || []);
+    if (rawResult) {
+      return result as unknown as CategoryResponse;
+    }
+
+    if (!othersThreshold) {
+      return normalizedRows;
+    }
+
+    return [
+      ...normalizedRows,
+      {name: OTHERS_CATEGORY_NAME, value: result?.metadata?.others as number},
+    ];
   }
 
   async getFeatures(

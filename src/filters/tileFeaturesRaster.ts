@@ -1,9 +1,4 @@
-import {
-  cellToChildren as _cellToChildren,
-  cellToTile,
-  geometryToCells,
-  getResolution,
-} from 'quadbin';
+import {cellToTile, getResolution, tileToCell} from 'quadbin';
 import type {RasterTile, SpatialFilter, Tile} from '../types.js';
 import type {FeatureData} from '../types-internal.js';
 import type {
@@ -11,10 +6,11 @@ import type {
   RasterMetadataBand,
   SpatialDataType,
 } from '../sources/types.js';
+import {intersectTileRaster} from './tileIntersection.js';
 
 export type TileFeaturesRasterOptions = {
   tiles: RasterTile[];
-  spatialFilter: SpatialFilter;
+  spatialFilter?: SpatialFilter;
   spatialDataColumn: string;
   spatialDataType: SpatialDataType;
   rasterMetadata: RasterMetadata;
@@ -43,23 +39,27 @@ export function tileFeaturesRaster({
   const tileBlockSize = tiles[0].data!.blockSize;
   const cellResolution = tileResolution + BigInt(Math.log2(tileBlockSize));
 
-  // Compute covering cells for the spatial filter, at same resolution as the
-  // raster pixels, to be used as a mask.
-  const spatialFilterCells = new Set(
-    geometryToCells(options.spatialFilter, cellResolution)
-  );
-
   const data = new Map<bigint, FeatureData>();
 
   for (const tile of tiles as Required<RasterTile>[]) {
     const parent = tile.index.q;
 
-    const children = cellToChildrenSorted(parent, cellResolution);
+    const intersection = intersectTileRaster(
+      parent,
+      cellResolution,
+      options.spatialFilter
+    );
+
+    if (intersection === false) continue;
+
+    const tileSortedCells = cellToChildrenRaster(parent, cellResolution);
 
     // For each pixel/cell within the spatial filter, create a FeatureData.
     // Order is row-major, starting from NW and ending at SE.
-    for (let i = 0; i < children.length; i++) {
-      if (!spatialFilterCells.has(children[i])) continue;
+    for (let i = 0; i < tileSortedCells.length; i++) {
+      if (intersection !== true && !intersection.has(tileSortedCells[i])) {
+        continue;
+      }
 
       const cellData: FeatureData = {};
       let cellDataExists = false;
@@ -75,7 +75,7 @@ export function tileFeaturesRaster({
       }
 
       if (cellDataExists) {
-        data.set(children[i], cellData);
+        data.set(tileSortedCells[i], cellData);
       }
     }
   }
@@ -96,21 +96,28 @@ function isRasterTileVisible(tile: RasterTile): tile is Required<RasterTile> {
 }
 
 /**
- * For the raster format, children are sorted in row-major order, starting from
- * NW and ending at SE. Order returned by quadbin's cellToChildren() is not
- * defined (and not related to the raster format), so sort explicitly here.
+ * Alternative to `quadbin` module's `cellToChildren()` function, modified to
+ * return cells in row-major order, NW to SE, as stored in CARTO raster tiles.
+ * Sorting after computing cells is too slow.
  */
-function cellToChildrenSorted(parent: bigint, resolution: bigint): bigint[] {
-  return _cellToChildren(parent, resolution).sort(
-    (cellA: bigint, cellB: bigint) => {
-      const tileA = cellToTile(cellA);
-      const tileB = cellToTile(cellB);
-      if (tileA.y !== tileB.y) {
-        return tileA.y > tileB.y ? 1 : -1;
-      }
-      return tileA.x > tileB.x ? 1 : -1;
-    }
-  );
+function cellToChildrenRaster(parent: bigint, resolution: bigint): bigint[] {
+  const parentTile = cellToTile(parent);
+
+  // 1. Calculate x/y/z of upper left pixel in raster tile.
+  const childZ = Number(resolution);
+  const blockSize = 2 ** (childZ - parentTile.z);
+  const childBaseX = parentTile.x * blockSize;
+  const childBaseY = parentTile.y * blockSize;
+
+  // 2. Iterate pixels in raster tile order; compute cell ID from base x/y.
+  const cells: bigint[] = [];
+  for (let i = 0, il = blockSize ** 2; i < il; i++) {
+    const x = childBaseX + (i % blockSize);
+    const y = childBaseY + Math.floor(i / blockSize);
+    cells.push(tileToCell({x, y, z: childZ}));
+  }
+
+  return cells;
 }
 
 /**
