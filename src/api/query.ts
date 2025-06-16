@@ -15,7 +15,7 @@ import {getClient} from '../client.js';
 
 export type QueryOptions = SourceOptions &
   QuerySourceOptions & {
-    /** 
+    /**
      * @internal
      * @experimental
      * Used to append additional parameters to the SQL API request for features specific to providers or integrations.
