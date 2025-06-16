@@ -15,8 +15,12 @@ import {getClient} from '../client.js';
 
 export type QueryOptions = SourceOptions &
   QuerySourceOptions & {
-    /** Used to append additional parameters to the SQL API request for features specific to providers or integrations. */
-    additionalParameters?: Record<string, string | boolean | number>;
+    /** 
+     * @internal
+     * @experimental
+     * Used to append additional parameters to the SQL API request for features specific to providers or integrations.
+     */
+    internalParameters?: Record<string, string | boolean | number>;
     /** Used to abort the request. */
     signal?: AbortSignal;
   };
@@ -33,7 +37,7 @@ export const query = async function (
     connectionName,
     sqlQuery,
     queryParameters,
-    additionalParameters,
+    internalParameters,
   } = options;
   const urlParameters: UrlParameters = {q: sqlQuery};
 
@@ -48,7 +52,8 @@ export const query = async function (
   };
   const parameters = {
     client: clientId,
-    ...additionalParameters,
+    ...options.tags,
+    ...internalParameters,
     ...urlParameters,
   };
 
