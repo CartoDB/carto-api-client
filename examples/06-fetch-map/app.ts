@@ -5,24 +5,16 @@ import {
   getDataFilterExtensionProps,
   GoogleBasemap,
   LayerDescriptor,
-  LayerType,
   MapLibreBasemap,
 } from '@carto/api-client';
-import {_ConstructorOf, Deck, Layer} from '@deck.gl/core';
+import {Deck} from '@deck.gl/core';
 import {DataFilterExtension} from '@deck.gl/extensions';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import {Loader} from '@googlemaps/js-api-loader';
 import {GoogleMapsOverlay} from '@deck.gl/google-maps';
 import {MapboxOverlay} from '@deck.gl/mapbox';
-import {
-  ClusterTileLayer,
-  H3TileLayer,
-  HeatmapTileLayer,
-  VectorTileLayer,
-  QuadbinTileLayer,
-  RasterTileLayer,
-} from '@deck.gl/carto';
+import {LayerFactory} from '@deck.gl/carto';
 import {createLegend} from './legend.js';
 
 type FetchMapResult = any; // TODO: fix type
@@ -34,29 +26,18 @@ const GOOGLE_MAPS_API_KEY = '';
 const apiBaseUrl = 'https://gcp-us-east1.api.carto.com';
 // const apiBaseUrl = 'https://gcp-us-east1-05.dev.api.carto.com';
 
-// For now, define here. Eventually LayerFactory will be available in @deck.gl/carto
-const layerClasses: Record<LayerType, _ConstructorOf<Layer>> = {
-  clusterTile: ClusterTileLayer,
-  h3: H3TileLayer,
-  heatmapTile: HeatmapTileLayer,
-  mvt: VectorTileLayer,
-  quadbin: QuadbinTileLayer,
-  raster: RasterTileLayer,
-  tileset: VectorTileLayer,
-};
-function LayerFactory(layers: LayerDescriptor[]) {
+function createLayers(layers: LayerDescriptor[]) {
   return layers
-    .map(({type, props, filters}) => {
-      const LayerClass = layerClasses[type];
-      if (!LayerClass) {
-        console.error(`No layer class found for type: ${type}`);
-        return null;
-      }
+    .map((descriptor) => {
+      const {filters} = descriptor;
       const filterProps = filters && {
         ...getDataFilterExtensionProps(filters),
         extensions: [new DataFilterExtension({filterSize: 4})],
       };
-      return new LayerClass({...props, ...filterProps});
+      return LayerFactory({
+        ...descriptor,
+        props: {...descriptor.props, ...filterProps},
+      });
     })
     .filter(Boolean);
 }
@@ -77,7 +58,7 @@ function createMapWithMapLibreOverlay(result: FetchMapResult) {
     })
   );
 
-  const overlay = new MapboxOverlay({layers: LayerFactory(result.layers)});
+  const overlay = new MapboxOverlay({layers: createLayers(result.layers)});
   map.addControl(overlay);
 
   return overlay;
@@ -95,7 +76,7 @@ async function createMapWithGoogleMapsOverlay(result: FetchMapResult) {
     disableDefaultUI: true,
   });
 
-  const overlay = new GoogleMapsOverlay({layers: LayerFactory(result.layers)});
+  const overlay = new GoogleMapsOverlay({layers: createLayers(result.layers)});
   overlay.setMap(map);
 
   return overlay;
@@ -116,7 +97,7 @@ async function createMap(cartoMapId: string) {
     // Autorefresh the data every 5 seconds
     options.autoRefresh = 5;
     options.onNewData = (result) => {
-      deck?.setProps({layers: LayerFactory(result.layers)});
+      deck?.setProps({layers: createLayers(result.layers)});
     };
   }
 
