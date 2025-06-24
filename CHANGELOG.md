@@ -2,6 +2,10 @@
 
 ## 0.5
 
+### 0.5.9
+
+- feat(widgets): orderBy support in WidgetSource.getCategory (#203)
+
 ## 0.5.8
 
 - feat(widgets): Add othersThreshold to WidgetSource.getCategories (#194)
