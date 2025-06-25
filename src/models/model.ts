@@ -43,6 +43,7 @@ export interface ModelSource {
   spatialDataColumn?: string;
   spatialDataType?: SpatialDataType;
   spatialFiltersMode?: SpatialFilterPolyfillMode;
+  tags?: Record<string, string>;
 }
 
 const {V3} = ApiVersion;
@@ -87,6 +88,7 @@ export function executeModel(props: {
     spatialDataType = 'geo',
     spatialDataColumn = DEFAULT_GEO_COLUMN,
     spatialFiltersMode = 'intersects',
+    tags,
   } = source;
 
   const queryParams: Record<string, unknown> = {
@@ -97,6 +99,7 @@ export function executeModel(props: {
     queryParameters: source.queryParameters || '',
     filters,
     filtersLogicalOperator,
+    ...(tags ?? {}),
   };
 
   queryParams.spatialDataType = spatialDataType;

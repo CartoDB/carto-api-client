@@ -23,6 +23,7 @@ export async function requestWithParameters<T = any>({
   errorContext,
   maxLengthURL = DEFAULT_MAX_LENGTH_URL,
   localCache,
+  signal,
 }: {
   baseUrl: string;
   parameters?: Record<string, unknown>;
@@ -30,6 +31,7 @@ export async function requestWithParameters<T = any>({
   errorContext: APIErrorContext;
   maxLengthURL?: number;
   localCache?: LocalCacheOptions;
+  signal?: AbortSignal;
 }): Promise<T> {
   // Parameters added to all requests issued with `requestWithParameters()`.
   // These parameters override parameters already in the base URL, but not
@@ -65,8 +67,9 @@ export async function requestWithParameters<T = any>({
           method: 'POST',
           body: JSON.stringify(parameters),
           headers,
+          signal,
         })
-      : fetch(url, {headers});
+      : fetch(url, {headers, signal});
 
   let response: Response | undefined;
   let responseJson: unknown;
@@ -143,10 +146,12 @@ function createURLWithParameters(
     if (isPureObject(value) || Array.isArray(value)) {
       baseUrl.searchParams.set(key, JSON.stringify(value));
     } else {
-      baseUrl.searchParams.set(
-        key,
-        (value as string | boolean | number).toString()
-      );
+      if (value !== null && value !== undefined) {
+        baseUrl.searchParams.set(
+          key,
+          (value as string | boolean | number).toString()
+        );
+      }
     }
   }
   return baseUrl.toString();
