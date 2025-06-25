@@ -77,8 +77,14 @@ export abstract class WidgetRemoteSource<
       rawResult,
       ...params
     } = options;
-    const {column, operation, operationColumn, operationExp, othersThreshold} =
-      params;
+    const {
+      column,
+      operation,
+      operationColumn,
+      operationExp,
+      othersThreshold,
+      orderBy,
+    } = params;
 
     if (operation === AggregationTypes.Custom) {
       assert(operationExp, 'operationExp is required for custom operation');
@@ -97,6 +103,7 @@ export abstract class WidgetRemoteSource<
         operationExp,
         operationColumn: operationColumn || column,
         othersThreshold,
+        orderBy,
       },
       opts: {signal, headers: this.props.headers},
     });
