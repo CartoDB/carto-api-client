@@ -99,7 +99,7 @@ export function executeModel(props: {
     queryParameters: source.queryParameters || '',
     filters,
     filtersLogicalOperator,
-    tags,
+    ...(tags ?? {}),
   };
 
   queryParams.spatialDataType = spatialDataType;
