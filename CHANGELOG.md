@@ -2,6 +2,10 @@
 
 ## 0.5
 
+### 0.5.10
+
+- fix(widgets): orderBy support in WidgetRasterSource.getCategory (#210)
+
 ### 0.5.9
 
 - feat(widgets): orderBy support in WidgetSource.getCategory (#203)
