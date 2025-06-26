@@ -221,7 +221,11 @@ export type FeaturesResponse = {rows: Record<string, unknown>[]};
 export type FormulaResponse = {value: number | null};
 
 /** Entry in the category widget response, see  {@link WidgetRemoteSource#getCategories}. */
-export type CategoryResponseEntry = {name: string | null; value: number};
+export type CategoryResponseEntry = {
+  name: string | number | null;
+  value: number;
+};
+
 /** Response from {@link WidgetRemoteSource#getCategories}. */
 export type CategoryResponse = CategoryResponseEntry[];
 
