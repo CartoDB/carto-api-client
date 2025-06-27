@@ -237,7 +237,7 @@ export interface Tilejson {
   minzoom: number;
   maxzoom: number;
   bounds: [left: number, bottom: number, right: number, top: number];
-  center: [longitute: number, latitude: number, zoom: number];
+  center: [longitude: number, latitude: number, zoom: number];
   vector_layers: VectorLayer[];
 
   //
