@@ -33,6 +33,12 @@ export default defineConfig([
         js: `.js`,
       };
     },
+    esbuildOptions(options) {
+      options.logOverride ||= {};
+      // "import.meta" is not available with "iife" output, but we don't
+      // need the Worker URL inside the worker itself anyway.
+      options.logOverride['empty-import-meta'] = 'silent';
+    },
     entry: {
       'worker-compat': 'src/workers/widget-tileset-worker.ts',
     },
