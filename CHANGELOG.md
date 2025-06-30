@@ -2,6 +2,12 @@
 
 ## 0.5
 
+### 0.5.12
+
+- feat(sources): allow passing tags to baseSource and query methods (#193)
+
+### 0.5.11
+
 ### 0.5.10
 
 - fix(widgets): orderBy support in WidgetRasterSource.getCategory (#210)
