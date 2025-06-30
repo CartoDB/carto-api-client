@@ -3,6 +3,7 @@
 // Copyright (c) vis.gl contributors
 
 import type {Filters, SchemaField, QueryParameters} from '../types.js';
+import type {RasterBandColorinterp} from './constants.js';
 
 export type SourceRequiredOptions = {
   /** Carto platform access token. */
@@ -359,15 +360,6 @@ export type RasterMetadataBandStats = {
    */
   version?: string;
 };
-
-export enum RasterBandColorinterp {
-  Gray = 'gray',
-  Red = 'red',
-  Green = 'green',
-  Blue = 'blue',
-  Alpha = 'alpha',
-  Palette = 'palette',
-}
 
 export type RasterBandType =
   | 'uint8'
