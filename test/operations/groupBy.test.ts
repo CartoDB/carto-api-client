@@ -221,6 +221,30 @@ describe('groupValuesByColumn', () => {
           {name: 'NY', value: 1},
         ]);
       });
+      test('should support numeric categories', () => {
+        expect(
+          groupValuesByColumn({
+            data: [
+              {code: 1, value: 100},
+              {code: 10, value: 200},
+              {code: 1, value: 250},
+              {code: 5, value: 400},
+              {code: 25, value: 400},
+              {code: 25, value: 500},
+              {code: 25, value: 50},
+            ],
+            valuesColumns: ['value'],
+            keysColumn: 'code',
+            operation: 'count',
+            orderBy: 'alphabetical_asc',
+          }).rows
+        ).toEqual([
+          {name: 1, value: 2},
+          {name: 5, value: 1},
+          {name: 10, value: 1},
+          {name: 25, value: 3},
+        ]);
+      });
     });
   });
 

@@ -240,7 +240,7 @@ export interface Tilejson {
   minzoom: number;
   maxzoom: number;
   bounds: [left: number, bottom: number, right: number, top: number];
-  center: [longitute: number, latitude: number, zoom: number];
+  center: [longitude: number, latitude: number, zoom: number];
   vector_layers: VectorLayer[];
 
   //
@@ -385,6 +385,13 @@ export type RasterMetadataBand = {
   type: RasterBandType;
   name: string;
   stats: RasterMetadataBandStats;
+
+  /**
+   * Optional table of mappings from (integer) band values to (string) human
+   * readable labels. Values found in tiles are NOT guaranteed to have labels.
+   */
+  valuelabels?: Record<string, string>;
+
   /**
    * Known values:
    *  * `palette`: use unique value and `colortable` ad default mapping
@@ -411,10 +418,11 @@ export type RasterMetadata = {
   block_resolution: number;
   minresolution: number;
   maxresolution: number;
+  /** @deprecated Use {@link RasterMetadataBand.nodata} from {@link RasterMetadata.bands}. */
   nodata: number | string;
   bands: RasterMetadataBand[];
   bounds: [left: number, bottom: number, right: number, top: number];
-  center: [longitute: number, latitude: number, zoom: number];
+  center: [longitude: number, latitude: number, zoom: number];
   width: number;
   height: number;
   block_width: number;

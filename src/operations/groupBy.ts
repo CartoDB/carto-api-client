@@ -85,19 +85,27 @@ export function getSorter(
   switch (orderBy) {
     case 'frequency_asc':
       // 'value ASC, name ASC'
-      return (a, b) => a.value - b.value || localeCompare(a.name, b.name);
+      return (a, b) => a.value - b.value || nameCompare(a.name, b.name);
     case 'frequency_desc':
       // 'value DESC, name ASC'
-      return (a, b) => b.value - a.value || localeCompare(a.name, b.name);
+      return (a, b) => b.value - a.value || nameCompare(a.name, b.name);
     case 'alphabetical_asc':
       // 'name ASC, value DESC'
-      return (a, b) => localeCompare(a.name, b.name) || b.value - a.value;
+      return (a, b) => nameCompare(a.name, b.name) || b.value - a.value;
     case 'alphabetical_desc':
       // 'name DESC, value DESC'
-      return (a, b) => localeCompare(b.name, a.name) || b.value - a.value;
+      return (a, b) => nameCompare(b.name, a.name) || b.value - a.value;
   }
 }
 
-function localeCompare(a?: string | null, b?: string | null) {
-  return (a ?? 'null').localeCompare(b ?? 'null');
+function nameCompare(
+  a?: CategoryResponseEntry['name'],
+  b?: CategoryResponseEntry['name']
+) {
+  // Despite the naming of 'alphabetical_*' sort options, we still want to
+  // sort numeric category names (usually raster datasets) numerically.
+  if (typeof a === 'number' && typeof b === 'number') {
+    return a - b;
+  }
+  return String(a ?? 'null').localeCompare(String(b ?? 'null'));
 }
