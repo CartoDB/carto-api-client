@@ -125,8 +125,8 @@
     "tsup": "^8.3.6",
     "typescript": "~5.8.2",
     "typescript-eslint": "^8.26.1",
-    "vite": "^6.2.2",
-    "vitest": "3.2.3"
+    "vite": "^7.0.0",
+    "vitest": "3.2.4"
   },
   "resolutions": {
     "@carto/api-client": "portal:./",
