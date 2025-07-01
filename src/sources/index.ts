@@ -3,6 +3,7 @@
 // Copyright (c) vis.gl contributors
 
 export {SOURCE_DEFAULTS} from './base-source.js';
+export {RasterBandColorinterp} from './constants.js';
 export type {
   SourceOptions,
   SourceRequiredOptions,
@@ -26,7 +27,6 @@ export type {
   RasterMetadataBand,
   RasterMetadataBandStats,
   RasterBandType,
-  RasterBandColorinterp,
 } from './types.js';
 
 export {boundaryQuerySource} from './boundary-query-source.js';
