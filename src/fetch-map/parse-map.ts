@@ -75,6 +75,7 @@ export function parseMap(json: any) {
   const {filters, mapState, mapStyle, popupSettings, legendSettings} = config;
   const {layers, layerBlending, interactionConfig} = config.visState;
 
+  const layersReverse = [...layers].reverse()
   return {
     id: json.id,
     title: json.title,
@@ -87,8 +88,7 @@ export function parseMap(json: any) {
     popupSettings,
     legendSettings,
     token,
-    layers: layers
-      .reverse()
+    layers: layersReverse
       .map(({id, type, config, visualChannels}: MapConfigLayer) => {
         try {
           const {dataId} = config;
