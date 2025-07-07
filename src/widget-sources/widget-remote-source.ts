@@ -441,7 +441,6 @@ export abstract class WidgetRemoteSource<
         xmax: number;
         ymax: number;
       };
-      metadata: {categories: string[]};
     };
 
     return requestWithParameters<StatsResponse>({
