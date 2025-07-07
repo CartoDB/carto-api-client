@@ -1,3 +1,4 @@
+import type {BBox} from 'geojson';
 import type {
   SpatialFilterPolyfillMode,
   TileResolution,
@@ -206,6 +207,9 @@ export interface TimeSeriesRequestOptions extends BaseRequestOptions {
   splitByCategoryValues?: string[];
 }
 
+/** @experimental */
+export type ExtentRequestOptions = BaseRequestOptions;
+
 /******************************************************************************
  * WIDGET API RESPONSES
  */
@@ -256,3 +260,6 @@ export type TimeSeriesResponse = {
 
 /** Response from {@link WidgetRemoteSource#getHistogram}. */
 export type HistogramResponse = number[];
+
+/** @experimental */
+export type ExtentResponse = {bbox: BBox};

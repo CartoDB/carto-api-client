@@ -1,6 +1,7 @@
 import type {
   CategoryRequestOptions,
   CategoryResponse,
+  ExtentResponse,
   FeaturesResponse,
   FormulaRequestOptions,
   FormulaResponse,
@@ -319,5 +320,10 @@ export class WidgetTilesetSource<
     ...options
   }: RangeRequestOptions): Promise<RangeResponse> {
     return this._executeWorkerMethod(Method.GET_RANGE, [options], signal);
+  }
+
+  /** @experimental */
+  async getExtent(): Promise<ExtentResponse> {
+    return Promise.reject(new Error('not implemented'));
   }
 }

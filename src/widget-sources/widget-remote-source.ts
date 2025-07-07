@@ -2,6 +2,8 @@ import {executeModel, type ModelSource} from '../models/index.js';
 import type {
   CategoryRequestOptions,
   CategoryResponse,
+  ExtentRequestOptions,
+  ExtentResponse,
   FeaturesRequestOptions,
   FeaturesResponse,
   FormulaRequestOptions,
@@ -24,6 +26,8 @@ import type {Filters} from '../types.js';
 import {AggregationTypes, ApiVersion} from '../constants.js';
 import {getApplicableFilters} from '../filters.js';
 import {OTHERS_CATEGORY_NAME} from './constants.js';
+import {requestWithParameters} from '../api/request-with-parameters.js';
+import type {APIErrorContext} from '../api/carto-api-error.js';
 
 export type WidgetRemoteSourceProps = WidgetSourceProps;
 
@@ -387,6 +391,67 @@ export abstract class WidgetRemoteSource<
     }).then((res: TimeSeriesModelResponse) => ({
       rows: normalizeObjectKeys(res.rows),
       categories: res.metadata?.categories,
+    }));
+  }
+
+  /** @experimental */
+  async getExtent(options: ExtentRequestOptions): Promise<ExtentResponse> {
+    const {signal, filters = this.props.filters, filterOwner} = options;
+
+    const {
+      type,
+      data,
+      apiBaseUrl,
+      apiVersion,
+      connectionName,
+      spatialDataColumn,
+      spatialDataType,
+      queryParameters,
+    } = this.getModelSource(filters, filterOwner);
+
+    assert(apiVersion === ApiVersion.V3, 'Stats API requires CARTO 3+');
+
+    let url: string;
+
+    const parameters: Record<string, unknown> = {filters, spatialDataType};
+
+    if (type === 'query') {
+      url = `${apiBaseUrl}/${apiVersion}/stats/${connectionName}/${spatialDataColumn}`;
+      parameters.q = data;
+      parameters.queryParameters = queryParameters;
+    } else {
+      url = `${apiBaseUrl}/${apiVersion}/stats/${connectionName}/${data}/${spatialDataColumn}`;
+    }
+
+    const headers = {
+      Authorization: `Bearer ${this.props.accessToken}`,
+      ...this.props.headers,
+    };
+
+    const errorContext: APIErrorContext = {
+      requestType: 'Tile stats',
+      connection: connectionName,
+      type: type,
+    };
+
+    type StatsResponse = {
+      extent: {
+        xmin: number;
+        ymin: number;
+        xmax: number;
+        ymax: number;
+      };
+      metadata: {categories: string[]};
+    };
+
+    return requestWithParameters<StatsResponse>({
+      baseUrl: url,
+      headers,
+      signal,
+      errorContext,
+      parameters,
+    }).then(({extent: {xmin, ymin, xmax, ymax}}) => ({
+      bbox: [xmin, ymin, xmax, ymax],
     }));
   }
 }
