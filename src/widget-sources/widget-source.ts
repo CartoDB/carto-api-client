@@ -128,5 +128,5 @@ export abstract class WidgetSource<
   ): Promise<TimeSeriesResponse>;
 
   /** @experimental */
-  abstract getExtent(options: ExtentRequestOptions): Promise<ExtentResponse>;
+  abstract getExtent(options?: ExtentRequestOptions): Promise<ExtentResponse>;
 }

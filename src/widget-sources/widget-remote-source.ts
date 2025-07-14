@@ -395,7 +395,7 @@ export abstract class WidgetRemoteSource<
   }
 
   /** @experimental */
-  async getExtent(options: ExtentRequestOptions): Promise<ExtentResponse> {
+  async getExtent(options: ExtentRequestOptions = {}): Promise<ExtentResponse> {
     const {signal, filters = this.props.filters, filterOwner} = options;
 
     const {
