@@ -43,6 +43,7 @@ export const rasterSource = async function (
         tileFormat: getTileFormat(result),
         spatialDataColumn: 'quadbin',
         spatialDataType: 'quadbin',
+        spatialDataBBox: result.bounds,
         rasterMetadata: result.raster_metadata!,
       }),
     })
