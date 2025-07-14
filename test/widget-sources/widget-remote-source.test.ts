@@ -6,6 +6,7 @@ import {
   WidgetRemoteSource,
   WidgetRemoteSourceProps,
 } from '@carto/api-client';
+import type {BBox} from 'geojson';
 
 const createMockResponse = (data: unknown) => ({
   ok: true,
@@ -697,4 +698,43 @@ test('getHistogram', async () => {
     filters: JSON.stringify({}),
     filtersLogicalOperator: 'and',
   });
+});
+
+/******************************************************************************
+ * getExtent
+ */
+
+test('getExtent', async () => {
+  const widgetSource = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+    apiBaseUrl: 'https://api.example.com',
+    spatialDataColumn: 'my_geom',
+  });
+
+  const bbox = [-9.2, 37.5, 1.0, 43.5] as BBox;
+  const [xmin, ymin, xmax, ymax] = bbox;
+
+  const mockFetch = vi
+    .fn()
+    .mockResolvedValueOnce(
+      createMockResponse({extent: {xmin, ymin, xmax, ymax}})
+    );
+  vi.stubGlobal('fetch', mockFetch);
+
+  const result = await widgetSource.getExtent();
+  expect(result).toEqual({bbox});
+
+  expect(mockFetch).toHaveBeenCalledExactlyOnceWith(
+    expect.stringMatching(
+      'https://api.example.com/v3/stats/carto_dw/test-data/my_geom'
+    ),
+    expect.objectContaining({
+      headers: {
+        Accept: 'application/json',
+        Authorization: 'Bearer <token>',
+        'Content-Type': 'application/json',
+      },
+    })
+  );
 });
