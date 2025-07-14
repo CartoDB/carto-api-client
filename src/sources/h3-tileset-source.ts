@@ -34,7 +34,7 @@ export const h3TilesetSource = async function (
         tileFormat: getTileFormat(result),
         spatialDataColumn,
         spatialDataType: 'h3',
-        spatialDataBBox: result.bounds,
+        spatialDataBounds: result.bounds,
       }),
     })
   ) as Promise<H3TilesetSourceResponse>;

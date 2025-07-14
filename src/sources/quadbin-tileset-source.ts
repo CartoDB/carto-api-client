@@ -34,7 +34,7 @@ export const quadbinTilesetSource = async function (
         tileFormat: getTileFormat(result),
         spatialDataColumn,
         spatialDataType: 'quadbin',
-        spatialDataBBox: result.bounds,
+        spatialDataBounds: result.bounds,
       }),
     })
   ) as Promise<QuadbinTilesetSourceResponse>;

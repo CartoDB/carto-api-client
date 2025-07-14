@@ -33,7 +33,7 @@ export type WidgetTilesetSourceProps = WidgetSourceProps &
     /**
      * Extent of spatial data, typically from TileJSON. Does not include filters.
      */
-    spatialDataBBox: BBox;
+    spatialDataBounds: BBox;
   };
 
 export type WidgetTilesetSourceResult = {widgetSource: WidgetTilesetSource};
@@ -329,7 +329,7 @@ export class WidgetTilesetSource<
   /** @experimental */
   async getExtent(): Promise<ExtentResponse> {
     return Promise.resolve({
-      bbox: this.props.spatialDataBBox,
+      bbox: this.props.spatialDataBounds,
     });
   }
 }

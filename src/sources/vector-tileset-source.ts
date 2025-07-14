@@ -35,7 +35,7 @@ export const vectorTilesetSource = async function (
         tileFormat: getTileFormat(result),
         spatialDataColumn,
         spatialDataType: 'geo',
-        spatialDataBBox: result.bounds,
+        spatialDataBounds: result.bounds,
       }),
     })
   ) as Promise<VectorTilesetSourceResponse>;
