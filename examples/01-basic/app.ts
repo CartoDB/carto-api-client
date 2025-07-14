@@ -81,11 +81,7 @@ function updateLayers() {
 
   deck.setProps({layers: [layer]});
   data
-    .then(({attribution, widgetSource}) => {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      widgetSource.getExtent({}).then((response) => {
-        console.log('getExtent', response);
-      });
+    .then(({attribution}) => {
       document.querySelector('#footer')!.innerHTML = attribution;
     })
     .catch((error) => {
