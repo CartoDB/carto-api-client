@@ -2,6 +2,14 @@
 
 ## 0.5
 
+### 0.5.14
+
+- feat(widgets): Add 'getExtent()' method, experimental (#220)
+
+### 0.5.13
+
+- fix(constants): Export RasterBandColorinterp (#216)
+
 ### 0.5.12
 
 - feat(sources): allow passing tags to baseSource and query methods (#193)
