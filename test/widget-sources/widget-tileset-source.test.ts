@@ -5,11 +5,13 @@ import {
   createViewportSpatialFilter,
 } from '@carto/api-client';
 import {MOCK_GEOJSON} from './__mock-geojson.js';
+import type {BBox} from 'geojson';
 
 let source: WidgetTilesetSource;
 
 const MOCK_COLUMNS = Object.keys(MOCK_GEOJSON.features[0].properties);
 const MOCK_SPATIAL_FILTER = createViewportSpatialFilter([-175, 85, 175, -85]);
+const MOCK_BOUNDS = [-9.2, 37.5, 1.0, 43.5] as BBox;
 
 beforeEach(() => {
   source = new WidgetTilesetSource({
@@ -18,6 +20,7 @@ beforeEach(() => {
     accessToken: '••••',
     tileFormat: TileFormat.BINARY,
     spatialDataType: 'geo',
+    spatialDataBounds: MOCK_BOUNDS,
   });
 
   source.loadGeoJSON({
@@ -246,5 +249,12 @@ describe('getTable', () => {
       totalCount: 1,
       rows: [MOCK_GEOJSON.features[0].properties],
     });
+  });
+});
+
+describe('getExtent', () => {
+  it('should return TileJSON bounds', async () => {
+    const result = await source.getExtent();
+    expect(result).toEqual({bbox: MOCK_BOUNDS});
   });
 });

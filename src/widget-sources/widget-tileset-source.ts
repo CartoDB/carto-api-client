@@ -1,6 +1,7 @@
 import type {
   CategoryRequestOptions,
   CategoryResponse,
+  ExtentResponse,
   FeaturesResponse,
   FormulaRequestOptions,
   FormulaResponse,
@@ -17,7 +18,7 @@ import type {
 } from './types.js';
 import type {SpatialFilter, Tile} from '../types.js';
 import type {TileFeatureExtractOptions} from '../filters/index.js';
-import type {FeatureCollection} from 'geojson';
+import type {BBox, FeatureCollection} from 'geojson';
 import {WidgetSource, type WidgetSourceProps} from './widget-source.js';
 import {Method} from '../workers/constants.js';
 import type {WorkerRequest, WorkerResponse} from '../workers/types.js';
@@ -29,6 +30,10 @@ export type WidgetTilesetSourceProps = WidgetSourceProps &
   Omit<TilesetSourceOptions, 'filters'> & {
     tileFormat: TileFormat;
     spatialDataType: SpatialDataType;
+    /**
+     * Extent of spatial data, typically from TileJSON. Does not include filters.
+     */
+    spatialDataBounds: BBox;
   };
 
 export type WidgetTilesetSourceResult = {widgetSource: WidgetTilesetSource};
@@ -319,5 +324,12 @@ export class WidgetTilesetSource<
     ...options
   }: RangeRequestOptions): Promise<RangeResponse> {
     return this._executeWorkerMethod(Method.GET_RANGE, [options], signal);
+  }
+
+  /** @experimental */
+  async getExtent(): Promise<ExtentResponse> {
+    return Promise.resolve({
+      bbox: this.props.spatialDataBounds,
+    });
   }
 }

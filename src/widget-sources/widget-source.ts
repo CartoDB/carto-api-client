@@ -1,6 +1,8 @@
 import type {
   CategoryRequestOptions,
   CategoryResponse,
+  ExtentRequestOptions,
+  ExtentResponse,
   FeaturesRequestOptions,
   FeaturesResponse,
   FormulaRequestOptions,
@@ -124,4 +126,7 @@ export abstract class WidgetSource<
   abstract getTimeSeries(
     options: TimeSeriesRequestOptions
   ): Promise<TimeSeriesResponse>;
+
+  /** @experimental */
+  abstract getExtent(options?: ExtentRequestOptions): Promise<ExtentResponse>;
 }

@@ -2,6 +2,7 @@
 import type {
   CategoryRequestOptions,
   CategoryResponse,
+  ExtentResponse,
   FeaturesResponse,
   FormulaRequestOptions,
   FormulaResponse,
@@ -388,6 +389,11 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       min: aggregationFunctions.min(filteredFeatures, column),
       max: aggregationFunctions.max(filteredFeatures, column),
     };
+  }
+
+  /** @experimental */
+  async getExtent(): Promise<ExtentResponse> {
+    return Promise.reject(new Error('not implemented'));
   }
 
   /****************************************************************************

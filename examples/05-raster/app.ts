@@ -83,7 +83,6 @@ function updateLayers() {
 
 function updateTiles(tiles: unknown[]) {
   data.widgetSource.loadTiles(tiles);
-  console.log('loadTiles', tiles);
   updateWidgetsDebounced();
 }
 
