@@ -223,6 +223,7 @@ __metadata:
     d3-format: "npm:^3.1.0"
     d3-scale: "npm:^4.0.2"
     h3-js: "npm:^4.1.0"
+    jsep: "npm:^0.3.4"
     quadbin: "npm:^0.4.1-alpha.0"
   languageName: node
   linkType: soft
@@ -275,6 +276,7 @@ __metadata:
     echarts: "npm:^6.0.0"
     eslint: "npm:^9.22.0"
     h3-js: "npm:^4.1.0"
+    jsep: "npm:^0.3.4"
     lit: "npm:^3.2.1"
     lit-analyzer: "npm:^2.0.3"
     maplibre-gl: "npm:^5.2.0"
@@ -4240,6 +4242,13 @@ __metadata:
   version: 1.1.0
   resolution: "jsbn@npm:1.1.0"
   checksum: 10c0/4f907fb78d7b712e11dea8c165fe0921f81a657d3443dde75359ed52eb2b5d33ce6773d97985a089f09a65edd80b11cb75c767b57ba47391fee4c969f7215c96
+  languageName: node
+  linkType: hard
+
+"jsep@npm:^0.3.4":
+  version: 0.3.5
+  resolution: "jsep@npm:0.3.5"
+  checksum: 10c0/fb5def7a4ba1cee41d144ebdd0d477785dc84b6bc1fed6cf5169f106de980dbe363bf99cb36a450435d7fd952d22b1d76e1609aeb5c7e7cbbbdb6d15fad03614
   languageName: node
   linkType: hard
 

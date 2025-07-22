@@ -28,6 +28,7 @@ import {
   scaleIdentity,
 } from './utils.js';
 import type {
+  ColorRange,
   CustomMarkersRange,
   Dataset,
   MapLayerConfig,
@@ -38,6 +39,7 @@ import type {
 import type {ProviderType, SchemaField} from '../types.js';
 import {DEFAULT_AGGREGATION_EXP_ALIAS} from '../constants-internal.js';
 import {AggregationTypes} from '../constants.js';
+import type {RasterMetadataBand, TilejsonResult} from '../sources/types.js';
 
 export type D3Scale = {
   domain: (d?: any) => any[];
@@ -235,8 +237,8 @@ function domainFromValues(values: any, scaleType: ScaleType) {
 }
 
 function calculateDomain(
-  data: any,
-  name: any,
+  data: TilejsonResult,
+  name: string,
   scaleType: ScaleType,
   scaleLength?: number
 ) {
@@ -251,7 +253,7 @@ function calculateDomain(
 }
 
 function normalizeAccessor(accessor: any, data: any) {
-  if (data.features || data.tilestats) {
+  if (data.features || data.tilestats || data.raster_metadata) {
     return (object: any, info: any) => {
       if (object) {
         return accessor(object.properties || object.__source.object.properties);
@@ -321,14 +323,13 @@ export function getColorAccessor(
   return {accessor: normalizeAccessor(accessor, data), scale};
 }
 
-function calculateLayerScale(
-  name: any,
+export function calculateLayerScale(
+  name: string,
   scaleType: ScaleType,
-  range: any,
-  data: any
+  range: ColorRange,
+  data: TilejsonResult
 ) {
-  const scale = SCALE_FUNCS[scaleType]();
-  let domain: (string | number)[] = [];
+  let domain: string[] | number[] = [];
   let scaleColor: string[] = [];
 
   if (scaleType !== 'identity') {
@@ -336,7 +337,7 @@ function calculateLayerScale(
 
     if (Array.isArray(colorMap)) {
       colorMap.forEach(([value, color]) => {
-        domain.push(value);
+        (domain as string[]).push(value);
         scaleColor.push(color);
       });
     } else {
@@ -349,8 +350,17 @@ function calculateLayerScale(
     }
   }
 
+  return createColorScale(scaleType, domain, scaleColor);
+}
+
+export function createColorScale(
+  scaleType: ScaleType,
+  domain: string[] | number[],
+  range: string[]
+) {
+  const scale = SCALE_FUNCS[scaleType]();
   scale.domain(domain);
-  scale.range(scaleColor);
+  scale.range(range);
   scale.unknown!(UNKNOWN_COLOR);
 
   return scale;

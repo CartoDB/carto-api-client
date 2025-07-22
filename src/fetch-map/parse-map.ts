@@ -32,6 +32,10 @@ import type {
   VisualChannelField,
 } from './types.js';
 import {isRemoteCalculationSupported} from './utils.js';
+import {
+  getRasterTileLayerStylePropsRgb,
+  getRasterTileLayerStylePropsScaledBand,
+} from './raster-layer.js';
 
 export type Scale = {
   field: VisualChannelField;
@@ -44,7 +48,7 @@ export type LayerDescriptor = {
   type: LayerType;
   props: Record<string, any>;
   filters?: Filters;
-  scales: Record<ScaleKey, Scale>;
+  scales: Partial<Record<ScaleKey, Scale>>;
 };
 
 export type ParseMapResult = {
@@ -75,7 +79,7 @@ export function parseMap(json: any) {
   const {filters, mapState, mapStyle, popupSettings, legendSettings} = config;
   const {layers, layerBlending, interactionConfig} = config.visState;
 
-  const layersReverse = [...layers].reverse()
+  const layersReverse = [...layers].reverse();
   return {
     id: json.id,
     title: json.title,
@@ -88,8 +92,8 @@ export function parseMap(json: any) {
     popupSettings,
     legendSettings,
     token,
-    layers: layersReverse
-      .map(({id, type, config, visualChannels}: MapConfigLayer) => {
+    layers: layersReverse.map(
+      ({id, type, config, visualChannels}: MapConfigLayer) => {
         try {
           const {dataId} = config;
           const dataset: Dataset | null = datasets.find(
@@ -128,7 +132,7 @@ export function parseMap(json: any) {
                 layerBlending,
                 styleProps.parameters || {}
               ), // Must come after style
-              ...createLoadOptions(token),
+              ...createLoadOptions(data.accessToken || token),
             },
             scales,
           };
@@ -137,7 +141,8 @@ export function parseMap(json: any) {
           console.error(e.message);
           return undefined;
         }
-      }),
+      }
+    ),
   };
 }
 
@@ -239,7 +244,10 @@ function createChannelProps(
   visualChannels: VisualChannels,
   data: any,
   dataset: Dataset
-): {channelProps: Record<string, any>; scales: Record<ScaleKey, Scale>} {
+): {
+  channelProps: Record<string, any>;
+  scales: Partial<Record<ScaleKey, Scale>>;
+} {
   const {
     colorField,
     colorScale,
@@ -249,6 +257,36 @@ function createChannelProps(
     strokeColorScale,
     weightField,
   } = visualChannels;
+  if (layerType === 'raster') {
+    const rasterStyleType = config.visConfig.rasterStyleType;
+    if (rasterStyleType === 'rgb') {
+      return {
+        channelProps: getRasterTileLayerStylePropsRgb({
+          layerConfig: config,
+          rasterMetadata: data.raster_metadata,
+        }),
+        scales: {},
+      };
+    } else {
+      return {
+        channelProps: getRasterTileLayerStylePropsScaledBand({
+          layerConfig: config,
+          visualChannels,
+          rasterMetadata: data.raster_metadata,
+        }),
+        scales: {
+          ...(colorField && {
+            fillColor: {
+              field: colorField,
+              type: 'ordinal',
+              domain: [],
+              range: [],
+            },
+          }),
+        },
+      };
+    }
+  }
   const {heightField, heightScale} = visualChannels;
   const {textLabel, visConfig} = config;
   const result: Record<string, any> = {};
