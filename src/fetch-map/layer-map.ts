@@ -39,7 +39,7 @@ import type {
 import type {ProviderType, SchemaField} from '../types.js';
 import {DEFAULT_AGGREGATION_EXP_ALIAS} from '../constants-internal.js';
 import {AggregationTypes} from '../constants.js';
-import type {RasterMetadataBand, TilejsonResult} from '../sources/types.js';
+import type {TilejsonResult} from '../sources/types.js';
 
 export type D3Scale = {
   domain: (d?: any) => any[];
