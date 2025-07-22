@@ -44,6 +44,13 @@ export type Scale = {
   type: ScaleType;
 };
 
+export type ScaleKey =
+  | 'fillColor'
+  | 'pointRadius'
+  | 'lineColor'
+  | 'elevation'
+  | 'weight';
+
 export type LayerDescriptor = {
   type: LayerType;
   props: Record<string, any>;
@@ -72,12 +79,59 @@ export type ParseMapResult = {
   layers: LayerDescriptor[];
 };
 
+export function getLayerDescriptor({
+  mapConfig,
+  layer,
+  dataset,
+}: {
+  mapConfig: KeplerMapConfig;
+  layer: MapConfigLayer;
+  dataset: Dataset;
+}) {
+  const {filters, visState} = mapConfig;
+  const {layerBlending, interactionConfig} = visState;
+  const {id, type, config, visualChannels} = layer;
+  const {data, id: datasetId} = dataset;
+
+  const {propMap, defaultProps} = getLayerProps(type, config, dataset);
+
+  const styleProps = createStyleProps(config, propMap);
+
+  const {channelProps, scales} = createChannelProps(
+    id,
+    type,
+    config,
+    visualChannels,
+    data,
+    dataset
+  );
+  const layerDescriptor: LayerDescriptor = {
+    type,
+    filters:
+      isEmptyObject(filters) || isRemoteCalculationSupported(dataset)
+        ? undefined
+        : filters[datasetId],
+    props: {
+      id,
+      data,
+      ...defaultProps,
+      ...createInteractionProps(interactionConfig),
+      ...styleProps,
+      ...channelProps,
+      ...createParametersProp(layerBlending, styleProps.parameters || {}), // Must come after style
+      ...createLoadOptions(data.accessToken),
+    },
+    scales,
+  };
+  return layerDescriptor;
+}
+
 export function parseMap(json: any) {
   const {keplerMapConfig, datasets, token} = json;
   assert(keplerMapConfig.version === 'v1', 'Only support Kepler v1');
   const config = keplerMapConfig.config as KeplerMapConfig;
-  const {filters, mapState, mapStyle, popupSettings, legendSettings} = config;
-  const {layers, layerBlending, interactionConfig} = config.visState;
+  const {mapState, mapStyle, popupSettings, legendSettings, visState} = config;
+  const {layers} = visState;
 
   const layersReverse = [...layers].reverse();
   return {
@@ -92,57 +146,24 @@ export function parseMap(json: any) {
     popupSettings,
     legendSettings,
     token,
-    layers: layersReverse.map(
-      ({id, type, config, visualChannels}: MapConfigLayer) => {
-        try {
-          const {dataId} = config;
-          const dataset: Dataset | null = datasets.find(
-            (d: any) => d.id === dataId
-          );
-          assert(dataset, `No dataset matching dataId: ${dataId}`);
-          const {data} = dataset;
-          assert(data, `No data loaded for dataId: ${dataId}`);
-
-          const {propMap, defaultProps} = getLayerProps(type, config, dataset);
-
-          const styleProps = createStyleProps(config, propMap);
-
-          const {channelProps, scales} = createChannelProps(
-            id,
-            type,
-            config,
-            visualChannels,
-            data,
-            dataset
-          );
-          const layer: LayerDescriptor = {
-            type,
-            filters:
-              isEmptyObject(filters) || isRemoteCalculationSupported(dataset)
-                ? undefined
-                : filters[dataId],
-            props: {
-              id,
-              data,
-              ...defaultProps,
-              ...createInteractionProps(interactionConfig),
-              ...styleProps,
-              ...channelProps,
-              ...createParametersProp(
-                layerBlending,
-                styleProps.parameters || {}
-              ), // Must come after style
-              ...createLoadOptions(data.accessToken || token),
-            },
-            scales,
-          };
-          return layer;
-        } catch (e: any) {
-          console.error(e.message);
-          return undefined;
-        }
+    layers: layersReverse.map((layer: MapConfigLayer) => {
+      try {
+        const {dataId} = layer.config;
+        const dataset: Dataset | null = datasets.find(
+          (d: any) => d.id === dataId
+        );
+        assert(dataset, `No dataset matching dataId: ${dataId}`);
+        const layerDescriptor = getLayerDescriptor({
+          mapConfig: keplerMapConfig,
+          layer: layer,
+          dataset,
+        });
+        return layerDescriptor;
+      } catch (e: any) {
+        console.error(e.message);
+        return undefined;
       }
-    ),
+    }),
   };
 }
 
@@ -229,13 +250,6 @@ function domainAndRangeFromScale(
     range: scale.range(),
   };
 }
-
-export type ScaleKey =
-  | 'fillColor'
-  | 'pointRadius'
-  | 'lineColor'
-  | 'elevation'
-  | 'weight';
 
 function createChannelProps(
   id: string,
