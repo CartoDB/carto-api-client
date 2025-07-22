@@ -55,7 +55,6 @@ export function validateVecExprSyntax(
   let parsed: jsep.Expression;
   try {
     parsed = compile(expression);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     return {
       valid: false,
