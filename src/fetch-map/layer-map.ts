@@ -28,6 +28,7 @@ import {
   scaleIdentity,
 } from './utils.js';
 import type {
+  ColorRange,
   CustomMarkersRange,
   Dataset,
   MapLayerConfig,
@@ -38,6 +39,7 @@ import type {
 import type {ProviderType, SchemaField} from '../types.js';
 import {DEFAULT_AGGREGATION_EXP_ALIAS} from '../constants-internal.js';
 import {AggregationTypes} from '../constants.js';
+import type {TilejsonResult} from '../sources/types.js';
 
 export type D3Scale = {
   domain: (d?: any) => any[];
@@ -113,6 +115,13 @@ const sharedPropMap = {
   },
 };
 
+const rasterPropsMap = {
+  isVisible: 'visible',
+  visConfig: {
+    opacity: 'opacity',
+  },
+};
+
 const customMarkersPropsMap = {
   color: 'getIconColor',
   visConfig: {
@@ -172,6 +181,13 @@ export function getLayerProps(
     throw new Error(
       `Outdated layer type: ${type}. Please open map in CARTO Builder to automatically migrate.`
     );
+  }
+
+  if (type === 'raster') {
+    return {
+      propMap: rasterPropsMap,
+      defaultProps: {},
+    };
   }
 
   let basePropMap: any = sharedPropMap;
@@ -235,8 +251,8 @@ function domainFromValues(values: any, scaleType: ScaleType) {
 }
 
 function calculateDomain(
-  data: any,
-  name: any,
+  data: TilejsonResult,
+  name: string,
   scaleType: ScaleType,
   scaleLength?: number
 ) {
@@ -251,7 +267,7 @@ function calculateDomain(
 }
 
 function normalizeAccessor(accessor: any, data: any) {
-  if (data.features || data.tilestats) {
+  if (data.features || data.tilestats || data.raster_metadata) {
     return (object: any, info: any) => {
       if (object) {
         return accessor(object.properties || object.__source.object.properties);
@@ -321,14 +337,13 @@ export function getColorAccessor(
   return {accessor: normalizeAccessor(accessor, data), scale};
 }
 
-function calculateLayerScale(
-  name: any,
+export function calculateLayerScale(
+  name: string,
   scaleType: ScaleType,
-  range: any,
-  data: any
+  range: ColorRange,
+  data: TilejsonResult
 ) {
-  const scale = SCALE_FUNCS[scaleType]();
-  let domain: (string | number)[] = [];
+  let domain: string[] | number[] = [];
   let scaleColor: string[] = [];
 
   if (scaleType !== 'identity') {
@@ -336,7 +351,7 @@ function calculateLayerScale(
 
     if (Array.isArray(colorMap)) {
       colorMap.forEach(([value, color]) => {
-        domain.push(value);
+        (domain as string[]).push(value);
         scaleColor.push(color);
       });
     } else {
@@ -349,9 +364,19 @@ function calculateLayerScale(
     }
   }
 
+  return createColorScale(scaleType, domain, scaleColor, UNKNOWN_COLOR);
+}
+
+export function createColorScale<T>(
+  scaleType: ScaleType,
+  domain: string[] | number[],
+  range: T[],
+  unknown: T
+) {
+  const scale = SCALE_FUNCS[scaleType]();
   scale.domain(domain);
-  scale.range(scaleColor);
-  scale.unknown!(UNKNOWN_COLOR);
+  scale.range(range);
+  scale.unknown!(unknown as any);
 
   return scale;
 }

@@ -32,6 +32,10 @@ import type {
   VisualChannelField,
 } from './types.js';
 import {isRemoteCalculationSupported} from './utils.js';
+import {
+  getRasterTileLayerStylePropsRgb,
+  getRasterTileLayerStylePropsScaledBand,
+} from './raster-layer.js';
 
 export type Scale = {
   field: VisualChannelField;
@@ -40,11 +44,18 @@ export type Scale = {
   type: ScaleType;
 };
 
+export type ScaleKey =
+  | 'fillColor'
+  | 'pointRadius'
+  | 'lineColor'
+  | 'elevation'
+  | 'weight';
+
 export type LayerDescriptor = {
   type: LayerType;
   props: Record<string, any>;
   filters?: Filters;
-  scales: Record<ScaleKey, Scale>;
+  scales: Partial<Record<ScaleKey, Scale>>;
 };
 
 export type ParseMapResult = {
@@ -68,13 +79,62 @@ export type ParseMapResult = {
   layers: LayerDescriptor[];
 };
 
+export function getLayerDescriptor({
+  mapConfig,
+  layer,
+  dataset,
+}: {
+  mapConfig: KeplerMapConfig;
+  layer: MapConfigLayer;
+  dataset: Dataset;
+}) {
+  const {filters, visState} = mapConfig;
+  const {layerBlending, interactionConfig} = visState;
+  const {id, type, config, visualChannels} = layer;
+  const {data, id: datasetId} = dataset;
+
+  const {propMap, defaultProps} = getLayerProps(type, config, dataset);
+
+  const styleProps = createStyleProps(config, propMap);
+
+  const {channelProps, scales} = createChannelProps(
+    id,
+    type,
+    config,
+    visualChannels,
+    data,
+    dataset
+  );
+  const layerDescriptor: LayerDescriptor = {
+    type,
+    filters:
+      isEmptyObject(filters) || isRemoteCalculationSupported(dataset)
+        ? undefined
+        : filters[datasetId],
+    props: {
+      id,
+      data,
+      ...defaultProps,
+      ...createInteractionProps(interactionConfig),
+      ...styleProps,
+      ...channelProps,
+      ...createParametersProp(layerBlending, styleProps.parameters || {}), // Must come after style
+      ...createLoadOptions(data.accessToken),
+    },
+    scales,
+  };
+  return layerDescriptor;
+}
+
 export function parseMap(json: any) {
   const {keplerMapConfig, datasets, token} = json;
   assert(keplerMapConfig.version === 'v1', 'Only support Kepler v1');
-  const config = keplerMapConfig.config as KeplerMapConfig;
-  const {filters, mapState, mapStyle, popupSettings, legendSettings} = config;
-  const {layers, layerBlending, interactionConfig} = config.visState;
+  const mapConfig = keplerMapConfig.config as KeplerMapConfig;
+  const {mapState, mapStyle, popupSettings, legendSettings, visState} =
+    mapConfig;
+  const {layers} = visState;
 
+  const layersReverse = [...layers].reverse();
   return {
     id: json.id,
     title: json.title,
@@ -87,57 +147,24 @@ export function parseMap(json: any) {
     popupSettings,
     legendSettings,
     token,
-    layers: layers
-      .reverse()
-      .map(({id, type, config, visualChannels}: MapConfigLayer) => {
-        try {
-          const {dataId} = config;
-          const dataset: Dataset | null = datasets.find(
-            (d: any) => d.id === dataId
-          );
-          assert(dataset, `No dataset matching dataId: ${dataId}`);
-          const {data} = dataset;
-          assert(data, `No data loaded for dataId: ${dataId}`);
-
-          const {propMap, defaultProps} = getLayerProps(type, config, dataset);
-
-          const styleProps = createStyleProps(config, propMap);
-
-          const {channelProps, scales} = createChannelProps(
-            id,
-            type,
-            config,
-            visualChannels,
-            data,
-            dataset
-          );
-          const layer: LayerDescriptor = {
-            type,
-            filters:
-              isEmptyObject(filters) || isRemoteCalculationSupported(dataset)
-                ? undefined
-                : filters[dataId],
-            props: {
-              id,
-              data,
-              ...defaultProps,
-              ...createInteractionProps(interactionConfig),
-              ...styleProps,
-              ...channelProps,
-              ...createParametersProp(
-                layerBlending,
-                styleProps.parameters || {}
-              ), // Must come after style
-              ...createLoadOptions(token),
-            },
-            scales,
-          };
-          return layer;
-        } catch (e: any) {
-          console.error(e.message);
-          return undefined;
-        }
-      }),
+    layers: layersReverse.map((layer: MapConfigLayer) => {
+      try {
+        const {dataId} = layer.config;
+        const dataset: Dataset | null = datasets.find(
+          (d: any) => d.id === dataId
+        );
+        assert(dataset, `No dataset matching dataId: ${dataId}`);
+        const layerDescriptor = getLayerDescriptor({
+          mapConfig,
+          layer,
+          dataset,
+        });
+        return layerDescriptor;
+      } catch (e: any) {
+        console.error(e.message);
+        return undefined;
+      }
+    }),
   };
 }
 
@@ -225,13 +252,6 @@ function domainAndRangeFromScale(
   };
 }
 
-export type ScaleKey =
-  | 'fillColor'
-  | 'pointRadius'
-  | 'lineColor'
-  | 'elevation'
-  | 'weight';
-
 function createChannelProps(
   id: string,
   layerType: LayerType,
@@ -239,7 +259,10 @@ function createChannelProps(
   visualChannels: VisualChannels,
   data: any,
   dataset: Dataset
-): {channelProps: Record<string, any>; scales: Record<ScaleKey, Scale>} {
+): {
+  channelProps: Record<string, any>;
+  scales: Partial<Record<ScaleKey, Scale>>;
+} {
   const {
     colorField,
     colorScale,
@@ -249,9 +272,41 @@ function createChannelProps(
     strokeColorScale,
     weightField,
   } = visualChannels;
+  if (layerType === 'raster') {
+    const rasterStyleType = config.visConfig.rasterStyleType;
+    if (rasterStyleType === 'Rgb') {
+      return {
+        channelProps: getRasterTileLayerStylePropsRgb({
+          layerConfig: config,
+          rasterMetadata: data.raster_metadata,
+          visualChannels,
+        }),
+        scales: {},
+      };
+    } else {
+      return {
+        channelProps: getRasterTileLayerStylePropsScaledBand({
+          layerConfig: config,
+          visualChannels,
+          rasterMetadata: data.raster_metadata,
+        }),
+        scales: {
+          ...(colorField && {
+            fillColor: {
+              field: colorField,
+              type: 'ordinal',
+              domain: [],
+              range: [],
+            },
+          }),
+        },
+      };
+    }
+  }
   const {heightField, heightScale} = visualChannels;
   const {textLabel, visConfig} = config;
   const result: Record<string, any> = {};
+  const updateTriggers: Record<string, any> = {};
 
   const scales: Record<string, Scale> = {};
 
@@ -265,7 +320,7 @@ function createChannelProps(
       data
     );
     result.getFillColor = accessor;
-    scales.fillColor = {
+    scales.fillColor = updateTriggers.fillColor = {
       field: colorField,
       type: colorScale!,
       ...domainAndRangeFromScale(scale),
@@ -288,6 +343,8 @@ function createChannelProps(
       return d.properties[aggregationExpAlias];
     };
 
+    updateTriggers.getWeight = aggregationExpAlias;
+
     result.getPointRadius = (d: any, info: any) => {
       return calculateClusterRadius(
         d.properties,
@@ -295,6 +352,10 @@ function createChannelProps(
         visConfig.radiusRange as [number, number],
         aggregationExpAlias
       );
+    };
+    updateTriggers.getPointRadius = {
+      aggregationExpAlias,
+      radiusRange: visConfig.radiusRange,
     };
 
     result.textCharacterSet = 'auto';
@@ -304,6 +365,8 @@ function createChannelProps(
 
     result.getText = (d: any) =>
       TEXT_NUMBER_FORMATTER.format(d.properties[aggregationExpAlias]);
+
+    updateTriggers.getText = aggregationExpAlias;
 
     result.getTextColor = config.textLabel[TEXT_LABEL_INDEX].color;
     result.textOutlineColor = [
@@ -322,6 +385,11 @@ function createChannelProps(
       );
       return calculateClusterTextFontSize(radius);
     };
+
+    updateTriggers.getTextSize = {
+      aggregationExpAlias,
+      radiusRange: visConfig.radiusRange,
+    };
   }
 
   if (radiusField) {
@@ -333,7 +401,7 @@ function createChannelProps(
       data
     );
     result.getPointRadius = accessor;
-    scales.pointRadius = {
+    scales.pointRadius = updateTriggers.getPointRadius = {
       field: radiusField,
       type: radiusScale || 'identity',
       ...domainAndRangeFromScale(scale),
@@ -353,7 +421,7 @@ function createChannelProps(
       data
     );
     result.getLineColor = accessor;
-    scales.lineColor = {
+    scales.lineColor = updateTriggers.getLineColor = {
       field: strokeColorField,
       type: strokeColorScale!,
       ...domainAndRangeFromScale(scale),
@@ -368,7 +436,7 @@ function createChannelProps(
       data
     );
     result.getElevation = accessor;
-    scales.elevation = {
+    scales.elevation = updateTriggers.getElevation = {
       field: heightField,
       type: heightScale || 'identity',
       ...domainAndRangeFromScale(scale),
@@ -384,9 +452,9 @@ function createChannelProps(
       data
     );
     result.getWeight = accessor;
-    scales.weight = {
+    scales.weight = updateTriggers.getWeight = {
       field: weightField,
-      type: 'identity',
+      type: 'identity' as ScaleType,
       ...domainAndRangeFromScale(scale),
     };
   }
@@ -407,6 +475,12 @@ function createChannelProps(
       {fallbackUrl: customMarkersUrl, maxIconSize, useMaskedIcons},
       data
     );
+    updateTriggers.getIcon = {
+      customMarkersUrl,
+      customMarkersRange,
+      maxIconSize,
+      useMaskedIcons,
+    };
     result._subLayerProps = {
       'points-icon': {
         loadOptions: {
@@ -424,10 +498,12 @@ function createChannelProps(
 
     if (getFillColor && useMaskedIcons) {
       result.getIconColor = getFillColor;
+      updateTriggers.getIconColor = updateTriggers.getFillColor;
     }
 
     if (getPointRadius) {
       result.getIconSize = getPointRadius;
+      updateTriggers.getIconSize = updateTriggers.getPointRadius;
     }
 
     if (visualChannels.rotationField) {
@@ -439,6 +515,7 @@ function createChannelProps(
         data
       );
       result.getIconAngle = negateAccessor(accessor);
+      updateTriggers.getIconAngle = updateTriggers.getRotationField;
     }
   } else if (layerType === 'tileset') {
     result.pointType = 'circle';
@@ -494,7 +571,13 @@ function createChannelProps(
     };
   }
 
-  return {channelProps: result, scales};
+  return {
+    channelProps: {
+      ...result,
+      updateTriggers,
+    },
+    scales,
+  };
 }
 
 function createLoadOptions(accessToken: string) {
