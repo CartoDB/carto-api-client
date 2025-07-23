@@ -130,7 +130,8 @@ export function parseMap(json: any) {
   const {keplerMapConfig, datasets, token} = json;
   assert(keplerMapConfig.version === 'v1', 'Only support Kepler v1');
   const mapConfig = keplerMapConfig.config as KeplerMapConfig;
-  const {mapState, mapStyle, popupSettings, legendSettings, visState} = mapConfig;
+  const {mapState, mapStyle, popupSettings, legendSettings, visState} =
+    mapConfig;
   const {layers} = visState;
 
   const layersReverse = [...layers].reverse();
@@ -273,11 +274,12 @@ function createChannelProps(
   } = visualChannels;
   if (layerType === 'raster') {
     const rasterStyleType = config.visConfig.rasterStyleType;
-    if (rasterStyleType === 'rgb') {
+    if (rasterStyleType === 'Rgb') {
       return {
         channelProps: getRasterTileLayerStylePropsRgb({
           layerConfig: config,
           rasterMetadata: data.raster_metadata,
+          visualChannels,
         }),
         scales: {},
       };

@@ -91,7 +91,7 @@ export type VisConfig = {
   clusterLevel?: number;
   isTextVisible?: boolean;
 
-  rasterStyleType?: 'rgb' | 'colorRange' | 'uniqueValues';
+  rasterStyleType?: 'Rgb' | 'ColorRange' | 'UniqueValues';
   colorBands?: RasterLayerConfigColorBand[];
 
   uniqueValuesColorRange?: ColorRange;

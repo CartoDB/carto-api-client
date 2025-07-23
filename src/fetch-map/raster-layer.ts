@@ -278,9 +278,11 @@ function getUsedSymbols(colorBands: RasterLayerConfigColorBand[]) {
 export function getRasterTileLayerStylePropsRgb({
   layerConfig,
   rasterMetadata,
+  visualChannels,
 }: {
   layerConfig: MapLayerConfig;
   rasterMetadata: RasterMetadata;
+  visualChannels: VisualChannels;
 }) {
   const {visConfig} = layerConfig;
   const {colorBands} = visConfig;
@@ -312,6 +314,10 @@ export function getRasterTileLayerStylePropsRgb({
 
   return {
     dataTransform: combinedDataTransform as () => any,
+    updateTriggers: getRasterTileLayerUpdateTriggers({
+      layerConfig,
+      visualChannels,
+    }),
   };
 }
 
@@ -407,11 +413,11 @@ export function getRasterTileLayerStylePropsScaledBand({
   const {rasterStyleType} = visConfig;
 
   const colorRange =
-    rasterStyleType === 'colorRange'
+    rasterStyleType === 'ColorRange'
       ? visConfig.colorRange
       : visConfig.uniqueValuesColorRange;
   const scaleType =
-    rasterStyleType === 'colorRange' ? visualChannels.colorScale : 'ordinal';
+    rasterStyleType === 'ColorRange' ? visualChannels.colorScale : 'ordinal';
   const bandInfo = rasterMetadata.bands.find(
     (band) => band.name === colorField?.name
   );
@@ -438,6 +444,40 @@ export function getRasterTileLayerStylePropsScaledBand({
 
   return {
     dataTransform: bandColorScaleDataTransform as () => any,
+    updateTriggers: getRasterTileLayerUpdateTriggers({
+      layerConfig,
+      visualChannels,
+    }),
+  };
+}
+
+export function getRasterTileLayerUpdateTriggers({
+  layerConfig,
+  visualChannels,
+}: {
+  layerConfig: MapLayerConfig;
+  visualChannels: VisualChannels;
+}) {
+  const {visConfig} = layerConfig;
+  const {rasterStyleType} = visConfig;
+  const getFillColorUpdateTriggers: Record<string, unknown> = {
+    rasterStyleType,
+  };
+  if (rasterStyleType === 'ColorRange') {
+    getFillColorUpdateTriggers.colorRange = visConfig.colorRange?.colors;
+    getFillColorUpdateTriggers.colorMap = visConfig.colorRange?.colorMap;
+    getFillColorUpdateTriggers.colorScale = visualChannels.colorScale;
+    getFillColorUpdateTriggers.colorFieldId = visualChannels.colorField?.name;
+  } else if (rasterStyleType === 'UniqueValues') {
+    getFillColorUpdateTriggers.colorMap =
+      visConfig.uniqueValuesColorRange?.colorMap;
+    getFillColorUpdateTriggers.colorFieldId = visualChannels.colorField?.name;
+  } else if (rasterStyleType === 'Rgb') {
+    getFillColorUpdateTriggers.colorBands = visConfig.colorBands;
+  }
+
+  return {
+    getFillColor: getFillColorUpdateTriggers,
   };
 }
 
