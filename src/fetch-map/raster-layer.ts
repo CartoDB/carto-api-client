@@ -1,4 +1,4 @@
-import type {RasterMetadata, RasterMetadataBand} from '@carto/api-client';
+import type {RasterMetadata, RasterMetadataBand} from '../sources/types.js';
 
 import {
   createVecExprEvaluator,
@@ -13,6 +13,8 @@ import type {
   VisualChannels,
 } from './types.js';
 import {createColorScale, type ScaleType} from './layer-map.js';
+
+const UNKNOWN_COLOR = [134, 141, 145];
 
 const RASTER_COLOR_BANDS = ['red', 'green', 'blue'] as const;
 
@@ -420,7 +422,12 @@ export function getRasterTileLayerStylePropsScaledBand({
 
   const domain = domainFromRasterMetadataBand(bandInfo, scaleType, colorRange);
 
-  const scaleFun = createColorScale(scaleType, domain, colorRange.colors);
+  const scaleFun = createColorScale(
+    scaleType,
+    domain,
+    colorRange.colors.map(hexToRGB),
+    UNKNOWN_COLOR
+  );
 
   const bandColorScaleDataTransform = createBandColorScaleDataTransform({
     bandName: bandInfo.name,
@@ -446,4 +453,12 @@ function bufferSetRgba(
   target[index + 1] = g;
   target[index + 2] = b;
   target[index + 3] = a;
+}
+
+function hexToRGB(hexColor: string): [number, number, number] {
+  const r = parseInt(hexColor.slice(1, 3), 16);
+  const g = parseInt(hexColor.slice(3, 5), 16);
+  const b = parseInt(hexColor.slice(5, 7), 16);
+
+  return [r, g, b];
 }

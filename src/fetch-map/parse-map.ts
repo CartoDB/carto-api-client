@@ -129,8 +129,8 @@ export function getLayerDescriptor({
 export function parseMap(json: any) {
   const {keplerMapConfig, datasets, token} = json;
   assert(keplerMapConfig.version === 'v1', 'Only support Kepler v1');
-  const config = keplerMapConfig.config as KeplerMapConfig;
-  const {mapState, mapStyle, popupSettings, legendSettings, visState} = config;
+  const mapConfig = keplerMapConfig.config as KeplerMapConfig;
+  const {mapState, mapStyle, popupSettings, legendSettings, visState} = mapConfig;
   const {layers} = visState;
 
   const layersReverse = [...layers].reverse();
@@ -154,8 +154,8 @@ export function parseMap(json: any) {
         );
         assert(dataset, `No dataset matching dataId: ${dataId}`);
         const layerDescriptor = getLayerDescriptor({
-          mapConfig: keplerMapConfig,
-          layer: layer,
+          mapConfig,
+          layer,
           dataset,
         });
         return layerDescriptor;

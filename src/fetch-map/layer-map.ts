@@ -115,6 +115,13 @@ const sharedPropMap = {
   },
 };
 
+const rasterPropsMap = {
+  isVisible: 'visible',
+  visConfig: {
+    opacity: 'opacity',
+  },
+};
+
 const customMarkersPropsMap = {
   color: 'getIconColor',
   visConfig: {
@@ -174,6 +181,13 @@ export function getLayerProps(
     throw new Error(
       `Outdated layer type: ${type}. Please open map in CARTO Builder to automatically migrate.`
     );
+  }
+
+  if (type === 'raster') {
+    return {
+      propMap: rasterPropsMap,
+      defaultProps: {},
+    };
   }
 
   let basePropMap: any = sharedPropMap;
@@ -350,18 +364,19 @@ export function calculateLayerScale(
     }
   }
 
-  return createColorScale(scaleType, domain, scaleColor);
+  return createColorScale(scaleType, domain, scaleColor, UNKNOWN_COLOR);
 }
 
-export function createColorScale(
+export function createColorScale<T>(
   scaleType: ScaleType,
   domain: string[] | number[],
-  range: string[]
+  range: T[],
+  unknown: T
 ) {
   const scale = SCALE_FUNCS[scaleType]();
   scale.domain(domain);
   scale.range(range);
-  scale.unknown!(UNKNOWN_COLOR);
+  scale.unknown!(unknown as any);
 
   return scale;
 }
