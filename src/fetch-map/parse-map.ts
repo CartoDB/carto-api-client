@@ -306,6 +306,7 @@ function createChannelProps(
   const {heightField, heightScale} = visualChannels;
   const {textLabel, visConfig} = config;
   const result: Record<string, any> = {};
+  const updateTriggers: Record<string, any> = {};
 
   const scales: Record<string, Scale> = {};
 
@@ -319,7 +320,7 @@ function createChannelProps(
       data
     );
     result.getFillColor = accessor;
-    scales.fillColor = {
+    scales.fillColor = updateTriggers.fillColor = {
       field: colorField,
       type: colorScale!,
       ...domainAndRangeFromScale(scale),
@@ -342,6 +343,8 @@ function createChannelProps(
       return d.properties[aggregationExpAlias];
     };
 
+    updateTriggers.getWeight = aggregationExpAlias;
+
     result.getPointRadius = (d: any, info: any) => {
       return calculateClusterRadius(
         d.properties,
@@ -349,6 +352,10 @@ function createChannelProps(
         visConfig.radiusRange as [number, number],
         aggregationExpAlias
       );
+    };
+    updateTriggers.getPointRadius = {
+      aggregationExpAlias,
+      radiusRange: visConfig.radiusRange,
     };
 
     result.textCharacterSet = 'auto';
@@ -358,6 +365,8 @@ function createChannelProps(
 
     result.getText = (d: any) =>
       TEXT_NUMBER_FORMATTER.format(d.properties[aggregationExpAlias]);
+
+    updateTriggers.getText = aggregationExpAlias;
 
     result.getTextColor = config.textLabel[TEXT_LABEL_INDEX].color;
     result.textOutlineColor = [
@@ -376,6 +385,11 @@ function createChannelProps(
       );
       return calculateClusterTextFontSize(radius);
     };
+
+    updateTriggers.getTextSize = {
+      aggregationExpAlias,
+      radiusRange: visConfig.radiusRange,
+    };
   }
 
   if (radiusField) {
@@ -387,7 +401,7 @@ function createChannelProps(
       data
     );
     result.getPointRadius = accessor;
-    scales.pointRadius = {
+    scales.pointRadius = updateTriggers.getPointRadius = {
       field: radiusField,
       type: radiusScale || 'identity',
       ...domainAndRangeFromScale(scale),
@@ -407,7 +421,7 @@ function createChannelProps(
       data
     );
     result.getLineColor = accessor;
-    scales.lineColor = {
+    scales.lineColor = updateTriggers.getLineColor = {
       field: strokeColorField,
       type: strokeColorScale!,
       ...domainAndRangeFromScale(scale),
@@ -422,7 +436,7 @@ function createChannelProps(
       data
     );
     result.getElevation = accessor;
-    scales.elevation = {
+    scales.elevation = updateTriggers.getElevation = {
       field: heightField,
       type: heightScale || 'identity',
       ...domainAndRangeFromScale(scale),
@@ -438,9 +452,9 @@ function createChannelProps(
       data
     );
     result.getWeight = accessor;
-    scales.weight = {
+    scales.weight = updateTriggers.getWeight = {
       field: weightField,
-      type: 'identity',
+      type: 'identity' as ScaleType,
       ...domainAndRangeFromScale(scale),
     };
   }
@@ -461,6 +475,12 @@ function createChannelProps(
       {fallbackUrl: customMarkersUrl, maxIconSize, useMaskedIcons},
       data
     );
+    updateTriggers.getIcon = {
+      customMarkersUrl,
+      customMarkersRange,
+      maxIconSize,
+      useMaskedIcons,
+    };
     result._subLayerProps = {
       'points-icon': {
         loadOptions: {
@@ -478,10 +498,12 @@ function createChannelProps(
 
     if (getFillColor && useMaskedIcons) {
       result.getIconColor = getFillColor;
+      updateTriggers.getIconColor = updateTriggers.getFillColor;
     }
 
     if (getPointRadius) {
       result.getIconSize = getPointRadius;
+      updateTriggers.getIconSize = updateTriggers.getPointRadius;
     }
 
     if (visualChannels.rotationField) {
@@ -493,6 +515,7 @@ function createChannelProps(
         data
       );
       result.getIconAngle = negateAccessor(accessor);
+      updateTriggers.getIconAngle = updateTriggers.getRotationField;
     }
   } else if (layerType === 'tileset') {
     result.pointType = 'circle';
@@ -548,7 +571,13 @@ function createChannelProps(
     };
   }
 
-  return {channelProps: result, scales};
+  return {
+    channelProps: {
+      ...result,
+      updateTriggers,
+    },
+    scales,
+  };
 }
 
 function createLoadOptions(accessToken: string) {
