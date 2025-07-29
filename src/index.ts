@@ -9,6 +9,7 @@ export type {
 } from './fetch-map/index.js';
 export {
   createVecExprEvaluator as _createVecExprEvaluator,
+  evaluateVecExpr as _evaluateVecExpr,
   validateVecExprSyntax as _validateVecExprSyntax,
   type VecExprResult as _VecExprResult,
   ErrorCode as _ErrorCode,
