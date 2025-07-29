@@ -377,6 +377,9 @@ export function domainFromRasterMetadataBand(
   }
   if (scaleType === 'custom') {
     if (colorRange.uiCustomScaleType === 'logarithmic') {
+      if (colorRange.colorMap) {
+        return colorRange.colorMap?.map(([value]) => value) || [];
+      }
       return [band.stats.min, band.stats.max];
     } else {
       // actually custom, read colorMap
@@ -449,6 +452,33 @@ export function getRasterTileLayerStylePropsScaledBand({
       visualChannels,
     }),
   };
+}
+
+export function getRasterTileLayerStyleProps({
+  layerConfig,
+  visualChannels,
+  rasterMetadata,
+}: {
+  layerConfig: MapLayerConfig;
+  visualChannels: VisualChannels;
+  rasterMetadata: RasterMetadata;
+}) {
+  const {visConfig} = layerConfig;
+  const {rasterStyleType} = visConfig;
+
+  if (rasterStyleType === 'Rgb') {
+    return getRasterTileLayerStylePropsRgb({
+      layerConfig,
+      rasterMetadata,
+      visualChannels,
+    });
+  } else {
+    return getRasterTileLayerStylePropsScaledBand({
+      layerConfig,
+      rasterMetadata,
+      visualChannels,
+    });
+  }
 }
 
 export function getRasterTileLayerUpdateTriggers({
