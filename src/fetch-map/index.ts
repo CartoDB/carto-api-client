@@ -1,4 +1,5 @@
 export {default as BASEMAP} from './basemap-styles.js';
+export {getRasterTileLayerStyleProps as _getRasterTileLayerStyleProps} from './raster-layer.js';
 export {fetchMap} from './fetch-map.js';
 export type {FetchMapOptions, FetchMapResult} from './fetch-map.js';
 export type {
