@@ -18,7 +18,8 @@ export function createVecExprEvaluator(
 ): VecExprEvaluator | null {
   try {
     const parsed = compile(expression);
-    const evalFun = (context: object) => evaluate(parsed, context);
+    const evalFun = (context: Record<string, VecExprResult>) =>
+      evaluate(parsed, context);
     evalFun.symbols = getSymbols(parsed);
     return evalFun as VecExprEvaluator;
   } catch {
@@ -28,7 +29,7 @@ export function createVecExprEvaluator(
 
 export function evaluateVecExpr(
   expression: string | jsep.Expression,
-  context: object
+  context: Record<string, VecExprResult>
 ) {
   try {
     return createVecExprEvaluator(expression)?.(context);
@@ -68,10 +69,13 @@ export function validateVecExprSyntax(
 export function createValidationContext(
   validSymbols: string[]
 ): Record<string, unknown> {
-  return validSymbols.reduce((acc, symbol) => {
-    acc[symbol] = 1;
-    return acc;
-  }, {});
+  return validSymbols.reduce(
+    (acc, symbol) => {
+      acc[symbol] = 1;
+      return acc;
+    },
+    {} as Record<string, unknown>
+  );
 }
 
 export type VecExprVecLike =
@@ -96,7 +100,7 @@ export type VecExprEvaluator = {
 function createResultArray(
   typeTemplate: VecExprVecLike,
   length: number = typeTemplate.length
-): VecExprVecLike {
+): number[] {
   return new Array(length);
 }
 
@@ -181,20 +185,39 @@ const binopsNum: Record<string, (a: number, b: number) => number> = {
   '%': (a: number, b: number) => a % b,
 };
 
-const unopsNum = {
+const unopsNum: Record<string, (a: number) => number> = {
   '-': (a: number) => -a,
   '+': (a: number) => +a,
   '~': (a: number) => ~a,
   '!': (a: number) => Number(!a),
 };
 
-const binopsVector = mapDictValues(binopsNum, createBinopVec);
-const binopsNumVec = mapDictValues(binopsNum, createBinopNumVec);
-const binopsVecNum = mapDictValues(binopsNum, createBinopVecNum);
+const binopsVector = mapDictValues(binopsNum, createBinopVec) as Record<
+  string,
+  Binop
+>;
+const binopsNumVec = mapDictValues(binopsNum, createBinopNumVec) as Record<
+  string,
+  Binop
+>;
+const binopsVecNum = mapDictValues(binopsNum, createBinopVecNum) as Record<
+  string,
+  Binop
+>;
 
-const unopsVector = mapDictValues(unopsNum, createUnopVec);
+const unopsVector = mapDictValues(unopsNum, createUnopVec) as Record<
+  string,
+  UnOp
+>;
 
-function getBinop(operator: string, left: VecExprResult, right: VecExprResult) {
+type UnOp = (a: VecExprResult) => VecExprResult;
+type Binop = (a: VecExprResult, b: VecExprResult) => VecExprResult;
+
+function getBinop(
+  operator: string,
+  left: VecExprResult,
+  right: VecExprResult
+): Binop {
   const isLeftVec = isVecLike(left);
   const isRightVec = isVecLike(right);
   if (isLeftVec && isRightVec) {
@@ -204,7 +227,7 @@ function getBinop(operator: string, left: VecExprResult, right: VecExprResult) {
   } else if (isRightVec) {
     return binopsNumVec[operator];
   } else {
-    return binopsNum[operator];
+    return binopsNum[operator] as Binop;
   }
 }
 
@@ -216,11 +239,13 @@ type AnyExpression =
   | jsep.ConditionalExpression
   | jsep.Identifier
   | jsep.Literal
-  | jsep.LogicalExpression
   | jsep.ThisExpression
   | jsep.UnaryExpression;
 
-export function evaluate(_node: jsep.Expression, context: object) {
+export function evaluate(
+  _node: jsep.Expression,
+  context: Record<string, VecExprResult>
+): VecExprResult {
   const node = _node as AnyExpression;
 
   switch (node.type) {
@@ -241,7 +266,9 @@ export function evaluate(_node: jsep.Expression, context: object) {
         const r = createResultArray(val);
         for (let i = 0; i < length; i++) {
           const entryVal = val[i] ? consequentVal : alternateVal;
-          r[i] = isVecLike(entryVal) ? (entryVal[i] ?? NaN) : entryVal;
+          r[i] = isVecLike(entryVal)
+            ? (entryVal[i] ?? NaN)
+            : (entryVal as number);
         }
         return r;
       } else {
@@ -255,25 +282,18 @@ export function evaluate(_node: jsep.Expression, context: object) {
       return context[node.name];
 
     case 'Literal':
-      return node.value;
-
-    case 'LogicalExpression': {
-      const left = evaluate(node.left, context);
-      const right = evaluate(node.right, context);
-      const binopFun = getBinop(node.operator, left, right);
-      return binopFun(left, right);
-    }
+      return node.value as number;
 
     case 'UnaryExpression': {
       const val = evaluate(node.argument, context);
       const unopFun = isVecLike(val)
         ? unopsVector[node.operator]
-        : unopsNum[node.operator];
+        : (unopsNum[node.operator] as UnOp);
       return unopFun(val);
     }
 
     default:
-      return undefined;
+      return undefined as unknown as VecExprResult;
   }
 }
 
@@ -294,12 +314,6 @@ function visit(_node: jsep.Expression, visitor: (node: AnyExpression) => void) {
       visit(node.test, visitor);
       visit(node.consequent, visitor);
       visit(node.alternate, visitor);
-      break;
-    }
-
-    case 'LogicalExpression': {
-      visit(node.left, visitor);
-      visit(node.right, visitor);
       break;
     }
 
