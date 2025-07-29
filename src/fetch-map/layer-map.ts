@@ -216,6 +216,9 @@ function domainFromAttribute(
   scaleLength: number
 ) {
   if (scaleType === 'ordinal' || scaleType === 'point') {
+    if (!attribute.categories) {
+      return [0, 1];
+    }
     return attribute.categories
       .map((c: any) => c.category)
       .filter((c: any) => c !== undefined && c !== null);

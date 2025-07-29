@@ -39,7 +39,7 @@ export type ColorRange = {
   colorMap: string[][] | undefined;
   name: string;
   type: string;
-  uiCustomScaleType?: 'logarithmic'
+  uiCustomScaleType?: 'logarithmic';
 };
 
 export type CustomMarkersRange = {
@@ -50,15 +50,13 @@ export type CustomMarkersRange = {
   othersMarker?: string;
 };
 
-
-export type ColorBand = 'red' | 'green' | 'blue' | 'alpha'
+export type ColorBand = 'red' | 'green' | 'blue' | 'alpha';
 
 export type RasterLayerConfigColorBand = {
-  band: ColorBand
-  type: 'none' | 'band' | 'expression'
-  value: string // band name or expression
-}
-
+  band: ColorBand;
+  type: 'none' | 'band' | 'expression';
+  value: string; // band name or expression
+};
 
 export type VisConfig = {
   filled?: boolean;

@@ -320,7 +320,7 @@ function createChannelProps(
       data
     );
     result.getFillColor = accessor;
-    scales.fillColor = updateTriggers.fillColor = {
+    scales.fillColor = updateTriggers.getFillColor = {
       field: colorField,
       type: colorScale!,
       ...domainAndRangeFromScale(scale),

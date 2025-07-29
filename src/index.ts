@@ -3,6 +3,12 @@ export * from './constants.js';
 export * from './deck/index.js';
 export * from './fetch-map/index.js';
 export type {LayerDescriptor, LayerType} from './fetch-map/index.js';
+export {
+  createVecExprEvaluator as _createVecExprEvaluator,
+  validateVecExprSyntax as _validateVecExprSyntax,
+  type VecExprResult as _VecExprResult,
+  ErrorCode as _ErrorCode,
+} from './fetch-map/vec-expr-evaluator.js';
 export * from './filters.js';
 export * from './geo.js';
 export * from './sources/index.js';
