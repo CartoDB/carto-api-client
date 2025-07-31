@@ -36,6 +36,7 @@ import {
   getRasterTileLayerStylePropsRgb,
   getRasterTileLayerStylePropsScaledBand,
 } from './raster-layer.js';
+import type { TilejsonResult } from '../sources/types.js';
 
 export type Scale = {
   field: VisualChannelField;
@@ -257,7 +258,7 @@ function createChannelProps(
   layerType: LayerType,
   config: MapLayerConfig,
   visualChannels: VisualChannels,
-  data: any,
+  data: TilejsonResult,
   dataset: Dataset
 ): {
   channelProps: Record<string, any>;
@@ -270,15 +271,24 @@ function createChannelProps(
     radiusScale,
     strokeColorField,
     strokeColorScale,
+    sizeField: strokeWidthField,
+    sizeScale: strokeWidthScale,
     weightField,
   } = visualChannels;
   if (layerType === 'raster') {
+    const rasterMetadata = data.raster_metadata;
+    if (!rasterMetadata) {
+      return {
+        channelProps: {},
+        scales: {},
+      };
+    }
     const rasterStyleType = config.visConfig.rasterStyleType;
     if (rasterStyleType === 'Rgb') {
       return {
         channelProps: getRasterTileLayerStylePropsRgb({
           layerConfig: config,
-          rasterMetadata: data.raster_metadata,
+          rasterMetadata,
           visualChannels,
         }),
         scales: {},
@@ -288,7 +298,7 @@ function createChannelProps(
         channelProps: getRasterTileLayerStylePropsScaledBand({
           layerConfig: config,
           visualChannels,
-          rasterMetadata: data.raster_metadata,
+          rasterMetadata,
         }),
         scales: {
           ...(colorField && {
@@ -427,6 +437,22 @@ function createChannelProps(
       ...domainAndRangeFromScale(scale),
     };
   }
+  if (strokeWidthField) {
+    const {accessor, scale} = getSizeAccessor(
+      strokeWidthField,
+      strokeWidthScale,
+      visConfig.sizeAggregation,
+      visConfig.sizeRange,
+      data
+    );
+    result.getLineWidth = accessor;
+    scales.lineWidth = updateTriggers.getLineWidth = {
+      field: strokeWidthField,
+      type: strokeWidthScale || 'identity',
+      ...domainAndRangeFromScale(scale),
+    };
+  }
+
   if (heightField && visConfig.enable3d) {
     const {accessor, scale} = getSizeAccessor(
       heightField,
