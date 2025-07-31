@@ -39,7 +39,7 @@ import type {
 import type {ProviderType, SchemaField} from '../types.js';
 import {DEFAULT_AGGREGATION_EXP_ALIAS} from '../constants-internal.js';
 import {AggregationTypes} from '../constants.js';
-import type {TilejsonResult} from '../sources/types.js';
+import type {Attribute, TilejsonResult} from '../sources/types.js';
 
 export type D3Scale = {
   domain: (d?: any) => any[];
@@ -211,10 +211,10 @@ export function getLayerProps(
 }
 
 function domainFromAttribute(
-  attribute: any,
+  attribute: Attribute,
   scaleType: ScaleType,
   scaleLength: number
-) {
+): number[] | string[] {
   if (scaleType === 'ordinal' || scaleType === 'point') {
     if (!attribute.categories) {
       return [0, 1];
@@ -225,7 +225,7 @@ function domainFromAttribute(
   }
 
   if (scaleType === 'quantile' && attribute.quantiles) {
-    return attribute.quantiles.global
+    return 'global' in attribute.quantiles
       ? attribute.quantiles.global[scaleLength]
       : attribute.quantiles[scaleLength];
   }
@@ -234,7 +234,7 @@ function domainFromAttribute(
   if (scaleType === 'log' && min === 0) {
     min = 1e-5;
   }
-  return [min, attribute.max];
+  return [min ?? 0, attribute.max ?? 1];
 }
 
 function domainFromValues(values: any, scaleType: ScaleType) {
@@ -263,7 +263,9 @@ function calculateDomain(
     // Tileset data type
     const {attributes} = data.tilestats.layers[0];
     const attribute = attributes.find((a: any) => a.attribute === name);
-    return domainFromAttribute(attribute, scaleType, scaleLength as number);
+    if (attribute) {
+      return domainFromAttribute(attribute, scaleType, scaleLength as number);
+    }
   }
 
   return [0, 1];
@@ -318,7 +320,7 @@ export function getColorAccessor(
   scaleType: ScaleType,
   {aggregation, range}: {aggregation: string; range: any},
   opacity: number | undefined,
-  data: any
+  data: TilejsonResult
 ): {accessor: any; scale: any} {
   const scale = calculateLayerScale(
     colorColumn || name,
@@ -456,7 +458,7 @@ export function getSizeAccessor(
   scaleType: ScaleType | undefined,
   aggregation: string | null | undefined,
   range: Iterable<Range> | null | undefined,
-  data: any
+  data: TilejsonResult
 ): {accessor: any; scale: any} {
   const scale = scaleType ? SCALE_FUNCS[scaleType]() : identity;
   if (scaleType) {

@@ -36,7 +36,7 @@ import {
   getRasterTileLayerStylePropsRgb,
   getRasterTileLayerStylePropsScaledBand,
 } from './raster-layer.js';
-import type { TilejsonResult } from '../sources/types.js';
+import type {TilejsonResult} from '../sources/types.js';
 
 export type Scale = {
   field: VisualChannelField;
