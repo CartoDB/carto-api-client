@@ -330,11 +330,6 @@ describe('getRasterTileLayerStyleProps', () => {
           colorRange: {
             ...dummyColorRange,
             colors: ['#ff0000', '#00ff00', '#0000ff'],
-            colorMap: [
-              [10, '#ff0000'],
-              [100, '#00ff00'],
-              [null, '#0000ff'],
-            ],
             uiCustomScaleType: 'logarithmic',
           },
         },
