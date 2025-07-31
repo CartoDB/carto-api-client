@@ -25,6 +25,7 @@ import {
   createBinaryProxy,
   formatDate,
   formatTimestamp,
+  getLog10ScaleSteps,
   scaleIdentity,
 } from './utils.js';
 import type {
@@ -212,9 +213,21 @@ export function getLayerProps(
 
 function domainFromAttribute(
   attribute: Attribute,
-  scaleType: ScaleType,
+  scaleType: ScaleType | 'log10steps',
   scaleLength: number
 ): number[] | string[] {
+  if (
+    scaleType === 'log10steps' &&
+    attribute.min !== undefined &&
+    attribute.max !== undefined
+  ) {
+    return getLog10ScaleSteps({
+      min: attribute.min,
+      max: attribute.max,
+      steps: scaleLength,
+      // really don't understand why this null is needed for overflow items
+    }) as number[];
+  }
   if (scaleType === 'ordinal' || scaleType === 'point') {
     if (!attribute.categories) {
       return [0, 1];
@@ -256,7 +269,7 @@ function domainFromValues(values: any, scaleType: ScaleType) {
 function calculateDomain(
   data: TilejsonResult,
   name: string,
-  scaleType: ScaleType,
+  scaleType: ScaleType | 'log10steps',
   scaleLength?: number
 ) {
   if (data.tilestats) {
@@ -350,19 +363,22 @@ export function calculateLayerScale(
 ) {
   let domain: string[] | number[] = [];
   let scaleColor: string[] = [];
+  const {colors} = range;
 
-  if (scaleType !== 'identity') {
-    const {colorMap, colors} = range;
-
-    if (Array.isArray(colorMap)) {
+  if (scaleType === 'custom') {
+    if (range.uiCustomScaleType === 'logarithmic') {
+      domain = calculateDomain(data, name, 'log10steps', colors.length);
+      scaleColor = colors;
+    } else if (range.colorMap) {
+      const {colorMap} = range;
       colorMap.forEach(([value, color]) => {
         (domain as string[]).push(value);
         scaleColor.push(color);
       });
-    } else {
-      domain = calculateDomain(data, name, scaleType, colors.length);
-      scaleColor = colors;
     }
+  } else if (scaleType !== 'identity') {
+    domain = calculateDomain(data, name, scaleType, colors.length);
+    scaleColor = colors;
 
     if (scaleType === 'ordinal') {
       domain = domain.slice(0, scaleColor.length);

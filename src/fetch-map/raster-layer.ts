@@ -13,6 +13,7 @@ import type {
   VisualChannels,
 } from './types.js';
 import {createColorScale, type ScaleType} from './layer-map.js';
+import {getLog10ScaleSteps} from './utils.js';
 
 const UNKNOWN_COLOR = [134, 141, 145];
 
@@ -377,10 +378,11 @@ export function domainFromRasterMetadataBand(
   }
   if (scaleType === 'custom') {
     if (colorRange.uiCustomScaleType === 'logarithmic') {
-      if (colorRange.colorMap) {
-        return colorRange.colorMap?.map(([value]) => value) || [];
-      }
-      return [band.stats.min, band.stats.max];
+      return getLog10ScaleSteps({
+        min: band.stats.min,
+        max: band.stats.max,
+        steps: colorRange.colors.length,
+      }) as number[];
     } else {
       // actually custom, read colorMap
       return colorRange.colorMap?.map(([value]) => value) || [];

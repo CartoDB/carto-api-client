@@ -66,18 +66,6 @@ export function validateVecExprSyntax(
   return validate(parsed, context);
 }
 
-export function createValidationContext(
-  validSymbols: string[]
-): Record<string, unknown> {
-  return validSymbols.reduce(
-    (acc, symbol) => {
-      acc[symbol] = 1;
-      return acc;
-    },
-    {} as Record<string, unknown>
-  );
-}
-
 export type VecExprVecLike =
   | number[]
   | Float32Array

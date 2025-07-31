@@ -15,3 +15,4 @@ export type {
 export * from './basemap.js';
 export * from './layer-map.js';
 export * from './parse-map.js';
+export {getLog10ScaleSteps as _getLog10ScaleSteps} from './utils.js';
