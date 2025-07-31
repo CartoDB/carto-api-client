@@ -382,7 +382,7 @@ export function domainFromRasterMetadataBand(
         min: band.stats.min,
         max: band.stats.max,
         steps: colorRange.colors.length,
-      }) as number[];
+      });
     } else {
       // actually custom, read colorMap
       return colorRange.colorMap?.map(([value]) => value) || [];
