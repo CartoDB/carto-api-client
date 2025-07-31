@@ -2,11 +2,6 @@ export * from './client.js';
 export * from './constants.js';
 export * from './deck/index.js';
 export * from './fetch-map/index.js';
-export type {
-  LayerDescriptor,
-  LayerType,
-  _getRasterTileLayerStyleProps,
-} from './fetch-map/index.js';
 export {
   createVecExprEvaluator as _createVecExprEvaluator,
   evaluateVecExpr as _evaluateVecExpr,

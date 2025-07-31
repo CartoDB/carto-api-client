@@ -92,7 +92,7 @@ export const STYLE_LAYER_GROUPS: StyleLayerGroup[] = [
 ];
 
 export function applyLayerGroupFilters(
-  style: any,
+  style: any, // this Maplibre/Mapbox style, we don't want to add a dependency on Maplibre
   visibleLayerGroups: Record<StyleLayerGroupSlug, boolean>
 ) {
   if (!Array.isArray(style?.layers)) {
