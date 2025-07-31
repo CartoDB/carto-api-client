@@ -225,8 +225,7 @@ function domainFromAttribute(
       min: attribute.min,
       max: attribute.max,
       steps: scaleLength,
-      // really don't understand why this null is needed for overflow items
-    }) as number[];
+    });
   }
   if (scaleType === 'ordinal' || scaleType === 'point') {
     if (!attribute.categories) {
