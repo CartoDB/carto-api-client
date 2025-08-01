@@ -75,7 +75,21 @@ function identity<T>(v: T): T {
   return v;
 }
 
+const hexToRGB = (c: any) => {
+  const {r, g, b} = rgb(c);
+  return [r, g, b];
+};
+
+const rgbToHex = (c: number[]) => {
+  const [r, g, b] = c;
+  const rStr = r.toString(16).padStart(2, '0');
+  const gStr = g.toString(16).padStart(2, '0');
+  const bStr = b.toString(16).padStart(2, '0');
+  return `#${rStr}${gStr}${bStr}`.toUpperCase();
+};
+
 const UNKNOWN_COLOR = '#868d91';
+const UNKNOWN_COLOR_RGB = hexToRGB(UNKNOWN_COLOR);
 
 export const OPACITY_MAP: Record<string, string> = {
   getFillColor: 'opacity',
@@ -342,14 +356,14 @@ export function getColorAccessor(
       accessorKeys = findAccessorKey(accessorKeys, properties);
     }
     const propertyValue = properties[accessorKeys[0]];
-    const {r, g, b} = rgb(scale(propertyValue));
+    const [r, g, b] = scale(propertyValue);
     return [r, g, b, propertyValue === null ? 0 : alpha];
   };
   return {
     accessor: normalizeAccessor(accessor, data),
     scaleDomain: scale.domain(),
     domain,
-    range: scale.range() as string[],
+    range: scale.range().map(rgbToHex),
   };
 }
 
@@ -395,8 +409,8 @@ export function calculateLayerScale(
     scale: createColorScale(
       scaleType,
       scaleDomain || domain,
-      scaleColor,
-      UNKNOWN_COLOR
+      scaleColor.map(hexToRGB),
+      UNKNOWN_COLOR_RGB
     ),
     domain,
   };
