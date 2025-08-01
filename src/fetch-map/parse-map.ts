@@ -16,7 +16,6 @@ import {
   TEXT_NUMBER_FORMATTER,
   TEXT_LABEL_INDEX,
   TEXT_OUTLINE_OPACITY,
-  type D3Scale,
   type ScaleType,
 } from './layer-map.js';
 
@@ -39,10 +38,11 @@ import {
 import type {TilejsonResult} from '../sources/types.js';
 
 export type Scale = {
+  type: ScaleType;
   field: VisualChannelField;
   domain: string[] | number[];
-  range: string[] | number[];
-  type: ScaleType;
+  scaleDomain?: string[] | number[];
+  range?: string[] | number[];
 };
 
 export type ScaleKey =
@@ -232,7 +232,7 @@ function createStyleProps(config: MapLayerConfig, mapping: any) {
     if (Array.isArray(result[colorAccessor])) {
       const color = [...result[colorAccessor]];
       const opacityKey = OPACITY_MAP[colorAccessor];
-      const opacity = config.visConfig[opacityKey as keyof VisConfig];
+      const opacity = config.visConfig[opacityKey as keyof VisConfig] as number;
       color[3] = opacityToAlpha(opacity);
       result[colorAccessor] = color;
     }
@@ -242,15 +242,6 @@ function createStyleProps(config: MapLayerConfig, mapping: any) {
     ? [255, 255, 255, 60]
     : [252, 242, 26, 255];
   return result;
-}
-
-function domainAndRangeFromScale(
-  scale: D3Scale
-): Pick<Scale, 'domain' | 'range'> {
-  return {
-    domain: scale.domain(),
-    range: scale.range(),
-  };
 }
 
 function createChannelProps(
@@ -264,17 +255,6 @@ function createChannelProps(
   channelProps: Record<string, any>;
   scales: Partial<Record<ScaleKey, Scale>>;
 } {
-  const {
-    colorField,
-    colorScale,
-    radiusField,
-    radiusScale,
-    strokeColorField,
-    strokeColorScale,
-    sizeField: strokeWidthField,
-    sizeScale: strokeWidthScale,
-    weightField,
-  } = visualChannels;
   if (layerType === 'raster') {
     const rasterMetadata = data.raster_metadata;
     if (!rasterMetadata) {
@@ -291,7 +271,7 @@ function createChannelProps(
           rasterMetadata,
           visualChannels,
         }),
-        scales: {},
+        scales: {}, // TODO
       };
     } else {
       return {
@@ -301,42 +281,38 @@ function createChannelProps(
           rasterMetadata,
         }),
         scales: {
-          ...(colorField && {
-            fillColor: {
-              field: colorField,
-              type: 'ordinal',
-              domain: [],
-              range: [],
-            },
-          }),
+          // TODO
         },
       };
     }
   }
-  const {heightField, heightScale} = visualChannels;
   const {textLabel, visConfig} = config;
   const result: Record<string, any> = {};
   const updateTriggers: Record<string, any> = {};
 
   const scales: Record<string, Scale> = {};
 
-  if (colorField) {
-    const {colorAggregation: aggregation, colorRange: range} = visConfig;
-    const {accessor, scale} = getColorAccessor(
-      colorField,
-      colorScale!,
-      {aggregation, range},
-      visConfig.opacity,
-      data
-    );
-    result.getFillColor = accessor;
-    scales.fillColor = updateTriggers.getFillColor = {
-      field: colorField,
-      type: colorScale!,
-      ...domainAndRangeFromScale(scale),
-    };
-  } else if (visConfig.filled) {
-    scales.fillColor = {} as any;
+  // fill color
+  {
+    const {colorField, colorScale} = visualChannels;
+    const {colorRange, colorAggregation} = visConfig;
+    if (colorField && colorScale && colorRange) {
+      const {accessor, ...scaleProps} = getColorAccessor(
+        colorField,
+        colorScale,
+        {aggregation: colorAggregation, range: colorRange},
+        visConfig.opacity,
+        data
+      );
+      result.getFillColor = accessor;
+      scales.fillColor = updateTriggers.getFillColor = {
+        field: colorField,
+        type: colorScale,
+        ...scaleProps,
+      };
+    } else {
+      scales.fillColor = {} as any;
+    }
   }
 
   if (layerType === 'clusterTile') {
@@ -402,87 +378,115 @@ function createChannelProps(
     };
   }
 
-  if (radiusField) {
-    const {accessor, scale} = getSizeAccessor(
-      radiusField,
-      radiusScale,
-      visConfig.sizeAggregation,
-      visConfig.radiusRange || visConfig.sizeRange,
-      data
-    );
-    result.getPointRadius = accessor;
-    scales.pointRadius = updateTriggers.getPointRadius = {
-      field: radiusField,
-      type: radiusScale || 'identity',
-      ...domainAndRangeFromScale(scale),
-    };
+  // point radius
+  {
+    const radiusRange = visConfig.radiusRange;
+    const {radiusField, radiusScale} = visualChannels;
+    if (radiusField && radiusRange && radiusScale) {
+      const {accessor, ...scaleProps} = getSizeAccessor(
+        radiusField,
+        radiusScale,
+        visConfig.sizeAggregation,
+        radiusRange,
+        data
+      );
+      result.getPointRadius = accessor;
+      scales.pointRadius = updateTriggers.getPointRadius = {
+        field: radiusField,
+        type: radiusScale,
+        ...scaleProps,
+      };
+    }
   }
 
-  if (strokeColorField) {
-    const opacity =
-      visConfig.strokeOpacity !== undefined ? visConfig.strokeOpacity : 1;
-    const {strokeColorAggregation: aggregation, strokeColorRange: range} =
-      visConfig;
-    const {accessor, scale} = getColorAccessor(
-      strokeColorField,
-      strokeColorScale!,
-      {aggregation, range},
-      opacity,
-      data
-    );
-    result.getLineColor = accessor;
-    scales.lineColor = updateTriggers.getLineColor = {
-      field: strokeColorField,
-      type: strokeColorScale!,
-      ...domainAndRangeFromScale(scale),
-    };
-  }
-  if (strokeWidthField) {
-    const {accessor, scale} = getSizeAccessor(
-      strokeWidthField,
-      strokeWidthScale,
-      visConfig.sizeAggregation,
-      visConfig.sizeRange,
-      data
-    );
-    result.getLineWidth = accessor;
-    scales.lineWidth = updateTriggers.getLineWidth = {
-      field: strokeWidthField,
-      type: strokeWidthScale || 'identity',
-      ...domainAndRangeFromScale(scale),
-    };
+  // stroke/ouline color
+  {
+    const strokeColorRange = visConfig.strokeColorRange;
+    const {strokeColorScale, strokeColorField} = visualChannels;
+    if (strokeColorField && strokeColorRange && strokeColorScale) {
+      const {strokeColorAggregation: aggregation} = visConfig;
+      const opacity =
+        visConfig.strokeOpacity !== undefined ? visConfig.strokeOpacity : 1;
+
+      const {accessor, ...scaleProps} = getColorAccessor(
+        strokeColorField,
+        strokeColorScale,
+        {aggregation, range: strokeColorRange},
+        opacity,
+        data
+      );
+      result.getLineColor = accessor;
+      scales.lineColor = updateTriggers.getLineColor = {
+        field: strokeColorField,
+        type: strokeColorScale,
+        ...scaleProps,
+      };
+    }
   }
 
-  if (heightField && visConfig.enable3d) {
-    const {accessor, scale} = getSizeAccessor(
-      heightField,
-      heightScale,
-      visConfig.heightAggregation,
-      visConfig.heightRange || visConfig.sizeRange,
-      data
-    );
-    result.getElevation = accessor;
-    scales.elevation = updateTriggers.getElevation = {
-      field: heightField,
-      type: heightScale || 'identity',
-      ...domainAndRangeFromScale(scale),
-    };
+  // stroke/line width
+  {
+    const {sizeField: strokeWidthField, sizeScale: strokeWidthScale} =
+      visualChannels;
+    const {sizeRange, sizeAggregation} = visConfig;
+
+    if (strokeWidthField && sizeRange) {
+      const {accessor, ...scaleProps} = getSizeAccessor(
+        strokeWidthField,
+        strokeWidthScale,
+        sizeAggregation,
+        sizeRange,
+        data
+      );
+      result.getLineWidth = accessor;
+      scales.lineWidth = updateTriggers.getLineWidth = {
+        field: strokeWidthField,
+        type: strokeWidthScale || 'identity',
+        ...scaleProps,
+      };
+    }
   }
 
-  if (weightField) {
-    const {accessor, scale} = getSizeAccessor(
-      weightField,
-      undefined,
-      visConfig.weightAggregation,
-      undefined,
-      data
-    );
-    result.getWeight = accessor;
-    scales.weight = updateTriggers.getWeight = {
-      field: weightField,
-      type: 'identity' as ScaleType,
-      ...domainAndRangeFromScale(scale),
-    };
+  // height / elevation
+  {
+    const {enable3d, heightRange} = visConfig;
+    const {heightField, heightScale} = visualChannels;
+    if (heightField && heightRange && heightScale && enable3d) {
+      const {accessor, ...scaleProps} = getSizeAccessor(
+        heightField,
+        heightScale,
+        visConfig.heightAggregation,
+        heightRange,
+        data
+      );
+      result.getElevation = accessor;
+      scales.elevation = updateTriggers.getElevation = {
+        field: heightField,
+        type: heightScale || 'identity',
+        ...scaleProps,
+      };
+    }
+  }
+
+  // weight
+  {
+    const {weightField} = visualChannels;
+    const {weightAggregation} = visConfig;
+    if (weightField && weightAggregation) {
+      const {accessor, ...scaleProps} = getSizeAccessor(
+        weightField,
+        undefined,
+        weightAggregation,
+        undefined,
+        data
+      );
+      result.getWeight = accessor;
+      scales.weight = updateTriggers.getWeight = {
+        field: weightField,
+        type: 'identity' as ScaleType,
+        ...scaleProps,
+      };
+    }
   }
 
   if (visConfig.customMarkers) {

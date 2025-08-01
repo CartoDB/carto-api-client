@@ -63,7 +63,7 @@ export type VisConfig = {
   opacity?: number;
   enable3d?: boolean;
 
-  colorAggregation?: any;
+  colorAggregation?: string;
   colorRange: ColorRange;
 
   customMarkers?: boolean;
@@ -73,17 +73,17 @@ export type VisConfig = {
   radius: number;
   radiusRange?: number[];
 
-  sizeAggregation?: any;
-  sizeRange?: any;
+  sizeAggregation?: string;
+  sizeRange?: number[];
 
-  strokeColorAggregation?: any;
+  strokeColorAggregation?: string;
   strokeOpacity?: number;
   strokeColorRange?: ColorRange;
 
-  heightRange?: any;
-  heightAggregation?: any;
+  heightRange?: number[];
+  heightAggregation?: string;
 
-  weightAggregation?: any;
+  weightAggregation?: string;
 
   // type = clusterTile
   clusterLevel?: number;
