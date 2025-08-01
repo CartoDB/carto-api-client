@@ -40,7 +40,11 @@ import type {TilejsonResult} from '../sources/types.js';
 export type Scale = {
   type: ScaleType;
   field: VisualChannelField;
+
+  /** Natural domain of the scale, as defined by the data  */
   domain: string[] | number[];
+
+  /** Domain of the user to construct d3 scale */
   scaleDomain?: string[] | number[];
   range?: string[] | number[];
 };
@@ -52,11 +56,13 @@ export type ScaleKey =
   | 'elevation'
   | 'weight';
 
+export type Scales = Partial<Record<ScaleKey, Scale>>;
+
 export type LayerDescriptor = {
   type: LayerType;
   props: Record<string, any>;
   filters?: Filters;
-  scales: Partial<Record<ScaleKey, Scale>>;
+  scales: Scales;
 };
 
 export type ParseMapResult = {
@@ -451,7 +457,7 @@ function createChannelProps(
   {
     const {enable3d, heightRange} = visConfig;
     const {heightField, heightScale} = visualChannels;
-    if (heightField && heightRange && heightScale && enable3d) {
+    if (heightField && heightRange && enable3d) {
       const {accessor, ...scaleProps} = getSizeAccessor(
         heightField,
         heightScale,
