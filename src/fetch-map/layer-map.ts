@@ -213,20 +213,9 @@ export function getLayerProps(
 
 function domainFromAttribute(
   attribute: Attribute,
-  scaleType: ScaleType | 'log10steps',
+  scaleType: ScaleType,
   scaleLength: number
 ): number[] | string[] {
-  if (
-    scaleType === 'log10steps' &&
-    attribute.min !== undefined &&
-    attribute.max !== undefined
-  ) {
-    return getLog10ScaleSteps({
-      min: attribute.min,
-      max: attribute.max,
-      steps: scaleLength,
-    });
-  }
   if (scaleType === 'ordinal' || scaleType === 'point') {
     if (!attribute.categories) {
       return [0, 1];
@@ -268,7 +257,7 @@ function domainFromValues(values: any, scaleType: ScaleType) {
 function calculateDomain(
   data: TilejsonResult,
   name: string,
-  scaleType: ScaleType | 'log10steps',
+  scaleType: ScaleType,
   scaleLength?: number
 ) {
   if (data.tilestats) {
@@ -330,11 +319,16 @@ function findAccessorKey(keys: string[], properties: any): string[] {
 export function getColorAccessor(
   {name, colorColumn}: VisualChannelField,
   scaleType: ScaleType,
-  {aggregation, range}: {aggregation: string; range: any},
+  {aggregation, range}: {aggregation?: string; range: ColorRange},
   opacity: number | undefined,
   data: TilejsonResult
-): {accessor: any; scale: any} {
-  const scale = calculateLayerScale(
+): {
+  accessor: any;
+  domain: number[] | string[];
+  scaleDomain: number[] | string[];
+  range: string[];
+} {
+  const {scale, domain} = calculateLayerScale(
     colorColumn || name,
     scaleType,
     range,
@@ -351,7 +345,12 @@ export function getColorAccessor(
     const {r, g, b} = rgb(scale(propertyValue));
     return [r, g, b, propertyValue === null ? 0 : alpha];
   };
-  return {accessor: normalizeAccessor(accessor, data), scale};
+  return {
+    accessor: normalizeAccessor(accessor, data),
+    scaleDomain: scale.domain(),
+    domain,
+    range: scale.range() as string[],
+  };
 }
 
 export function calculateLayerScale(
@@ -359,14 +358,22 @@ export function calculateLayerScale(
   scaleType: ScaleType,
   range: ColorRange,
   data: TilejsonResult
-) {
+): {scale: D3Scale; domain: string[] | number[]} {
   let domain: string[] | number[] = [];
+  let scaleDomain: number[] | undefined;
   let scaleColor: string[] = [];
   const {colors} = range;
 
   if (scaleType === 'custom') {
     if (range.uiCustomScaleType === 'logarithmic') {
-      domain = calculateDomain(data, name, 'log10steps', colors.length);
+      domain = calculateDomain(data, name, scaleType, colors.length);
+      const [min, max] = domain as number[];
+      scaleDomain = getLog10ScaleSteps({
+        min,
+        max,
+        steps: colors.length,
+      });
+
       scaleColor = colors;
     } else if (range.colorMap) {
       const {colorMap} = range;
@@ -384,7 +391,15 @@ export function calculateLayerScale(
     }
   }
 
-  return createColorScale(scaleType, domain, scaleColor, UNKNOWN_COLOR);
+  return {
+    scale: createColorScale(
+      scaleType,
+      scaleDomain || domain,
+      scaleColor,
+      UNKNOWN_COLOR
+    ),
+    domain,
+  };
 }
 
 export function createColorScale<T>(
@@ -472,13 +487,22 @@ export function getSizeAccessor(
   {name}: VisualChannelField,
   scaleType: ScaleType | undefined,
   aggregation: string | null | undefined,
-  range: Iterable<Range> | null | undefined,
+  range: number[] | undefined,
   data: TilejsonResult
-): {accessor: any; scale: any} {
+): {
+  accessor: any;
+  domain: number[];
+  scaleDomain: number[];
+  range: number[] | undefined;
+} {
   const scale = scaleType ? SCALE_FUNCS[scaleType]() : identity;
-  if (scaleType) {
+  let domain: number[] = [];
+  if (scaleType && range) {
     if (aggregation !== AggregationTypes.Count) {
-      (scale as D3Scale).domain(calculateDomain(data, name, scaleType));
+      domain = calculateDomain(data, name, scaleType) as number[];
+      (scale as D3Scale).domain(domain);
+    } else {
+      domain = (scale as D3Scale).domain();
     }
     (scale as D3Scale).range(range);
   }
@@ -491,7 +515,12 @@ export function getSizeAccessor(
     const propertyValue = properties[accessorKeys[0]];
     return scale(propertyValue);
   };
-  return {accessor: normalizeAccessor(accessor, data), scale};
+  return {
+    accessor: normalizeAccessor(accessor, data),
+    domain,
+    scaleDomain: domain,
+    range,
+  };
 }
 
 const FORMATS: Record<string, (value: any) => string> = {
