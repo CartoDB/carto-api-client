@@ -379,9 +379,9 @@ export function calculateLayerScale(
   const {colors} = range;
 
   if (scaleType === 'custom') {
+    domain = calculateDomain(data, name, scaleType, colors.length);
+    const [min, max] = domain as number[];
     if (range.uiCustomScaleType === 'logarithmic') {
-      domain = calculateDomain(data, name, scaleType, colors.length);
-      const [min, max] = domain as number[];
       scaleDomain = getLog10ScaleSteps({
         min,
         max,
@@ -391,8 +391,9 @@ export function calculateLayerScale(
       scaleColor = colors;
     } else if (range.colorMap) {
       const {colorMap} = range;
+      scaleDomain = [];
       colorMap.forEach(([value, color]) => {
-        (domain as string[]).push(value);
+        (scaleDomain as number[]).push(Number(value));
         scaleColor.push(color);
       });
     }
