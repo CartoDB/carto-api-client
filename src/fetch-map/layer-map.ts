@@ -344,26 +344,27 @@ export function getColorAccessor(
 } {
   const {scale, domain} = calculateLayerScale(
     colorColumn || name,
-    scaleType,
+    colorColumn ? 'identity' : scaleType,
     range,
     data
   );
   const alpha = opacityToAlpha(opacity);
 
-  let accessorKeys = getAccessorKeys(name, aggregation);
+  let accessorKeys = getAccessorKeys(colorColumn || name, aggregation);
   const accessor = (properties: any) => {
     if (!(accessorKeys[0] in properties)) {
       accessorKeys = findAccessorKey(accessorKeys, properties);
     }
     const propertyValue = properties[accessorKeys[0]];
-    const [r, g, b] = scale(propertyValue);
-    return [r, g, b, propertyValue === null ? 0 : alpha];
+    const scaled = scale(propertyValue);
+    const rgb = typeof scaled === 'string' ? hexToRGB(scaled) : scaled;
+    return [...rgb, propertyValue === null ? 0 : alpha];
   };
   return {
     accessor: normalizeAccessor(accessor, data),
     scaleDomain: scale.domain(),
     domain,
-    range: scale.range().map(rgbToHex),
+    range: (scale.range() || []).map(rgbToHex),
   };
 }
 
