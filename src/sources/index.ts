@@ -97,3 +97,15 @@ export type {
   VectorTilesetSourceOptions,
   VectorTilesetSourceResponse,
 } from './vector-tileset-source.js';
+
+export {trajectoryQuerySource} from './trajectory-query-source.js';
+export type {
+  TrajectoryQuerySourceOptions,
+  TrajectoryQuerySourceResponse,
+} from './trajectory-query-source.js';
+
+export {trajectoryTableSource} from './trajectory-table-source.js';
+export type {
+  TrajectoryTableSourceOptions,
+  TrajectoryTableSourceResponse,
+} from './trajectory-table-source.js';
