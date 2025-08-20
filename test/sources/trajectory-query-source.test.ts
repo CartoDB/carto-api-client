@@ -30,9 +30,7 @@ describe('trajectoryQuerySource', () => {
     expect(initURL).toMatch(/trajectoryIdColumn=trajectory_id/);
     expect(initURL).toMatch(/timestampColumn=timestamp/);
     expect(initURL).toMatch(/aggregationExp=COUNT%28\*%29/);
-    expect(initURL).toMatch(
-      /queryParameters=%7B%22minDuration%22%3A3600%7D/
-    );
+    expect(initURL).toMatch(/queryParameters=%7B%22minDuration%22%3A3600%7D/);
 
     expect(tilesetURL).toMatch(/^https:\/\/xyz\.com\/\?format=tilejson/);
 
