@@ -6,6 +6,7 @@ import {
   WidgetRemoteSource,
   WidgetRemoteSourceProps,
 } from '@carto/api-client';
+import { AggregationTypes } from '../../src/constants';
 import type {BBox} from 'geojson';
 
 const createMockResponse = (data: unknown) => ({
@@ -38,6 +39,54 @@ test('constructor', () => {
   expect(widgetSource.props).toMatchObject({
     accessToken: '<token>',
     connectionName: 'carto_dw',
+  });
+});
+
+test('getAggregations - normaliza claves y mezcla alias/por defecto', async () => {
+  const widgetSource = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+  });
+
+  // Simula un DW que devuelve claves con mayúsculas variadas y/o sin alias
+  const serverRow = {
+    SUM_POP_HIGH: 10,
+    avg_pop_low: 5,
+    COUNT_records: 7,
+  };
+
+  const mockFetch = vi
+    .fn()
+    .mockResolvedValueOnce(
+      createMockResponse({ rows: [serverRow] })
+    );
+  vi.stubGlobal('fetch', mockFetch);
+
+  const result = await widgetSource.getAggregations({
+    aggregations: [
+      { column: 'pop_high', operation: AggregationTypes.Sum, alias: 'Sum_Pop_High' },
+      { column: 'pop_low', operation: AggregationTypes.Avg },
+      { column: '*', operation: AggregationTypes.Count, alias: 'COUNT_Records' },
+    ],
+  });
+
+  // normalizeObjectKeys debe forzar lowercase de las claves del servidor
+  // y el cliente debe devolver un objeto plano con esas claves normalizadas.
+  // Alias provistos y por defecto deben convivir y ser normalizados.
+  expect(result).toEqual({
+    // alias provisto "Sum_Pop_High" -> server devolvió SUM_POP_HIGH -> normalizado a minúsculas
+    sum_pop_high: 10,
+    // sin alias -> por defecto avg_pop_low
+    avg_pop_low: 5,
+    // alias provisto COUNT_Records -> server COUNT_records -> minúsculas
+    count_records: 7,
+  });
+
+  const params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
+  // Verifica que se envían los parámetros esperados (no exhaustivo)
+  expect(Object.fromEntries(params)).toMatchObject({
+    type: 'test',
+    source: 'test-data',
   });
 });
 
