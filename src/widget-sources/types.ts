@@ -219,7 +219,7 @@ export interface TimeSeriesRequestOptions extends BaseRequestOptions {
 export interface AggregationsRequestOptions extends BaseRequestOptions {
   /** Aggregations to compute. Can be an array of objects or a SQL string expression. */
   aggregations: 
-    | { column: string; operation: AggregationType; alias?: string }[]
+    | { column: string; operation: Exclude<AggregationType, 'custom'>; alias?: string }[]
     | string;
 }
 
