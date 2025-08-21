@@ -13,6 +13,7 @@ import type {
   SpatialDataType,
   TableSourceOptions,
   TilejsonResult,
+  TimestampRangeResult,
 } from './types.js';
 
 export type TrajectoryTableSourceOptions = SourceOptions &
@@ -36,7 +37,9 @@ type UrlParameters = {
 };
 
 export type TrajectoryTableSourceResponse = TilejsonResult &
-  WidgetTableSourceResult;
+  WidgetTableSourceResult & {
+    timestampRange: TimestampRangeResult;
+  };
 
 export const trajectoryTableSource = async function (
   options: TrajectoryTableSourceOptions
@@ -69,16 +72,25 @@ export const trajectoryTableSource = async function (
     urlParameters.aggregationExp = aggregationExp;
   }
 
-  return baseSource<UrlParameters>('table', options, urlParameters).then(
-    (result) => ({
-      ...result,
-      widgetSource: new WidgetTableSource({
-        ...options,
-        // NOTE: Parameters with default values above must be explicitly passed here.
-        spatialDataColumn,
-        spatialDataType,
-        tileResolution,
-      }),
-    })
+  const result = await baseSource<UrlParameters>(
+    'table',
+    options,
+    urlParameters
   );
+
+  const widgetSource = new WidgetTableSource({
+    ...options,
+    // NOTE: Parameters with default values above must be explicitly passed here.
+    spatialDataColumn,
+    spatialDataType,
+    tileResolution,
+  });
+
+  const timestampRange = await widgetSource.getRange({column: timestampColumn});
+
+  return {
+    ...result,
+    widgetSource,
+    timestampRange,
+  };
 };
