@@ -211,7 +211,7 @@ export type ColumnsOption = {
   columns?: string[];
 };
 
-export type SpatialDataType = 'geo' | 'h3' | 'quadbin';
+export type SpatialDataType = 'geo' | 'h3' | 'quadbin' | 'trajectory';
 
 /**
  * Strategy used for covering spatial filter geometry with spatial indexes.
