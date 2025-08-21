@@ -418,11 +418,17 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
 
     // Handle array-based aggregations
     const result: Record<string, number> = {};
-    
+    const usedAliases = new Set<string>();
+
     for (const {column, operation, alias} of aggregations) {
       assertColumn(this._features, column);
       
       const aggregationKey = alias || `${operation}_${column}`;
+      const aliasKey = aggregationKey.toLowerCase();
+      if (usedAliases.has(aliasKey)) {
+        throw new Error(`Duplicate aggregation alias: ${aggregationKey}`);
+      }
+      usedAliases.add(aliasKey);
       
       if (operation === AggregationTypes.Count) {
         result[aggregationKey] = filteredFeatures.length;
