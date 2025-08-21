@@ -13,6 +13,7 @@ import type {
   SpatialDataType,
   TilejsonResult,
   ColumnsOption,
+  TimestampRangeResult,
 } from './types.js';
 
 export type TrajectoryQuerySourceOptions = SourceOptions &
@@ -38,7 +39,7 @@ type UrlParameters = {
 
 export type TrajectoryQuerySourceResponse = TilejsonResult &
   WidgetQuerySourceResult & {
-    timestampRange: {min: number | string; max: number | string} | null;
+    timestampRange: TimestampRangeResult;
   };
 
 export const trajectoryQuerySource = async function (

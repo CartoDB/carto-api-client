@@ -13,6 +13,7 @@ import type {
   SpatialDataType,
   TableSourceOptions,
   TilejsonResult,
+  TimestampRangeResult,
 } from './types.js';
 
 export type TrajectoryTableSourceOptions = SourceOptions &
@@ -37,7 +38,7 @@ type UrlParameters = {
 
 export type TrajectoryTableSourceResponse = TilejsonResult &
   WidgetTableSourceResult & {
-    timestampRange: {min: number | string; max: number | string} | null;
+    timestampRange: TimestampRangeResult;
   };
 
 export const trajectoryTableSource = async function (

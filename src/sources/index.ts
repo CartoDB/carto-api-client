@@ -10,6 +10,7 @@ export type {
   SourceOptionalOptions,
   TilejsonResult,
   QueryResult,
+  TimestampRangeResult,
   FilterOptions,
   QuerySourceOptions,
   TableSourceOptions,
