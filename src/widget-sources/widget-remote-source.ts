@@ -419,9 +419,9 @@ export abstract class WidgetRemoteSource<
         aggregations,
       },
       opts: {signal, headers: this.props.headers},
-    }).then((res: AggregationsModelResponse) => 
-      res.rows.length > 0 ? normalizeObjectKeys(res.rows[0]) : {}
-    );
+    }).then((res: AggregationsModelResponse) => ({
+      rows: res.rows.map(row => normalizeObjectKeys(row))
+    }));
   }
 
   /** @experimental */

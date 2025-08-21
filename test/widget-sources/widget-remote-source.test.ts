@@ -71,15 +71,17 @@ test('getAggregations - normaliza claves y mezcla alias/por defecto', async () =
   });
 
   // normalizeObjectKeys debe forzar lowercase de las claves del servidor
-  // y el cliente debe devolver un objeto plano con esas claves normalizadas.
+  // y el cliente debe devolver un objeto con rows array.
   // Alias provistos y por defecto deben convivir y ser normalizados.
   expect(result).toEqual({
-    // alias provisto "Sum_Pop_High" -> server devolvió SUM_POP_HIGH -> normalizado a minúsculas
-    sum_pop_high: 10,
-    // sin alias -> por defecto avg_pop_low
-    avg_pop_low: 5,
-    // alias provisto COUNT_Records -> server COUNT_records -> minúsculas
-    count_records: 7,
+    rows: [{
+      // alias provisto "Sum_Pop_High" -> server devolvió SUM_POP_HIGH -> normalizado a minúsculas
+      sum_pop_high: 10,
+      // sin alias -> por defecto avg_pop_low
+      avg_pop_low: 5,
+      // alias provisto COUNT_Records -> server COUNT_records -> minúsculas
+      count_records: 7,
+    }]
   });
 
   const params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();

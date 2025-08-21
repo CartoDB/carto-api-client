@@ -278,7 +278,9 @@ export type TimeSeriesResponse = {
 export type HistogramResponse = number[];
 
 /** Response from {@link WidgetRemoteSource#getAggregations}. */
-export type AggregationsResponse = Record<string, number>;
+export type AggregationsResponse = {
+  rows: Record<string, number>[];
+};
 
 /** @experimental */
 export type ExtentResponse = {bbox: BBox};

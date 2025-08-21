@@ -406,7 +406,7 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
     );
 
     if (!this._features.length) {
-      return {};
+      return {rows: []};
     }
 
     // Handle string-based aggregations
@@ -445,7 +445,7 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       }
     }
 
-    return result;
+    return {rows: [result]};
   }
 
   /** @experimental */
