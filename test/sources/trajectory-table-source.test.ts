@@ -1,6 +1,5 @@
 import {WidgetTableSource, trajectoryTableSource} from '@carto/api-client';
 import {describe, vi, test, expect} from 'vitest';
-import {stubGlobalFetchForSource} from '../__mock-fetch.js';
 
 const createMockResponse = (data: unknown) => ({
   ok: true,
@@ -9,7 +8,26 @@ const createMockResponse = (data: unknown) => ({
 
 describe('trajectoryTableSource', () => {
   test('default', async () => {
-    stubGlobalFetchForSource();
+    // Mock 3 calls: init, tileset, and getRange
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({
+          tilejson: {url: [`https://xyz.com?format=tilejson`]},
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({
+          tilejson: '2.2.0',
+          tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
+          tilestats: {layers: []},
+          schema: [],
+        }),
+      })
+      .mockResolvedValueOnce(createMockResponse({rows: [{min: 0, max: 100}]}));
+    vi.stubGlobal('fetch', mockFetch);
 
     const tilejson = await trajectoryTableSource({
       connectionName: 'carto_dw',
@@ -22,9 +40,9 @@ describe('trajectoryTableSource', () => {
       aggregationExp: 'COUNT(*)',
     });
 
-    expect(vi.mocked(fetch)).toHaveBeenCalledTimes(2);
+    expect(mockFetch).toHaveBeenCalledTimes(3);
 
-    const [[initURL], [tilesetURL]] = vi.mocked(fetch).mock.calls;
+    const [[initURL], [tilesetURL]] = mockFetch.mock.calls;
 
     expect(initURL).toMatch(/v3\/maps\/carto_dw\/table/);
     expect(initURL).toMatch(/name=a\.b\.trajectory_table/);
@@ -45,7 +63,26 @@ describe('trajectoryTableSource', () => {
   });
 
   test('when aggregationExp is not provided', async () => {
-    stubGlobalFetchForSource();
+    // Mock 3 calls: init, tileset, and getRange
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({
+          tilejson: {url: [`https://xyz.com?format=tilejson`]},
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({
+          tilejson: '2.2.0',
+          tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
+          tilestats: {layers: []},
+          schema: [],
+        }),
+      })
+      .mockResolvedValueOnce(createMockResponse({rows: [{min: 0, max: 100}]}));
+    vi.stubGlobal('fetch', mockFetch);
 
     await trajectoryTableSource({
       connectionName: 'carto_dw',
@@ -55,14 +92,33 @@ describe('trajectoryTableSource', () => {
       timestampColumn: 'timestamp',
     });
 
-    const [[initURL]] = vi.mocked(fetch).mock.calls;
+    const [[initURL]] = mockFetch.mock.calls;
     expect(initURL).not.toContain('aggregationExp');
     expect(initURL).toMatch(/trajectoryIdColumn=trajectory_id/);
     expect(initURL).toMatch(/timestampColumn=timestamp/);
   });
 
   test('when columns are not provided', async () => {
-    stubGlobalFetchForSource();
+    // Mock 3 calls: init, tileset, and getRange
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({
+          tilejson: {url: [`https://xyz.com?format=tilejson`]},
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({
+          tilejson: '2.2.0',
+          tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
+          tilestats: {layers: []},
+          schema: [],
+        }),
+      })
+      .mockResolvedValueOnce(createMockResponse({rows: [{min: 0, max: 100}]}));
+    vi.stubGlobal('fetch', mockFetch);
 
     await trajectoryTableSource({
       connectionName: 'carto_dw',
@@ -72,12 +128,33 @@ describe('trajectoryTableSource', () => {
       timestampColumn: 'timestamp',
     });
 
-    const [[initURL]] = vi.mocked(fetch).mock.calls;
+    const [[initURL]] = mockFetch.mock.calls;
     expect(initURL).not.toContain('columns');
   });
 
-  test('getTimeRange', async () => {
-    stubGlobalFetchForSource();
+  test('timeRange', async () => {
+    const expectedTimeRange = {min: 1609459200000, max: 1640995200000}; // Unix timestamps
+    
+    // Mock both the source initialization and the getRange call for timeRange
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({
+          tilejson: {url: [`https://xyz.com?format=tilejson`]},
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({
+          tilejson: '2.2.0',
+          tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
+          tilestats: {layers: []},
+          schema: [],
+        }),
+      })
+      .mockResolvedValueOnce(createMockResponse({rows: [expectedTimeRange]}));
+    vi.stubGlobal('fetch', mockFetch);
 
     const source = await trajectoryTableSource({
       connectionName: 'carto_dw',
@@ -87,22 +164,14 @@ describe('trajectoryTableSource', () => {
       timestampColumn: 'timestamp',
     });
 
-    // Reset fetch mock to prepare for getTimeRange call
-    vi.clearAllMocks();
-    const expectedTimeRange = {min: 1609459200000, max: 1640995200000}; // Unix timestamps
+    expect(source.timeRange).toEqual(expectedTimeRange);
 
-    const mockFetch = vi
-      .fn()
-      .mockResolvedValueOnce(createMockResponse({rows: [expectedTimeRange]}));
-    vi.stubGlobal('fetch', mockFetch);
-
-    const actualTimeRange = await source.getTimeRange();
-
-    expect(mockFetch).toHaveBeenCalledOnce();
-    expect(actualTimeRange).toEqual(expectedTimeRange);
-
-    // Verify it calls the range API with the timestamp column
-    const params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
+    // Verify that 3 fetch calls were made: init, tileset, getRange
+    expect(mockFetch).toHaveBeenCalledTimes(3);
+    
+    // Verify the getRange API was called with the timestamp column
+    const rangeCallUrl = mockFetch.mock.calls[2][0];
+    const params = new URL(rangeCallUrl).searchParams.entries();
     expect(Object.fromEntries(params)).toMatchObject({
       params: JSON.stringify({
         column: 'timestamp',

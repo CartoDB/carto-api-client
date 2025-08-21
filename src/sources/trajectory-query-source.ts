@@ -38,7 +38,7 @@ type UrlParameters = {
 
 export type TrajectoryQuerySourceResponse = TilejsonResult &
   WidgetQuerySourceResult & {
-    getTimeRange(): Promise<{min: number; max: number} | null>;
+    timeRange: {min: number; max: number} | null;
   };
 
 export const trajectoryQuerySource = async function (
@@ -76,23 +76,21 @@ export const trajectoryQuerySource = async function (
     urlParameters.aggregationExp = aggregationExp;
   }
 
-  return baseSource<UrlParameters>('query', options, urlParameters).then(
-    (result) => {
-      const widgetSource = new WidgetQuerySource({
-        ...options,
-        // NOTE: Parameters with default values above must be explicitly passed here.
-        spatialDataColumn,
-        spatialDataType,
-        tileResolution,
-      });
-      
-      return {
-        ...result,
-        widgetSource,
-        getTimeRange(): Promise<{min: number; max: number} | null> {
-          return widgetSource.getRange({column: timestampColumn});
-        },
-      };
-    }
-  );
+  const result = await baseSource<UrlParameters>('query', options, urlParameters);
+  
+  const widgetSource = new WidgetQuerySource({
+    ...options,
+    // NOTE: Parameters with default values above must be explicitly passed here.
+    spatialDataColumn,
+    spatialDataType,
+    tileResolution,
+  });
+
+  const timeRange = await widgetSource.getRange({column: timestampColumn});
+
+  return {
+    ...result,
+    widgetSource,
+    timeRange,
+  };
 };
