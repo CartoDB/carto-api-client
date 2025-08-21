@@ -77,8 +77,12 @@ export const trajectoryQuerySource = async function (
     urlParameters.aggregationExp = aggregationExp;
   }
 
-  const result = await baseSource<UrlParameters>('query', options, urlParameters);
-  
+  const result = await baseSource<UrlParameters>(
+    'query',
+    options,
+    urlParameters
+  );
+
   const widgetSource = new WidgetQuerySource({
     ...options,
     // NOTE: Parameters with default values above must be explicitly passed here.

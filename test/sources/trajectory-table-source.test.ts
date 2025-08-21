@@ -13,18 +13,20 @@ describe('trajectoryTableSource', () => {
       .fn()
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({
-          tilejson: {url: [`https://xyz.com?format=tilejson`]},
-        }),
+        json: () =>
+          Promise.resolve({
+            tilejson: {url: [`https://xyz.com?format=tilejson`]},
+          }),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({
-          tilejson: '2.2.0',
-          tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
-          tilestats: {layers: []},
-          schema: [],
-        }),
+        json: () =>
+          Promise.resolve({
+            tilejson: '2.2.0',
+            tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
+            tilestats: {layers: []},
+            schema: [],
+          }),
       })
       .mockResolvedValueOnce(createMockResponse({rows: [{min: 0, max: 100}]}));
     vi.stubGlobal('fetch', mockFetch);
@@ -68,18 +70,20 @@ describe('trajectoryTableSource', () => {
       .fn()
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({
-          tilejson: {url: [`https://xyz.com?format=tilejson`]},
-        }),
+        json: () =>
+          Promise.resolve({
+            tilejson: {url: [`https://xyz.com?format=tilejson`]},
+          }),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({
-          tilejson: '2.2.0',
-          tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
-          tilestats: {layers: []},
-          schema: [],
-        }),
+        json: () =>
+          Promise.resolve({
+            tilejson: '2.2.0',
+            tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
+            tilestats: {layers: []},
+            schema: [],
+          }),
       })
       .mockResolvedValueOnce(createMockResponse({rows: [{min: 0, max: 100}]}));
     vi.stubGlobal('fetch', mockFetch);
@@ -104,18 +108,20 @@ describe('trajectoryTableSource', () => {
       .fn()
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({
-          tilejson: {url: [`https://xyz.com?format=tilejson`]},
-        }),
+        json: () =>
+          Promise.resolve({
+            tilejson: {url: [`https://xyz.com?format=tilejson`]},
+          }),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({
-          tilejson: '2.2.0',
-          tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
-          tilestats: {layers: []},
-          schema: [],
-        }),
+        json: () =>
+          Promise.resolve({
+            tilejson: '2.2.0',
+            tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
+            tilestats: {layers: []},
+            schema: [],
+          }),
       })
       .mockResolvedValueOnce(createMockResponse({rows: [{min: 0, max: 100}]}));
     vi.stubGlobal('fetch', mockFetch);
@@ -134,26 +140,30 @@ describe('trajectoryTableSource', () => {
 
   test('timestampRange', async () => {
     const expectedTimestampRange = {min: 1609459200000, max: 1640995200000}; // Unix timestamps
-    
+
     // Mock both the source initialization and the getRange call for timeRange
     const mockFetch = vi
       .fn()
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({
-          tilejson: {url: [`https://xyz.com?format=tilejson`]},
-        }),
+        json: () =>
+          Promise.resolve({
+            tilejson: {url: [`https://xyz.com?format=tilejson`]},
+          }),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({
-          tilejson: '2.2.0',
-          tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
-          tilestats: {layers: []},
-          schema: [],
-        }),
+        json: () =>
+          Promise.resolve({
+            tilejson: '2.2.0',
+            tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
+            tilestats: {layers: []},
+            schema: [],
+          }),
       })
-      .mockResolvedValueOnce(createMockResponse({rows: [expectedTimestampRange]}));
+      .mockResolvedValueOnce(
+        createMockResponse({rows: [expectedTimestampRange]})
+      );
     vi.stubGlobal('fetch', mockFetch);
 
     const source = await trajectoryTableSource({
@@ -168,7 +178,7 @@ describe('trajectoryTableSource', () => {
 
     // Verify that 3 fetch calls were made: init, tileset, getRange
     expect(mockFetch).toHaveBeenCalledTimes(3);
-    
+
     // Verify the getRange API was called with the timestamp column
     const rangeCallUrl = mockFetch.mock.calls[2][0];
     const params = new URL(rangeCallUrl).searchParams.entries();
@@ -180,27 +190,34 @@ describe('trajectoryTableSource', () => {
   });
 
   test('timestampRange with string timestamps', async () => {
-    const expectedTimestampRange = {min: '2017-07-08T12:07:53.000Z', max: '2019-03-06T11:56:39.000Z'};
-    
+    const expectedTimestampRange = {
+      min: '2017-07-08T12:07:53.000Z',
+      max: '2019-03-06T11:56:39.000Z',
+    };
+
     // Mock 3 calls: init, tileset, and getRange
     const mockFetch = vi
       .fn()
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({
-          tilejson: {url: [`https://xyz.com?format=tilejson`]},
-        }),
+        json: () =>
+          Promise.resolve({
+            tilejson: {url: [`https://xyz.com?format=tilejson`]},
+          }),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({
-          tilejson: '2.2.0',
-          tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
-          tilestats: {layers: []},
-          schema: [],
-        }),
+        json: () =>
+          Promise.resolve({
+            tilejson: '2.2.0',
+            tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
+            tilestats: {layers: []},
+            schema: [],
+          }),
       })
-      .mockResolvedValueOnce(createMockResponse({rows: [expectedTimestampRange]}));
+      .mockResolvedValueOnce(
+        createMockResponse({rows: [expectedTimestampRange]})
+      );
     vi.stubGlobal('fetch', mockFetch);
 
     const source = await trajectoryTableSource({

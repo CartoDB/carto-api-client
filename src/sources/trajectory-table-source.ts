@@ -72,8 +72,12 @@ export const trajectoryTableSource = async function (
     urlParameters.aggregationExp = aggregationExp;
   }
 
-  const result = await baseSource<UrlParameters>('table', options, urlParameters);
-  
+  const result = await baseSource<UrlParameters>(
+    'table',
+    options,
+    urlParameters
+  );
+
   const widgetSource = new WidgetTableSource({
     ...options,
     // NOTE: Parameters with default values above must be explicitly passed here.
