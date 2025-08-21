@@ -169,8 +169,8 @@ describe('trajectoryQuerySource', () => {
     expect(initURL).not.toContain('queryParameters');
   });
 
-  test('timeRange', async () => {
-    const expectedTimeRange = {min: 1609459200000, max: 1640995200000}; // Unix timestamps
+  test('timestampRange', async () => {
+    const expectedTimestampRange = {min: 1609459200000, max: 1640995200000}; // Unix timestamps
     
     // Mock both the source initialization and the getRange call for timeRange
     const mockFetch = vi
@@ -190,7 +190,7 @@ describe('trajectoryQuerySource', () => {
           schema: [],
         }),
       })
-      .mockResolvedValueOnce(createMockResponse({rows: [expectedTimeRange]}));
+      .mockResolvedValueOnce(createMockResponse({rows: [expectedTimestampRange]}));
     vi.stubGlobal('fetch', mockFetch);
 
     const source = await trajectoryQuerySource({
@@ -202,7 +202,7 @@ describe('trajectoryQuerySource', () => {
     });
 
     expect(mockFetch).toHaveBeenCalledTimes(3);
-    expect(source.timeRange).toEqual(expectedTimeRange);
+    expect(source.timestampRange).toEqual(expectedTimestampRange);
 
     // Verify the getRange API was called with the timestamp column
     const rangeCallUrl = mockFetch.mock.calls[2][0];
@@ -212,5 +212,41 @@ describe('trajectoryQuerySource', () => {
         column: 'timestamp',
       }),
     });
+  });
+
+  test('timestampRange with string timestamps', async () => {
+    const expectedTimestampRange = {min: '2017-07-08T12:07:53.000Z', max: '2019-03-06T11:56:39.000Z'};
+    
+    // Mock 3 calls: init, tileset, and getRange
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({
+          tilejson: {url: [`https://xyz.com?format=tilejson`]},
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({
+          tilejson: '2.2.0',
+          tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary'],
+          tilestats: {layers: []},
+          schema: [],
+        }),
+      })
+      .mockResolvedValueOnce(createMockResponse({rows: [expectedTimestampRange]}));
+    vi.stubGlobal('fetch', mockFetch);
+
+    const source = await trajectoryQuerySource({
+      connectionName: 'carto_dw',
+      accessToken: '<token>',
+      sqlQuery: 'SELECT * FROM a.b.trajectory_table WHERE created_at > \'2017-01-01\'',
+      trajectoryIdColumn: 'trajectory_id',
+      timestampColumn: 'created_at',
+    });
+
+    expect(source.timestampRange).toEqual(expectedTimestampRange);
+    expect(mockFetch).toHaveBeenCalledTimes(3);
   });
 });

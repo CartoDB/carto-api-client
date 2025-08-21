@@ -37,7 +37,7 @@ type UrlParameters = {
 
 export type TrajectoryTableSourceResponse = TilejsonResult &
   WidgetTableSourceResult & {
-    timeRange: {min: number; max: number} | null;
+    timestampRange: {min: number | string; max: number | string} | null;
   };
 
 export const trajectoryTableSource = async function (
@@ -81,11 +81,11 @@ export const trajectoryTableSource = async function (
     tileResolution,
   });
 
-  const timeRange = await widgetSource.getRange({column: timestampColumn});
+  const timestampRange = await widgetSource.getRange({column: timestampColumn});
 
   return {
     ...result,
     widgetSource,
-    timeRange,
+    timestampRange,
   };
 };
