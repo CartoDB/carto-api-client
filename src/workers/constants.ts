@@ -10,4 +10,5 @@ export enum Method {
   GET_TABLE = 'getTable',
   GET_TIME_SERIES = 'getTimeSeries',
   GET_RANGE = 'getRange',
+  GET_AGGREGATIONS = 'getAggregations',
 }

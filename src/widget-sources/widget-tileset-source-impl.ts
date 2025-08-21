@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/require-await */
 import type {
+  AggregationsRequestOptions,
+  AggregationsResponse,
   CategoryRequestOptions,
   CategoryResponse,
   ExtentResponse,
@@ -389,6 +391,55 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       min: aggregationFunctions.min(filteredFeatures, column),
       max: aggregationFunctions.max(filteredFeatures, column),
     };
+  }
+
+  async getAggregations({
+    aggregations,
+    filters,
+    filterOwner,
+    spatialFilter,
+  }: AggregationsRequestOptions): Promise<AggregationsResponse> {
+    const filteredFeatures = this._getFilteredFeatures(
+      spatialFilter,
+      filters,
+      filterOwner
+    );
+
+    if (!this._features.length) {
+      return {};
+    }
+
+    // Handle string-based aggregations
+    if (typeof aggregations === 'string') {
+      // For tilesets, string-based aggregations are not supported as they
+      // require SQL execution which is only available for remote sources
+      throw new Error('String-based aggregations not supported for tilesets');
+    }
+
+    // Handle array-based aggregations
+    const result: Record<string, number> = {};
+    
+    for (const {column, operation, alias} of aggregations) {
+      assertColumn(this._features, column);
+      
+      const aggregationKey = alias || `${operation}_${column}`;
+      
+      if (operation === AggregationTypes.Count) {
+        result[aggregationKey] = filteredFeatures.length;
+      } else if (operation === AggregationTypes.Sum) {
+        result[aggregationKey] = aggregationFunctions.sum(filteredFeatures, column);
+      } else if (operation === AggregationTypes.Avg) {
+        result[aggregationKey] = aggregationFunctions.avg(filteredFeatures, column);
+      } else if (operation === AggregationTypes.Min) {
+        result[aggregationKey] = aggregationFunctions.min(filteredFeatures, column);
+      } else if (operation === AggregationTypes.Max) {
+        result[aggregationKey] = aggregationFunctions.max(filteredFeatures, column);
+      } else {
+        throw new Error(`Unsupported aggregation operation: ${operation}`);
+      }
+    }
+
+    return result;
   }
 
   /** @experimental */

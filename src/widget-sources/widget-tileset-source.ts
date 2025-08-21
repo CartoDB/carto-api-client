@@ -1,4 +1,6 @@
 import type {
+  AggregationsRequestOptions,
+  AggregationsResponse,
   CategoryRequestOptions,
   CategoryResponse,
   ExtentResponse,
@@ -324,6 +326,13 @@ export class WidgetTilesetSource<
     ...options
   }: RangeRequestOptions): Promise<RangeResponse> {
     return this._executeWorkerMethod(Method.GET_RANGE, [options], signal);
+  }
+
+  async getAggregations({
+    signal,
+    ...options
+  }: AggregationsRequestOptions): Promise<AggregationsResponse> {
+    return this._executeWorkerMethod(Method.GET_AGGREGATIONS, [options], signal);
   }
 
   /** @experimental */
