@@ -36,7 +36,9 @@ type UrlParameters = {
 };
 
 export type TrajectoryTableSourceResponse = TilejsonResult &
-  WidgetTableSourceResult;
+  WidgetTableSourceResult & {
+    getTimeRange(): Promise<{min: number; max: number} | null>;
+  };
 
 export const trajectoryTableSource = async function (
   options: TrajectoryTableSourceOptions
@@ -70,15 +72,22 @@ export const trajectoryTableSource = async function (
   }
 
   return baseSource<UrlParameters>('table', options, urlParameters).then(
-    (result) => ({
-      ...result,
-      widgetSource: new WidgetTableSource({
+    (result) => {
+      const widgetSource = new WidgetTableSource({
         ...options,
         // NOTE: Parameters with default values above must be explicitly passed here.
         spatialDataColumn,
         spatialDataType,
         tileResolution,
-      }),
-    })
+      });
+      
+      return {
+        ...result,
+        widgetSource,
+        getTimeRange(): Promise<{min: number; max: number} | null> {
+          return widgetSource.getRange({column: timestampColumn});
+        },
+      };
+    }
   );
 };

@@ -2,6 +2,11 @@ import {WidgetTableSource, trajectoryTableSource} from '@carto/api-client';
 import {describe, vi, test, expect} from 'vitest';
 import {stubGlobalFetchForSource} from '../__mock-fetch.js';
 
+const createMockResponse = (data: unknown) => ({
+  ok: true,
+  json: () => new Promise((resolve) => resolve(data)),
+});
+
 describe('trajectoryTableSource', () => {
   test('default', async () => {
     stubGlobalFetchForSource();
@@ -69,5 +74,39 @@ describe('trajectoryTableSource', () => {
 
     const [[initURL]] = vi.mocked(fetch).mock.calls;
     expect(initURL).not.toContain('columns');
+  });
+
+  test('getTimeRange', async () => {
+    stubGlobalFetchForSource();
+
+    const source = await trajectoryTableSource({
+      connectionName: 'carto_dw',
+      accessToken: '<token>',
+      tableName: 'a.b.trajectory_table',
+      trajectoryIdColumn: 'trajectory_id',
+      timestampColumn: 'timestamp',
+    });
+
+    // Reset fetch mock to prepare for getTimeRange call
+    vi.clearAllMocks();
+    const expectedTimeRange = {min: 1609459200000, max: 1640995200000}; // Unix timestamps
+
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValueOnce(createMockResponse({rows: [expectedTimeRange]}));
+    vi.stubGlobal('fetch', mockFetch);
+
+    const actualTimeRange = await source.getTimeRange();
+
+    expect(mockFetch).toHaveBeenCalledOnce();
+    expect(actualTimeRange).toEqual(expectedTimeRange);
+
+    // Verify it calls the range API with the timestamp column
+    const params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
+    expect(Object.fromEntries(params)).toMatchObject({
+      params: JSON.stringify({
+        column: 'timestamp',
+      }),
+    });
   });
 });
