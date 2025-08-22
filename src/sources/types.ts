@@ -292,14 +292,64 @@ export interface Tilestats {
 
 export interface Layer {
   layer: string;
+  /** Number of features in the layer. */
   count: number;
+
+  /** Number of attributes in the layer. */
   attributeCount: number;
   attributes: Attribute[];
+
+  /** Type of geometry as in geojson geometry type (Point, LineString, Polygon, etc.) */
+  geometry?: string;
+}
+
+export interface AttributeCategoryItem {
+  category: string;
+  frequency: number;
+}
+
+/**
+ * Quantiles by number of buckets.
+ *
+ * Example:
+ * ```ts
+ *   {
+ *     // for 3 buckets, first 1/3 of items lies in range [min, 20], second 1/3 is in [20, 40], and last 1/3 is in [40, max]
+ *     3: [20, 40],
+ *     4: [20, 30, 50], for 4 buckets ...
+ *   }
+ * ```
+ */
+export interface QuantileStats {
+  [bucketCount: number]: number[];
 }
 
 export interface Attribute {
-  attribute: string;
+  /**
+   * String, Number, Timestamp, Boolean
+   */
   type: string;
+
+  /**
+   * Attribute name.
+   */
+  attribute: string;
+
+  // Stats for numeric attributes
+  min?: number;
+  max?: number;
+  sum?: number;
+
+  /** Quantiles by number of buckets */
+  quantiles?:
+    | {
+        // Quantile stats for numeric attributes in static spatial index tilesets are enclosed in extra global object
+        global: QuantileStats;
+      }
+    | QuantileStats;
+
+  // Stats for string/boolean attributes
+  categories?: AttributeCategoryItem[];
 }
 
 export interface VectorLayer {
@@ -325,17 +375,8 @@ export type RasterMetadataBandStats = {
 
   /**
    * Quantiles by number of buckets.
-   *
-   * Example:
-   * ```ts
-   *   {
-   *     // for 3 buckets, first 1/3 of items lies in range [min, 20], second 1/3 is in [20, 40], and last 1/3 is in [40, max]
-   *     3: [20, 40],
-   *     4: [20, 30, 50], for 4 buckets ...
-   *   }
-   * ```
    */
-  quantiles?: Record<number, number[]>;
+  quantiles?: QuantileStats;
 
   /**
    * Top values by number of values.

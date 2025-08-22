@@ -25,9 +25,11 @@ import {
   createBinaryProxy,
   formatDate,
   formatTimestamp,
+  getLog10ScaleSteps,
   scaleIdentity,
 } from './utils.js';
 import type {
+  ColorRange,
   CustomMarkersRange,
   Dataset,
   MapLayerConfig,
@@ -38,6 +40,7 @@ import type {
 import type {ProviderType, SchemaField} from '../types.js';
 import {DEFAULT_AGGREGATION_EXP_ALIAS} from '../constants-internal.js';
 import {AggregationTypes} from '../constants.js';
+import type {Attribute, TilejsonResult} from '../sources/types.js';
 
 export type D3Scale = {
   domain: (d?: any) => any[];
@@ -72,7 +75,21 @@ function identity<T>(v: T): T {
   return v;
 }
 
+const hexToRGB = (c: any) => {
+  const {r, g, b} = rgb(c);
+  return [r, g, b];
+};
+
+const rgbToHex = (c: number[]) => {
+  const [r, g, b] = c;
+  const rStr = r.toString(16).padStart(2, '0');
+  const gStr = g.toString(16).padStart(2, '0');
+  const bStr = b.toString(16).padStart(2, '0');
+  return `#${rStr}${gStr}${bStr}`.toUpperCase();
+};
+
 const UNKNOWN_COLOR = '#868d91';
+const UNKNOWN_COLOR_RGB = hexToRGB(UNKNOWN_COLOR);
 
 export const OPACITY_MAP: Record<string, string> = {
   getFillColor: 'opacity',
@@ -110,6 +127,13 @@ const sharedPropMap = {
     thickness: 'getLineWidth',
     radius: 'getPointRadius',
     wireframe: 'wireframe',
+  },
+};
+
+const rasterPropsMap = {
+  isVisible: 'visible',
+  visConfig: {
+    opacity: 'opacity',
   },
 };
 
@@ -174,6 +198,13 @@ export function getLayerProps(
     );
   }
 
+  if (type === 'raster') {
+    return {
+      propMap: rasterPropsMap,
+      defaultProps: {},
+    };
+  }
+
   let basePropMap: any = sharedPropMap;
   if (config.visConfig?.customMarkers) {
     basePropMap = mergePropMaps(basePropMap, customMarkersPropsMap);
@@ -195,18 +226,21 @@ export function getLayerProps(
 }
 
 function domainFromAttribute(
-  attribute: any,
+  attribute: Attribute,
   scaleType: ScaleType,
   scaleLength: number
-) {
+): number[] | string[] {
   if (scaleType === 'ordinal' || scaleType === 'point') {
+    if (!attribute.categories) {
+      return [0, 1];
+    }
     return attribute.categories
       .map((c: any) => c.category)
       .filter((c: any) => c !== undefined && c !== null);
   }
 
   if (scaleType === 'quantile' && attribute.quantiles) {
-    return attribute.quantiles.global
+    return 'global' in attribute.quantiles
       ? attribute.quantiles.global[scaleLength]
       : attribute.quantiles[scaleLength];
   }
@@ -215,7 +249,7 @@ function domainFromAttribute(
   if (scaleType === 'log' && min === 0) {
     min = 1e-5;
   }
-  return [min, attribute.max];
+  return [min ?? 0, attribute.max ?? 1];
 }
 
 function domainFromValues(values: any, scaleType: ScaleType) {
@@ -235,8 +269,8 @@ function domainFromValues(values: any, scaleType: ScaleType) {
 }
 
 function calculateDomain(
-  data: any,
-  name: any,
+  data: TilejsonResult,
+  name: string,
   scaleType: ScaleType,
   scaleLength?: number
 ) {
@@ -244,14 +278,16 @@ function calculateDomain(
     // Tileset data type
     const {attributes} = data.tilestats.layers[0];
     const attribute = attributes.find((a: any) => a.attribute === name);
-    return domainFromAttribute(attribute, scaleType, scaleLength as number);
+    if (attribute) {
+      return domainFromAttribute(attribute, scaleType, scaleLength as number);
+    }
   }
 
   return [0, 1];
 }
 
 function normalizeAccessor(accessor: any, data: any) {
-  if (data.features || data.tilestats) {
+  if (data.features || data.tilestats || data.raster_metadata) {
     return (object: any, info: any) => {
       if (object) {
         return accessor(object.properties || object.__source.object.properties);
@@ -297,61 +333,101 @@ function findAccessorKey(keys: string[], properties: any): string[] {
 export function getColorAccessor(
   {name, colorColumn}: VisualChannelField,
   scaleType: ScaleType,
-  {aggregation, range}: {aggregation: string; range: any},
+  {aggregation, range}: {aggregation?: string; range: ColorRange},
   opacity: number | undefined,
-  data: any
-): {accessor: any; scale: any} {
-  const scale = calculateLayerScale(
+  data: TilejsonResult
+): {
+  accessor: any;
+  domain: number[] | string[];
+  scaleDomain: number[] | string[];
+  range: string[];
+} {
+  const {scale, domain} = calculateLayerScale(
     colorColumn || name,
-    scaleType,
+    colorColumn ? 'identity' : scaleType,
     range,
     data
   );
   const alpha = opacityToAlpha(opacity);
 
-  let accessorKeys = getAccessorKeys(name, aggregation);
+  let accessorKeys = getAccessorKeys(colorColumn || name, aggregation);
   const accessor = (properties: any) => {
     if (!(accessorKeys[0] in properties)) {
       accessorKeys = findAccessorKey(accessorKeys, properties);
     }
     const propertyValue = properties[accessorKeys[0]];
-    const {r, g, b} = rgb(scale(propertyValue));
-    return [r, g, b, propertyValue === null ? 0 : alpha];
+    const scaled = scale(propertyValue);
+    const rgb = typeof scaled === 'string' ? hexToRGB(scaled) : scaled;
+    return [...rgb, propertyValue === null ? 0 : alpha];
   };
-  return {accessor: normalizeAccessor(accessor, data), scale};
+  return {
+    accessor: normalizeAccessor(accessor, data),
+    scaleDomain: scale.domain(),
+    domain,
+    range: (scale.range() || []).map(rgbToHex),
+  };
 }
 
-function calculateLayerScale(
-  name: any,
+export function calculateLayerScale(
+  name: string,
   scaleType: ScaleType,
-  range: any,
-  data: any
-) {
-  const scale = SCALE_FUNCS[scaleType]();
-  let domain: (string | number)[] = [];
+  range: ColorRange,
+  data: TilejsonResult
+): {scale: D3Scale; domain: string[] | number[]} {
+  let domain: string[] | number[] = [];
+  let scaleDomain: number[] | undefined;
   let scaleColor: string[] = [];
+  const {colors} = range;
 
-  if (scaleType !== 'identity') {
-    const {colorMap, colors} = range;
+  if (scaleType === 'custom') {
+    domain = calculateDomain(data, name, scaleType, colors.length);
+    const [min, max] = domain as number[];
+    if (range.uiCustomScaleType === 'logarithmic') {
+      scaleDomain = getLog10ScaleSteps({
+        min,
+        max,
+        steps: colors.length,
+      });
 
-    if (Array.isArray(colorMap)) {
+      scaleColor = colors;
+    } else if (range.colorMap) {
+      const {colorMap} = range;
+      scaleDomain = [];
       colorMap.forEach(([value, color]) => {
-        domain.push(value);
+        (scaleDomain as number[]).push(Number(value));
         scaleColor.push(color);
       });
-    } else {
-      domain = calculateDomain(data, name, scaleType, colors.length);
-      scaleColor = colors;
     }
+  } else if (scaleType !== 'identity') {
+    domain = calculateDomain(data, name, scaleType, colors.length);
+    scaleColor = colors;
 
     if (scaleType === 'ordinal') {
       domain = domain.slice(0, scaleColor.length);
     }
   }
 
+  return {
+    scale: createColorScale(
+      scaleType,
+      scaleDomain || domain,
+      scaleColor.map(hexToRGB),
+      UNKNOWN_COLOR_RGB
+    ),
+    domain,
+  };
+}
+
+export function createColorScale<T>(
+  scaleType: ScaleType,
+  domain: string[] | number[],
+  range: T[],
+  unknown: T
+) {
+  const scale = SCALE_FUNCS[scaleType]();
   scale.domain(domain);
-  scale.range(scaleColor);
-  scale.unknown!(UNKNOWN_COLOR);
+  scale.range(range);
+  scale.unknown!(unknown as any);
 
   return scale;
 }
@@ -427,13 +503,22 @@ export function getSizeAccessor(
   {name}: VisualChannelField,
   scaleType: ScaleType | undefined,
   aggregation: string | null | undefined,
-  range: Iterable<Range> | null | undefined,
-  data: any
-): {accessor: any; scale: any} {
+  range: number[] | undefined,
+  data: TilejsonResult
+): {
+  accessor: any;
+  domain: number[];
+  scaleDomain: number[];
+  range: number[] | undefined;
+} {
   const scale = scaleType ? SCALE_FUNCS[scaleType]() : identity;
-  if (scaleType) {
+  let domain: number[] = [];
+  if (scaleType && range) {
     if (aggregation !== AggregationTypes.Count) {
-      (scale as D3Scale).domain(calculateDomain(data, name, scaleType));
+      domain = calculateDomain(data, name, scaleType) as number[];
+      (scale as D3Scale).domain(domain);
+    } else {
+      domain = (scale as D3Scale).domain();
     }
     (scale as D3Scale).range(range);
   }
@@ -446,7 +531,12 @@ export function getSizeAccessor(
     const propertyValue = properties[accessorKeys[0]];
     return scale(propertyValue);
   };
-  return {accessor: normalizeAccessor(accessor, data), scale};
+  return {
+    accessor: normalizeAccessor(accessor, data),
+    domain,
+    scaleDomain: domain,
+    range,
+  };
 }
 
 const FORMATS: Record<string, (value: any) => string> = {
