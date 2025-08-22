@@ -421,7 +421,10 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
     const usedAliases = new Set<string>();
 
     for (const {column, operation, alias} of aggregations) {
-      assertColumn(this._features, column);
+      // Column is required except when operation is 'count'.
+      if ((column && column !== '*') || operation !== AggregationTypes.Count) {
+        assertColumn(this._features, column);
+      }
       
       const aggregationKey = alias || `${operation}_${column}`;
       const aliasKey = aggregationKey.toLowerCase();
