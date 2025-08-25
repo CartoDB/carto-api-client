@@ -444,7 +444,7 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       } else if (operation === AggregationTypes.Max) {
         result[aggregationKey] = aggregationFunctions.max(filteredFeatures, column);
       } else {
-        throw new Error(`Unsupported aggregation operation: ${operation}`);
+        throw new Error(`Unsupported aggregation operation: ${String(operation)}`);
       }
     }
 
