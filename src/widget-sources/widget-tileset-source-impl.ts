@@ -425,26 +425,40 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       if ((column && column !== '*') || operation !== AggregationTypes.Count) {
         assertColumn(this._features, column);
       }
-      
+
       const aggregationKey = alias || `${operation}_${column}`;
       const aliasKey = aggregationKey.toLowerCase();
       if (usedAliases.has(aliasKey)) {
         throw new Error(`Duplicate aggregation alias: ${aggregationKey}`);
       }
       usedAliases.add(aliasKey);
-      
+
       if (operation === AggregationTypes.Count) {
         result[aggregationKey] = filteredFeatures.length;
       } else if (operation === AggregationTypes.Sum) {
-        result[aggregationKey] = aggregationFunctions.sum(filteredFeatures, column);
+        result[aggregationKey] = aggregationFunctions.sum(
+          filteredFeatures,
+          column
+        );
       } else if (operation === AggregationTypes.Avg) {
-        result[aggregationKey] = aggregationFunctions.avg(filteredFeatures, column);
+        result[aggregationKey] = aggregationFunctions.avg(
+          filteredFeatures,
+          column
+        );
       } else if (operation === AggregationTypes.Min) {
-        result[aggregationKey] = aggregationFunctions.min(filteredFeatures, column);
+        result[aggregationKey] = aggregationFunctions.min(
+          filteredFeatures,
+          column
+        );
       } else if (operation === AggregationTypes.Max) {
-        result[aggregationKey] = aggregationFunctions.max(filteredFeatures, column);
+        result[aggregationKey] = aggregationFunctions.max(
+          filteredFeatures,
+          column
+        );
       } else {
-        throw new Error(`Unsupported aggregation operation: ${String(operation)}`);
+        throw new Error(
+          `Unsupported aggregation operation: ${String(operation)}`
+        );
       }
     }
 

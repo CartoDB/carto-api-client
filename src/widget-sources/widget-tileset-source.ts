@@ -332,7 +332,11 @@ export class WidgetTilesetSource<
     signal,
     ...options
   }: AggregationsRequestOptions): Promise<AggregationsResponse> {
-    return this._executeWorkerMethod(Method.GET_AGGREGATIONS, [options], signal);
+    return this._executeWorkerMethod(
+      Method.GET_AGGREGATIONS,
+      [options],
+      signal
+    );
   }
 
   /** @experimental */

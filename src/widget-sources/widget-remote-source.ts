@@ -396,7 +396,9 @@ export abstract class WidgetRemoteSource<
     }));
   }
 
-  async getAggregations(options: AggregationsRequestOptions): Promise<AggregationsResponse> {
+  async getAggregations(
+    options: AggregationsRequestOptions
+  ): Promise<AggregationsResponse> {
     const {
       signal,
       filters = this.props.filters,
@@ -420,7 +422,7 @@ export abstract class WidgetRemoteSource<
       },
       opts: {signal, headers: this.props.headers},
     }).then((res: AggregationsModelResponse) => ({
-      rows: res.rows.map(row => normalizeObjectKeys(row))
+      rows: res.rows.map((row) => normalizeObjectKeys(row)),
     }));
   }
 

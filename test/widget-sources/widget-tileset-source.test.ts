@@ -262,16 +262,16 @@ describe('getExtent', () => {
 describe('getAggregations', () => {
   it('should handle count operation with * column', async () => {
     const result = await source.getAggregations({
-      aggregations: [
-        { column: '*', operation: 'count', alias: 'RECORD_COUNT' },
-      ],
+      aggregations: [{column: '*', operation: 'count', alias: 'RECORD_COUNT'}],
       spatialFilter: MOCK_SPATIAL_FILTER,
     });
 
     expect(result).toEqual({
-      rows: [{
-        RECORD_COUNT: expect.any(Number),
-      }]
+      rows: [
+        {
+          RECORD_COUNT: expect.any(Number),
+        },
+      ],
     });
     expect(result.rows[0].RECORD_COUNT).toBeGreaterThan(0);
   });
@@ -279,9 +279,9 @@ describe('getAggregations', () => {
   it('should return aggregations with specified aliases', async () => {
     const result = await source.getAggregations({
       aggregations: [
-        { column: 'revenue', operation: 'sum', alias: 'Total_Revenue' },
-        { column: 'size_m2', operation: 'avg', alias: 'AVG_Size' },
-        { column: '*', operation: 'count', alias: 'RECORD_COUNT' },
+        {column: 'revenue', operation: 'sum', alias: 'Total_Revenue'},
+        {column: 'size_m2', operation: 'avg', alias: 'AVG_Size'},
+        {column: '*', operation: 'count', alias: 'RECORD_COUNT'},
       ],
       spatialFilter: MOCK_SPATIAL_FILTER,
     });
@@ -289,11 +289,13 @@ describe('getAggregations', () => {
     // Para tileset sources, las agregaciones se calculan localmente
     // y los alias se devuelven exactamente como se especificaron
     expect(result).toEqual({
-      rows: [{
-        Total_Revenue: expect.any(Number),
-        AVG_Size: expect.any(Number),
-        RECORD_COUNT: expect.any(Number),
-      }]
+      rows: [
+        {
+          Total_Revenue: expect.any(Number),
+          AVG_Size: expect.any(Number),
+          RECORD_COUNT: expect.any(Number),
+        },
+      ],
     });
 
     // Verificar que devuelve valores numéricos válidos
@@ -305,20 +307,22 @@ describe('getAggregations', () => {
   it('should generate default aliases when not provided', async () => {
     const result = await source.getAggregations({
       aggregations: [
-        { column: 'revenue', operation: 'sum' }, // sin alias
-        { column: 'size_m2', operation: 'avg' },  // sin alias
-        { column: '*', operation: 'count' },       // sin alias
+        {column: 'revenue', operation: 'sum'}, // sin alias
+        {column: 'size_m2', operation: 'avg'}, // sin alias
+        {column: '*', operation: 'count'}, // sin alias
       ],
       spatialFilter: MOCK_SPATIAL_FILTER,
     });
 
     // Los alias por defecto siguen el patrón operation_column
     expect(result).toEqual({
-      rows: [{
-        sum_revenue: expect.any(Number),
-        avg_size_m2: expect.any(Number),
-        'count_*': expect.any(Number),
-      }]
+      rows: [
+        {
+          sum_revenue: expect.any(Number),
+          avg_size_m2: expect.any(Number),
+          'count_*': expect.any(Number),
+        },
+      ],
     });
   });
 
@@ -327,7 +331,11 @@ describe('getAggregations', () => {
     await expect(async () => {
       await source.getAggregations({
         aggregations: [
-          { column: 'revenue', operation: 'custom' as any, alias: 'custom_result' }
+          {
+            column: 'revenue',
+            operation: 'custom' as any,
+            alias: 'custom_result',
+          },
         ],
         spatialFilter: MOCK_SPATIAL_FILTER,
       });
@@ -338,7 +346,8 @@ describe('getAggregations', () => {
     // Los tilesets no soportan agregaciones basadas en strings porque requieren SQL
     await expect(async () => {
       await source.getAggregations({
-        aggregations: 'sum(revenue) as total_revenue, avg(size_m2) as avg_size' as any,
+        aggregations:
+          'sum(revenue) as total_revenue, avg(size_m2) as avg_size' as any,
         spatialFilter: MOCK_SPATIAL_FILTER,
       });
     }).rejects.toThrow('String-based aggregations not supported for tilesets');
@@ -348,27 +357,29 @@ describe('getAggregations', () => {
     const result = await source.getAggregations({
       aggregations: [
         // Con alias personalizado
-        { column: 'revenue', operation: 'sum', alias: 'CustomRevenue' },
-        { column: 'size_m2', operation: 'avg', alias: 'AVERAGE_SIZE' },
+        {column: 'revenue', operation: 'sum', alias: 'CustomRevenue'},
+        {column: 'size_m2', operation: 'avg', alias: 'AVERAGE_SIZE'},
         // Sin alias (generado automáticamente)
-        { column: 'cartodb_id', operation: 'count' },
-        { column: 'store_id', operation: 'max' },
+        {column: 'cartodb_id', operation: 'count'},
+        {column: 'store_id', operation: 'max'},
         // Combinado con count usando *
-        { column: '*', operation: 'count', alias: 'TotalRecords' },
+        {column: '*', operation: 'count', alias: 'TotalRecords'},
       ],
       spatialFilter: MOCK_SPATIAL_FILTER,
     });
 
     expect(result).toEqual({
-      rows: [{
-        // Alias personalizados se mantienen exactamente como se especificaron
-        CustomRevenue: expect.any(Number),
-        AVERAGE_SIZE: expect.any(Number),
-        TotalRecords: expect.any(Number),
-        // Alias por defecto siguen el patrón operation_column
-        count_cartodb_id: expect.any(Number),
-        max_store_id: expect.any(Number),
-      }]
+      rows: [
+        {
+          // Alias personalizados se mantienen exactamente como se especificaron
+          CustomRevenue: expect.any(Number),
+          AVERAGE_SIZE: expect.any(Number),
+          TotalRecords: expect.any(Number),
+          // Alias por defecto siguen el patrón operation_column
+          count_cartodb_id: expect.any(Number),
+          max_store_id: expect.any(Number),
+        },
+      ],
     });
 
     // Verificar que todos son números válidos
@@ -384,18 +395,20 @@ describe('getAggregations', () => {
     const result = await source.getAggregations({
       aggregations: [
         // Alias vacío debería usar el patrón por defecto
-        { column: 'revenue', operation: 'sum', alias: '' },
-        { column: 'size_m2', operation: 'avg', alias: undefined as any },
+        {column: 'revenue', operation: 'sum', alias: ''},
+        {column: 'size_m2', operation: 'avg', alias: undefined as any},
       ],
       spatialFilter: MOCK_SPATIAL_FILTER,
     });
 
     // Con alias vacío o undefined, debe usar el patrón por defecto
     expect(result).toEqual({
-      rows: [{
-        sum_revenue: expect.any(Number),
-        avg_size_m2: expect.any(Number),
-      }]
+      rows: [
+        {
+          sum_revenue: expect.any(Number),
+          avg_size_m2: expect.any(Number),
+        },
+      ],
     });
   });
 });
