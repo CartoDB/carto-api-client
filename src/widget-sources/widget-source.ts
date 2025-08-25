@@ -1,4 +1,6 @@
 import type {
+  AggregationsRequestOptions,
+  AggregationsResponse,
   CategoryRequestOptions,
   CategoryResponse,
   ExtentRequestOptions,
@@ -126,6 +128,15 @@ export abstract class WidgetSource<
   abstract getTimeSeries(
     options: TimeSeriesRequestOptions
   ): Promise<TimeSeriesResponse>;
+
+  /**
+   * Returns multiple aggregated values computed over matching data. Suitable
+   * for aggregated statistics from pivoted tables, such as H3 tables with
+   * pre-computed aggregations across multiple columns.
+   */
+  abstract getAggregations(
+    options: AggregationsRequestOptions
+  ): Promise<AggregationsResponse>;
 
   /** @experimental */
   abstract getExtent(options?: ExtentRequestOptions): Promise<ExtentResponse>;
