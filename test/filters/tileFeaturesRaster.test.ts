@@ -65,7 +65,7 @@ describe('tileFeaturesRaster', () => {
       tileFormat: TileFormat.BINARY,
       spatialDataType: 'quadbin',
       spatialFilter,
-      rasterMetadata: rasterMetadata as RasterMetadata,
+      rasterMetadata: rasterMetadata,
     });
 
     expect(features.length).toBe(16);

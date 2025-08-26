@@ -4,6 +4,7 @@ import {
 } from '../constants-internal.js';
 import {
   WidgetQuerySource,
+  type RangeResponse,
   type WidgetQuerySourceResult,
 } from '../widget-sources/index.js';
 import {baseSource} from './base-source.js';
@@ -37,7 +38,9 @@ type UrlParameters = {
 };
 
 export type TrajectoryQuerySourceResponse = TilejsonResult &
-  WidgetQuerySourceResult;
+  WidgetQuerySourceResult & {
+    timestampRange: RangeResponse;
+  };
 
 export const trajectoryQuerySource = async function (
   options: TrajectoryQuerySourceOptions
@@ -74,16 +77,25 @@ export const trajectoryQuerySource = async function (
     urlParameters.aggregationExp = aggregationExp;
   }
 
-  return baseSource<UrlParameters>('query', options, urlParameters).then(
-    (result) => ({
-      ...result,
-      widgetSource: new WidgetQuerySource({
-        ...options,
-        // NOTE: Parameters with default values above must be explicitly passed here.
-        spatialDataColumn,
-        spatialDataType,
-        tileResolution,
-      }),
-    })
+  const result = await baseSource<UrlParameters>(
+    'query',
+    options,
+    urlParameters
   );
+
+  const widgetSource = new WidgetQuerySource({
+    ...options,
+    // NOTE: Parameters with default values above must be explicitly passed here.
+    spatialDataColumn,
+    spatialDataType,
+    tileResolution,
+  });
+
+  const timestampRange = await widgetSource.getRange({column: timestampColumn});
+
+  return {
+    ...result,
+    widgetSource,
+    timestampRange,
+  };
 };
