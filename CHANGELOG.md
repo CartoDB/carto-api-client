@@ -2,6 +2,11 @@
 
 ## 0.5
 
+### 0.5.15
+
+- feat(sources) Trajectory source timestampRange (#228)
+- feat(sources) Add support for trajectory data sources (#227)
+
 ### 0.5.14
 
 - feat(widgets): Add 'getExtent()' method, experimental (#220)
