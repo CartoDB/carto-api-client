@@ -4,6 +4,7 @@ import {
 } from '../constants-internal.js';
 import {
   WidgetQuerySource,
+  type RangeResponse,
   type WidgetQuerySourceResult,
 } from '../widget-sources/index.js';
 import {baseSource} from './base-source.js';
@@ -13,7 +14,6 @@ import type {
   SpatialDataType,
   TilejsonResult,
   ColumnsOption,
-  TimestampRangeResult,
 } from './types.js';
 
 export type TrajectoryQuerySourceOptions = SourceOptions &
@@ -39,7 +39,7 @@ type UrlParameters = {
 
 export type TrajectoryQuerySourceResponse = TilejsonResult &
   WidgetQuerySourceResult & {
-    timestampRange: TimestampRangeResult;
+    timestampRange: RangeResponse;
   };
 
 export const trajectoryQuerySource = async function (

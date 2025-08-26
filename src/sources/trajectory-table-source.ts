@@ -4,6 +4,7 @@ import {
 } from '../constants-internal.js';
 import {
   WidgetTableSource,
+  type RangeResponse,
   type WidgetTableSourceResult,
 } from '../widget-sources/index.js';
 import {baseSource} from './base-source.js';
@@ -13,7 +14,6 @@ import type {
   SpatialDataType,
   TableSourceOptions,
   TilejsonResult,
-  TimestampRangeResult,
 } from './types.js';
 
 export type TrajectoryTableSourceOptions = SourceOptions &
@@ -38,7 +38,7 @@ type UrlParameters = {
 
 export type TrajectoryTableSourceResponse = TilejsonResult &
   WidgetTableSourceResult & {
-    timestampRange: TimestampRangeResult;
+    timestampRange: RangeResponse;
   };
 
 export const trajectoryTableSource = async function (

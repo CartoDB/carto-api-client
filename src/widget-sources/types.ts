@@ -241,7 +241,7 @@ export type CategoryResponseRaw = {
 };
 
 /** Response from {@link WidgetRemoteSource#getRange}. */
-export type RangeResponse = {min: number; max: number} | null;
+export type RangeResponse = {min: number; max: number} | {min: string, max: string} | null;
 
 /** Response from {@link WidgetRemoteSource#getTable}. */
 export type TableResponse = {

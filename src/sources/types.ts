@@ -434,8 +434,3 @@ export type QueryResult = {
   rows: Record<string, any>[];
   schema: {name: string; type: string}[];
 };
-
-export type TimestampRangeResult = {
-  min: number | string;
-  max: number | string;
-} | null;
