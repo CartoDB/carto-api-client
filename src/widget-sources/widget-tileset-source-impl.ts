@@ -433,33 +433,8 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       }
       usedAliases.add(aliasKey);
 
-      if (operation === AggregationTypes.Count) {
-        result[aggregationKey] = filteredFeatures.length;
-      } else if (operation === AggregationTypes.Sum) {
-        result[aggregationKey] = aggregationFunctions.sum(
-          filteredFeatures,
-          column
-        );
-      } else if (operation === AggregationTypes.Avg) {
-        result[aggregationKey] = aggregationFunctions.avg(
-          filteredFeatures,
-          column
-        );
-      } else if (operation === AggregationTypes.Min) {
-        result[aggregationKey] = aggregationFunctions.min(
-          filteredFeatures,
-          column
-        );
-      } else if (operation === AggregationTypes.Max) {
-        result[aggregationKey] = aggregationFunctions.max(
-          filteredFeatures,
-          column
-        );
-      } else {
-        throw new Error(
-          `Unsupported aggregation operation: ${String(operation)}`
-        );
-      }
+      const targetOperation = aggregationFunctions[operation];
+      result[aggregationKey] = targetOperation(filteredFeatures, column)
     }
 
     return {rows: [result]};

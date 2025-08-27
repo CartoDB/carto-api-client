@@ -283,7 +283,7 @@ export type HistogramResponse = number[];
 
 /** Response from {@link WidgetRemoteSource#getAggregations}. */
 export type AggregationsResponse = {
-  rows: Record<string, number>[];
+  rows: Record<string, number | string | null>[];
 };
 
 /** @experimental */
