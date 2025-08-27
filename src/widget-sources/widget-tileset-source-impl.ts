@@ -434,7 +434,7 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       usedAliases.add(aliasKey);
 
       const targetOperation = aggregationFunctions[operation];
-      result[aggregationKey] = targetOperation(filteredFeatures, column)
+      result[aggregationKey] = targetOperation(filteredFeatures, column);
     }
 
     return {rows: [result]};
