@@ -20,7 +20,7 @@ import type {
   TimeSeriesResponse,
 } from './types.js';
 import {InvalidColumnError, assert, assignOptional} from '../utils.js';
-import type {Filter, SpatialFilter, Tile} from '../types.js';
+import type {Filter, SpatialFilter, Tile, AggregationType} from '../types.js';
 
 import {
   type TileFeatureExtractOptions,
@@ -149,6 +149,9 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       assertColumn(this._features, column);
     }
 
+    if (operation === 'custom') {
+      throw new Error(`Unsupported aggregation operation: ${operation}`);
+    }
     const targetOperation = aggregationFunctions[operation];
     return {
       value: targetOperation(filteredFeatures, column, joinOperation),
@@ -433,6 +436,9 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       }
       usedAliases.add(aliasKey);
 
+      if (operation === 'custom') {
+        throw new Error(`Unsupported aggregation operation: ${operation}`);
+      }
       const targetOperation = aggregationFunctions[operation];
       result[aggregationKey] = targetOperation(filteredFeatures, column);
     }
