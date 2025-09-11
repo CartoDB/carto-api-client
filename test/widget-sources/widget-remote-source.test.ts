@@ -47,8 +47,7 @@ test('getAggregations - normaliza claves y mezcla alias/por defecto', async () =
     accessToken: '<token>',
     connectionName: 'carto_dw',
   });
-
-  // Simula un DW que devuelve claves con mayúsculas variadas y/o sin alias
+  // Simulate a DW that returns keys with varying uppercase and/or without alias
   const serverRow = {
     SUM_POP_HIGH: 10,
     avg_pop_low: 5,

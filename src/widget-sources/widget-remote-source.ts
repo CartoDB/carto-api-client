@@ -408,8 +408,6 @@ export abstract class WidgetRemoteSource<
       aggregations,
     } = options;
 
-    type AggregationsModelResponse = {rows: Record<string, number>[]};
-
     return executeModel({
       model: 'aggregations',
       source: {
@@ -421,7 +419,7 @@ export abstract class WidgetRemoteSource<
         aggregations,
       },
       opts: {signal, headers: this.props.headers},
-    }).then((res: AggregationsModelResponse) => ({
+    }).then((res: AggregationsResponse) => ({
       rows: res.rows.map((row) => normalizeObjectKeys(row)),
     }));
   }
