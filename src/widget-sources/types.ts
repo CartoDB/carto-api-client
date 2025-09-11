@@ -222,7 +222,7 @@ export interface AggregationsRequestOptions extends BaseRequestOptions {
     | {
         column: string;
         operation: Exclude<AggregationType, 'custom'>;
-        alias?: string;
+        alias: string;
       }[]
     | string;
 }

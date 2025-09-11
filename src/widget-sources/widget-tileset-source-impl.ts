@@ -429,10 +429,9 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
         assertColumn(this._features, column);
       }
 
-      const aggregationKey = alias || `${operation}_${column}`;
-      const aliasKey = aggregationKey.toLowerCase();
+      const aliasKey = alias.toLowerCase();
       if (usedAliases.has(aliasKey)) {
-        throw new Error(`Duplicate aggregation alias: ${aggregationKey}`);
+        throw new Error(`Duplicate aggregation alias: ${aliasKey}`);
       }
       usedAliases.add(aliasKey);
 
@@ -440,7 +439,7 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
         throw new Error(`Unsupported aggregation operation: ${operation}`);
       }
       const targetOperation = aggregationFunctions[operation];
-      result[aggregationKey] = targetOperation(filteredFeatures, column);
+      result[aliasKey] = targetOperation(filteredFeatures, column);
     }
 
     return {rows: [result]};
