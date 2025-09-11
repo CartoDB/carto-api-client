@@ -258,3 +258,76 @@ describe('getExtent', () => {
     expect(result).toEqual({bbox: MOCK_BOUNDS});
   });
 });
+
+describe('getAggregations', () => {
+  it('should handle count operation with * column', async () => {
+    const result = await source.getAggregations({
+      aggregations: [{column: '*', operation: 'count', alias: 'RECORD_COUNT'}],
+      spatialFilter: MOCK_SPATIAL_FILTER,
+    });
+
+    expect(result).toEqual({
+      rows: [
+        {
+          RECORD_COUNT: expect.any(Number),
+        },
+      ],
+    });
+    expect(result.rows[0].RECORD_COUNT).toBeGreaterThan(0);
+  });
+
+  it('should return aggregations with specified aliases', async () => {
+    const result = await source.getAggregations({
+      aggregations: [
+        {column: 'revenue', operation: 'sum', alias: 'Total_Revenue'},
+        {column: 'size_m2', operation: 'avg', alias: 'AVG_Size'},
+        {column: '*', operation: 'count', alias: 'RECORD_COUNT'},
+      ],
+      spatialFilter: MOCK_SPATIAL_FILTER,
+    });
+
+    // For tileset sources, aggregations are calculated locally
+    // and aliases are returned exactly as specified
+    expect(result).toEqual({
+      rows: [
+        {
+          Total_Revenue: expect.any(Number),
+          AVG_Size: expect.any(Number),
+          RECORD_COUNT: expect.any(Number),
+        },
+      ],
+    });
+
+    // Verify that it returns valid numeric values
+    expect(result.rows[0].Total_Revenue).toBeGreaterThan(0);
+    expect(result.rows[0].AVG_Size).toBeGreaterThan(0);
+    expect(result.rows[0].RECORD_COUNT).toBeGreaterThan(0);
+  });
+
+  it('should throw error for custom operation', async () => {
+    // Although TypeScript already prevents this at compile-time, we verify at runtime
+    await expect(async () => {
+      await source.getAggregations({
+        aggregations: [
+          {
+            column: 'revenue',
+            operation: 'custom' as any,
+            alias: 'custom_result',
+          },
+        ],
+        spatialFilter: MOCK_SPATIAL_FILTER,
+      });
+    }).rejects.toThrow('Unsupported aggregation operation: custom');
+  });
+
+  it('should throw error for string-based aggregations (not supported)', async () => {
+    // Tilesets do not support string-based aggregations because they require SQL
+    await expect(async () => {
+      await source.getAggregations({
+        aggregations:
+          'sum(revenue) as total_revenue, avg(size_m2) as avg_size' as any,
+        spatialFilter: MOCK_SPATIAL_FILTER,
+      });
+    }).rejects.toThrow('String-based aggregations not supported for tilesets');
+  });
+});

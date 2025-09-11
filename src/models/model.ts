@@ -24,6 +24,7 @@ const AVAILABLE_MODELS = [
   'range',
   'scatterplot',
   'table',
+  'aggregations',
 ] as const;
 
 export type Model = (typeof AVAILABLE_MODELS)[number];

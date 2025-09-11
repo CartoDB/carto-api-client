@@ -1,5 +1,7 @@
 import {executeModel, type ModelSource} from '../models/index.js';
 import type {
+  AggregationsRequestOptions,
+  AggregationsResponse,
   CategoryRequestOptions,
   CategoryResponse,
   ExtentRequestOptions,
@@ -391,6 +393,34 @@ export abstract class WidgetRemoteSource<
     }).then((res: TimeSeriesModelResponse) => ({
       rows: normalizeObjectKeys(res.rows),
       categories: res.metadata?.categories,
+    }));
+  }
+
+  async getAggregations(
+    options: AggregationsRequestOptions
+  ): Promise<AggregationsResponse> {
+    const {
+      signal,
+      filters = this.props.filters,
+      filterOwner,
+      spatialFilter,
+      spatialFiltersMode,
+      aggregations,
+    } = options;
+
+    return executeModel({
+      model: 'aggregations',
+      source: {
+        ...this.getModelSource(filters, filterOwner),
+        spatialFiltersMode,
+        spatialFilter,
+      },
+      params: {
+        aggregations,
+      },
+      opts: {signal, headers: this.props.headers},
+    }).then((res: AggregationsResponse) => ({
+      rows: res.rows.map((row) => normalizeObjectKeys(row)),
     }));
   }
 

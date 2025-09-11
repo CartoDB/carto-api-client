@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/require-await */
 import type {
+  AggregationsRequestOptions,
+  AggregationsResponse,
   CategoryRequestOptions,
   CategoryResponse,
   ExtentResponse,
@@ -147,6 +149,9 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       assertColumn(this._features, column);
     }
 
+    if (!(operation in aggregationFunctions)) {
+      throw new Error(`Unsupported aggregation operation: ${operation}`);
+    }
     const targetOperation = aggregationFunctions[operation];
     return {
       value: targetOperation(filteredFeatures, column, joinOperation),
@@ -389,6 +394,55 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       min: aggregationFunctions.min(filteredFeatures, column),
       max: aggregationFunctions.max(filteredFeatures, column),
     };
+  }
+
+  async getAggregations({
+    aggregations,
+    filters,
+    filterOwner,
+    spatialFilter,
+  }: AggregationsRequestOptions): Promise<AggregationsResponse> {
+    const filteredFeatures = this._getFilteredFeatures(
+      spatialFilter,
+      filters,
+      filterOwner
+    );
+
+    if (!this._features.length) {
+      return {rows: []};
+    }
+
+    // Handle string-based aggregations
+    if (typeof aggregations === 'string') {
+      // For tilesets, string-based aggregations are not supported as they
+      // require SQL execution which is only available for remote sources
+      throw new Error('String-based aggregations not supported for tilesets');
+    }
+
+    // Handle array-based aggregations
+    const result: Record<string, number> = {};
+    const usedAliases = new Set<string>();
+
+    for (const {column, operation, alias} of aggregations) {
+      // Column is required except when operation is 'count'.
+      if ((column && column !== '*') || operation !== AggregationTypes.Count) {
+        assertColumn(this._features, column);
+      }
+
+      const aliasKey = alias.toLowerCase();
+      if (usedAliases.has(aliasKey)) {
+        throw new Error(`Duplicate aggregation alias: ${aliasKey}`);
+      }
+      usedAliases.add(aliasKey);
+
+      if (!(operation in aggregationFunctions)) {
+        throw new Error(`Unsupported aggregation operation: ${operation}`);
+      }
+      const targetOperation = aggregationFunctions[operation];
+      result[alias] = targetOperation(filteredFeatures, column);
+    }
+
+    return {rows: [result]};
   }
 
   /** @experimental */

@@ -6,6 +6,7 @@ import {
   WidgetRemoteSource,
   WidgetRemoteSourceProps,
 } from '@carto/api-client';
+import {AggregationTypes} from '../../src/constants';
 import type {BBox} from 'geojson';
 
 const createMockResponse = (data: unknown) => ({
@@ -38,6 +39,221 @@ test('constructor', () => {
   expect(widgetSource.props).toMatchObject({
     accessToken: '<token>',
     connectionName: 'carto_dw',
+  });
+});
+
+test('getAggregations - normaliza claves y mezcla alias/por defecto', async () => {
+  const widgetSource = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+  });
+  // Simulate a DW that returns keys with varying uppercase and/or without alias
+  const serverRow = {
+    SUM_POP_HIGH: 10,
+    avg_pop_low: 5,
+    COUNT_records: 7,
+  };
+
+  const mockFetch = vi
+    .fn()
+    .mockResolvedValueOnce(createMockResponse({rows: [serverRow]}));
+  vi.stubGlobal('fetch', mockFetch);
+
+  const result = await widgetSource.getAggregations({
+    aggregations: [
+      {
+        column: 'pop_high',
+        operation: AggregationTypes.Sum,
+        alias: 'Sum_Pop_High',
+      },
+      {column: 'pop_low', operation: AggregationTypes.Avg},
+      {column: '*', operation: AggregationTypes.Count, alias: 'COUNT_Records'},
+    ],
+  });
+
+  // normalizeObjectKeys debe forzar lowercase de las claves del servidor
+  // y el cliente debe devolver un objeto con rows array.
+  // Alias provistos y por defecto deben convivir y ser normalizados.
+  expect(result).toEqual({
+    rows: [
+      {
+        // alias provisto "Sum_Pop_High" -> server devolvió SUM_POP_HIGH -> normalizado a minúsculas
+        sum_pop_high: 10,
+        // sin alias -> por defecto avg_pop_low
+        avg_pop_low: 5,
+        // alias provisto COUNT_Records -> server COUNT_records -> minúsculas
+        count_records: 7,
+      },
+    ],
+  });
+
+  const params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
+  // Verifica que se envían los parámetros esperados (no exhaustivo)
+  expect(Object.fromEntries(params)).toMatchObject({
+    type: 'test',
+    source: 'test-data',
+  });
+});
+
+test('getAggregations - normalización de alias con diferentes casings', async () => {
+  const widgetSource = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+  });
+
+  // Simula diferentes data warehouses que devuelven alias con casings variados
+  const serverRow = {
+    // BigQuery podría devolver en UPPERCASE
+    TOTAL_REVENUE: 50000,
+    // PostgreSQL podría mantener el caso original
+    Customer_Count: 125,
+    // Snowflake podría devolver todo en mayúsculas
+    AVG_ORDER_VALUE: 400.5,
+    // Sin alias, generado automáticamente por el backend
+    max_rating: 5,
+    // Algunos DW podrían devolver en mixedCase
+    minScore: 1.2,
+  };
+
+  const mockFetch = vi
+    .fn()
+    .mockResolvedValueOnce(createMockResponse({rows: [serverRow]}));
+  vi.stubGlobal('fetch', mockFetch);
+
+  const result = await widgetSource.getAggregations({
+    aggregations: [
+      {
+        column: 'revenue',
+        operation: AggregationTypes.Sum,
+        alias: 'Total_Revenue',
+      },
+      {column: '*', operation: AggregationTypes.Count, alias: 'Customer_Count'},
+      {
+        column: 'order_value',
+        operation: AggregationTypes.Avg,
+        alias: 'AVG_ORDER_VALUE',
+      },
+      {column: 'rating', operation: AggregationTypes.Max}, // sin alias
+      {column: 'score', operation: AggregationTypes.Min, alias: 'MinScore'},
+    ],
+  });
+
+  // normalizeObjectKeys debe convertir TODAS las claves a minúsculas,
+  // independientemente del casing original del servidor
+  expect(result).toEqual({
+    rows: [
+      {
+        // TOTAL_REVENUE (server) -> total_revenue (cliente)
+        total_revenue: 50000,
+        // Customer_Count (server) -> customer_count (cliente)
+        customer_count: 125,
+        // AVG_ORDER_VALUE (server) -> avg_order_value (cliente)
+        avg_order_value: 400.5,
+        // max_rating (server) -> max_rating (cliente, ya era lowercase)
+        max_rating: 5,
+        // minScore (server) -> minscore (cliente)
+        minscore: 1.2,
+      },
+    ],
+  });
+
+  // Verificar que se hizo la llamada al servidor
+  expect(mockFetch).toHaveBeenCalledTimes(1);
+
+  // El test principal es que normalizeObjectKeys convierte correctamente
+  // los diferentes casings que pueden venir de diferentes data warehouses
+});
+
+test('getAggregations - mezcla completa de alias provistos y por defecto', async () => {
+  const widgetSource = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+  });
+
+  // Simula un servidor que devuelve claves con diferentes casings
+  const serverRow = {
+    // Con alias personalizado - servidor devuelve en UPPERCASE
+    TOTAL_SALES: 150000,
+    // Sin alias - servidor genera automáticamente con case específico del DW
+    sum_products: 45,
+    // Con alias personalizado - servidor devuelve en mixedCase
+    Customer_Average: 99.5,
+    // Sin alias - servidor genera automáticamente en lowercase
+    max_score: 100,
+    // Con alias personalizado - servidor devuelve todo UPPERCASE
+    TOTAL_COUNT: 500,
+  };
+
+  const mockFetch = vi
+    .fn()
+    .mockResolvedValueOnce(createMockResponse({rows: [serverRow]}));
+  vi.stubGlobal('fetch', mockFetch);
+
+  const result = await widgetSource.getAggregations({
+    aggregations: [
+      // Casos con alias personalizado
+      {column: 'sales', operation: AggregationTypes.Sum, alias: 'Total_Sales'},
+      {
+        column: 'customer_rating',
+        operation: AggregationTypes.Avg,
+        alias: 'Customer_Average',
+      },
+      {column: '*', operation: AggregationTypes.Count, alias: 'TOTAL_COUNT'},
+      // Casos sin alias (generados automáticamente)
+      {column: 'products', operation: AggregationTypes.Sum},
+      {column: 'score', operation: AggregationTypes.Max},
+    ],
+  });
+
+  // TODAS las claves deben estar normalizadas a minúsculas por normalizeObjectKeys
+  expect(result).toEqual({
+    rows: [
+      {
+        // Alias personalizado: "Total_Sales" -> servidor "TOTAL_SALES" -> cliente "total_sales"
+        total_sales: 150000,
+        // Alias personalizado: "Customer_Average" -> servidor "Customer_Average" -> cliente "customer_average"
+        customer_average: 99.5,
+        // Alias personalizado: "TOTAL_COUNT" -> servidor "TOTAL_COUNT" -> cliente "total_count"
+        total_count: 500,
+        // Sin alias: generado automáticamente -> servidor "sum_products" -> cliente "sum_products"
+        sum_products: 45,
+        // Sin alias: generado automáticamente -> servidor "max_score" -> cliente "max_score"
+        max_score: 100,
+      },
+    ],
+  });
+});
+
+test('getAggregations - string format funciona para remote sources', async () => {
+  const widgetSource = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+  });
+
+  const serverRow = {
+    CUSTOM_METRIC: 42.7,
+    COMPLEX_CALC: 789,
+  };
+
+  const mockFetch = vi
+    .fn()
+    .mockResolvedValueOnce(createMockResponse({rows: [serverRow]}));
+  vi.stubGlobal('fetch', mockFetch);
+
+  // String format permite cualquier SQL personalizado
+  const result = await widgetSource.getAggregations({
+    aggregations:
+      "sum(sales * 1.21) as CUSTOM_METRIC, sum(case when status = 'active' then 1 else 0 end) as COMPLEX_CALC",
+  });
+
+  // Las claves del servidor se normalizan a lowercase
+  expect(result).toEqual({
+    rows: [
+      {
+        custom_metric: 42.7,
+        complex_calc: 789,
+      },
+    ],
   });
 });
 

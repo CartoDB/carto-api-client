@@ -207,6 +207,26 @@ export interface TimeSeriesRequestOptions extends BaseRequestOptions {
   splitByCategoryValues?: string[];
 }
 
+/**
+ * Examples:
+ *   * aggregations with array syntax
+ *      * aggregations: [{column: 'pop_high', operation: 'sum', alias: 'high_pop'}, {column: 'pop_low', operation: 'avg'}]
+ *   * aggregations with string syntax
+ *      * aggregations: 'sum(pop_high) as high_pop, avg(pop_low) as avg_low'
+ *
+ * Options for {@link WidgetRemoteSource#getAggregations}.
+ */
+export interface AggregationsRequestOptions extends BaseRequestOptions {
+  /** Aggregations to compute. Can be an array of objects or a SQL string expression. */
+  aggregations:
+    | {
+        column: string;
+        operation: Exclude<AggregationType, 'custom'>;
+        alias: string;
+      }[]
+    | string;
+}
+
 /** @experimental */
 export type ExtentRequestOptions = BaseRequestOptions;
 
@@ -263,6 +283,11 @@ export type TimeSeriesResponse = {
 
 /** Response from {@link WidgetRemoteSource#getHistogram}. */
 export type HistogramResponse = number[];
+
+/** Response from {@link WidgetRemoteSource#getAggregations}. */
+export type AggregationsResponse = {
+  rows: Record<string, number | string | null>[];
+};
 
 /** @experimental */
 export type ExtentResponse = {bbox: BBox};
