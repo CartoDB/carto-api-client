@@ -439,7 +439,7 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
         throw new Error(`Unsupported aggregation operation: ${operation}`);
       }
       const targetOperation = aggregationFunctions[operation];
-      result[aliasKey] = targetOperation(filteredFeatures, column);
+      result[alias] = targetOperation(filteredFeatures, column);
     }
 
     return {rows: [result]};
