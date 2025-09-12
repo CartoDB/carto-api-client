@@ -19,12 +19,7 @@ import type {
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
 } from './types.js';
-import {
-  InvalidColumnError,
-  assert,
-  assignOptional,
-  isPureObject,
-} from '../utils.js';
+import {InvalidColumnError, assert, assignOptional} from '../utils.js';
 import type {Filter, SpatialFilter, Tile} from '../types.js';
 
 import {
