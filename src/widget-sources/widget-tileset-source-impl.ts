@@ -19,7 +19,12 @@ import type {
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
 } from './types.js';
-import {InvalidColumnError, assert, assignOptional} from '../utils.js';
+import {
+  InvalidColumnError,
+  assert,
+  assignOptional,
+  isPureObject,
+} from '../utils.js';
 import type {Filter, SpatialFilter, Tile} from '../types.js';
 
 import {
@@ -149,10 +154,9 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       assertColumn(this._features, column);
     }
 
-    if (!(operation in aggregationFunctions)) {
-      throw new Error(`Unsupported aggregation operation: ${operation}`);
-    }
     const targetOperation = aggregationFunctions[operation];
+    assert(targetOperation, `Unsupported aggregation operation: ${operation}`);
+
     return {
       value: targetOperation(filteredFeatures, column, joinOperation),
     };
@@ -412,12 +416,11 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       return {rows: []};
     }
 
-    // Handle string-based aggregations
-    if (typeof aggregations === 'string') {
-      // For tilesets, string-based aggregations are not supported as they
-      // require SQL execution which is only available for remote sources
-      throw new Error('String-based aggregations not supported for tilesets');
-    }
+    // SQL aggregations require remote execution, and are not supported for tilesets.
+    assert(
+      typeof aggregations !== 'string',
+      'Unsupported tileset SQL aggregation'
+    );
 
     // Handle array-based aggregations
     const result: Record<string, number> = {};
@@ -430,15 +433,12 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
       }
 
       const aliasKey = alias.toLowerCase();
-      if (usedAliases.has(aliasKey)) {
-        throw new Error(`Duplicate aggregation alias: ${aliasKey}`);
-      }
+      assert(!usedAliases.has(aliasKey), `Duplicate alias: ${aliasKey}`);
       usedAliases.add(aliasKey);
 
-      if (!(operation in aggregationFunctions)) {
-        throw new Error(`Unsupported aggregation operation: ${operation}`);
-      }
       const targetOperation = aggregationFunctions[operation];
+      assert(targetOperation, `Unsupported operation: ${operation}`);
+
       result[alias] = targetOperation(filteredFeatures, column);
     }
 
