@@ -2,6 +2,11 @@
 
 ## 0.5
 
+### 0.5.16
+
+- feat(widgets): Add getAggregations() method (#229)
+- chore(deps): bump h3-js from 4.2.1 to 4.3.0 (#232)
+
 ### 0.5.15
 
 - feat(sources): Add support for trajectory data sources (#227, #228)
