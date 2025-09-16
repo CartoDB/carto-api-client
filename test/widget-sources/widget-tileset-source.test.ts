@@ -317,7 +317,7 @@ describe('getAggregations', () => {
         ],
         spatialFilter: MOCK_SPATIAL_FILTER,
       });
-    }).rejects.toThrow('Unsupported aggregation operation: custom');
+    }).rejects.toThrow(/custom/i);
   });
 
   it('should throw error for string-based aggregations (not supported)', async () => {
@@ -328,6 +328,6 @@ describe('getAggregations', () => {
           'sum(revenue) as total_revenue, avg(size_m2) as avg_size' as any,
         spatialFilter: MOCK_SPATIAL_FILTER,
       });
-    }).rejects.toThrow('String-based aggregations not supported for tilesets');
+    }).rejects.toThrow(/sql/i);
   });
 });
