@@ -2,9 +2,11 @@
 
 ## Unreleased
 
-- feat(fetchMap): Raster layers, update triggers and other fixes (#223)
-
 ## 0.5
+
+### 0.5.17
+
+- feat(fetchMap): Raster layers, update triggers and other fixes (#223)
 
 ### 0.5.16
 
