@@ -71,6 +71,7 @@
     "d3-format": "^3.1.0",
     "d3-scale": "^4.0.2",
     "h3-js": "^4.1.0",
+    "jsep": "^1.4.0",
     "quadbin": "^0.4.1-alpha.0"
   },
   "devDependencies": {

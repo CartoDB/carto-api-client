@@ -66,7 +66,7 @@ describe('layer-map', () => {
     ];
 
     test.each(COLOR_TESTS)('getColorAccessor $colorScale', (testCase) => {
-      const {accessor, scale} = getColorAccessor(
+      const {accessor, range} = getColorAccessor(
         testCase.colorField,
         testCase.colorScale,
         {range: testCase.colorRange},
@@ -74,7 +74,7 @@ describe('layer-map', () => {
         testCase.data
       );
       expect(accessor(testCase.d)).toEqual(testCase.expected);
-      expect(scale.range()).toEqual(testCase.colorRange.colors);
+      expect(range).toEqual(testCase.colorRange.colors);
     });
   });
 

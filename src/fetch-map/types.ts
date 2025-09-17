@@ -39,6 +39,7 @@ export type ColorRange = {
   colorMap: string[][] | undefined;
   name: string;
   type: string;
+  uiCustomScaleType?: 'logarithmic';
 };
 
 export type CustomMarkersRange = {
@@ -49,12 +50,20 @@ export type CustomMarkersRange = {
   othersMarker?: string;
 };
 
+export type ColorBand = 'red' | 'green' | 'blue' | 'alpha';
+
+export type RasterLayerConfigColorBand = {
+  band: ColorBand;
+  type: 'none' | 'band' | 'expression';
+  value: string; // band name or expression
+};
+
 export type VisConfig = {
   filled?: boolean;
   opacity?: number;
   enable3d?: boolean;
 
-  colorAggregation?: any;
+  colorAggregation?: string;
   colorRange: ColorRange;
 
   customMarkers?: boolean;
@@ -64,21 +73,26 @@ export type VisConfig = {
   radius: number;
   radiusRange?: number[];
 
-  sizeAggregation?: any;
-  sizeRange?: any;
+  sizeAggregation?: string;
+  sizeRange?: number[];
 
-  strokeColorAggregation?: any;
+  strokeColorAggregation?: string;
   strokeOpacity?: number;
   strokeColorRange?: ColorRange;
 
-  heightRange?: any;
-  heightAggregation?: any;
+  heightRange?: number[];
+  heightAggregation?: string;
 
-  weightAggregation?: any;
+  weightAggregation?: string;
 
   // type = clusterTile
   clusterLevel?: number;
   isTextVisible?: boolean;
+
+  rasterStyleType?: 'Rgb' | 'ColorRange' | 'UniqueValues';
+  colorBands?: RasterLayerConfigColorBand[];
+
+  uniqueValuesColorRange?: ColorRange;
 };
 
 export type TextLabel = {
