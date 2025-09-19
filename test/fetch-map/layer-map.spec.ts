@@ -52,6 +52,88 @@ describe('layer-map', () => {
         expected: [90, 24, 70, 255],
       },
       {
+        title: 'colorMap with length 2',
+        colorField: {name: 'v'},
+        colorScale: 'ordinal',
+        colorRange: {
+          colors: colors.slice(0, 2),
+          colorMap: [
+            ['b', colors[0]],
+            ['a', colors[1]],
+          ],
+        },
+        opacity: 1,
+        data: {
+          tilestats: {
+            layers: [
+              {
+                attributes: [
+                  {
+                    attribute: 'v',
+                    categories: [{category: 'a'}, {category: 'b'}],
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        d: {properties: {v: 'b'}},
+        expected: [90, 24, 70, 255],
+      },
+      {
+        title: 'quantize with length 2',
+        colorField: {name: 'v'},
+        colorScale: 'quantize',
+        colorRange: {
+          colors: colors.slice(0, 2),
+        },
+        opacity: 1,
+        data: {
+          tilestats: {
+            layers: [
+              {
+                attributes: [
+                  {
+                    attribute: 'v',
+                    min: 0,
+                    max: 1,
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        d: {properties: {v: '0'}},
+        expected: [90, 24, 70, 255],
+      },
+      {
+        title: 'quantile with length 2',
+        colorField: {name: 'v'},
+        colorScale: 'quantile',
+        colorRange: {
+          colors: colors.slice(0, 2),
+        },
+        opacity: 1,
+        data: {
+          tilestats: {
+            layers: [
+              {
+                attributes: [
+                  {
+                    attribute: 'v',
+                    min: 0,
+                    max: 1,
+                    quantiles: {3: [0, 0.5, 1], 4: [0, 0.33, 0.66, 1]},
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        d: {properties: {v: '0'}},
+        expected: [90, 24, 70, 255],
+      },
+      {
         title: 'quantile',
         colorField: {name: 'v'},
         colorScale: 'quantile',
