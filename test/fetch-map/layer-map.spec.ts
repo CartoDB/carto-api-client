@@ -27,7 +27,7 @@ describe('layer-map', () => {
           colorMap: [
             ['b', colors[0]],
             ['a', colors[1]],
-            ['c', colors[2]]
+            ['c', colors[2]],
           ],
         },
         opacity: 1,
