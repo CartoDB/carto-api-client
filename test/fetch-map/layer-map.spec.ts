@@ -19,6 +19,40 @@ describe('layer-map', () => {
   describe('color accessors', () => {
     const COLOR_TESTS = [
       {
+        title: 'colorMap always win',
+        colorField: {name: 'v'},
+        colorScale: 'ordinal',
+        colorRange: {
+          colors,
+          colorMap: [
+            ['b', colors[0]],
+            ['a', colors[1]],
+            ['c', colors[2]],
+            ['d', colors[3]],
+            ['e', colors[4]],
+            ['f', colors[5]],
+          ],
+        },
+        opacity: 1,
+        data: {
+          tilestats: {
+            layers: [
+              {
+                attributes: [
+                  {
+                    attribute: 'v',
+                    categories: [{category: 'a'}, {category: 'b'}],
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        d: {properties: {v: 'b'}},
+        expected: [90, 24, 70, 255],
+      },
+      {
+        title: 'quantile',
         colorField: {name: 'v'},
         colorScale: 'quantile',
         colorRange: {
@@ -40,6 +74,7 @@ describe('layer-map', () => {
         expected: [90, 24, 70, 255],
       },
       {
+        title: 'quantile (2)',
         colorField: {name: 'v'},
         colorScale: 'quantile',
         colorRange: {
@@ -65,7 +100,7 @@ describe('layer-map', () => {
       },
     ];
 
-    test.each(COLOR_TESTS)('getColorAccessor $colorScale', (testCase) => {
+    test.each(COLOR_TESTS)('getColorAccessor $title', (testCase) => {
       const {accessor, range} = getColorAccessor(
         testCase.colorField,
         testCase.colorScale,
