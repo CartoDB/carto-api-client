@@ -374,23 +374,21 @@ export function calculateLayerScale(
   range: ColorRange,
   data: TilejsonResult
 ): {scale: D3Scale; domain: string[] | number[]} {
-  let domain: string[] | number[] = [];
   let scaleDomain: number[] | string[] | undefined;
-  let scaleColor: string[] = [];
+  let scaleColors: string[] = [];
   const {colors} = range;
 
+  const domain = calculateDomain(data, name, scaleType, colors.length);
   if (scaleType !== 'identity') {
     if (range.colorMap) {
       const {colorMap} = range;
       scaleDomain = [];
       colorMap.forEach(([value, color]) => {
         (scaleDomain as any[]).push(value);
-        scaleColor.push(color);
+        scaleColors.push(color);
       });
-      domain = scaleDomain;
     } else {
       if (scaleType === 'custom' && range.uiCustomScaleType === 'logarithmic') {
-        domain = calculateDomain(data, name, scaleType, colors.length);
         const [min, max] = domain as number[];
         scaleDomain = getLog10ScaleSteps({
           min,
@@ -398,22 +396,17 @@ export function calculateLayerScale(
           steps: colors.length,
         });
 
-        scaleColor = colors;
+        scaleColors = colors;
       } else {
-        domain = calculateDomain(data, name, scaleType, colors.length);
-        scaleColor = colors;
+        scaleColors = colors;
       }
-    }
-
-    if (scaleType === 'ordinal') {
-      domain = domain.slice(0, scaleColor.length);
     }
   }
   return {
     scale: createColorScale(
       scaleType,
       scaleDomain || domain,
-      scaleColor.map(hexToRGB),
+      scaleColors.map(hexToRGB),
       UNKNOWN_COLOR_RGB
     ),
     domain,
