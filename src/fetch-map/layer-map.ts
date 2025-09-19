@@ -375,38 +375,40 @@ export function calculateLayerScale(
   data: TilejsonResult
 ): {scale: D3Scale; domain: string[] | number[]} {
   let domain: string[] | number[] = [];
-  let scaleDomain: number[] | undefined;
+  let scaleDomain: number[] | string[] | undefined;
   let scaleColor: string[] = [];
   const {colors} = range;
 
-  if (scaleType === 'custom') {
-    domain = calculateDomain(data, name, scaleType, colors.length);
-    const [min, max] = domain as number[];
-    if (range.uiCustomScaleType === 'logarithmic') {
-      scaleDomain = getLog10ScaleSteps({
-        min,
-        max,
-        steps: colors.length,
-      });
-
-      scaleColor = colors;
-    } else if (range.colorMap) {
+  if (scaleType !== 'identity') {
+    if (range.colorMap) {
       const {colorMap} = range;
       scaleDomain = [];
       colorMap.forEach(([value, color]) => {
-        (scaleDomain as number[]).push(Number(value));
+        (scaleDomain as any[]).push(value);
         scaleColor.push(color);
       });
+      domain = scaleDomain;
+    } else {
+      if (scaleType === 'custom' && range.uiCustomScaleType === 'logarithmic') {
+        domain = calculateDomain(data, name, scaleType, colors.length);
+        const [min, max] = domain as number[];
+        scaleDomain = getLog10ScaleSteps({
+          min,
+          max,
+          steps: colors.length,
+        });
+
+        scaleColor = colors;
+      } else {
+        domain = calculateDomain(data, name, scaleType, colors.length);
+      }
     }
-  } else if (scaleType !== 'identity') {
-    domain = calculateDomain(data, name, scaleType, colors.length);
     scaleColor = colors;
 
     if (scaleType === 'ordinal') {
       domain = domain.slice(0, scaleColor.length);
     }
   }
-
   return {
     scale: createColorScale(
       scaleType,
