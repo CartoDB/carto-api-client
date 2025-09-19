@@ -2,9 +2,12 @@
 
 ## Unreleased
 
-- fix(fetchMap): getColorAccessor treats colorMap as override of actual domain (#238)
 
 ## 0.5
+
+### 0.5.18
+
+- fix(fetchMap): getColorAccessor treats colorMap as override of actual domain (#238)
 
 ### 0.5.17
 
