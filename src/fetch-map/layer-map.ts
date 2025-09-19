@@ -401,9 +401,9 @@ export function calculateLayerScale(
         scaleColor = colors;
       } else {
         domain = calculateDomain(data, name, scaleType, colors.length);
+        scaleColor = colors;
       }
     }
-    scaleColor = colors;
 
     if (scaleType === 'ordinal') {
       domain = domain.slice(0, scaleColor.length);
