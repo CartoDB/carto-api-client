@@ -169,6 +169,33 @@ describe('layer-map', () => {
         // we expect v: 3.5 to land in 3rd range, that is [3, 4) so third color
         expected: hexToRGBA(colors[2]),
       },
+      {
+        title: 'hexColumn',
+        colorField: {name: 'v', colorColumn: 'vColor'},
+        colorScale: 'ordinal',
+        colorRange: {
+          colors: [],
+          hexColor: true,
+        },
+        opacity: 1,
+        data: {
+          tilestats: {
+            layers: [
+              {
+                attributes: [
+                  {
+                    attribute: 'v',
+                    categories: [{category: 'foo'}],
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        d: {properties: {v: 'foo', vColor: '#ff00ff'}},
+        // we expect v: 3.5 to land in 3rd range, that is [3, 4) so third color
+        expected: hexToRGBA('#ff00ff'),
+      },
     ];
 
     test.each(COLOR_TESTS)('getColorAccessor $title', (testCase) => {
