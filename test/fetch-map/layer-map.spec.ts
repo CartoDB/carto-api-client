@@ -5,6 +5,12 @@ import {
   getLayerProps,
   _domainFromValues,
 } from '@carto/api-client';
+import {rgb} from 'd3-color';
+
+const hexToRGBA = (c: any) => {
+  const {r, g, b} = rgb(c);
+  return [r, g, b, 255];
+};
 
 describe('layer-map', () => {
   const colors = [
@@ -49,36 +55,11 @@ describe('layer-map', () => {
           },
         },
         d: {properties: {v: 'b'}},
-        expected: [90, 24, 70, 255],
-      },
-      {
-        title: 'colorMap with length 2',
-        colorField: {name: 'v'},
-        colorScale: 'ordinal',
-        colorRange: {
-          colors: colors.slice(0, 2),
-          colorMap: [
-            ['b', colors[0]],
-            ['a', colors[1]],
-          ],
-        },
-        opacity: 1,
-        data: {
-          tilestats: {
-            layers: [
-              {
-                attributes: [
-                  {
-                    attribute: 'v',
-                    categories: [{category: 'a'}, {category: 'b'}],
-                  },
-                ],
-              },
-            ],
-          },
-        },
-        d: {properties: {v: 'b'}},
-        expected: [90, 24, 70, 255],
+        // this case is for colorMap that contains 6 values, but actual (current)
+        // domain is shorter for example thanks to filtering
+        // We expect colorMap to override current attrubute stats and result in first color,
+        // whether attribute stats would map 'b' to second color
+        expected: hexToRGBA(colors[0]),
       },
       {
         title: 'quantize with length 2',
@@ -103,15 +84,17 @@ describe('layer-map', () => {
             ],
           },
         },
-        d: {properties: {v: '0'}},
-        expected: [90, 24, 70, 255],
+        d: {properties: {v: 0.5}},
+        // quantize [0,1] with two colors should emit ranges [-Inf, 0.5) [0.5, Inf]
+        // so we should result with second color
+        expected: hexToRGBA(colors[1]),
       },
       {
         title: 'quantile with length 2',
         colorField: {name: 'v'},
         colorScale: 'quantile',
         colorRange: {
-          colors: colors.slice(0, 2),
+          colors: colors.slice(0, 4),
         },
         opacity: 1,
         data: {
@@ -123,15 +106,19 @@ describe('layer-map', () => {
                     attribute: 'v',
                     min: 0,
                     max: 1,
-                    quantiles: {3: [0, 0.5, 1], 4: [0, 0.33, 0.66, 1]},
+                    quantiles: {
+                      3: [0, 0.33, 0.66, 1],
+                      4: [0, 0.25, 0.5, 0.75, 1],
+                    },
                   },
                 ],
               },
             ],
           },
         },
-        d: {properties: {v: '0'}},
-        expected: [90, 24, 70, 255],
+        d: {properties: {v: '0.5'}},
+        // our data is exactly median, and fits [0.5-0.75> so should be 3rd color
+        expected: hexToRGBA(colors[2]),
       },
       {
         title: 'quantile',
@@ -146,17 +133,18 @@ describe('layer-map', () => {
             layers: [
               {
                 attributes: [
-                  {attribute: 'v', quantiles: {6: [1, 2, 3, 4, 5, 6]}},
+                  {attribute: 'v', quantiles: {6: [1, 2, 3, 4, 5, 6, 7]}},
                 ],
               },
             ],
           },
         },
-        d: {properties: {v: 1}},
-        expected: [90, 24, 70, 255],
+        d: {properties: {v: 2}},
+        // we expect v=2 to land in second range, that is [2-3)
+        expected: hexToRGBA(colors[1]),
       },
       {
-        title: 'quantile (2)',
+        title: 'quantiles, global',
         colorField: {name: 'v'},
         colorScale: 'quantile',
         colorRange: {
@@ -170,7 +158,7 @@ describe('layer-map', () => {
                 attributes: [
                   {
                     attribute: 'v',
-                    quantiles: {global: {6: [1, 2, 3, 4, 5, 6]}},
+                    quantiles: {global: {6: [1, 2, 3, 4, 5, 6, 7]}},
                   },
                 ],
               },
@@ -178,7 +166,8 @@ describe('layer-map', () => {
           },
         },
         d: {properties: {v: 3.5}},
-        expected: [227, 97, 28, 255],
+        // we expect v: 3.5 to land in 3rd range, that is [3, 4) so third color
+        expected: hexToRGBA(colors[2]),
       },
     ];
 
