@@ -132,13 +132,13 @@ export const CARTO_SOURCES = {
   h3QuerySource,
   h3TableSource,
   h3TilesetSource,
-  rasterSource,
   quadbinQuerySource,
   quadbinTableSource,
   quadbinTilesetSource,
-  vectorQuerySource,
-  vectorTableSource,
-  vectorTilesetSource,
+  rasterSource,
   trajectoryQuerySource,
   trajectoryTableSource,
+  vectorQuerySource,
+  vectorTableSource,
+  vectorTilesetSource
 };
