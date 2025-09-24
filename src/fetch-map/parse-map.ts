@@ -392,7 +392,7 @@ function createChannelProps(
       const {accessor, ...scaleProps} = getSizeAccessor(
         radiusField,
         radiusScale,
-        visConfig.sizeAggregation,
+        visConfig.radiusAggregation,
         radiusRange,
         data
       );
