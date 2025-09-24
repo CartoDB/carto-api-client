@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(fetchMap): support point radius aggregation (#241)
+
 ## 0.5
 
 ### 0.5.18
