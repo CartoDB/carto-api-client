@@ -20,7 +20,7 @@ describe('sources index', () => {
       'trajectoryTableSource',
       'vectorQuerySource',
       'vectorTableSource',
-      'vectorTilesetSource'
+      'vectorTilesetSource',
     ];
 
     expectedSources.forEach((sourceName) => {
@@ -33,4 +33,3 @@ describe('sources index', () => {
     expect(Object.keys(CARTO_SOURCES)).toHaveLength(expectedSources.length);
   });
 });
-

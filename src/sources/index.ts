@@ -140,5 +140,5 @@ export const CARTO_SOURCES = {
   trajectoryTableSource,
   vectorQuerySource,
   vectorTableSource,
-  vectorTilesetSource
+  vectorTilesetSource,
 };
