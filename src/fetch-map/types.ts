@@ -72,6 +72,7 @@ export type VisConfig = {
 
   radius: number;
   radiusRange?: number[];
+  radiusAggregation?: string;
 
   sizeAggregation?: string;
   sizeRange?: number[];
