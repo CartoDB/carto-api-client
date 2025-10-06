@@ -240,9 +240,19 @@ function domainFromAttribute(
   }
 
   if (scaleType === 'quantile' && attribute.quantiles) {
-    return 'global' in attribute.quantiles
-      ? attribute.quantiles.global[scaleLength]
-      : attribute.quantiles[scaleLength];
+    const quantiles: Record<number, number[]> =
+      'global' in attribute.quantiles
+        ? attribute.quantiles.global
+        : attribute.quantiles;
+
+    // Stats API doesn't provide quantile[2] - which would be effecively [min, median, max]
+    // so let's derive median from Quartiles (quantile[4]), of which second is median
+    if (scaleLength === 2 && !quantiles[2] && quantiles[4]?.length === 5) {
+      return [quantiles[4][0], quantiles[4][2], quantiles[4][4]];
+    }
+    if (quantiles[scaleLength]) {
+      return quantiles[scaleLength];
+    }
   }
 
   let {min} = attribute;
