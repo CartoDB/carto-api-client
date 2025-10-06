@@ -2,9 +2,11 @@
 
 ## Unreleased
 
-- fix(fetchMap): support quantile color scale with 2 ranges (#241)
-
 ## 0.5
+
+### 0.5.20
+
+- fix(fetchMap): support quantile color scale with 2 ranges (#241)
 
 ### 0.5.19
 
