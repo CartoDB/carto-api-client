@@ -4,6 +4,10 @@
 
 ## 0.5
 
+### 0.5.21
+
+- fix(query,fetchMap): Fix queryParameter encoding in POST requests (#247)
+
 ### 0.5.20
 
 - fix(fetchMap): support quantile color scale with 2 ranges (#241)
