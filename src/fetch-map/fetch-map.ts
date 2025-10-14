@@ -70,14 +70,14 @@ async function _fetchTilestats(
   const baseUrl = buildStatsUrl({attribute, apiBaseUrl, ...dataset});
   const client = new URLSearchParams(data.tiles[0]).get('client');
   const headers = {Authorization: `Bearer ${context.accessToken}`};
-  const parameters: Record<string, string> = {};
+  const parameters: Record<string, unknown> = {};
   if (client) {
     parameters.client = client;
   }
   if (type === 'query') {
     parameters.q = source;
     if (queryParameters) {
-      parameters.queryParameters = JSON.stringify(queryParameters);
+      parameters.queryParameters = queryParameters;
     }
   }
   const stats = await requestWithParameters({
