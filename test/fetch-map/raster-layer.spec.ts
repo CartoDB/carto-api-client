@@ -246,7 +246,7 @@ describe('getRasterTileLayerStyleProps', () => {
   });
 
   it('colorRange / quantile', () => {
-    const {dataTransform} = getRasterTileLayerStyleProps({
+    const {dataTransform, ...scaleProps} = getRasterTileLayerStyleProps({
       layerConfig: {
         ...dummyLayerConfig,
         visConfig: {
@@ -268,6 +268,14 @@ describe('getRasterTileLayerStyleProps', () => {
       },
     });
 
+    expect(scaleProps).toMatchObject({
+      type: 'quantile',
+      field: {name: 'band_1', type: 'integer'},
+      domain: [0, 255],
+      scaleDomain: [0, 50, 100, 255],
+      range: ['#ff0000', '#00ff00', '#0000ff'],
+    });
+
     const testValues = [
       {input: 40, expected: [255, 0, 0, 255]},
       {input: 60, expected: [0, 255, 0, 255]},
@@ -283,7 +291,7 @@ describe('getRasterTileLayerStyleProps', () => {
   });
 
   it('colorRange / quantize', () => {
-    const {dataTransform} = getRasterTileLayerStyleProps({
+    const {dataTransform, ...scaleProps} = getRasterTileLayerStyleProps({
       layerConfig: {
         ...dummyLayerConfig,
         visConfig: {
@@ -305,6 +313,14 @@ describe('getRasterTileLayerStyleProps', () => {
       },
     });
 
+    expect(scaleProps).toMatchObject({
+      type: 'quantize',
+      field: {name: 'band_1', type: 'integer'},
+      domain: [0, 255],
+      scaleDomain: [0, 255],
+      range: ['#ff0000', '#00ff00', '#0000ff'],
+    });
+
     const testValues = [
       {input: 10, expected: [255, 0, 0, 255]},
       // { input: 123, expected: [0, 255, 0, 255] },
@@ -321,7 +337,7 @@ describe('getRasterTileLayerStyleProps', () => {
     runFillColorTests(testValues, info);
   });
   it('colorRange / log', () => {
-    const {dataTransform} = getRasterTileLayerStyleProps({
+    const {dataTransform, ...scaleProps} = getRasterTileLayerStyleProps({
       layerConfig: {
         ...dummyLayerConfig,
         visConfig: {
@@ -344,6 +360,14 @@ describe('getRasterTileLayerStyleProps', () => {
       },
     });
 
+    expect(scaleProps).toMatchObject({
+      type: 'custom',
+      field: {name: 'band_1', type: 'integer'},
+      domain: [0, 255],
+      scaleDomain: [10, 100],
+      range: ['#ff0000', '#00ff00', '#0000ff'],
+    });
+
     const testValues = [
       {input: 4, expected: [255, 0, 0, 255]},
       {input: 15, expected: [0, 255, 0, 255]},
@@ -359,7 +383,7 @@ describe('getRasterTileLayerStyleProps', () => {
     runFillColorTests(testValues, info);
   });
   it('uniqueValue / default', () => {
-    const {dataTransform} = getRasterTileLayerStyleProps({
+    const {dataTransform, ...scaleProps} = getRasterTileLayerStyleProps({
       layerConfig: {
         ...dummyLayerConfig,
         visConfig: {
@@ -383,6 +407,14 @@ describe('getRasterTileLayerStyleProps', () => {
       },
     });
 
+    expect(scaleProps).toMatchObject({
+      type: 'ordinal',
+      field: {name: 'band_1', type: 'integer'},
+      domain: [0, 1, 2, 3, 25],
+      scaleDomain: [0, 1, 2, 3, 25],
+      range: defaultQualitativeColor.colors,
+    });
+
     const testValues = [
       {input: 0, expected: defaultQualitativeColor.colors[0]},
       {input: 1, expected: defaultQualitativeColor.colors[1]},
@@ -400,7 +432,7 @@ describe('getRasterTileLayerStyleProps', () => {
     runFillColorTests(testValues, info);
   });
   it('uniqueValue / custom', () => {
-    const {dataTransform} = getRasterTileLayerStyleProps({
+    const {dataTransform, ...scaleProps} = getRasterTileLayerStyleProps({
       layerConfig: {
         ...dummyLayerConfig,
         visConfig: {
@@ -425,6 +457,14 @@ describe('getRasterTileLayerStyleProps', () => {
           type: 'integer',
         },
       },
+    });
+
+    expect(scaleProps).toMatchObject({
+      type: 'ordinal',
+      field: {name: 'band_1', type: 'integer'},
+      domain: [0, 1, 2],
+      scaleDomain: [0, 1, 2],
+      range: ['#ff0000', '#00ff00', '#0000ff'],
     });
 
     const testValues = [

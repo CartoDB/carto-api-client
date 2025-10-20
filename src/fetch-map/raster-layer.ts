@@ -376,20 +376,19 @@ export function domainFromRasterMetadataBand(
   if (scaleType === 'ordinal') {
     return colorRange.colorMap?.map(([value]) => value) || [];
   }
-  if (scaleType === 'custom') {
-    if (colorRange.uiCustomScaleType === 'logarithmic') {
-      return getLog10ScaleSteps({
-        min: band.stats.min,
-        max: band.stats.max,
-        steps: colorRange.colors.length,
-      });
-    } else {
-      // actually custom, read colorMap
-      return colorRange.colorMap?.map(([value]) => value) || [];
-    }
+  if (
+    scaleType === 'custom' &&
+    colorRange.uiCustomScaleType === 'logarithmic'
+  ) {
+    return getLog10ScaleSteps({
+      min: band.stats.min,
+      max: band.stats.max,
+      steps: colorRange.colors.length,
+    });
   }
-  const scaleLength = colorRange.colors.length;
+
   if (scaleType === 'quantile') {
+    const scaleLength = colorRange.colors.length;
     const quantiles = band.stats.quantiles?.[scaleLength];
     if (!quantiles) {
       return [0, 1];
@@ -453,6 +452,11 @@ export function getRasterTileLayerStylePropsScaledBand({
       layerConfig,
       visualChannels,
     }),
+    domain: rasterStyleType === 'ColorRange' ? [bandInfo.stats.min, bandInfo.stats.max] : domain,
+    scaleDomain: scaleFun.domain(),
+    range: colorRange.colors,
+    type: scaleType,
+    field: colorField,
   };
 }
 

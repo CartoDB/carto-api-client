@@ -31,6 +31,7 @@ export type VisualChannels = {
   heightScale?: ScaleType;
 
   weightField?: VisualChannelField;
+  uniqueValuesColorScale?: ScaleType;
 };
 
 export type ColorRange = {

@@ -280,14 +280,22 @@ function createChannelProps(
         scales: {}, // TODO
       };
     } else {
-      return {
-        channelProps: getRasterTileLayerStylePropsScaledBand({
+      const {dataTransform, updateTriggers, ...scaleProps} =
+        getRasterTileLayerStylePropsScaledBand({
           layerConfig: config,
           visualChannels,
           rasterMetadata,
-        }),
+        });
+
+      return {
+        channelProps: {
+          dataTransform,
+          updateTriggers,
+        },
         scales: {
-          // TODO
+          ...(scaleProps.type && {
+            fillColor: scaleProps,
+          }),
         },
       };
     }
