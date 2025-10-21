@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(query,fetchMap): Fix queryParameter encoding for POST requests. (#247)
+
 ## 0.5
 
 ### 0.5.20
