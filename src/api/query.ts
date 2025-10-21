@@ -24,7 +24,10 @@ export type QueryOptions = SourceOptions &
     /** Used to abort the request. */
     signal?: AbortSignal;
   };
-type UrlParameters = {q: string; queryParameters?: string};
+type UrlParameters = {
+  q: string;
+  queryParameters?: Record<string, unknown> | unknown[];
+};
 
 export const query = async function (
   options: QueryOptions
@@ -42,7 +45,7 @@ export const query = async function (
   const urlParameters: UrlParameters = {q: sqlQuery};
 
   if (queryParameters) {
-    urlParameters.queryParameters = JSON.stringify(queryParameters);
+    urlParameters.queryParameters = queryParameters;
   }
 
   const baseUrl = buildQueryUrl({apiBaseUrl, connectionName});
