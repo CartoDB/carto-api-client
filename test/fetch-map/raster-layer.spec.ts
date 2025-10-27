@@ -271,7 +271,7 @@ describe('getRasterTileLayerStyleProps', () => {
     expect(scaleProps).toMatchObject({
       type: 'quantile',
       field: {name: 'band_1', type: 'integer'},
-      domain: [0, 255],
+      domain: [0, 50, 100, 255],
       scaleDomain: [0, 50, 100, 255],
       range: ['#ff0000', '#00ff00', '#0000ff'],
     });
@@ -336,7 +336,7 @@ describe('getRasterTileLayerStyleProps', () => {
 
     runFillColorTests(testValues, info);
   });
-  it('colorRange / log', () => {
+  it('colorRange / 10', () => {
     const {dataTransform, ...scaleProps} = getRasterTileLayerStyleProps({
       layerConfig: {
         ...dummyLayerConfig,
@@ -382,6 +382,57 @@ describe('getRasterTileLayerStyleProps', () => {
 
     runFillColorTests(testValues, info);
   });
+  it('colorRange / custom', () => {
+    const {dataTransform, ...scaleProps} = getRasterTileLayerStyleProps({
+      layerConfig: {
+        ...dummyLayerConfig,
+        visConfig: {
+          ...dummyLayerConfig.visConfig,
+          rasterStyleType: 'ColorRange',
+          colorRange: {
+            ...dummyColorRange,
+            colors: ['#ff0000', '#00ff00', '#0000ff'],
+            colorMap: [
+              [10, '#ff0000'],
+              [100, '#00ff00'],
+              [null, '#0000ff'],
+            ],
+          },
+        },
+      },
+      rasterMetadata: dummyRasterMetadataRgb,
+      visualChannels: {
+        colorScale: 'custom',
+        colorField: {
+          name: 'band_1',
+          type: 'integer',
+        },
+      },
+    });
+
+    expect(scaleProps).toMatchObject({
+      type: 'custom',
+      field: {name: 'band_1', type: 'integer'},
+      domain: [0, 255],
+      scaleDomain: [10, 100, null],
+      range: ['#ff0000', '#00ff00', '#0000ff'],
+    });
+
+    const testValues = [
+      {input: 4, expected: [255, 0, 0, 255]},
+      {input: 15, expected: [0, 255, 0, 255]},
+      {input: 150, expected: [0, 0, 255, 255]},
+      {input: 255, expected: [0, 0, 0, 0]}, // nodata -> transparent
+    ];
+
+    const info = makeWrappedObjectInfo(
+      dataTransform,
+      ...testValues.map(({input}) => ({band_1: input}))
+    );
+
+    runFillColorTests(testValues, info);
+  });
+
   it('uniqueValue / default', () => {
     const {dataTransform, ...scaleProps} = getRasterTileLayerStyleProps({
       layerConfig: {
