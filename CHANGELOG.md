@@ -4,6 +4,10 @@
 
 ## 0.5
 
+### 0.5.22
+
+- fix(parseMap): Fix scale info for custom & logarithmic scales (#251)
+
 ### 0.5.21
 
 - fix(query,fetchMap): Fix queryParameter encoding for POST requests. (#247)
