@@ -39,10 +39,10 @@ import type {TilejsonResult} from '../sources/types.js';
 
 export type Scale = {
   type: ScaleType;
-  field: VisualChannelField;
+  field?: VisualChannelField;
 
   /** Natural domain of the scale, as defined by the data  */
-  domain: string[] | number[];
+  domain?: string[] | number[];
 
   /** Domain of the user to construct d3 scale */
   scaleDomain?: string[] | number[];
@@ -277,17 +277,29 @@ function createChannelProps(
           rasterMetadata,
           visualChannels,
         }),
-        scales: {}, // TODO
+        scales: {
+          fillColor: {
+            type: 'identity',
+          },
+        },
       };
     } else {
-      return {
-        channelProps: getRasterTileLayerStylePropsScaledBand({
+      const {dataTransform, updateTriggers, ...scaleProps} =
+        getRasterTileLayerStylePropsScaledBand({
           layerConfig: config,
           visualChannels,
           rasterMetadata,
-        }),
+        });
+
+      return {
+        channelProps: {
+          dataTransform,
+          updateTriggers,
+        },
         scales: {
-          // TODO
+          ...(scaleProps.type && {
+            fillColor: scaleProps,
+          }),
         },
       };
     }
