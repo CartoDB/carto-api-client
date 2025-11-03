@@ -95,7 +95,7 @@ async function _fetchTilestats(
   return true;
 }
 
-async function fillInMapDatasets(
+export async function fillInMapDatasets(
   {datasets, keplerMapConfig}: {datasets: Dataset[]; keplerMapConfig: any},
   context: _FetchMapContext
 ) {
@@ -106,7 +106,7 @@ async function fillInMapDatasets(
   return await Promise.all(promises);
 }
 
-async function fillInTileStats(
+export async function fillInTileStats(
   {datasets, keplerMapConfig}: {datasets: Dataset[]; keplerMapConfig: any},
   context: _FetchMapContext
 ) {
