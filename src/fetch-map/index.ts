@@ -3,7 +3,11 @@ export {
   applyLayerGroupFilters as _applyLayerGroupFilters,
 } from './basemap-styles.js';
 export {getRasterTileLayerStyleProps as _getRasterTileLayerStyleProps} from './raster-layer.js';
-export {fetchMap} from './fetch-map.js';
+export {
+  fetchMap,
+  fillInMapDatasets as _fillInMapDatasets,
+  fillInTileStats as _fillInTileStats,
+} from './fetch-map.js';
 export type {FetchMapOptions, FetchMapResult} from './fetch-map.js';
 export type {
   Basemap,
