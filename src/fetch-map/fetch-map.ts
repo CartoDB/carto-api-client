@@ -9,7 +9,7 @@ import {
 } from '../api/index.js';
 
 import {type ParseMapResult, parseMap} from './parse-map.js';
-import {assert} from '../utils.js';
+import {assert, isEmptyObject} from '../utils.js';
 import type {Basemap, Dataset, KeplerMapConfig} from './types.js';
 import {fetchBasemapProps} from './basemap.js';
 import {configureSource} from './source.js';
@@ -26,7 +26,7 @@ async function _fetchMapDataset(
   const cache: {value?: number} = {};
   const configuredSource = configureSource({
     dataset,
-    filters: isRemoteCalculationSupported(dataset) ? filters : undefined,
+    filters: !isEmptyObject(filters) && isRemoteCalculationSupported(dataset) ? filters : undefined,
     options: {
       ...context,
       connection: connectionName,
@@ -78,6 +78,9 @@ async function _fetchTilestats(
   const parameters: Record<string, unknown> = {};
   if (client) {
     parameters.client = client;
+  }
+  if (context.mapId) {
+    parameters[AUDIT_TAGS.mapId] = context.mapId;
   }
   if (type === 'query') {
     parameters.q = source;
