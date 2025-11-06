@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(fetchMap): Add tag-mapId to requests (#255)
+
 ## 0.5
 
 ### 0.5.22
