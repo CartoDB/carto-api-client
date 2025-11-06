@@ -26,7 +26,10 @@ async function _fetchMapDataset(
   const cache: {value?: number} = {};
   const configuredSource = configureSource({
     dataset,
-    filters: !isEmptyObject(filters) && isRemoteCalculationSupported(dataset) ? filters : undefined,
+    filters:
+      !isEmptyObject(filters) && isRemoteCalculationSupported(dataset)
+        ? filters
+        : undefined,
     options: {
       ...context,
       connection: connectionName,

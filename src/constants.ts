@@ -34,7 +34,7 @@ export const DEFAULT_API_BASE_URL = 'https://gcp-us-east1.api.carto.com';
 
 export const AUDIT_TAGS = {
   mapId: 'tag-mapId',
-}
+};
 
 /** @privateRemarks Source: @carto/react-core */
 export enum TileFormat {
