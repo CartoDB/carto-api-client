@@ -1,4 +1,4 @@
-import {DEFAULT_API_BASE_URL} from '../constants.js';
+import {AUDIT_TAGS, DEFAULT_API_BASE_URL} from '../constants.js';
 
 import {
   type APIErrorContext,
@@ -34,6 +34,9 @@ async function _fetchMapDataset(
       accessToken: context.accessToken!,
       apiBaseUrl: context.apiBaseUrl,
       maxLengthURL: context.maxLengthURL,
+      tags: {
+        [AUDIT_TAGS.mapId]: context.mapId,
+      },
     },
   });
   dataset.data = await configuredSource;
@@ -190,7 +193,7 @@ export type FetchMapOptions = {
 /**
  * Context reused while fetching and updating a map with fetchMap().
  */
-type _FetchMapContext = {apiBaseUrl: string} & Pick<
+type _FetchMapContext = {apiBaseUrl: string; mapId: string} & Pick<
   FetchMapOptions,
   'accessToken' | 'clientId' | 'headers' | 'maxLengthURL'
 >;
@@ -243,6 +246,7 @@ export async function fetchMap({
     maxLengthURL,
   });
   const context: _FetchMapContext = {
+    mapId: cartoMapId,
     accessToken: map.token || accessToken,
     apiBaseUrl,
     clientId,
