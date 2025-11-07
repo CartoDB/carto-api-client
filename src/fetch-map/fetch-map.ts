@@ -1,4 +1,4 @@
-import {DEFAULT_API_BASE_URL} from '../constants.js';
+import {AUDIT_TAGS, DEFAULT_API_BASE_URL} from '../constants.js';
 
 import {
   type APIErrorContext,
@@ -9,7 +9,7 @@ import {
 } from '../api/index.js';
 
 import {type ParseMapResult, parseMap} from './parse-map.js';
-import {assert} from '../utils.js';
+import {assert, isEmptyObject} from '../utils.js';
 import type {Basemap, Dataset, KeplerMapConfig} from './types.js';
 import {fetchBasemapProps} from './basemap.js';
 import {configureSource} from './source.js';
@@ -26,7 +26,10 @@ async function _fetchMapDataset(
   const cache: {value?: number} = {};
   const configuredSource = configureSource({
     dataset,
-    filters: isRemoteCalculationSupported(dataset) ? filters : undefined,
+    filters:
+      !isEmptyObject(filters) && isRemoteCalculationSupported(dataset)
+        ? filters
+        : undefined,
     options: {
       ...context,
       connection: connectionName,
@@ -34,6 +37,11 @@ async function _fetchMapDataset(
       accessToken: context.accessToken!,
       apiBaseUrl: context.apiBaseUrl,
       maxLengthURL: context.maxLengthURL,
+      ...(context.mapId && {
+        tags: {
+          [AUDIT_TAGS.mapId]: context.mapId,
+        },
+      }),
     },
   });
   dataset.data = await configuredSource;
@@ -73,6 +81,9 @@ async function _fetchTilestats(
   const parameters: Record<string, unknown> = {};
   if (client) {
     parameters.client = client;
+  }
+  if (context.mapId) {
+    parameters[AUDIT_TAGS.mapId] = context.mapId;
   }
   if (type === 'query') {
     parameters.q = source;
@@ -190,7 +201,7 @@ export type FetchMapOptions = {
 /**
  * Context reused while fetching and updating a map with fetchMap().
  */
-type _FetchMapContext = {apiBaseUrl: string} & Pick<
+type _FetchMapContext = {apiBaseUrl: string; mapId?: string} & Pick<
   FetchMapOptions,
   'accessToken' | 'clientId' | 'headers' | 'maxLengthURL'
 >;
@@ -243,6 +254,7 @@ export async function fetchMap({
     maxLengthURL,
   });
   const context: _FetchMapContext = {
+    mapId: cartoMapId,
     accessToken: map.token || accessToken,
     apiBaseUrl,
     clientId,

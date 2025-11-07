@@ -41,6 +41,7 @@ type FetchDatasetOptions = {
     cacheControl: 'no-cache'[];
   };
   maxLengthURL?: number;
+  tags?: Record<string, string>;
 };
 
 type FetchDataset = {
@@ -169,6 +170,7 @@ function getSourceOptions({
   connection,
   headers,
   maxLengthURL,
+  tags,
 }: FetchDatasetOptions) {
   return {
     accessToken,
@@ -181,6 +183,7 @@ function getSourceOptions({
         cacheControl: ['no-cache'] as 'no-cache'[],
       },
     }),
+    tags,
   };
 }
 
