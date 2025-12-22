@@ -2,9 +2,12 @@
 
 ## Unreleased
 
-- fix(fetchMap): Add tag-mapId to requests (#255)
-
 ## 0.5
+
+### 0.5.23
+
+- fix(fetchMap): Add tag-mapId to requests (#255)
+- chore(fetch-map): expose fillInMapDatasets and fillInTileStats as private (#254)
 
 ### 0.5.22
 
