@@ -3863,9 +3863,9 @@ __metadata:
   linkType: hard
 
 "h3-js@npm:^4.1.0":
-  version: 4.3.0
-  resolution: "h3-js@npm:4.3.0"
-  checksum: 10c0/f9a08cb831e5637c0fcdb99913f669641d9d7cce979e4fbda02c96d3d0dee08ef200478bc1e62aaea58871065c46d73ca626c40bb4eecbe5ed1f729adb9f8700
+  version: 4.4.0
+  resolution: "h3-js@npm:4.4.0"
+  checksum: 10c0/3a324b3a879601e1d012c2f67b2f78e9a480b0fa8e51c54b77ee281b421343ae735c3d892ab80c2cc8c47522ad0822ccb457b97b3792a040e41991016801f3ed
   languageName: node
   linkType: hard
 
