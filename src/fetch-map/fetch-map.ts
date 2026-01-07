@@ -322,6 +322,7 @@ export async function fetchMap({
   /* global FontFace, window, document */
   if (
     textLayers.length &&
+    typeof window !== 'undefined' &&
     window.FontFace &&
     !document.fonts.check('12px Inter')
   ) {
