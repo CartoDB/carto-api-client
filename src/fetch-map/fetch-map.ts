@@ -322,7 +322,10 @@ export async function fetchMap({
   /* global FontFace, window, document */
   if (
     textLayers.length &&
+    typeof window !== 'undefined' &&
+    typeof document !== 'undefined' &&
     window.FontFace &&
+    document.fonts &&
     !document.fonts.check('12px Inter')
   ) {
     // Fetch font needed for labels
