@@ -4,6 +4,10 @@
 
 ## 0.5
 
+### 0.5.24
+
+- fix(fetchMap): Don't fetch fonts when invoked outside browser (#264)
+
 ### 0.5.23
 
 - fix(fetchMap): Add tag-mapId to requests (#255)
