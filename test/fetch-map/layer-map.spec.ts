@@ -170,6 +170,39 @@ describe('layer-map', () => {
         expected: hexToRGBA(colors[2]),
       },
       {
+        title: 'ordinal overflow categories get unknown color',
+        colorField: {name: 'v'},
+        colorScale: 'ordinal',
+        colorRange: {
+          colors: colors.slice(0, 3), // only 3 palette colors
+        },
+        opacity: 1,
+        data: {
+          tilestats: {
+            layers: [
+              {
+                attributes: [
+                  {
+                    attribute: 'v',
+                    categories: [
+                      {category: 'A'},
+                      {category: 'B'},
+                      {category: 'C'},
+                      {category: 'D'},
+                      {category: 'E'},
+                      {category: 'F'},
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        // Category D overflows the 3-color palette, should get grey "Others"
+        d: {properties: {v: 'D'}},
+        expected: [134, 141, 145, 255],
+      },
+      {
         title: 'hexColumn',
         colorField: {name: 'v', colorColumn: 'vColor'},
         colorScale: 'ordinal',
