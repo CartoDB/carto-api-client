@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+### 0.5.25
+
 - fix(fetchMap): ordinal color scale overflow categories render as "Others" instead of cycling palette (#269)
 
 ### 0.5.24
