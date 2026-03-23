@@ -236,7 +236,8 @@ function domainFromAttribute(
     }
     return attribute.categories
       .map((c: any) => c.category)
-      .filter((c: any) => c !== undefined && c !== null);
+      .filter((c: any) => c !== undefined && c !== null)
+      .slice(0, scaleLength);
   }
 
   if (scaleType === 'quantile' && attribute.quantiles) {
