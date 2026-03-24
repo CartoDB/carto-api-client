@@ -140,9 +140,8 @@ export abstract class WidgetRemoteSource<
       spatialFiltersMode,
       ...params
     } = options;
-    const {columns, dataType, featureIds, z, limit, tileResolution} = params;
-
-    type FeaturesModelResponse = {rows: Record<string, unknown>[]};
+    const {columns, dataType, featureIds, z, limit, tileResolution, offset} =
+      params;
 
     return executeModel({
       model: 'pick',
@@ -156,12 +155,13 @@ export abstract class WidgetRemoteSource<
         dataType,
         featureIds,
         z,
+        offset,
         limit: limit || 1000,
         tileResolution: tileResolution || DEFAULT_TILE_RESOLUTION,
       },
       opts: {signal, headers: this.props.headers},
       // Avoid `normalizeObjectKeys()`, which changes column names.
-    }).then(({rows}: FeaturesModelResponse) => ({rows}));
+    }).then(({rows, metadata}: FeaturesResponse) => ({rows, metadata}));
   }
 
   async getFormula(options: FormulaRequestOptions): Promise<FormulaResponse> {
