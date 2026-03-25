@@ -58,14 +58,24 @@ yarn format
 
 Tests, coverage, and other development-related scripts are defined in `package.json#scripts`.
 
-## Releases
+## Official releases
 
 1. Update changelog
 
-2. Create a new version: `yarn version [ major | minor | patch | prerelease ]`
+2. Create a new version: `yarn version [ major | minor | patch ]`
 
 3. Commit, tag, and push to GitHub: `yarn postversion`
 
 4. Publish
-   - If working on `main`, the previous step will automatically create and push a branch. Open a pull request, get any required approvals, and merge. Merged pull requests with commit messages beginning `chore(release)` will trigger a release automatically.
-   - If working on a branch, a commit for the release will be pushed to the branch. You'll then need to [manually run a workflow](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/manually-running-a-workflow), “Release”, selecting the target branch in the menu.
+
+   Open a pull request, get any required approvals, and merge. Merged pull requests with commit messages beginning `chore(release)` will trigger a release automatically.
+
+## Work-in-progress alpha releases
+
+To publish a prerelease from any branch, [manually run](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/manually-running-a-workflow) the “Release” workflow, selecting the target branch in the menu.
+
+It will bump the patch version and add prerelease tags to make it unique:
+
+Example: `0.5.26` → `0.5.27-alpha.482101a.112`
+
+The package is published to npm under the `alpha` dist tag. A `dry_run` option is available to test the workflow without publishing.
