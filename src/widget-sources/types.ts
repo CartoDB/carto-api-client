@@ -114,6 +114,11 @@ export interface FeaturesRequestOptions extends BaseRequestOptions {
   limit?: number;
 
   /**
+   * Number of objects to skip in the result set.
+   */
+  offset?: number;
+
+  /**
    * Must match `tileResolution` used when obtaining the `_carto_feature_id`
    * column, typically in a layer's tile requests.
    */
@@ -239,7 +244,10 @@ export type ExtentRequestOptions = BaseRequestOptions;
  * @experimental
  * @internal
  */
-export type FeaturesResponse = {rows: Record<string, unknown>[]};
+export type FeaturesResponse = {
+  rows: Record<string, unknown>[];
+  metadata: {total?: number};
+};
 
 /** Response from {@link WidgetRemoteSource#getFormula}. */
 export type FormulaResponse = {value: number | null};
