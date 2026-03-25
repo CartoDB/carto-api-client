@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- chore(ci): add prerelease support to release workflow (#274)
+
 ### 0.5.25
 
 - fix(fetchMap): ordinal color scale overflow categories render as "Others" instead of cycling palette (#269)
