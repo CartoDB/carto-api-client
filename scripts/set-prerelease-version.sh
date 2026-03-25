@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BASE_VERSION=$(npm pkg get version | xargs)
+BASE_VERSION=$(yarn pkg get version | xargs)
 SHORT_SHA=$(git rev-parse --short HEAD)
 PRE_VERSION="${BASE_VERSION}-alpha.${SHORT_SHA}.${GITHUB_RUN_NUMBER}"
 
 echo "Setting version to ${PRE_VERSION}"
-npm version "${PRE_VERSION}" --no-git-tag-version
+yarn version "${PRE_VERSION}"
