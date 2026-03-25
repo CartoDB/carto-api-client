@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### 0.5.26
+
+- fix(widgetSources): add offset request option and total for pagination (#273)
+
 ### 0.5.25
 
 - fix(fetchMap): ordinal color scale overflow categories render as "Others" instead of cycling palette (#269)
