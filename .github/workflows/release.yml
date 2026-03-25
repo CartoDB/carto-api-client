@@ -38,7 +38,7 @@ jobs:
 
       - name: Set prerelease version
         if: github.event_name == 'workflow_dispatch'
-        run: bash scripts/set-prerelease-version.sh
+        run: bash scripts/ci-set-prerelease-version.sh
 
       # Read version from 'package.json'; git tags are lost on a merged PR.
       - name: Read package version
@@ -86,4 +86,4 @@ jobs:
           PKG_VERSION: ${{ steps.version.outputs.PKG_VERSION }}
           DIST_TAG: ${{ steps.dist-tag.outputs.result }}
           DRY_RUN: ${{ inputs.dry_run }}
-        run: bash scripts/release-summary.sh >> "$GITHUB_STEP_SUMMARY"
+        run: bash scripts/ci-release-summary.sh >> "$GITHUB_STEP_SUMMARY"
