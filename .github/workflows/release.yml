@@ -31,11 +31,14 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Set prerelease version
-        if: github.event_name == 'workflow_dispatch'
+      - name: Install
         run: |
           corepack enable
-          bash scripts/set-prerelease-version.sh
+          yarn install
+
+      - name: Set prerelease version
+        if: github.event_name == 'workflow_dispatch'
+        run: bash scripts/set-prerelease-version.sh
 
       # Read version from 'package.json'; git tags are lost on a merged PR.
       - name: Read package version
@@ -60,11 +63,6 @@ jobs:
             }
             console.log(`npm dist tag: ${distTag}`)
             return distTag
-
-      - name: Install
-        run: |
-          corepack enable
-          yarn install
 
       # Build. Tests are run automatically by `yarn prepublish`.
       - name: Build
