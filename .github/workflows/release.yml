@@ -6,6 +6,12 @@ on:
       NPM_CARTODB_AUTH_TOKEN:
         required: true
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (skip publish)'
+        required: false
+        default: false
+        type: boolean
 
 env:
   NODE_VERSION: 20
@@ -19,6 +25,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set prerelease version
+        if: github.event_name == 'workflow_dispatch'
+        run: bash scripts/set-prerelease-version.sh
 
       # Read version from 'package.json'; git tags are lost on a merged PR.
       - name: Read package version
@@ -66,6 +76,14 @@ jobs:
           yarn config set npmAuthToken "${NPM_AUTH_TOKEN}"
 
       - name: Publish
+        if: inputs.dry_run != true
         env:
           DIST_TAG: ${{ steps.dist-tag.outputs.result }}
         run: yarn npm publish --tag ${DIST_TAG}
+
+      - name: Summary
+        env:
+          PKG_VERSION: ${{ steps.version.outputs.PKG_VERSION }}
+          DIST_TAG: ${{ steps.dist-tag.outputs.result }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: bash scripts/release-summary.sh >> "$GITHUB_STEP_SUMMARY"
