@@ -26,19 +26,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
       - name: Set prerelease version
         if: github.event_name == 'workflow_dispatch'
-        run: bash scripts/set-prerelease-version.sh
+        run: |
+          corepack enable
+          bash scripts/set-prerelease-version.sh
 
       # Read version from 'package.json'; git tags are lost on a merged PR.
       - name: Read package version
         id: version
         run: echo "PKG_VERSION=v$(npm pkg get version | xargs)" >> $GITHUB_OUTPUT
-
-      - name: Set up Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
 
       # Determine whether to tag the release as 'latest' or 'alpha'.
       - name: Assign dist tag
