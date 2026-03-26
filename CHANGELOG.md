@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- chore(ci): add prerelease support to release workflow (#274)
+
 ### 0.5.26
 
 - fix(widgetSources): add offset request option and total for pagination (#273)
