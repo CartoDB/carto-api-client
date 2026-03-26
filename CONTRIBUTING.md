@@ -72,7 +72,7 @@ Tests, coverage, and other development-related scripts are defined in `package.j
 
 ## Work-in-progress alpha releases
 
-To publish a prerelease from any branch, [manually run](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/manually-running-a-workflow) the “Release” workflow, selecting the target branch in the menu.
+To publish a prerelease from any branch, [manually run](https://github.com/CartoDB/carto-api-client/actions/workflows/release.yml) the “Release” workflow, selecting the target branch in the menu.
 
 It will bump the patch version and add prerelease tags to make it unique:
 
