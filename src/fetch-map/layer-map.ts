@@ -342,9 +342,17 @@ function findAccessorKey(keys: string[], properties: any): string[] {
 }
 
 export function getColorAccessor(
-  {name, colorColumn}: VisualChannelField,
+  {name, colorColumn, accessorKey}: VisualChannelField,
   scaleType: ScaleType,
-  {aggregation, range}: {aggregation?: string; range: ColorRange},
+  {
+    aggregation,
+    range,
+    domainOverride,
+  }: {
+    aggregation?: string;
+    range: ColorRange;
+    domainOverride?: [number, number];
+  },
   opacity: number | undefined,
   data: TilejsonResult
 ): {
@@ -353,15 +361,23 @@ export function getColorAccessor(
   scaleDomain: number[] | string[];
   range: string[];
 } {
+  // accessorKey (custom-agg alias) wins over colorColumn (legacy identity-color
+  // column), which wins over name (standard field).
+  const effectiveName = accessorKey ?? colorColumn ?? name;
+  const effectiveScaleType =
+    colorColumn && !accessorKey ? 'identity' : scaleType;
   const {scale, domain} = calculateLayerScale(
-    colorColumn || name,
-    colorColumn ? 'identity' : scaleType,
+    effectiveName,
+    effectiveScaleType,
     range,
-    data
+    data,
+    domainOverride
   );
   const alpha = opacityToAlpha(opacity);
 
-  let accessorKeys = getAccessorKeys(colorColumn || name, aggregation);
+  let accessorKeys = accessorKey
+    ? [accessorKey]
+    : getAccessorKeys(colorColumn || name, aggregation);
   const accessor = (properties: any) => {
     if (!(accessorKeys[0] in properties)) {
       accessorKeys = findAccessorKey(accessorKeys, properties);
@@ -383,13 +399,20 @@ export function calculateLayerScale(
   name: string,
   scaleType: ScaleType,
   range: ColorRange,
-  data: TilejsonResult
+  data: TilejsonResult,
+  domainOverride?: [number, number]
 ): {scale: D3Scale; domain: string[] | number[]} {
   let scaleDomain: number[] | string[] | undefined;
   let scaleColors: string[] = [];
   const {colors} = range;
 
-  const domain = calculateDomain(data, name, scaleType, colors.length);
+  // colorMap (explicit break values from Custom classification) wins over
+  // domainOverride (user Min/Max for Custom aggregation). colorMap defines
+  // its own domain, so the override does not apply.
+  const domain =
+    domainOverride && !range.colorMap
+      ? domainOverride
+      : calculateDomain(data, name, scaleType, colors.length);
   if (scaleType !== 'identity') {
     if (range.colorMap) {
       const {colorMap} = range;
@@ -506,11 +529,12 @@ export function negateAccessor(accessor: Accessor): Accessor {
 }
 
 export function getSizeAccessor(
-  {name}: VisualChannelField,
+  {name, accessorKey}: VisualChannelField,
   scaleType: ScaleType | undefined,
   aggregation: string | null | undefined,
   range: number[] | undefined,
-  data: TilejsonResult
+  data: TilejsonResult,
+  domainOverride?: [number, number]
 ): {
   accessor: any;
   domain: number[];
@@ -521,7 +545,10 @@ export function getSizeAccessor(
   let domain: number[] = [];
   if (scaleType && range) {
     if (aggregation !== AggregationTypes.Count) {
-      domain = calculateDomain(data, name, scaleType) as number[];
+      const source = accessorKey ?? name;
+      domain =
+        domainOverride ??
+        (calculateDomain(data, source, scaleType) as number[]);
       (scale as D3Scale).domain(domain);
     } else {
       domain = (scale as D3Scale).domain();
@@ -529,7 +556,9 @@ export function getSizeAccessor(
     (scale as D3Scale).range(range);
   }
 
-  let accessorKeys = getAccessorKeys(name, aggregation);
+  let accessorKeys = accessorKey
+    ? [accessorKey]
+    : getAccessorKeys(name, aggregation);
   const accessor = (properties: any) => {
     if (!(accessorKeys[0] in properties)) {
       accessorKeys = findAccessorKey(accessorKeys, properties);
@@ -597,14 +626,42 @@ export function getDefaultAggregationExpColumnAliasForLayerType(
   }
 }
 
+function hashString(input: string): string {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < input.length; i++) {
+    h ^= input.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(16).padStart(8, '0');
+}
+
+function normalizeExpression(exp: string): string {
+  return exp.trim().replace(/\s+/g, ' ');
+}
+
+function applyProviderCase(alias: string, provider: ProviderType): string {
+  return provider === 'snowflake' ? alias.toUpperCase() : alias;
+}
+
 /** @privateRemarks Source: Builder */
 function getColumnAliasForAggregationExp(
   name: string,
   aggregation: string,
   provider: ProviderType
 ) {
-  const columnAlias = `${name}_${aggregation}`;
-  return provider === 'snowflake' ? columnAlias.toUpperCase() : columnAlias;
+  return applyProviderCase(`${name}_${aggregation}`, provider);
+}
+
+export function compileCustomAggregation(
+  exp: string,
+  opts: {provider: ProviderType}
+): string {
+  const normalized = normalizeExpression(exp);
+  if (!normalized) {
+    throw new Error('Custom aggregation expression must not be empty');
+  }
+  const hash = hashString(normalized);
+  return applyProviderCase('custom_agg_' + hash, opts.provider);
 }
 
 /** @privateRemarks Source: Builder */
