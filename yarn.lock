@@ -215,7 +215,6 @@ __metadata:
     d3-scale: "npm:^4.0.2"
     h3-js: "npm:^4.1.0"
     jsep: "npm:^1.4.0"
-    protocol-buffers-schema: "npm:3.6.1"
     quadbin: "npm:^0.4.1-alpha.0"
   languageName: node
   linkType: soft
@@ -5117,7 +5116,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"protocol-buffers-schema@npm:3.6.1, protocol-buffers-schema@npm:^3.3.1":
+"protocol-buffers-schema@npm:^3.3.1":
   version: 3.6.1
   resolution: "protocol-buffers-schema@npm:3.6.1"
   checksum: 10c0/e0a6858d085aa1a6719c924c0be52000dafc24bf3b0d0b1a6e1e68c8b95f8efe3d4069902e14270a2101f2144374eeefc11381dff07ad9909386a4fbc70c7ebd
