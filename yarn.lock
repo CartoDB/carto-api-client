@@ -213,7 +213,6 @@ __metadata:
     "@types/geojson": "npm:^7946.0.16"
     d3-format: "npm:^3.1.0"
     d3-scale: "npm:^4.0.2"
-    fast-xml-parser: "npm:4.5.6"
     h3-js: "npm:^4.1.0"
     jsep: "npm:^1.4.0"
     quadbin: "npm:^0.4.1-alpha.0"
@@ -3568,7 +3567,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-xml-parser@npm:4.5.6, fast-xml-parser@npm:^4.2.5":
+"fast-xml-parser@npm:^4.2.5":
   version: 4.5.6
   resolution: "fast-xml-parser@npm:4.5.6"
   dependencies:
