@@ -68,7 +68,7 @@
   "dependencies": {
     "@loaders.gl/schema": "^4.3.3",
     "@types/geojson": "^7946.0.16",
-    "d3-format": "^3.1.0",
+    "d3-format": "^3.1.2",
     "d3-scale": "^4.0.2",
     "h3-js": "^4.1.0",
     "jsep": "^1.4.0",
