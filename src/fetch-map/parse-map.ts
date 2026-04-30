@@ -2,6 +2,7 @@ import type {ColorParameters} from '@luma.gl/core';
 import {
   calculateClusterRadius,
   calculateClusterTextFontSize,
+  compileCustomAggregation,
   getDefaultAggregationExpColumnAliasForLayerType,
   getLayerProps,
   getColorAccessor,
@@ -35,6 +36,7 @@ import {
   getRasterTileLayerStylePropsRgb,
   getRasterTileLayerStylePropsScaledBand,
 } from './raster-layer.js';
+import type {ProviderType} from '../types.js';
 import type {TilejsonResult} from '../sources/types.js';
 
 export type Scale = {
@@ -53,6 +55,7 @@ export type ScaleKey =
   | 'fillColor'
   | 'pointRadius'
   | 'lineColor'
+  | 'lineWidth'
   | 'elevation'
   | 'weight';
 
@@ -250,6 +253,37 @@ function createStyleProps(config: MapLayerConfig, mapping: any) {
   return result;
 }
 
+function resolveCustomAggregation({
+  field,
+  aggregation,
+  expression,
+  domain,
+  providerId,
+}: {
+  field: VisualChannelField | undefined;
+  aggregation: string | undefined;
+  expression: string | undefined;
+  domain: [number, number] | undefined;
+  providerId: ProviderType;
+}): {
+  field: VisualChannelField | undefined;
+  aggregation: string | undefined;
+  domainOverride: [number, number] | undefined;
+} {
+  if (aggregation !== 'custom') {
+    return {field, aggregation, domainOverride: undefined};
+  }
+  if (!field || !expression?.trim()) {
+    return {field, aggregation: undefined, domainOverride: undefined};
+  }
+  const alias = compileCustomAggregation(expression, {provider: providerId});
+  return {
+    field: {...field, accessorKey: alias},
+    aggregation: undefined,
+    domainOverride: domain,
+  };
+}
+
 function createChannelProps(
   id: string,
   layerType: LayerType,
@@ -313,18 +347,25 @@ function createChannelProps(
   // fill color
   {
     const {colorField, colorScale} = visualChannels;
-    const {colorRange, colorAggregation} = visConfig;
-    if (colorField && colorScale && colorRange) {
+    const {colorRange} = visConfig;
+    const {field, aggregation, domainOverride} = resolveCustomAggregation({
+      field: colorField,
+      aggregation: visConfig.colorAggregation,
+      expression: visConfig.colorAggregationExp,
+      domain: visConfig.colorAggregationDomain,
+      providerId: dataset.providerId,
+    });
+    if (field && colorScale && colorRange) {
       const {accessor, ...scaleProps} = getColorAccessor(
-        colorField,
+        field,
         colorScale,
-        {aggregation: colorAggregation, range: colorRange},
+        {aggregation, range: colorRange, domainOverride},
         visConfig.opacity,
         data
       );
       result.getFillColor = accessor;
       scales.fillColor = updateTriggers.getFillColor = {
-        field: colorField,
+        field,
         type: colorScale,
         ...scaleProps,
       };
@@ -398,44 +439,57 @@ function createChannelProps(
 
   // point radius
   {
-    const radiusRange = visConfig.radiusRange;
     const {radiusField, radiusScale} = visualChannels;
-    if (radiusField && radiusRange && radiusScale) {
+    const {radiusRange} = visConfig;
+    const {field, aggregation, domainOverride} = resolveCustomAggregation({
+      field: radiusField,
+      aggregation: visConfig.radiusAggregation,
+      expression: visConfig.radiusAggregationExp,
+      domain: visConfig.radiusAggregationDomain,
+      providerId: dataset.providerId,
+    });
+    if (field && radiusRange && radiusScale) {
       const {accessor, ...scaleProps} = getSizeAccessor(
-        radiusField,
+        field,
         radiusScale,
-        visConfig.radiusAggregation,
+        aggregation,
         radiusRange,
-        data
+        data,
+        domainOverride
       );
       result.getPointRadius = accessor;
       scales.pointRadius = updateTriggers.getPointRadius = {
-        field: radiusField,
+        field,
         type: radiusScale,
         ...scaleProps,
       };
     }
   }
 
-  // stroke/ouline color
+  // stroke/outline color
   {
-    const strokeColorRange = visConfig.strokeColorRange;
     const {strokeColorScale, strokeColorField} = visualChannels;
-    if (strokeColorField && strokeColorRange && strokeColorScale) {
-      const {strokeColorAggregation: aggregation} = visConfig;
+    const {strokeColorRange} = visConfig;
+    const {field, aggregation, domainOverride} = resolveCustomAggregation({
+      field: strokeColorField,
+      aggregation: visConfig.strokeColorAggregation,
+      expression: visConfig.strokeColorAggregationExp,
+      domain: visConfig.strokeColorAggregationDomain,
+      providerId: dataset.providerId,
+    });
+    if (field && strokeColorRange && strokeColorScale) {
       const opacity =
         visConfig.strokeOpacity !== undefined ? visConfig.strokeOpacity : 1;
-
       const {accessor, ...scaleProps} = getColorAccessor(
-        strokeColorField,
+        field,
         strokeColorScale,
-        {aggregation, range: strokeColorRange},
+        {aggregation, range: strokeColorRange, domainOverride},
         opacity,
         data
       );
       result.getLineColor = accessor;
       scales.lineColor = updateTriggers.getLineColor = {
-        field: strokeColorField,
+        field,
         type: strokeColorScale,
         ...scaleProps,
       };
@@ -446,19 +500,26 @@ function createChannelProps(
   {
     const {sizeField: strokeWidthField, sizeScale: strokeWidthScale} =
       visualChannels;
-    const {sizeRange, sizeAggregation} = visConfig;
-
-    if (strokeWidthField && sizeRange) {
+    const {sizeRange} = visConfig;
+    const {field, aggregation, domainOverride} = resolveCustomAggregation({
+      field: strokeWidthField,
+      aggregation: visConfig.sizeAggregation,
+      expression: visConfig.sizeAggregationExp,
+      domain: visConfig.sizeAggregationDomain,
+      providerId: dataset.providerId,
+    });
+    if (field && sizeRange) {
       const {accessor, ...scaleProps} = getSizeAccessor(
-        strokeWidthField,
+        field,
         strokeWidthScale,
-        sizeAggregation,
+        aggregation,
         sizeRange,
-        data
+        data,
+        domainOverride
       );
       result.getLineWidth = accessor;
       scales.lineWidth = updateTriggers.getLineWidth = {
-        field: strokeWidthField,
+        field,
         type: strokeWidthScale || 'identity',
         ...scaleProps,
       };
@@ -467,19 +528,27 @@ function createChannelProps(
 
   // height / elevation
   {
-    const {enable3d, heightRange} = visConfig;
     const {heightField, heightScale} = visualChannels;
-    if (heightField && heightRange && enable3d) {
+    const {enable3d, heightRange} = visConfig;
+    const {field, aggregation, domainOverride} = resolveCustomAggregation({
+      field: heightField,
+      aggregation: visConfig.heightAggregation,
+      expression: visConfig.heightAggregationExp,
+      domain: visConfig.heightAggregationDomain,
+      providerId: dataset.providerId,
+    });
+    if (field && heightRange && enable3d) {
       const {accessor, ...scaleProps} = getSizeAccessor(
-        heightField,
+        field,
         heightScale,
-        visConfig.heightAggregation,
+        aggregation,
         heightRange,
-        data
+        data,
+        domainOverride
       );
       result.getElevation = accessor;
       scales.elevation = updateTriggers.getElevation = {
-        field: heightField,
+        field,
         type: heightScale || 'identity',
         ...scaleProps,
       };
@@ -489,18 +558,25 @@ function createChannelProps(
   // weight
   {
     const {weightField} = visualChannels;
-    const {weightAggregation} = visConfig;
-    if (weightField && weightAggregation) {
+    const {field, aggregation, domainOverride} = resolveCustomAggregation({
+      field: weightField,
+      aggregation: visConfig.weightAggregation,
+      expression: visConfig.weightAggregationExp,
+      domain: visConfig.weightAggregationDomain,
+      providerId: dataset.providerId,
+    });
+    if (field && (aggregation || visConfig.weightAggregation === 'custom')) {
       const {accessor, ...scaleProps} = getSizeAccessor(
-        weightField,
+        field,
         undefined,
-        weightAggregation,
+        aggregation,
         undefined,
-        data
+        data,
+        domainOverride
       );
       result.getWeight = accessor;
       scales.weight = updateTriggers.getWeight = {
-        field: weightField,
+        field,
         type: 'identity' as ScaleType,
         ...scaleProps,
       };

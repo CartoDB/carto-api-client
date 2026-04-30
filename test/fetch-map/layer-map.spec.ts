@@ -1,6 +1,7 @@
 import {describe, test, expect} from 'vitest';
 import {
   getColorAccessor,
+  getSizeAccessor,
   getTextAccessor,
   getLayerProps,
   _domainFromValues,
@@ -244,21 +245,178 @@ describe('layer-map', () => {
     });
   });
 
-  // describe('size accessors', () => {
-  //   // TODO add test cases using tilestats data
-  //   const SIZE_TESTS = [];
+  describe('getColorAccessor accessorKey override', () => {
+    const COLOR_ACCESSOR_KEY_TESTS = [
+      {
+        title: 'uses accessorKey when provided',
+        field: {
+          name: 'revenue',
+          type: 'real',
+          accessorKey: 'custom_agg_abc12345',
+        },
+        attribute: 'custom_agg_abc12345',
+        properties: {custom_agg_abc12345: 50, revenue: 999},
+      },
+      {
+        title: 'falls back to getAccessorKeys when accessorKey is absent',
+        field: {name: 'v', type: 'real'},
+        attribute: 'v',
+        properties: {v: 50},
+      },
+    ];
 
-  //   test.each(SIZE_TESTS)('getSizeAccessor $sizeScale', (testCase) => {
-  //     const accessor = getSizeAccessor(
-  //       testCase.sizeField,
-  //       testCase.sizeScale,
-  //       undefined,
-  //       testCase.sizeRange,
-  //       testCase.data
-  //     );
-  //     expect(accessor(testCase.d)).toBe(testCase.expected);
-  //   });
-  // });
+    test.each(COLOR_ACCESSOR_KEY_TESTS)(
+      'getColorAccessor $title',
+      (testCase) => {
+        const {accessor} = getColorAccessor(
+          testCase.field,
+          'quantize',
+          {
+            range: {
+              colors: colors.slice(0, 2),
+              name: '',
+              type: '',
+              category: '',
+              colorMap: undefined,
+            },
+          },
+          1,
+          {
+            tilestats: {
+              layers: [
+                {
+                  attributes: [
+                    {attribute: testCase.attribute, min: 0, max: 100},
+                  ],
+                },
+              ],
+            },
+          }
+        );
+        const result = accessor({properties: testCase.properties});
+        expect(result).toBeDefined();
+        expect(result.length).toBe(4);
+      }
+    );
+
+    test('accessorKey reads the aliased property, not the name-derived one', () => {
+      const data = {
+        tilestats: {
+          layers: [
+            {
+              attributes: [
+                {attribute: 'custom_agg_abc12345', min: 0, max: 100},
+              ],
+            },
+          ],
+        },
+      };
+      const range = {
+        colors: colors.slice(0, 2),
+        name: '',
+        type: '',
+        category: '',
+        colorMap: undefined,
+      };
+      const {accessor: accessorWithKey} = getColorAccessor(
+        {name: 'revenue', type: 'real', accessorKey: 'custom_agg_abc12345'},
+        'quantize',
+        {range},
+        1,
+        data
+      );
+      const resultWithKey = accessorWithKey({
+        properties: {custom_agg_abc12345: 80, revenue: 20},
+      });
+
+      const {accessor: accessorNoKey} = getColorAccessor(
+        {name: 'revenue', type: 'real'},
+        'quantize',
+        {range},
+        1,
+        {
+          tilestats: {
+            layers: [{attributes: [{attribute: 'revenue', min: 0, max: 100}]}],
+          },
+        }
+      );
+      const resultNoKey = accessorNoKey({properties: {revenue: 20}});
+
+      expect(resultWithKey).not.toEqual(resultNoKey);
+    });
+  });
+
+  describe('getSizeAccessor accessorKey override', () => {
+    const SIZE_ACCESSOR_KEY_TESTS = [
+      {
+        title: 'uses accessorKey when provided',
+        field: {
+          name: 'population',
+          type: 'real',
+          accessorKey: 'custom_agg_def67890',
+        },
+        attribute: 'custom_agg_def67890',
+        properties: {custom_agg_def67890: 500, population: 999},
+      },
+      {
+        title: 'falls back to getAccessorKeys when accessorKey is absent',
+        field: {name: 'population', type: 'real'},
+        attribute: 'population',
+        properties: {population: 500},
+      },
+    ];
+
+    test.each(SIZE_ACCESSOR_KEY_TESTS)('getSizeAccessor $title', (testCase) => {
+      const {accessor} = getSizeAccessor(
+        testCase.field,
+        'linear',
+        undefined,
+        [1, 10],
+        {
+          tilestats: {
+            layers: [
+              {
+                attributes: [
+                  {attribute: testCase.attribute, min: 0, max: 1000},
+                ],
+              },
+            ],
+          },
+        }
+      );
+      const result = accessor({properties: testCase.properties});
+      expect(typeof result).toBe('number');
+    });
+
+    test('accessorKey reads aliased property and produces the expected scaled value', () => {
+      const {accessor} = getSizeAccessor(
+        {
+          name: 'population',
+          type: 'real',
+          accessorKey: 'custom_agg_def67890',
+        },
+        'linear',
+        undefined,
+        [1, 10],
+        {
+          tilestats: {
+            layers: [
+              {
+                attributes: [
+                  {attribute: 'custom_agg_def67890', min: 0, max: 1000},
+                ],
+              },
+            ],
+          },
+        }
+      );
+      const result = accessor({
+        properties: {custom_agg_def67890: 500, population: 100},
+      });
+      const scaledValue = 1 + (500 / 1000) * (10 - 1);
+      expect(result).toBeCloseTo(scaledValue, 1);
+    });
+  });
 
   describe('text accessors', () => {
     const TEXT_TESTS = [

@@ -6,6 +6,7 @@ export type VisualChannelField = {
   name: string;
   type: string;
   colorColumn?: string;
+  accessorKey?: string;
 };
 
 export type VisualChannels = {
@@ -65,6 +66,8 @@ export type VisConfig = {
   enable3d?: boolean;
 
   colorAggregation?: string;
+  colorAggregationExp?: string;
+  colorAggregationDomain?: [number, number];
   colorRange: ColorRange;
 
   customMarkers?: boolean;
@@ -74,18 +77,28 @@ export type VisConfig = {
   radius: number;
   radiusRange?: number[];
   radiusAggregation?: string;
+  radiusAggregationExp?: string;
+  radiusAggregationDomain?: [number, number];
 
   sizeAggregation?: string;
+  sizeAggregationExp?: string;
+  sizeAggregationDomain?: [number, number];
   sizeRange?: number[];
 
   strokeColorAggregation?: string;
+  strokeColorAggregationExp?: string;
+  strokeColorAggregationDomain?: [number, number];
   strokeOpacity?: number;
   strokeColorRange?: ColorRange;
 
   heightRange?: number[];
   heightAggregation?: string;
+  heightAggregationExp?: string;
+  heightAggregationDomain?: [number, number];
 
   weightAggregation?: string;
+  weightAggregationExp?: string;
+  weightAggregationDomain?: [number, number];
 
   // type = clusterTile
   clusterLevel?: number;
