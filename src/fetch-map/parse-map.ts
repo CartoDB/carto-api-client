@@ -128,6 +128,7 @@ export function getLayerDescriptor({
       ...createInteractionProps(interactionConfig),
       ...styleProps,
       ...channelProps,
+      ...createZoomScaleProps(config, visualChannels),
       ...createParametersProp(layerBlending, styleProps.parameters || {}), // Must come after style
       ...createLoadOptions(data.accessToken),
     },
@@ -206,6 +207,44 @@ function createInteractionProps(interactionConfig: any) {
     autoHighlight: pickable,
     pickable,
   };
+}
+
+// When `radiusScaleWithZoom` is enabled and the radius isn't driven by a data
+// field, render the point in deck.gl's `common` coordinate space so it scales
+// proportionally with zoom. At `radiusReferenceZoom`, 1 common unit equals
+// 2^referenceZoom pixels — dividing by that factor gives a size that matches
+// the configured `radius` pixels at the reference zoom and grows/shrinks from
+// there. Applied to both the circle (`pointRadius*`) and icon (`iconSize*`)
+// sub-layers so `pointType` switching just works.
+function createZoomScaleProps(
+  config: MapLayerConfig,
+  visualChannels: VisualChannels
+): Record<string, any> {
+  const {visConfig} = config;
+  if (
+    !visConfig.radiusScaleWithZoom ||
+    visualChannels.radiusField ||
+    visualChannels.sizeField
+  ) {
+    return {};
+  }
+  const referenceZoom = visConfig.radiusReferenceZoom ?? 12;
+  const scale = Math.pow(2, -referenceZoom);
+  const result: Record<string, any> = {
+    pointRadiusUnits: 'common',
+    pointRadiusScale: scale,
+    iconSizeUnits: 'common',
+    iconSizeScale: scale,
+  };
+  if (visConfig.sizeMinPixels !== undefined) {
+    result.pointRadiusMinPixels = visConfig.sizeMinPixels;
+    result.iconSizeMinPixels = visConfig.sizeMinPixels;
+  }
+  if (visConfig.sizeMaxPixels !== undefined) {
+    result.pointRadiusMaxPixels = visConfig.sizeMaxPixels;
+    result.iconSizeMaxPixels = visConfig.sizeMaxPixels;
+  }
+  return result;
 }
 
 function mapProps(source: any, target: any, mapping: any) {

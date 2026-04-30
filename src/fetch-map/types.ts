@@ -80,6 +80,18 @@ export type VisConfig = {
   radiusAggregationExp?: string;
   radiusAggregationDomain?: [number, number];
 
+  // pixel bounds applied to the point (circle or icon sub-layer) when its
+  // rendered size can vary — e.g. via a zoom-dependent scale. Kept generic so
+  // a single pair of bounds covers both pointType variants.
+  sizeMinPixels?: number;
+  sizeMaxPixels?: number;
+
+  // Zoom-dependent point sizing. When enabled, the point renders at `radius`
+  // pixels at `radiusReferenceZoom` and scales proportionally with zoom
+  // (implemented via deck.gl's `common` radius units).
+  radiusScaleWithZoom?: boolean;
+  radiusReferenceZoom?: number;
+
   sizeAggregation?: string;
   sizeAggregationExp?: string;
   sizeAggregationDomain?: [number, number];
