@@ -908,4 +908,110 @@ describe('parseMap', () => {
       expect(fillColor?.scaleDomain).toEqual([0, 100]);
     });
   });
+
+  describe('autoLabels for tileset textLabel', () => {
+    const buildTilesetDataset = (geometry: string) => ({
+      id: 'AUTOLABEL_DS',
+      data: {
+        tiles: ['https://example.com/tiles/{z}/{x}/{y}'],
+        tilestats: {
+          layers: [
+            {
+              attributes: [{attribute: 'name', categories: []}],
+              geometry,
+            },
+          ],
+        },
+      },
+      type: 'tileset',
+    });
+
+    const buildLayerConfig = (visConfigOverrides: Record<string, any> = {}) => ({
+      version: 'v1',
+      config: {
+        mapState: {},
+        mapStyle: {},
+        visState: {
+          layers: [
+            {
+              id: 'layer1',
+              type: 'tileset',
+              config: {
+                dataId: 'AUTOLABEL_DS',
+                label: 'Test Layer',
+                textLabel: [{field: {name: 'name', type: 'string'}, size: 12}],
+                visConfig: {
+                  filled: true,
+                  opacity: 1,
+                  colorRange: {
+                    category: 'sequential',
+                    colors: ['#f0f0f0', '#333333'],
+                    colorMap: undefined,
+                    name: 'custom',
+                    type: 'custom',
+                  },
+                  radius: 5,
+                  ...visConfigOverrides,
+                },
+              },
+              visualChannels: {},
+            },
+          ],
+          layerBlending: 'normal',
+          interactionConfig: {tooltip: {enabled: false}},
+        },
+      },
+    });
+
+    test('Polygon tileset with uniqueIdField sets autoLabels with uniqueIdProperty and pointType=text', () => {
+      const map = parseMap({
+        ...METADATA,
+        datasets: [buildTilesetDataset('Polygon')],
+        keplerMapConfig: buildLayerConfig({textLabelUniqueIdField: 'fid'}),
+      });
+      expect(map.layers[0].props.autoLabels).toEqual({uniqueIdProperty: 'fid'});
+      expect(map.layers[0].props.pointType).toBe('text');
+    });
+
+    test.each([
+      ['LineString'],
+      ['MultiLineString'],
+      ['Line'],
+      ['MultiPolygon'],
+    ])(
+      '%s tileset without uniqueIdField sets autoLabels=true and pointType=text',
+      (geometry) => {
+        const map = parseMap({
+          ...METADATA,
+          datasets: [buildTilesetDataset(geometry)],
+          keplerMapConfig: buildLayerConfig(),
+        });
+        expect(map.layers[0].props.autoLabels).toBe(true);
+        expect(map.layers[0].props.pointType).toBe('text');
+      }
+    );
+
+    test('Point tileset preserves circle+text pointType and does not set autoLabels', () => {
+      const map = parseMap({
+        ...METADATA,
+        datasets: [buildTilesetDataset('Point')],
+        keplerMapConfig: buildLayerConfig({textLabelUniqueIdField: 'fid'}),
+      });
+      expect(map.layers[0].props.autoLabels).toBeUndefined();
+      expect(map.layers[0].props.pointType).toBe('circle+text');
+    });
+
+    test('Polygon tileset without a textLabel field does not set autoLabels', () => {
+      const keplerMapConfig = buildLayerConfig();
+      keplerMapConfig.config.visState.layers[0].config.textLabel = [
+        {field: null, size: 12} as any,
+      ];
+      const map = parseMap({
+        ...METADATA,
+        datasets: [buildTilesetDataset('Polygon')],
+        keplerMapConfig,
+      });
+      expect(map.layers[0].props.autoLabels).toBeUndefined();
+    });
+  });
 });
