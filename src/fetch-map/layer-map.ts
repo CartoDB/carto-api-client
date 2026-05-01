@@ -514,10 +514,11 @@ export function getMaxMarkerSize(
   visConfig: VisConfig,
   visualChannels: VisualChannels
 ): number {
-  const {radiusRange, radius} = visConfig;
+  const {radiusRange, radius, sizeMaxPixels} = visConfig;
   const {radiusField, sizeField} = visualChannels;
   const field = radiusField || sizeField;
-  return Math.ceil(radiusRange && field ? radiusRange[1] : radius);
+  const baseSize = radiusRange && field ? radiusRange[1] : radius;
+  return Math.ceil(sizeMaxPixels ?? baseSize);
 }
 
 type Accessor = number | ((d: any, i: any) => number);

@@ -908,4 +908,169 @@ describe('parseMap', () => {
       expect(fillColor?.scaleDomain).toEqual([0, 100]);
     });
   });
+
+  describe('zoom-dependent point sizing (radiusScaleWithZoom)', () => {
+    const ZOOM_SCALE_DATASET = {
+      id: 'ZOOM_SCALE_DS',
+      data: {
+        tiles: ['https://example.com/tiles/{z}/{x}/{y}'],
+        tilestats: {
+          layers: [
+            {
+              attributes: [
+                {attribute: 'revenue', min: 0, max: 1000, type: 'Number'},
+              ],
+            },
+          ],
+        },
+      },
+      type: 'tileset',
+    };
+
+    const buildLayerConfig = (
+      visConfigOverrides: Record<string, any> = {},
+      visualChannels: Record<string, any> = {}
+    ) => ({
+      version: 'v1',
+      config: {
+        mapState: {},
+        mapStyle: {},
+        visState: {
+          layers: [
+            {
+              id: 'layer1',
+              type: 'tileset',
+              config: {
+                dataId: 'ZOOM_SCALE_DS',
+                label: 'Test Layer',
+                textLabel: [{field: null, size: 12}],
+                visConfig: {
+                  filled: true,
+                  opacity: 1,
+                  colorRange: {
+                    category: 'sequential',
+                    colors: ['#f0f0f0', '#333333'],
+                    colorMap: undefined,
+                    name: 'custom',
+                    type: 'custom',
+                  },
+                  radius: 5,
+                  ...visConfigOverrides,
+                },
+              },
+              visualChannels,
+            },
+          ],
+          layerBlending: 'normal',
+          interactionConfig: {tooltip: {enabled: false}},
+        },
+      },
+    });
+
+    test('radiusScaleWithZoom enabled emits common-unit scale for point and icon, defaulting referenceZoom to 12', () => {
+      const map = parseMap({
+        ...METADATA,
+        datasets: [ZOOM_SCALE_DATASET],
+        keplerMapConfig: buildLayerConfig({radiusScaleWithZoom: true}),
+      });
+      const props = map.layers[0].props;
+      const expectedScale = Math.pow(2, -12);
+      expect(props.pointRadiusUnits).toBe('common');
+      expect(props.pointRadiusScale).toBe(expectedScale);
+      expect(props.iconSizeUnits).toBe('common');
+      expect(props.iconSizeScale).toBe(expectedScale);
+    });
+
+    test('custom radiusReferenceZoom uses 2^-referenceZoom for the scale', () => {
+      const map = parseMap({
+        ...METADATA,
+        datasets: [ZOOM_SCALE_DATASET],
+        keplerMapConfig: buildLayerConfig({
+          radiusScaleWithZoom: true,
+          radiusReferenceZoom: 10,
+        }),
+      });
+      const props = map.layers[0].props;
+      const expectedScale = Math.pow(2, -10);
+      expect(props.pointRadiusScale).toBe(expectedScale);
+      expect(props.iconSizeScale).toBe(expectedScale);
+    });
+
+    test('sizeMinPixels and sizeMaxPixels are mirrored onto pointRadius and iconSize props', () => {
+      const map = parseMap({
+        ...METADATA,
+        datasets: [ZOOM_SCALE_DATASET],
+        keplerMapConfig: buildLayerConfig({
+          radiusScaleWithZoom: true,
+          sizeMinPixels: 4,
+          sizeMaxPixels: 32,
+        }),
+      });
+      const props = map.layers[0].props;
+      expect(props.pointRadiusMinPixels).toBe(4);
+      expect(props.pointRadiusMaxPixels).toBe(32);
+      expect(props.iconSizeMinPixels).toBe(4);
+      expect(props.iconSizeMaxPixels).toBe(32);
+    });
+
+    test('min/max pixel props are not set when sizeMinPixels/sizeMaxPixels are undefined', () => {
+      const map = parseMap({
+        ...METADATA,
+        datasets: [ZOOM_SCALE_DATASET],
+        keplerMapConfig: buildLayerConfig({radiusScaleWithZoom: true}),
+      });
+      const props = map.layers[0].props;
+      expect(props.pointRadiusMinPixels).toBeUndefined();
+      expect(props.pointRadiusMaxPixels).toBeUndefined();
+      expect(props.iconSizeMinPixels).toBeUndefined();
+      expect(props.iconSizeMaxPixels).toBeUndefined();
+    });
+
+    test('radiusScaleWithZoom disabled leaves pointRadiusUnits at the pixel default', () => {
+      const map = parseMap({
+        ...METADATA,
+        datasets: [ZOOM_SCALE_DATASET],
+        keplerMapConfig: buildLayerConfig(),
+      });
+      const props = map.layers[0].props;
+      expect(props.pointRadiusUnits).toBe('pixels');
+      expect(props.pointRadiusScale).toBeUndefined();
+      expect(props.iconSizeUnits).toBeUndefined();
+      expect(props.iconSizeScale).toBeUndefined();
+    });
+
+    test('radiusField present disables zoom scaling (radius is data-driven)', () => {
+      const map = parseMap({
+        ...METADATA,
+        datasets: [ZOOM_SCALE_DATASET],
+        keplerMapConfig: buildLayerConfig(
+          {radiusScaleWithZoom: true, radiusRange: [1, 20]},
+          {
+            radiusField: {name: 'revenue', type: 'real'},
+            radiusScale: 'linear',
+          }
+        ),
+      });
+      const props = map.layers[0].props;
+      expect(props.pointRadiusUnits).toBe('pixels');
+      expect(props.pointRadiusScale).toBeUndefined();
+    });
+
+    test('sizeField present disables zoom scaling', () => {
+      const map = parseMap({
+        ...METADATA,
+        datasets: [ZOOM_SCALE_DATASET],
+        keplerMapConfig: buildLayerConfig(
+          {radiusScaleWithZoom: true, sizeRange: [1, 10]},
+          {
+            sizeField: {name: 'revenue', type: 'real'},
+            sizeScale: 'linear',
+          }
+        ),
+      });
+      const props = map.layers[0].props;
+      expect(props.pointRadiusUnits).toBe('pixels');
+      expect(props.pointRadiusScale).toBeUndefined();
+    });
+  });
 });

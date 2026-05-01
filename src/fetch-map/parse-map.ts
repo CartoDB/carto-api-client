@@ -128,6 +128,7 @@ export function getLayerDescriptor({
       ...createInteractionProps(interactionConfig),
       ...styleProps,
       ...channelProps,
+      ...createZoomScaleProps(config, visualChannels),
       ...createParametersProp(layerBlending, styleProps.parameters || {}), // Must come after style
       ...createLoadOptions(data.accessToken),
     },
@@ -206,6 +207,39 @@ function createInteractionProps(interactionConfig: any) {
     autoHighlight: pickable,
     pickable,
   };
+}
+
+function createZoomScaleProps(
+  config: MapLayerConfig,
+  visualChannels: VisualChannels
+): Record<string, any> {
+  const {visConfig} = config;
+  if (
+    !visConfig.radiusScaleWithZoom ||
+    visualChannels.radiusField ||
+    visualChannels.sizeField
+  ) {
+    return {};
+  }
+  // When `radiusScaleWithZoom` is enabled, render the point in `common`
+  // coordinate space so it scales proportionally with zoom.
+  const referenceZoom = visConfig.radiusReferenceZoom ?? 12;
+  const scale = Math.pow(2, -referenceZoom);
+  const result: Record<string, any> = {
+    pointRadiusUnits: 'common',
+    pointRadiusScale: scale,
+    iconSizeUnits: 'common',
+    iconSizeScale: scale,
+  };
+  if (visConfig.sizeMinPixels !== undefined) {
+    result.pointRadiusMinPixels = visConfig.sizeMinPixels;
+    result.iconSizeMinPixels = visConfig.sizeMinPixels;
+  }
+  if (visConfig.sizeMaxPixels !== undefined) {
+    result.pointRadiusMaxPixels = visConfig.sizeMaxPixels;
+    result.iconSizeMaxPixels = visConfig.sizeMaxPixels;
+  }
+  return result;
 }
 
 function mapProps(source: any, target: any, mapping: any) {
