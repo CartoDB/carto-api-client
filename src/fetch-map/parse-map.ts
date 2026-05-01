@@ -678,10 +678,7 @@ function createChannelProps(
       geometry === 'Line' ||
       geometry === 'LineString' ||
       geometry === 'MultiLineString';
-    if (
-      isLineOrPolygon &&
-      (layerType === 'tileset' || layerType === 'mvt')
-    ) {
+    if (isLineOrPolygon && (layerType === 'tileset' || layerType === 'mvt')) {
       const uniqueIdProperty = visConfig.textLabelUniqueIdField;
       result.autoLabels = uniqueIdProperty ? {uniqueIdProperty} : true;
       result.pointType = 'text';

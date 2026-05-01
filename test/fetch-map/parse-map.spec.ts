@@ -926,7 +926,9 @@ describe('parseMap', () => {
       type: 'tileset',
     });
 
-    const buildLayerConfig = (visConfigOverrides: Record<string, any> = {}) => ({
+    const buildLayerConfig = (
+      visConfigOverrides: Record<string, any> = {}
+    ) => ({
       version: 'v1',
       config: {
         mapState: {},
