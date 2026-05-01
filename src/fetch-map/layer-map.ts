@@ -517,9 +517,6 @@ export function getMaxMarkerSize(
   const {radiusRange, radius, sizeMaxPixels} = visConfig;
   const {radiusField, sizeField} = visualChannels;
   const field = radiusField || sizeField;
-  // When sizeMaxPixels is set, the render is clamped to that value — size
-  // the atlas to match so it stays crisp at the largest possible render.
-  // Otherwise fall back to the configured render size.
   const baseSize = radiusRange && field ? radiusRange[1] : radius;
   return Math.ceil(sizeMaxPixels ?? baseSize);
 }

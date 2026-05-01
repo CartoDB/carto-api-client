@@ -209,13 +209,6 @@ function createInteractionProps(interactionConfig: any) {
   };
 }
 
-// When `radiusScaleWithZoom` is enabled and the radius isn't driven by a data
-// field, render the point in deck.gl's `common` coordinate space so it scales
-// proportionally with zoom. At `radiusReferenceZoom`, 1 common unit equals
-// 2^referenceZoom pixels — dividing by that factor gives a size that matches
-// the configured `radius` pixels at the reference zoom and grows/shrinks from
-// there. Applied to both the circle (`pointRadius*`) and icon (`iconSize*`)
-// sub-layers so `pointType` switching just works.
 function createZoomScaleProps(
   config: MapLayerConfig,
   visualChannels: VisualChannels
@@ -228,6 +221,8 @@ function createZoomScaleProps(
   ) {
     return {};
   }
+  // When `radiusScaleWithZoom` is enabled, render the point in `common`
+  // coordinate space so it scales proportionally with zoom.
   const referenceZoom = visConfig.radiusReferenceZoom ?? 12;
   const scale = Math.pow(2, -referenceZoom);
   const result: Record<string, any> = {
