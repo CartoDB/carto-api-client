@@ -23,7 +23,15 @@ import type {
 export type VectorQuerySourceOptions = SourceOptions &
   QuerySourceOptions &
   FilterOptions &
-  ColumnsOption;
+  ColumnsOption & {
+    /**
+     * If `true`, the server includes a `_carto_bbox` property on each polygon
+     * feature, containing the bounding box of the full (unclipped) geometry as
+     * a `"west,south,east,north"` string in WGS84. Used by clients to compute
+     * stable label positions for polygons that span multiple tiles.
+     */
+    featureBbox?: boolean;
+  };
 
 type UrlParameters = {
   columns?: string;
@@ -34,6 +42,7 @@ type UrlParameters = {
   q: string;
   queryParameters?: Record<string, unknown> | unknown[];
   aggregationExp?: string;
+  featureBbox?: boolean;
 };
 
 export type VectorQuerySourceResponse = TilejsonResult &
@@ -50,6 +59,7 @@ export const vectorQuerySource = async function (
     tileResolution = DEFAULT_TILE_RESOLUTION,
     queryParameters,
     aggregationExp,
+    featureBbox,
   } = options;
 
   const spatialDataType = 'geo';
@@ -72,6 +82,9 @@ export const vectorQuerySource = async function (
   }
   if (aggregationExp) {
     urlParameters.aggregationExp = aggregationExp;
+  }
+  if (featureBbox) {
+    urlParameters.featureBbox = true;
   }
 
   return baseSource<UrlParameters>('query', options, urlParameters).then(
