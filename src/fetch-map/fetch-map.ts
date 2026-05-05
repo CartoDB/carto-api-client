@@ -302,6 +302,28 @@ export async function fetchMap({
     }
   });
 
+  // Flag datasets that need feature bounding boxes for label positioning.
+  // When vector tiles use MVT format, polygon geometry is clipped to tile
+  // boundaries. The server-provided bbox enables stable label placement.
+  const layers = map.keplerMapConfig.config.visState.layers;
+  const datasetsWithLabels = new Set<string>();
+  for (const layer of layers) {
+    const hasTextLabel = layer.config?.textLabel?.some(
+      (t: any) => t.field?.name
+    );
+    if (hasTextLabel) {
+      datasetsWithLabels.add(layer.config.dataId);
+    }
+  }
+  map.datasets.forEach((dataset: any) => {
+    if (
+      datasetsWithLabels.has(dataset.id) &&
+      (dataset.type === 'table' || dataset.type === 'query')
+    ) {
+      dataset.featureBbox = true;
+    }
+  });
+
   const [basemap] = await Promise.all([
     fetchBasemapProps({config: map.keplerMapConfig.config, errorContext}),
 
