@@ -967,11 +967,14 @@ describe('parseMap', () => {
       },
     });
 
-    test('radiusScaleWithZoom enabled emits common-unit scale for point and icon, defaulting referenceZoom to 12', () => {
+    test('radiusScaleWithZoom enabled emits common-unit scale for point and icon', () => {
       const map = parseMap({
         ...METADATA,
         datasets: [ZOOM_SCALE_DATASET],
-        keplerMapConfig: buildLayerConfig({radiusScaleWithZoom: true}),
+        keplerMapConfig: buildLayerConfig({
+          radiusScaleWithZoom: true,
+          radiusReferenceZoom: 12,
+        }),
       });
       const props = map.layers[0].props;
       const expectedScale = Math.pow(2, -12);
@@ -1002,6 +1005,7 @@ describe('parseMap', () => {
         datasets: [ZOOM_SCALE_DATASET],
         keplerMapConfig: buildLayerConfig({
           radiusScaleWithZoom: true,
+          radiusReferenceZoom: 12,
           sizeMinPixels: 4,
           sizeMaxPixels: 32,
         }),
@@ -1017,7 +1021,7 @@ describe('parseMap', () => {
       const map = parseMap({
         ...METADATA,
         datasets: [ZOOM_SCALE_DATASET],
-        keplerMapConfig: buildLayerConfig({radiusScaleWithZoom: true}),
+        keplerMapConfig: buildLayerConfig({radiusScaleWithZoom: true, radiusReferenceZoom: 12}),
       });
       const props = map.layers[0].props;
       expect(props.pointRadiusMinPixels).toBeUndefined();

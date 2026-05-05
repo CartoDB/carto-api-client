@@ -223,8 +223,7 @@ function createZoomScaleProps(
   }
   // When `radiusScaleWithZoom` is enabled, render the point in `common`
   // coordinate space so it scales proportionally with zoom.
-  const referenceZoom = visConfig.radiusReferenceZoom ?? 12;
-  const scale = Math.pow(2, -referenceZoom);
+  const scale = Math.pow(2, -(visConfig.radiusReferenceZoom as number));
   const result: Record<string, any> = {
     pointRadiusUnits: 'common',
     pointRadiusScale: scale,
