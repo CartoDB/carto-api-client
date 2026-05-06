@@ -80,6 +80,11 @@ export type VisConfig = {
   radiusAggregationExp?: string;
   radiusAggregationDomain?: [number, number];
 
+  sizeMinPixels?: number;
+  sizeMaxPixels?: number;
+  radiusScaleWithZoom?: boolean;
+  radiusReferenceZoom?: number;
+
   sizeAggregation?: string;
   sizeAggregationExp?: string;
   sizeAggregationDomain?: [number, number];
