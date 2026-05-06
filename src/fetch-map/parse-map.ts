@@ -667,7 +667,24 @@ function createChannelProps(
     const getSecondaryText =
       secondaryField && getTextAccessor(secondaryField, data);
 
-    result.pointType = `${result.pointType}+text`;
+    // For line/polygon tileset layers, deck.gl's VectorTileLayer can synthesize
+    // point labels at line midpoints / polygon centroids via `autoLabels`. The
+    // optional `uniqueIdProperty` dedupes features that span multiple tiles so
+    // each feature gets one label instead of one-per-tile.
+    const geometry = data.tilestats?.layers?.[0]?.geometry;
+    const isLineOrPolygon =
+      geometry === 'Polygon' ||
+      geometry === 'MultiPolygon' ||
+      geometry === 'Line' ||
+      geometry === 'LineString' ||
+      geometry === 'MultiLineString';
+    if (isLineOrPolygon && (layerType === 'tileset' || layerType === 'mvt')) {
+      const uniqueIdProperty = visConfig.textLabelUniqueIdField;
+      result.autoLabels = uniqueIdProperty ? {uniqueIdProperty} : true;
+      result.pointType = 'text';
+    } else {
+      result.pointType = `${result.pointType}+text`;
+    }
     result.textCharacterSet = 'auto';
     result.textFontFamily = 'Inter, sans';
     result.textFontSettings = {sdf: true};

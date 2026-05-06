@@ -108,6 +108,7 @@ export type VisConfig = {
   colorBands?: RasterLayerConfigColorBand[];
 
   uniqueValuesColorRange?: ColorRange;
+  textLabelUniqueIdField?: string | null;
 };
 
 export type TextLabel = {
