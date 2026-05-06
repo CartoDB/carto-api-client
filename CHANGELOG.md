@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+### 0.5.28
+
 - feat(fetchMap): Support zoom-dependent point styling (#287)
 - feat(fetchMap): Support autoLabels (#288)
 
