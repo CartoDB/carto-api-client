@@ -1021,7 +1021,10 @@ describe('parseMap', () => {
       const map = parseMap({
         ...METADATA,
         datasets: [ZOOM_SCALE_DATASET],
-        keplerMapConfig: buildLayerConfig({radiusScaleWithZoom: true, radiusReferenceZoom: 12}),
+        keplerMapConfig: buildLayerConfig({
+          radiusScaleWithZoom: true,
+          radiusReferenceZoom: 12,
+        }),
       });
       const props = map.layers[0].props;
       expect(props.pointRadiusMinPixels).toBeUndefined();
