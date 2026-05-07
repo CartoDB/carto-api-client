@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## Unreleased
+
+### 0.5.28
+
+- feat(fetchMap): Support zoom-dependent point styling (#287)
+- feat(fetchMap): Support autoLabels (#288)
+
 ### 0.5.27
 
 - feat(parseMap): custom aggregation support on spatial-index and geometry-aggregated layers. Adds `compileCustomAggregation(expression, { provider })` helper, `VisualChannelField.accessorKey`, and `{channel}AggregationExp` / `{channel}AggregationDomain` on `VisConfig` for all 6 channels.
