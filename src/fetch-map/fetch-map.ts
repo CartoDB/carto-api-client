@@ -303,8 +303,8 @@ export async function fetchMap({
   });
 
   // Flag datasets that need feature bounding boxes for label positioning.
-  // When vector tiles use MVT format, polygon geometry is clipped to tile
-  // boundaries. The server-provided bbox enables stable label placement.
+  // Some data waraehouse (notably when using MVT) only support clipped
+  // geometry. The server-provided bbox enables stable label placement.
   const layers = map.keplerMapConfig.config.visState.layers;
   const datasetsWithLabels = new Set<string>();
   for (const layer of layers) {
