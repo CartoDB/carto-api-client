@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### 0.5.29
+
+- feat(sources): Support featureBbox parameter (#289)
+
 ### 0.5.28
 
 - feat(fetchMap): Support zoom-dependent point styling (#287)
