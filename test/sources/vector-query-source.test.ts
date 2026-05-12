@@ -55,6 +55,33 @@ describe('vectorQuerySource', () => {
     expect(initURL).not.toContain('aggregationExp');
   });
 
+  test('featureBbox', async () => {
+    stubGlobalFetchForSource();
+
+    await vectorQuerySource({
+      connectionName: 'carto_dw',
+      accessToken: '<token>',
+      sqlQuery: 'SELECT * FROM a.b.vector_table',
+      featureBbox: true,
+    });
+
+    const [[initURL]] = vi.mocked(fetch).mock.calls;
+    expect(initURL).toMatch(/featureBbox=true/);
+  });
+
+  test('featureBbox not set by default', async () => {
+    stubGlobalFetchForSource();
+
+    await vectorQuerySource({
+      connectionName: 'carto_dw',
+      accessToken: '<token>',
+      sqlQuery: 'SELECT * FROM a.b.vector_table',
+    });
+
+    const [[initURL]] = vi.mocked(fetch).mock.calls;
+    expect(initURL).not.toContain('featureBbox');
+  });
+
   test('widgetSource', async () => {
     stubGlobalFetchForSource();
 

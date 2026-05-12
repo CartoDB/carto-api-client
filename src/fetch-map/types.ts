@@ -265,6 +265,7 @@ export type Dataset = {
   name?: string | null;
   spatialIndex?: string | null;
   exportToBucketAvailable?: boolean;
+  featureBbox?: boolean;
 };
 
 export type AttributeType = 'String' | 'Number' | 'Timestamp' | 'Boolean';

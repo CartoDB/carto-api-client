@@ -49,6 +49,33 @@ describe('vectorTableSource', () => {
     expect(initURL).not.toContain('aggregationExp');
   });
 
+  test('featureBbox', async () => {
+    stubGlobalFetchForSource();
+
+    await vectorTableSource({
+      connectionName: 'carto_dw',
+      accessToken: '<token>',
+      tableName: 'a.b.vector_table',
+      featureBbox: true,
+    });
+
+    const [[initURL]] = vi.mocked(fetch).mock.calls;
+    expect(initURL).toMatch(/featureBbox=true/);
+  });
+
+  test('featureBbox not set by default', async () => {
+    stubGlobalFetchForSource();
+
+    await vectorTableSource({
+      connectionName: 'carto_dw',
+      accessToken: '<token>',
+      tableName: 'a.b.vector_table',
+    });
+
+    const [[initURL]] = vi.mocked(fetch).mock.calls;
+    expect(initURL).not.toContain('featureBbox');
+  });
+
   test('widgetSource', async () => {
     stubGlobalFetchForSource();
 
