@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- feat(widgetSources): support `featureIds` / `geometryType` request options to filter widget aggregations by a feature selection without relying on the synthetic `_carto_feature_id` column
+- feat(widgetSources): support `featureIds` / `geometryType` request options to filter widget aggregations by a feature selection without relying on the synthetic `_carto_feature_id` column (#294)
 
 ### 0.5.29
 
