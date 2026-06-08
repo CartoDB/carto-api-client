@@ -123,7 +123,7 @@ export interface FeaturesRequestOptions extends BaseRequestOptions {
   columns: string[];
 
   /** Topology of objects to be picked. */
-  dataType: 'points' | 'lines' | 'polygons';
+  dataType: WidgetFeatureGeometryType;
 
   /** Zoom level, required if using 'points' data type. */
   z?: number;
