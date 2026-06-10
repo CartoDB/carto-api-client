@@ -112,8 +112,37 @@ export type AggregationType =
  * FILTERS
  */
 
+/** A spatial filter expressed as a GeoJSON polygon, applied client- or server-side. */
+export type GeometrySpatialFilter = Polygon | MultiPolygon;
+
+/**
+ * Filter restricting a widget query to a set of spatial-index cells (H3 or
+ * Quadbin). Used for point-and-click selection on cell-rendered layers. Sent to
+ * the server-side model API only; maps-api chooses the SQL strategy from
+ * `spatialDataType`, so the same payload works for both natively-indexed
+ * sources and point/geometry sources dynamically aggregated into cells.
+ *
+ * @privateRemarks Source: @carto/query-builder (SpatialIndexFilter)
+ */
+export interface SpatialIndexFilter {
+  /**
+   * Selected cell ids. h3 = hex string; h3int = `BigInt(\`0x${id}\`)`; quadbin
+   * = decimal or `0x`-hex string.
+   */
+  indexes: string[];
+  /** Must match the column type; `h3` and `h3int` are interchangeable. */
+  type: 'h3' | 'h3int' | 'quadbin';
+}
+
 /** @privateRemarks Source: @carto/react-api */
-export type SpatialFilter = Polygon | MultiPolygon;
+export type SpatialFilter = GeometrySpatialFilter | SpatialIndexFilter;
+
+/** True when a {@link SpatialFilter} selects spatial-index cells rather than a polygon. */
+export function isSpatialIndexFilter(
+  spatialFilter: SpatialFilter
+): spatialFilter is SpatialIndexFilter {
+  return Array.isArray((spatialFilter as SpatialIndexFilter).indexes);
+}
 
 /** @privateRemarks Source: @deck.gl/carto */
 export interface Filters {

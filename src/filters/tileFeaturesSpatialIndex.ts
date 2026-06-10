@@ -1,6 +1,6 @@
 import {SpatialIndex} from '../constants.js';
 import {getResolution as quadbinGetResolution} from 'quadbin';
-import type {SpatialFilter, SpatialIndexTile} from '../types.js';
+import type {GeometrySpatialFilter, SpatialIndexTile} from '../types.js';
 import type {Feature} from 'geojson';
 import {getResolution as h3GetResolution} from 'h3-js';
 import type {FeatureData} from '../types-internal.js';
@@ -9,7 +9,7 @@ import {intersectTileH3, intersectTileQuadbin} from './tileIntersection.js';
 
 export type TileFeaturesSpatialIndexOptions = {
   tiles: SpatialIndexTile[];
-  spatialFilter?: SpatialFilter;
+  spatialFilter?: GeometrySpatialFilter;
   spatialDataColumn: string;
   spatialDataType: SpatialDataType;
 };

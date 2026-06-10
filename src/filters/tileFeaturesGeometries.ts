@@ -9,7 +9,7 @@ import type {
   Polygon,
   Position,
 } from 'geojson';
-import type {SpatialFilter, Tile} from '../types.js';
+import type {GeometrySpatialFilter, Tile} from '../types.js';
 import type {FeatureData} from '../types-internal.js';
 import type {
   BinaryAttribute,
@@ -45,7 +45,7 @@ export function tileFeaturesGeometries({
 }: {
   tiles: Tile[];
   tileFormat?: TileFormat;
-  spatialFilter?: SpatialFilter;
+  spatialFilter?: GeometrySpatialFilter;
   uniqueIdProperty?: string;
   options?: GeometryExtractOptions;
 }): FeatureData[] {
@@ -334,7 +334,7 @@ function calculateFeatures({
   options,
 }: {
   map: TileMap;
-  spatialFilter?: SpatialFilter;
+  spatialFilter?: GeometrySpatialFilter;
   data: BinaryFeature;
   type: BinaryGeometryType;
   bbox: BBox;

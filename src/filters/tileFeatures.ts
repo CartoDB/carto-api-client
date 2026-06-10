@@ -1,6 +1,6 @@
 import type {
   RasterTile,
-  SpatialFilter,
+  GeometrySpatialFilter,
   SpatialIndexTile,
   Tile,
 } from '../types.js';
@@ -19,7 +19,7 @@ export type TileFeatures = {
   tileFormat: TileFormat;
   spatialDataType: SpatialDataType;
   spatialDataColumn?: string;
-  spatialFilter?: SpatialFilter;
+  spatialFilter?: GeometrySpatialFilter;
   uniqueIdProperty?: string;
   rasterMetadata?: RasterMetadata;
   storeGeometry?: boolean;
