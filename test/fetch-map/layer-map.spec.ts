@@ -3,6 +3,7 @@ import {
   getColorAccessor,
   getSizeAccessor,
   getTextAccessor,
+  getLineStyleAccessor,
   getLayerProps,
   _domainFromValues,
 } from '@carto/api-client';
@@ -451,6 +452,46 @@ describe('layer-map', () => {
         expect(accessor(testCase.data)).toBe(testCase.expected);
       }
     );
+  });
+
+  describe('getLineStyleAccessor', () => {
+    const field = {name: 'road_type', type: 'string'};
+    const data = {
+      tilestats: {
+        layers: [{attributes: [{attribute: 'road_type', categories: []}]}],
+      },
+    };
+
+    test('maps each category to its dash array, returning the scale domain/range', () => {
+      const {accessor, domain, range} = getLineStyleAccessor(
+        field,
+        {
+          dashArrayMap: [
+            {value: 'a', dashArray: [4, 2]},
+            {value: 'b', dashArray: [1, 1]},
+          ],
+          othersDashArray: [8, 8],
+        },
+        data
+      );
+      expect(accessor({properties: {road_type: 'a'}})).toEqual([4, 2]);
+      expect(accessor({properties: {road_type: 'b'}})).toEqual([1, 1]);
+      expect(accessor({properties: {road_type: 'z'}})).toEqual([8, 8]);
+      expect(domain).toEqual(['a', 'b']);
+      expect(range).toEqual([
+        [4, 2],
+        [1, 1],
+      ]);
+    });
+
+    test('falls back to solid [0, 0] when othersDashArray is absent', () => {
+      const {accessor} = getLineStyleAccessor(
+        field,
+        {dashArrayMap: [{value: 'a', dashArray: [4, 2]}]},
+        data
+      );
+      expect(accessor({properties: {road_type: 'unknown'}})).toEqual([0, 0]);
+    });
   });
 
   test('throws error for deprecated layer types', () => {

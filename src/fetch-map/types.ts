@@ -28,6 +28,9 @@ export type VisualChannels = {
   strokeColorField?: VisualChannelField;
   strokeColorScale?: ScaleType;
 
+  lineStyleField?: VisualChannelField;
+  lineStyleScale?: ScaleType;
+
   heightField?: VisualChannelField;
   heightScale?: ScaleType;
 
@@ -50,6 +53,16 @@ export type CustomMarkersRange = {
     markerUrl?: string;
   }[];
   othersMarker?: string;
+};
+
+// Per-category mapping for by-column stroke styles. `dashArray` is the [dash, gap]
+// tuple that flows to deck.gl's `getDashArray`.
+export type LineStyleRange = {
+  dashArrayMap: {
+    value: string;
+    dashArray: [number, number];
+  }[];
+  othersDashArray?: [number, number];
 };
 
 export type ColorBand = 'red' | 'green' | 'blue' | 'alpha';
@@ -95,6 +108,12 @@ export type VisConfig = {
   strokeColorAggregationDomain?: [number, number];
   strokeOpacity?: number;
   strokeColorRange?: ColorRange;
+  stroked?: boolean;
+
+  // `dashArray` is [dash, gap] relative to stroke width. Dotted is [0, gap] + lineCapRounded.
+  lineStyle?: 'solid' | 'dashed' | 'dotted';
+  dashArray?: [number, number];
+  lineStyleRange?: LineStyleRange | null;
 
   heightRange?: number[];
   heightAggregation?: string;
