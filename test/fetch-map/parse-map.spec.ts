@@ -1188,4 +1188,179 @@ describe('parseMap', () => {
       expect(map.layers[0].props.autoLabels).toBeUndefined();
     });
   });
+
+  describe('stroke dash style', () => {
+    const buildDataset = (geometry: string) => ({
+      id: 'STROKE_DS',
+      data: {
+        tiles: ['https://example.com/tiles/{z}/{x}/{y}'],
+        tilestats: {
+          layers: [
+            {
+              attributes: [
+                {
+                  attribute: 'road_type',
+                  categories: [{category: 'a'}, {category: 'b'}],
+                },
+              ],
+              geometry,
+            },
+          ],
+        },
+      },
+      type: 'tileset',
+    });
+
+    const buildLayerConfig = (
+      visConfigOverrides: Record<string, any> = {},
+      visualChannels: Record<string, any> = {},
+      type = 'tileset'
+    ) => ({
+      version: 'v1',
+      config: {
+        mapState: {},
+        mapStyle: {},
+        visState: {
+          layers: [
+            {
+              id: 'layer1',
+              type,
+              config: {
+                dataId: 'STROKE_DS',
+                label: 'Test Layer',
+                textLabel: [{field: null, size: 12}],
+                visConfig: {
+                  filled: true,
+                  opacity: 1,
+                  colorRange: {
+                    category: 'sequential',
+                    colors: ['#f0f0f0', '#333333'],
+                    colorMap: undefined,
+                    name: 'custom',
+                    type: 'custom',
+                  },
+                  radius: 5,
+                  ...visConfigOverrides,
+                },
+              },
+              visualChannels,
+            },
+          ],
+          layerBlending: 'normal',
+          interactionConfig: {tooltip: {enabled: false}},
+        },
+      },
+    });
+
+    const parse = (
+      geometry: string,
+      ...args: Parameters<typeof buildLayerConfig>
+    ) =>
+      parseMap({
+        ...METADATA,
+        datasets: [buildDataset(geometry)],
+        keplerMapConfig: buildLayerConfig(...args),
+      }).layers[0];
+
+    test('single-mode dashed line sets a constant getDashArray and the flat lineStyle/dashArray fields (no scale)', () => {
+      const {props, scales} = parse('LineString', {
+        lineStyle: 'dashed',
+        dashArray: [4, 2],
+      });
+      expect(props.getDashArray).toEqual([4, 2]);
+      expect(props.lineStyle).toBe('dashed');
+      expect(props.dashArray).toEqual([4, 2]);
+      expect(props.lineCapRounded).toBeUndefined();
+      expect(scales.lineStyle).toBeUndefined();
+    });
+
+    test('dotted line sets lineCapRounded', () => {
+      const {props} = parse('LineString', {
+        lineStyle: 'dotted',
+        dashArray: [0, 3],
+      });
+      expect(props.lineCapRounded).toBe(true);
+      expect(props.getDashArray).toEqual([0, 3]);
+    });
+
+    test('solid line emits no dash props (deck.gl default renders solid)', () => {
+      const {props} = parse('LineString', {lineStyle: 'solid'});
+      expect(props.getDashArray).toBeUndefined();
+      expect(props.lineStyle).toBeUndefined();
+      expect(props.lineCapRounded).toBeUndefined();
+    });
+
+    test('polygon border needs stroked to receive dashes', () => {
+      expect(
+        parse('Polygon', {lineStyle: 'dashed', dashArray: [4, 2]}).props
+          .getDashArray
+      ).toBeUndefined();
+      expect(
+        parse('Polygon', {
+          lineStyle: 'dashed',
+          dashArray: [4, 2],
+          stroked: true,
+        }).props.getDashArray
+      ).toEqual([4, 2]);
+    });
+
+    test('points never receive dashes even when stroked', () => {
+      const {props} = parse('Point', {
+        lineStyle: 'dashed',
+        dashArray: [4, 2],
+        stroked: true,
+      });
+      expect(props.getDashArray).toBeUndefined();
+    });
+
+    test('by-column mode builds a per-feature accessor and a lineStyle scale', () => {
+      const {props, scales} = parse(
+        'LineString',
+        {
+          lineStyle: 'dashed',
+          dashArray: [4, 2],
+          lineStyleRange: {
+            dashArrayMap: [
+              {value: 'a', dashArray: [4, 2]},
+              {value: 'b', dashArray: [1, 1]},
+            ],
+            othersDashArray: [8, 8],
+          },
+        },
+        {
+          lineStyleField: {name: 'road_type', type: 'string'},
+          lineStyleScale: 'ordinal',
+        }
+      );
+      expect(typeof props.getDashArray).toBe('function');
+      expect(props.getDashArray({properties: {road_type: 'a'}})).toEqual([
+        4, 2,
+      ]);
+      expect(props.getDashArray({properties: {road_type: 'b'}})).toEqual([
+        1, 1,
+      ]);
+      expect(props.getDashArray({properties: {road_type: 'z'}})).toEqual([
+        8, 8,
+      ]);
+      expect(scales.lineStyle).toEqual({
+        field: {name: 'road_type', type: 'string'},
+        type: 'ordinal',
+        domain: ['a', 'b'],
+        range: [
+          [4, 2],
+          [1, 1],
+        ],
+      });
+    });
+
+    test('non-vector-tile layer type receives no dashes', () => {
+      const {props} = parse(
+        'LineString',
+        {lineStyle: 'dashed', dashArray: [4, 2]},
+        {},
+        'h3'
+      );
+      expect(props.getDashArray).toBeUndefined();
+    });
+  });
 });
