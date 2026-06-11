@@ -20,6 +20,7 @@ import type {
   TableResponse,
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
+  WidgetFeatureGeometryType,
 } from './types.js';
 import {assert, normalizeObjectKeys} from '../utils.js';
 import {DEFAULT_TILE_RESOLUTION} from '../constants-internal.js';
@@ -32,6 +33,31 @@ import {requestWithParameters} from '../api/request-with-parameters.js';
 import type {APIErrorContext} from '../api/carto-api-error.js';
 
 export type WidgetRemoteSourceProps = WidgetSourceProps;
+
+/** Maximum number of feature IDs accepted server-side per request. */
+const FEATURE_IDS_LIMIT = 1000;
+
+/**
+ * Validates and normalizes feature-selection options shared by widget
+ * requests. Returns the model params to forward, or an empty object when no
+ * selection is requested. `geometryType` is mandatory whenever `featureIds`
+ * is provided, mirroring the server-side contract.
+ */
+function getFeatureSelectionParams(options: {
+  featureIds?: string[];
+  geometryType?: WidgetFeatureGeometryType;
+}): {featureIds?: string[]; geometryType?: WidgetFeatureGeometryType} {
+  const {featureIds, geometryType} = options;
+  if (!featureIds || featureIds.length === 0) {
+    return {};
+  }
+  assert(geometryType, 'geometryType is required when featureIds are provided');
+  assert(
+    featureIds.length <= FEATURE_IDS_LIMIT,
+    `featureIds is limited to ${FEATURE_IDS_LIMIT} values, received ${featureIds.length}`
+  );
+  return {featureIds, geometryType};
+}
 
 /**
  * Source for Widget API requests.
@@ -110,6 +136,7 @@ export abstract class WidgetRemoteSource<
         operationColumn: operationColumn || column,
         othersThreshold,
         orderBy,
+        ...getFeatureSelectionParams(options),
       },
       opts: {signal, headers: this.props.headers},
     });
@@ -193,6 +220,7 @@ export abstract class WidgetRemoteSource<
         column: column ?? '*',
         operation: operation ?? AggregationTypes.Count,
         operationExp,
+        ...getFeatureSelectionParams(options),
       },
       opts: {signal, headers: this.props.headers},
     }).then((res: FormulaModelResponse) => normalizeObjectKeys(res.rows[0]));
@@ -220,7 +248,7 @@ export abstract class WidgetRemoteSource<
         spatialFiltersMode,
         spatialFilter,
       },
-      params: {column, operation, ticks},
+      params: {column, operation, ticks, ...getFeatureSelectionParams(options)},
       opts: {signal, headers: this.props.headers},
     }).then((res: HistogramModelResponse) => normalizeObjectKeys(res.rows));
 
@@ -257,7 +285,7 @@ export abstract class WidgetRemoteSource<
         spatialFiltersMode,
         spatialFilter,
       },
-      params: {column},
+      params: {column, ...getFeatureSelectionParams(options)},
       opts: {signal, headers: this.props.headers},
     }).then((res: RangeModelResponse) => normalizeObjectKeys(res.rows[0]));
   }
@@ -292,6 +320,7 @@ export abstract class WidgetRemoteSource<
         yAxisColumn,
         yAxisJoinOperation,
         limit: HARD_LIMIT,
+        ...getFeatureSelectionParams(options),
       },
       opts: {signal, headers: this.props.headers},
     })
@@ -328,6 +357,7 @@ export abstract class WidgetRemoteSource<
         sortDirection,
         limit,
         offset,
+        ...getFeatureSelectionParams(options),
       },
       opts: {signal, headers: this.props.headers},
     }).then((res: TableModelResponse) => ({
@@ -388,6 +418,7 @@ export abstract class WidgetRemoteSource<
         splitByCategory,
         splitByCategoryLimit,
         splitByCategoryValues,
+        ...getFeatureSelectionParams(options),
       },
       opts: {signal, headers: this.props.headers},
     }).then((res: TimeSeriesModelResponse) => ({
@@ -417,6 +448,7 @@ export abstract class WidgetRemoteSource<
       },
       params: {
         aggregations,
+        ...getFeatureSelectionParams(options),
       },
       opts: {signal, headers: this.props.headers},
     }).then((res: AggregationsResponse) => ({

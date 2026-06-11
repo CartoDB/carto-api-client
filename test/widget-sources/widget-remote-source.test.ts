@@ -838,3 +838,118 @@ test('getExtent', async () => {
     })
   );
 });
+
+/******************************************************************************
+ * feature selection (featureIds / geometryType)
+ */
+
+test('getFormula - forwards featureIds and geometryType', async () => {
+  const widgetSource = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+  });
+
+  const mockFetch = vi
+    .fn()
+    .mockResolvedValueOnce(createMockResponse({rows: [{value: 123}]}));
+  vi.stubGlobal('fetch', mockFetch);
+
+  await widgetSource.getFormula({
+    column: 'store_type',
+    operation: 'count',
+    featureIds: ['a', 'b', 'c'],
+    geometryType: 'points',
+  });
+
+  const params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
+  expect(Object.fromEntries(params)).toMatchObject({
+    params: JSON.stringify({
+      column: 'store_type',
+      operation: 'count',
+      featureIds: ['a', 'b', 'c'],
+      geometryType: 'points',
+    }),
+  });
+});
+
+test('getCategories - forwards featureIds and geometryType', async () => {
+  const widgetSource = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+  });
+
+  const mockFetch = vi.fn().mockResolvedValueOnce(
+    createMockResponse({
+      rows: [{name: 'a', value: 1}],
+    })
+  );
+  vi.stubGlobal('fetch', mockFetch);
+
+  await widgetSource.getCategories({
+    column: 'store_type',
+    operation: 'count',
+    featureIds: ['a', 'b'],
+    geometryType: 'polygons',
+  });
+
+  const params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
+  expect(Object.fromEntries(params)).toMatchObject({
+    params: JSON.stringify({
+      column: 'store_type',
+      operation: 'count',
+      operationColumn: 'store_type',
+      featureIds: ['a', 'b'],
+      geometryType: 'polygons',
+    }),
+  });
+});
+
+test('getFormula - omits feature selection params when featureIds absent', async () => {
+  const widgetSource = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+  });
+
+  const mockFetch = vi
+    .fn()
+    .mockResolvedValueOnce(createMockResponse({rows: [{value: 123}]}));
+  vi.stubGlobal('fetch', mockFetch);
+
+  await widgetSource.getFormula({column: 'store_type', operation: 'count'});
+
+  const params = new URL(mockFetch.mock.lastCall[0]).searchParams.entries();
+  expect(Object.fromEntries(params)).toMatchObject({
+    params: JSON.stringify({column: 'store_type', operation: 'count'}),
+  });
+});
+
+test('getFormula - requires geometryType when featureIds provided', async () => {
+  const widgetSource = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+  });
+
+  await expect(
+    widgetSource.getFormula({
+      column: 'store_type',
+      operation: 'count',
+      featureIds: ['a', 'b'],
+    })
+  ).rejects.toThrow(/geometryType is required/);
+});
+
+test('getFormula - rejects more than 1000 featureIds', async () => {
+  const widgetSource = new WidgetTestSource({
+    accessToken: '<token>',
+    connectionName: 'carto_dw',
+  });
+
+  await expect(
+    widgetSource.getFormula({
+      column: 'store_type',
+      operation: 'count',
+      featureIds: Array.from({length: 1001}, (_, i) => String(i)),
+      geometryType: 'points',
+    })
+  ).rejects.toThrow(/limited to 1000/);
+});

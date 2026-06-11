@@ -22,6 +22,12 @@ export interface ViewState {
   longitude: number;
 }
 
+/**
+ * Topology of the features referenced by {@link BaseRequestOptions#featureIds}.
+ * Must match the geometry type of the layer the features were picked from.
+ */
+export type WidgetFeatureGeometryType = 'points' | 'lines' | 'polygons';
+
 /** Common options for {@link WidgetRemoteSource} requests. */
 export interface BaseRequestOptions {
   signal?: AbortSignal;
@@ -30,6 +36,23 @@ export interface BaseRequestOptions {
   /** Overrides source filters, if any. */
   filters?: Filters;
   filterOwner?: string;
+  /**
+   * Restricts the request to a selection of features, identified by their
+   * `_carto_feature_id` (a hash of geometry). Unlike {@link filters}, this does
+   * not require `_carto_feature_id` to exist as a column on the source: the
+   * server regenerates the hash on-the-fly and AND-s the resulting predicate
+   * onto the existing source filters.
+   *
+   * Capped at 1000 IDs server-side. {@link geometryType} is required whenever
+   * `featureIds` is provided.
+   */
+  featureIds?: string[];
+  /**
+   * Geometry topology of the features in {@link featureIds}, required whenever
+   * `featureIds` is provided. Used by the server to regenerate the feature-id
+   * hash for the correct geometry type.
+   */
+  geometryType?: WidgetFeatureGeometryType;
 }
 
 export type CategoryOrderBy =
@@ -100,7 +123,7 @@ export interface FeaturesRequestOptions extends BaseRequestOptions {
   columns: string[];
 
   /** Topology of objects to be picked. */
-  dataType: 'points' | 'lines' | 'polygons';
+  dataType: WidgetFeatureGeometryType;
 
   /** Zoom level, required if using 'points' data type. */
   z?: number;
