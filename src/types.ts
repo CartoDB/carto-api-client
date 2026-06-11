@@ -116,21 +116,13 @@ export type AggregationType =
 export type GeometrySpatialFilter = Polygon | MultiPolygon;
 
 /**
- * Filter restricting a widget query to a set of spatial-index cells (H3 or
- * Quadbin). Used for point-and-click selection on cell-rendered layers. Sent to
- * the server-side model API only; maps-api chooses the SQL strategy from
- * `spatialDataType`, so the same payload works for both natively-indexed
- * sources and point/geometry sources dynamically aggregated into cells.
- *
- * @privateRemarks Source: @carto/query-builder (SpatialIndexFilter)
+ * Filter restricting a widget query to a selection of spatial-index cells,
+ * e.g. from point-and-click on an H3 or Quadbin layer.
  */
 export interface SpatialIndexFilter {
-  /**
-   * Selected cell ids. h3 = hex string; h3int = `BigInt(\`0x${id}\`)`; quadbin
-   * = decimal or `0x`-hex string.
-   */
+  /** Selected cell ids. */
   indexes: string[];
-  /** Must match the column type; `h3` and `h3int` are interchangeable. */
+  /** Spatial index type of the filtered column. */
   type: 'h3' | 'h3int' | 'quadbin';
 }
 
