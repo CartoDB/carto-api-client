@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- feat(fetchMap): Support line & polygon stroke dash styles (#297)
+
 ### 0.5.31
 
 - feat(sources): rename `featureBbox` source option to `prepareLabels` (Maps API `featureBbox` param unchanged)
