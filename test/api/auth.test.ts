@@ -63,4 +63,10 @@ describe('rewriteUrlForSessionMode', () => {
       '/v3/sql?q=1'
     );
   });
+
+  test('treats $-patterns in the base literally', () => {
+    expect(
+      rewriteUrlForSessionMode('https://host.com/v3/sql', '/proxy/$&/$1')
+    ).toBe('/proxy/$&/$1/v3/sql');
+  });
 });

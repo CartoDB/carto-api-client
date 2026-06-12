@@ -77,5 +77,8 @@ export function rewriteUrlForSessionMode(
   url: string,
   apiBaseUrl: string
 ): string {
-  return url.replace(/^https?:\/\/[^/?#]+/, apiBaseUrl.replace(/\/+$/, ''));
+  const base = apiBaseUrl.replace(/\/+$/, '');
+  // Use a replacement function so any `$`-patterns in apiBaseUrl (`$&`, `$1`,
+  // …) are treated literally rather than interpreted by String.replace.
+  return url.replace(/^https?:\/\/[^/?#]+/, () => base);
 }

@@ -145,7 +145,10 @@ function createCacheKey(
 const RELATIVE_ORIGIN = 'https://relative.invalid';
 
 function parseBaseUrl(baseUrlString: string): {url: URL; isRelative: boolean} {
-  const isRelative = baseUrlString.startsWith('/');
+  // Protocol-relative URLs ('//host/...') carry a host and must not be treated
+  // as relative, or the host would be lost when resolved against RELATIVE_ORIGIN.
+  const isRelative =
+    baseUrlString.startsWith('/') && !baseUrlString.startsWith('//');
   return {
     url: new URL(baseUrlString, isRelative ? RELATIVE_ORIGIN : undefined),
     isRelative,

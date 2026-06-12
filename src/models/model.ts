@@ -74,11 +74,12 @@ export function executeModel(props: {
   );
 
   const {model, source, params, opts} = props;
-  const {type, apiVersion, apiBaseUrl, accessToken, connectionName, clientId} =
-    source;
+  const {type, apiVersion, apiBaseUrl, connectionName, clientId} = source;
 
   assert(apiBaseUrl, 'executeModel: missing apiBaseUrl');
-  assert(accessToken, 'executeModel: missing accessToken');
+  // Auth (token vs session mode) is validated centrally by buildAuthHeaders,
+  // invoked from makeCall below — no separate accessToken assertion here, so
+  // that session mode (no accessToken) is not rejected before the request.
   assert(apiVersion === V3, 'executeModel: SQL Model API requires CARTO 3+');
   assert(type !== 'tileset', 'executeModel: Tilesets not supported');
 
