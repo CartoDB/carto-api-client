@@ -32,6 +32,7 @@ import type {
   ColorRange,
   CustomMarkersRange,
   Dataset,
+  LineStyleRange,
   MapLayerConfig,
   VisConfig,
   VisualChannelField,
@@ -508,6 +509,25 @@ export function getIconUrlAccessor(
     return mapping[propertyValue] || unknownIcon;
   };
   return normalizeAccessor(accessor, data);
+}
+
+export function getLineStyleAccessor(
+  field: VisualChannelField,
+  range: LineStyleRange,
+  data: any
+) {
+  const fallback = range.othersDashArray ?? [0, 0];
+  const mapping: Record<string, [number, number]> = {};
+  for (const {value, dashArray} of range.dashArrayMap) {
+    mapping[value] = dashArray;
+  }
+  const accessor = (properties: any) =>
+    mapping[properties[field.name]] ?? fallback;
+  return {
+    accessor: normalizeAccessor(accessor, data),
+    domain: range.dashArrayMap.map(({value}) => value),
+    range: range.dashArrayMap.map(({dashArray}) => dashArray),
+  };
 }
 
 export function getMaxMarkerSize(
