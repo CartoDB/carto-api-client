@@ -1,4 +1,9 @@
 import {InvalidColumnError} from '../utils.js';
+import {
+  buildAuthHeaders,
+  getAuthCredentials,
+  type AuthMode,
+} from '../api/auth.js';
 
 /** @privateRemarks Source: @carto/react-api */
 export interface ModelRequestOptions {
@@ -55,10 +60,12 @@ export function dealWithApiError({
 export async function makeCall({
   url,
   accessToken,
+  authMode,
   opts,
 }: {
   url: string;
-  accessToken: string;
+  accessToken?: string;
+  authMode?: AuthMode;
   opts: ModelRequestOptions;
 }) {
   let response;
@@ -67,10 +74,13 @@ export async function makeCall({
   try {
     response = await fetch(url.toString(), {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        ...buildAuthHeaders({accessToken, authMode}),
         ...(isPost && {'Content-Type': 'application/json'}),
         ...opts.headers,
       },
+      ...(getAuthCredentials(authMode) && {
+        credentials: getAuthCredentials(authMode),
+      }),
       ...(isPost && {
         method: opts?.method,
         body: opts?.body,

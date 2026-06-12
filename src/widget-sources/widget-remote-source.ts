@@ -30,6 +30,7 @@ import {AggregationTypes, ApiVersion} from '../constants.js';
 import {getApplicableFilters} from '../filters.js';
 import {OTHERS_CATEGORY_NAME} from './constants.js';
 import {requestWithParameters} from '../api/request-with-parameters.js';
+import {buildAuthHeaders, getAuthCredentials} from '../api/auth.js';
 import type {APIErrorContext} from '../api/carto-api-error.js';
 
 export type WidgetRemoteSourceProps = WidgetSourceProps;
@@ -88,6 +89,7 @@ export abstract class WidgetRemoteSource<
       apiBaseUrl: props.apiBaseUrl as string,
       clientId: props.clientId as string,
       accessToken: props.accessToken,
+      authMode: props.authMode,
       connectionName: props.connectionName,
       filters: getApplicableFilters(filterOwner, filters || props.filters),
       filtersLogicalOperator: props.filtersLogicalOperator,
@@ -486,7 +488,7 @@ export abstract class WidgetRemoteSource<
     }
 
     const headers = {
-      Authorization: `Bearer ${this.props.accessToken}`,
+      ...buildAuthHeaders(this.props),
       ...this.props.headers,
     };
 
@@ -511,6 +513,7 @@ export abstract class WidgetRemoteSource<
       signal,
       errorContext,
       parameters,
+      credentials: getAuthCredentials(this.props.authMode),
     }).then(({extent: {xmin, ymin, xmax, ymax}}) => ({
       bbox: [xmin, ymin, xmax, ymax],
     }));

@@ -24,6 +24,7 @@ export async function requestWithParameters<T = any>({
   maxLengthURL = DEFAULT_MAX_LENGTH_URL,
   localCache,
   signal,
+  credentials,
 }: {
   baseUrl: string;
   parameters?: Record<string, unknown>;
@@ -32,6 +33,8 @@ export async function requestWithParameters<T = any>({
   maxLengthURL?: number;
   localCache?: LocalCacheOptions;
   signal?: AbortSignal;
+  /** Forwarded to `fetch()`. Session auth mode passes 'same-origin'. */
+  credentials?: RequestCredentials;
 }): Promise<T> {
   // Parameters added to all requests issued with `requestWithParameters()`.
   // These parameters override parameters already in the base URL, but not
@@ -68,8 +71,9 @@ export async function requestWithParameters<T = any>({
           body: JSON.stringify(parameters),
           headers,
           signal,
+          ...(credentials && {credentials}),
         })
-      : fetch(url, {headers, signal});
+      : fetch(url, {headers, signal, ...(credentials && {credentials})});
 
   let response: Response | undefined;
   let responseJson: unknown;
@@ -133,6 +137,29 @@ function createCacheKey(
 }
 
 /**
+ * Base URLs may be relative (e.g. a same-origin proxy like
+ * '/app/_proxy/<slug>/v3/...' used with session auth mode). `new URL()`
+ * requires an origin, so relative URLs are resolved against a marker origin
+ * that is stripped back off before returning.
+ */
+const RELATIVE_ORIGIN = 'https://relative.invalid';
+
+function parseBaseUrl(baseUrlString: string): {url: URL; isRelative: boolean} {
+  // Protocol-relative URLs ('//host/...') carry a host and must not be treated
+  // as relative, or the host would be lost when resolved against RELATIVE_ORIGIN.
+  const isRelative =
+    baseUrlString.startsWith('/') && !baseUrlString.startsWith('//');
+  return {
+    url: new URL(baseUrlString, isRelative ? RELATIVE_ORIGIN : undefined),
+    isRelative,
+  };
+}
+
+function serializeBaseUrl(url: URL, isRelative: boolean): string {
+  return isRelative ? `${url.pathname}${url.search}` : url.toString();
+}
+
+/**
  * Appends query string parameters to a URL. Existing URL parameters are kept,
  * unless there is a conflict, in which case the new parameters override
  * those already in the URL.
@@ -141,7 +168,7 @@ function createURLWithParameters(
   baseUrlString: string,
   parameters: Record<string, unknown>
 ): string {
-  const baseUrl = new URL(baseUrlString);
+  const {url: baseUrl, isRelative} = parseBaseUrl(baseUrlString);
   for (const [key, value] of Object.entries(parameters)) {
     if (isPureObject(value) || Array.isArray(value)) {
       baseUrl.searchParams.set(key, JSON.stringify(value));
@@ -154,20 +181,20 @@ function createURLWithParameters(
       }
     }
   }
-  return baseUrl.toString();
+  return serializeBaseUrl(baseUrl, isRelative);
 }
 
 /**
  * Deletes query string parameters from a URL.
  */
 function excludeURLParameters(baseUrlString: string, parameters: string[]) {
-  const baseUrl = new URL(baseUrlString);
+  const {url: baseUrl, isRelative} = parseBaseUrl(baseUrlString);
   for (const param of parameters) {
     if (baseUrl.searchParams.has(param)) {
       baseUrl.searchParams.delete(param);
     }
   }
-  return baseUrl.toString();
+  return serializeBaseUrl(baseUrl, isRelative);
 }
 
 /**

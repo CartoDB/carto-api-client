@@ -3,12 +3,10 @@
 // Copyright (c) vis.gl contributors
 
 import type {Filters, SchemaField, QueryParameters} from '../types.js';
+import type {AuthOptions} from '../api/auth.js';
 import type {RasterBandColorinterp} from './constants.js';
 
-export type SourceRequiredOptions = {
-  /** Carto platform access token. */
-  accessToken: string;
-
+export type SourceRequiredOptions = AuthOptions & {
   /** Data warehouse connection name in Carto platform. */
   connectionName: string;
 };
@@ -466,7 +464,13 @@ export type RasterMetadata = {
 };
 
 export type TilejsonResult = Tilejson & {
-  accessToken: string;
+  /**
+   * Access token used to fetch the tiles. Absent when the source was created
+   * with `authMode: 'session'` — tile URLs are then rewritten onto the
+   * configured `apiBaseUrl` and authenticated by the server (session cookie),
+   * so consumers must not attach an Authorization header.
+   */
+  accessToken?: string;
   schema: SchemaField[];
 };
 

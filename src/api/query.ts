@@ -9,6 +9,7 @@ import type {
   QueryResult,
 } from '../sources/types.js';
 import {buildQueryUrl} from './endpoints.js';
+import {buildAuthHeaders, getAuthCredentials} from './auth.js';
 import {requestWithParameters} from './request-with-parameters.js';
 import type {APIErrorContext} from './carto-api-error.js';
 import {getClient} from '../client.js';
@@ -50,7 +51,7 @@ export const query = async function (
 
   const baseUrl = buildQueryUrl({apiBaseUrl, connectionName});
   const headers = {
-    Authorization: `Bearer ${options.accessToken}`,
+    ...buildAuthHeaders(options),
     ...options.headers,
   };
   const parameters = {
@@ -74,5 +75,6 @@ export const query = async function (
     maxLengthURL,
     localCache,
     signal: options.signal,
+    credentials: getAuthCredentials(options.authMode),
   });
 };
