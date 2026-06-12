@@ -5,6 +5,11 @@
 import {DEFAULT_API_BASE_URL} from '../constants.js';
 import {DEFAULT_MAX_LENGTH_URL} from '../constants-internal.js';
 import {buildSourceUrl} from '../api/endpoints.js';
+import {
+  buildAuthHeaders,
+  getAuthCredentials,
+  rewriteUrlForSessionMode,
+} from '../api/auth.js';
 import {requestWithParameters} from '../api/request-with-parameters.js';
 import type {
   SourceOptionalOptions,
@@ -43,10 +48,12 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
   }
   const baseUrl = buildSourceUrl(mergedOptions);
   const {clientId, maxLengthURL, localCache} = mergedOptions;
+  const sessionMode = options.authMode === 'session';
   const headers = {
-    Authorization: `Bearer ${options.accessToken}`,
+    ...buildAuthHeaders(options),
     ...options.headers,
   };
+  const credentials = getAuthCredentials(options.authMode);
   const parameters = {client: clientId, ...options.tags, ...urlParameters};
 
   const errorContext: APIErrorContext = {
@@ -63,14 +70,21 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
       errorContext,
       maxLengthURL,
       localCache,
+      credentials,
     });
 
-  const dataUrl = tilejson.url[0];
+  let dataUrl = tilejson.url[0];
   if (cache) {
     cache.value = parseInt(
       new URL(dataUrl).searchParams.get('cache') || '',
       10
     );
+  }
+  if (sessionMode) {
+    // The instantiation response points at the tenant API host, which the
+    // browser cannot reach directly in session mode — route it through the
+    // same-origin proxy behind apiBaseUrl.
+    dataUrl = rewriteUrlForSessionMode(dataUrl, mergedOptions.apiBaseUrl);
   }
   errorContext.requestType = 'Map data';
 
@@ -81,8 +95,17 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
     errorContext,
     maxLengthURL,
     localCache,
+    credentials,
   });
-  if (accessToken) {
+  if (sessionMode) {
+    // Tile URL templates also point at the tenant API host. Rewrite them onto
+    // the proxy, and deliberately leave `json.accessToken` unset: consumers
+    // (e.g. deck.gl tile layers) must not attach an Authorization header —
+    // the session credential rides on the same-origin cookie instead.
+    json.tiles = json.tiles?.map((template) =>
+      rewriteUrlForSessionMode(template, mergedOptions.apiBaseUrl)
+    );
+  } else if (accessToken) {
     json.accessToken = accessToken;
   }
   if (schema) {

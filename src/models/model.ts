@@ -1,4 +1,5 @@
 import {DEFAULT_GEO_COLUMN} from '../constants-internal.js';
+import type {AuthMode} from '../api/auth.js';
 import type {
   Filter,
   FilterLogicalOperator,
@@ -33,7 +34,8 @@ export interface ModelSource {
   type: MapType;
   apiVersion: ApiVersion;
   apiBaseUrl: string;
-  accessToken: string;
+  accessToken?: string;
+  authMode?: AuthMode;
   clientId: string;
   connectionName: string;
   data: string;
@@ -123,6 +125,7 @@ export function executeModel(props: {
   return makeCall({
     url,
     accessToken: source.accessToken,
+    authMode: source.authMode,
     opts: {
       ...opts,
       method: isGet ? 'GET' : 'POST',

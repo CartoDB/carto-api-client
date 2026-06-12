@@ -18,6 +18,11 @@ export * from './types.js';
 export {
   type APIErrorContext,
   type APIRequestType,
+  type AuthMode,
+  type AuthOptions,
+  buildAuthHeaders,
+  getAuthCredentials,
+  rewriteUrlForSessionMode,
   CartoAPIError,
   type QueryOptions,
   buildPublicMapUrl, // Internal, but required for fetchMap().
