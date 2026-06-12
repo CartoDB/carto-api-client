@@ -1,5 +1,5 @@
 import type {BBox} from 'geojson';
-import type {SpatialFilter} from '../types.js';
+import type {GeometrySpatialFilter} from '../types.js';
 import bboxPolygon from '@turf/bbox-polygon';
 import booleanWithin from '@turf/boolean-within';
 import intersect from '@turf/intersect';
@@ -19,7 +19,7 @@ import bboxClip from '@turf/bbox-clip';
 // Return types:
 // - true: All features in tile are within spatial filter.
 // - false: No features in tile are within spatial filter; skip tile.
-// - SpatialFilter/Set: Requires a more detailed per-feature check for each
+// - GeometrySpatialFilter/Set: Requires a more detailed per-feature check for each
 //    feature in the tile. Provides a clipped spatial filter local to the tile
 //    or, for spatial indexes, a set of indices ("covering set").
 //
@@ -41,8 +41,8 @@ import bboxClip from '@turf/bbox-clip';
 export function intersectTileGeometry(
   tileBbox: BBox,
   tileFormat?: TileFormat,
-  spatialFilter?: SpatialFilter
-): boolean | SpatialFilter {
+  spatialFilter?: GeometrySpatialFilter
+): boolean | GeometrySpatialFilter {
   const tilePolygon = bboxPolygon(tileBbox);
 
   if (!spatialFilter || booleanWithin(tilePolygon, spatialFilter)) {
@@ -71,7 +71,7 @@ export function intersectTileGeometry(
 export function intersectTileRaster(
   parent: bigint,
   cellResolution: bigint,
-  spatialFilter?: SpatialFilter
+  spatialFilter?: GeometrySpatialFilter
 ) {
   return intersectTileQuadbin(parent, cellResolution, spatialFilter);
 }
@@ -83,7 +83,7 @@ export function intersectTileRaster(
 export function intersectTileQuadbin(
   parent: bigint,
   cellResolution: bigint,
-  spatialFilter?: SpatialFilter
+  spatialFilter?: GeometrySpatialFilter
 ): boolean | Set<bigint> {
   const tilePolygon = quadbinCellToBoundary(parent);
 
@@ -116,7 +116,7 @@ const BBOX_EAST: BBox = [0, -90, 180, 90];
 /** @internal */
 export function intersectTileH3(
   cellResolution: number,
-  spatialFilter?: SpatialFilter
+  spatialFilter?: GeometrySpatialFilter
 ): true | Set<string> {
   if (!spatialFilter) {
     return true;

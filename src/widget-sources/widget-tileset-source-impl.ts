@@ -20,7 +20,13 @@ import type {
   TimeSeriesResponse,
 } from './types.js';
 import {InvalidColumnError, assert, assignOptional} from '../utils.js';
-import type {Filter, SpatialFilter, Tile} from '../types.js';
+import type {
+  Filter,
+  GeometrySpatialFilter,
+  SpatialFilter,
+  Tile,
+} from '../types.js';
+import {isSpatialIndexFilter} from '../types.js';
 
 import {
   type TileFeatureExtractOptions,
@@ -59,8 +65,9 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
   private _tiles: Tile[] = [];
   private _features: FeatureData[] = [];
   private _tileFeatureExtractOptions: TileFeatureExtractOptions = {};
-  private _tileFeatureExtractPreviousInputs: {spatialFilter?: SpatialFilter} =
-    {};
+  private _tileFeatureExtractPreviousInputs: {
+    spatialFilter?: GeometrySpatialFilter;
+  } = {};
 
   /**
    * Loads features as a list of tiles (typically provided by deck.gl).
@@ -79,12 +86,19 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
   }
 
   protected _extractTileFeatures(spatialFilter?: SpatialFilter) {
+    // Tilesets are filtered client-side, which only supports polygon filters;
+    // spatial-index filters are a server-side concern and don't apply here.
+    const geometryFilter =
+      spatialFilter && !isSpatialIndexFilter(spatialFilter)
+        ? spatialFilter
+        : undefined;
+
     // When spatial filter has not changed, don't redo extraction. If tiles or
     // tile extract options change, features will have been cleared already.
     const prevInputs = this._tileFeatureExtractPreviousInputs;
     if (
       this._features.length &&
-      spatialFilterEquals(prevInputs.spatialFilter, spatialFilter)
+      spatialFilterEquals(prevInputs.spatialFilter, geometryFilter)
     ) {
       return;
     }
@@ -92,10 +106,10 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
     this._features = tileFeatures({
       ...assignOptional({}, this.props, this._tileFeatureExtractOptions),
       tiles: this._tiles,
-      spatialFilter,
+      spatialFilter: geometryFilter,
     });
 
-    prevInputs.spatialFilter = spatialFilter;
+    prevInputs.spatialFilter = geometryFilter;
   }
 
   /**
@@ -108,7 +122,7 @@ export class WidgetTilesetSourceImpl extends WidgetSource<WidgetTilesetSourcePro
     spatialFilter,
   }: {
     geojson: FeatureCollection;
-    spatialFilter: SpatialFilter;
+    spatialFilter: GeometrySpatialFilter;
   }) {
     this._features = geojsonFeatures({
       geojson,
@@ -493,7 +507,10 @@ function normalizeColumns(columns: string | string[]): string[] {
       : [];
 }
 
-function spatialFilterEquals(a?: SpatialFilter, b?: SpatialFilter) {
+function spatialFilterEquals(
+  a?: GeometrySpatialFilter,
+  b?: GeometrySpatialFilter
+) {
   if (a === b) return true;
   if (!a || !b) return false;
   return booleanEqual(a, b);
