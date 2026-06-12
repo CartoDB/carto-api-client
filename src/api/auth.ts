@@ -1,7 +1,3 @@
-// deck.gl
-// SPDX-License-Identifier: MIT
-// Copyright (c) vis.gl contributors
-
 /**
  * How requests to the CARTO APIs are authenticated.
  *
@@ -77,8 +73,20 @@ export function rewriteUrlForSessionMode(
   url: string,
   apiBaseUrl: string
 ): string {
+  let origin: string;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+      return url;
+    }
+    origin = parsed.origin;
+  } catch {
+    // Relative URL — already same-origin, nothing to rewrite.
+    return url;
+  }
+  // Keep the path+query as a raw slice rather than re-serializing through
+  // URL: tile URL templates contain literal placeholders ({z}/{x}/{y}) that
+  // URL#pathname would percent-encode, breaking template substitution.
   const base = apiBaseUrl.replace(/\/+$/, '');
-  // Use a replacement function so any `$`-patterns in apiBaseUrl (`$&`, `$1`,
-  // …) are treated literally rather than interpreted by String.replace.
-  return url.replace(/^https?:\/\/[^/?#]+/, () => base);
+  return base + url.slice(origin.length);
 }
