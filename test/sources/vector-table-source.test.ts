@@ -1,6 +1,9 @@
 import {WidgetTableSource, vectorTableSource} from '@carto/api-client';
 import {describe, vi, test, expect} from 'vitest';
-import {stubGlobalFetchForSource} from '../__mock-fetch.js';
+import {
+  MOCK_TILESET_RESPONSE,
+  stubGlobalFetchForSource,
+} from '../__mock-fetch.js';
 
 describe('vectorTableSource', () => {
   test('default', async () => {
@@ -74,6 +77,43 @@ describe('vectorTableSource', () => {
 
     const [[initURL]] = vi.mocked(fetch).mock.calls;
     expect(initURL).not.toContain('featureBbox');
+  });
+
+  test('requests inlineTilejson', async () => {
+    stubGlobalFetchForSource();
+
+    await vectorTableSource({
+      connectionName: 'carto_dw',
+      accessToken: '<token>',
+      tableName: 'a.b.vector_table',
+    });
+
+    const [[initURL]] = vi.mocked(fetch).mock.calls;
+    expect(initURL).toMatch(/inlineTilejson=true/);
+  });
+
+  test('inlineTilejson — uses embedded document and skips the follow-up request', async () => {
+    const inlinedTilejson = {
+      ...MOCK_TILESET_RESPONSE,
+      tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary&cache=abc123'],
+    };
+    stubGlobalFetchForSource({
+      tilejson: {
+        url: ['https://xyz.com?format=tilejson&cache=abc123'],
+        data: inlinedTilejson,
+      },
+    });
+
+    const tilejson = await vectorTableSource({
+      connectionName: 'carto_dw',
+      accessToken: '<token>',
+      tableName: 'a.b.vector_table',
+    });
+
+    // Only the instantiation request — the tilejson GET is skipped.
+    expect(vi.mocked(fetch)).toHaveBeenCalledTimes(1);
+    expect(tilejson.tiles).toEqual(inlinedTilejson.tiles);
+    expect(tilejson.accessToken).toBe('<token>');
   });
 
   test('widgetSource', async () => {

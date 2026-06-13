@@ -54,7 +54,16 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
     ...options.headers,
   };
   const credentials = getAuthCredentials(options.authMode);
-  const parameters = {client: clientId, ...options.tags, ...urlParameters};
+  // Opt into the server embedding the tilejson document in the instantiation
+  // response (maps-api sc-556572) so the follow-up GET below can be skipped.
+  // Safe against servers that don't support it: the unknown query param is
+  // ignored and `tilejson.data` is simply absent, falling back to the fetch.
+  const parameters = {
+    client: clientId,
+    inlineTilejson: true,
+    ...options.tags,
+    ...urlParameters,
+  };
 
   const errorContext: APIErrorContext = {
     requestType: 'Map instantiation',
@@ -86,17 +95,24 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
     // same-origin proxy behind apiBaseUrl.
     dataUrl = rewriteUrlForSessionMode(dataUrl, mergedOptions.apiBaseUrl);
   }
-  errorContext.requestType = 'Map data';
-
-  const json = await requestWithParameters<TilejsonResult>({
-    baseUrl: dataUrl,
-    parameters: {client: clientId},
-    headers,
-    errorContext,
-    maxLengthURL,
-    localCache,
-    credentials,
-  });
+  // When the server inlined the tilejson document, use it directly and skip
+  // the follow-up request — one round trip less per source. Otherwise fetch it
+  // from the URL (older servers, or endpoints that don't inline).
+  let json: TilejsonResult;
+  if (tilejson.data) {
+    json = tilejson.data;
+  } else {
+    errorContext.requestType = 'Map data';
+    json = await requestWithParameters<TilejsonResult>({
+      baseUrl: dataUrl,
+      parameters: {client: clientId},
+      headers,
+      errorContext,
+      maxLengthURL,
+      localCache,
+      credentials,
+    });
+  }
   if (sessionMode) {
     // Tile URL templates also point at the tenant API host. Rewrite them onto
     // the proxy, and deliberately leave `json.accessToken` unset: consumers
