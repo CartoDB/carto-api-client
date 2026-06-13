@@ -223,7 +223,10 @@ export type TilejsonMapInstantiation = {
   nrows: number;
   size?: number;
   schema: SchemaField[];
-  tilejson: {url: string[]};
+  // `data` is the inlined tilejson document, present only when the request
+  // opts in with `inlineTilejson` and the server supports it (maps-api
+  // sc-556572). When present, clients can skip the follow-up GET to `url`.
+  tilejson: {url: string[]; data?: TilejsonResult};
 };
 
 export type TileResolution = 0.25 | 0.5 | 1 | 2 | 4;
