@@ -76,6 +76,33 @@ describe('vectorTableSource', () => {
     expect(initURL).not.toContain('featureBbox');
   });
 
+  test('fullTiles opts into the small-source fast path', async () => {
+    stubGlobalFetchForSource();
+
+    await vectorTableSource({
+      connectionName: 'carto_dw',
+      accessToken: '<token>',
+      tableName: 'a.b.vector_table',
+      fullTiles: true,
+    });
+
+    const [[initURL]] = vi.mocked(fetch).mock.calls;
+    expect(initURL).toMatch(/fullTiles=true/);
+  });
+
+  test('fullTiles not set by default', async () => {
+    stubGlobalFetchForSource();
+
+    await vectorTableSource({
+      connectionName: 'carto_dw',
+      accessToken: '<token>',
+      tableName: 'a.b.vector_table',
+    });
+
+    const [[initURL]] = vi.mocked(fetch).mock.calls;
+    expect(initURL).not.toContain('fullTiles');
+  });
+
   test('widgetSource', async () => {
     stubGlobalFetchForSource();
 

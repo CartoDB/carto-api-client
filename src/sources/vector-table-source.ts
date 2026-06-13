@@ -31,6 +31,20 @@ export type VectorTableSourceOptions = SourceOptions &
      * stable label positions for polygons that span multiple tiles.
      */
     featureBbox?: boolean;
+    /**
+     * Opt into the small-source fast path. When `true` and the source is small
+     * enough, the server collapses it to a single full-resolution z0 tile
+     * (tilejson `maxzoom: 0`, tile URLs carry `full=true`) instead of a pyramid
+     * — one warehouse query ever, CDN-shared, then zero warehouse work on
+     * pan/zoom.
+     *
+     * The consumer MUST be able to slice that one tile locally per zoom (see
+     * `isFullSourceTilejson` / `buildFullTileIndex` / `sliceFullTile`); without
+     * a slicer, deck.gl's native overzoom draws every feature at every zoom and
+     * low-zoom density blows up. No-op on sources the server can't size cheaply
+     * (e.g. query sources) — the tilejson then comes back as a normal pyramid.
+     */
+    fullTiles?: boolean;
   };
 
 type UrlParameters = {
@@ -42,6 +56,7 @@ type UrlParameters = {
   name: string;
   aggregationExp?: string;
   featureBbox?: boolean;
+  fullTiles?: boolean;
 };
 
 export type VectorTableSourceResponse = TilejsonResult &
@@ -58,6 +73,7 @@ export const vectorTableSource = async function (
     tileResolution = DEFAULT_TILE_RESOLUTION,
     aggregationExp,
     featureBbox,
+    fullTiles,
   } = options;
 
   const spatialDataType = 'geo';
@@ -80,6 +96,9 @@ export const vectorTableSource = async function (
   }
   if (featureBbox) {
     urlParameters.featureBbox = true;
+  }
+  if (fullTiles) {
+    urlParameters.fullTiles = true;
   }
 
   return baseSource<UrlParameters>('table', options, urlParameters).then(
