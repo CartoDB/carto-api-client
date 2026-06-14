@@ -1,17 +1,26 @@
 import {describe, test, expect} from 'vitest';
+// Public slicer API is consumed from the package entry (the build); the internal
+// reduction helpers aren't exported, so the unit tests import them from the
+// module directly.
 import {
   isFullSourceTilejson,
   buildFullTileIndex,
   sliceFullTile,
+} from '@carto/api-client';
+import {
   tileToBBox,
   getPointsAggregationLevel,
   getMaxFeaturesByResolution,
-} from '@carto/api-client';
-import type {Feature, Point, Polygon} from 'geojson';
+} from '../../src/sources/client-side-tiler.js';
+import type {Feature, Point, Polygon, LineString} from 'geojson';
 import type {TilejsonResult} from '@carto/api-client';
 
 // lng/lat -> tile x/y at zoom z (Web Mercator), for picking a covering tile.
-function lngLatToTile(lng: number, lat: number, z: number): {z: number; x: number; y: number} {
+function lngLatToTile(
+  lng: number,
+  lat: number,
+  z: number
+): {z: number; x: number; y: number} {
   const n = 2 ** z;
   const x = Math.floor(((lng + 180) / 360) * n);
   const rad = (lat * Math.PI) / 180;
@@ -21,7 +30,11 @@ function lngLatToTile(lng: number, lat: number, z: number): {z: number; x: numbe
   return {z, x, y};
 }
 
-const pt = (lng: number, lat: number, props: Record<string, unknown> = {}): Feature<Point> => ({
+const pt = (
+  lng: number,
+  lat: number,
+  props: Record<string, unknown> = {}
+): Feature<Point> => ({
   type: 'Feature',
   properties: props,
   geometry: {type: 'Point', coordinates: [lng, lat]},
@@ -49,15 +62,39 @@ const square = (
   },
 });
 
+const line = (
+  coords: [number, number][],
+  props: Record<string, unknown> = {}
+): Feature<LineString> => ({
+  type: 'Feature',
+  properties: props,
+  geometry: {type: 'LineString', coordinates: coords},
+});
+
 describe('client-side-tiler', () => {
   describe('isFullSourceTilejson', () => {
-    const base = {maxzoom: 0, tiles: ['https://x/{z}/{x}/{y}?full=true&formatTiles=binary']};
+    const base = {
+      maxzoom: 0,
+      tiles: ['https://x/{z}/{x}/{y}?full=true&formatTiles=binary'],
+    };
     test('true for maxzoom 0 + full=true tile URL', () => {
-      expect(isFullSourceTilejson(base as unknown as TilejsonResult)).toBe(true);
+      expect(isFullSourceTilejson(base as unknown as TilejsonResult)).toBe(
+        true
+      );
     });
     test('false when not a full source', () => {
-      expect(isFullSourceTilejson({maxzoom: 20, tiles: ['https://x/{z}/{x}/{y}']} as unknown as TilejsonResult)).toBe(false);
-      expect(isFullSourceTilejson({maxzoom: 0, tiles: ['https://x/{z}/{x}/{y}']} as unknown as TilejsonResult)).toBe(false);
+      expect(
+        isFullSourceTilejson({
+          maxzoom: 20,
+          tiles: ['https://x/{z}/{x}/{y}'],
+        } as unknown as TilejsonResult)
+      ).toBe(false);
+      expect(
+        isFullSourceTilejson({
+          maxzoom: 0,
+          tiles: ['https://x/{z}/{x}/{y}'],
+        } as unknown as TilejsonResult)
+      ).toBe(false);
     });
   });
 
@@ -81,7 +118,11 @@ describe('client-side-tiler', () => {
     const index = buildFullTileIndex(cluster);
 
     test('low zoom (z0) collapses the cluster to one feature with a density count', () => {
-      const out = sliceFullTile(index, {z: 0, x: 0, y: 0}, {geomType: 'points'});
+      const out = sliceFullTile(
+        index,
+        {z: 0, x: 0, y: 0},
+        {geomType: 'points'}
+      );
       expect(out).toHaveLength(1);
       expect(out[0].properties?._carto_point_density).toEqual(3);
     });
@@ -103,7 +144,9 @@ describe('client-side-tiler', () => {
       ]);
       const out = sliceFullTile(spreadIndex, tile, {geomType: 'points'});
       expect(out).toHaveLength(3);
-      expect(out.every((f) => f.properties?._carto_point_density === 1)).toBe(true);
+      expect(out.every((f) => f.properties?._carto_point_density === 1)).toBe(
+        true
+      );
     });
 
     test('grid level matches the server formula', () => {
@@ -126,6 +169,20 @@ describe('client-side-tiler', () => {
       expect(out[0].properties?.id).toEqual('inside');
     });
 
+    test('drops sub-pixel polygons, keeps ones bigger than ~1px', () => {
+      // at z0 ~1px ≈ 0.70deg, so the cull threshold is ~0.49 deg² of bbox area.
+      const index = buildFullTileIndex([
+        square(0, 0, 1, {id: 'big'}), // 1 deg² ≥ threshold
+        square(20, 20, 0.01, {id: 'tiny'}), // 1e-4 deg² ≪ threshold
+      ]);
+      const out = sliceFullTile(
+        index,
+        {z: 0, x: 0, y: 0},
+        {geomType: 'polygons'}
+      );
+      expect(out.map((f) => f.properties?.id)).toEqual(['big']);
+    });
+
     test('caps at the per-resolution max, biggest-first', () => {
       const cap = getMaxFeaturesByResolution('polygons', 0.5); // 5000
       const features: Feature[] = [];
@@ -136,8 +193,64 @@ describe('client-side-tiler', () => {
         const south = -40 + ((i * 7) % 70);
         features.push(square(west, south, 1 + (i % 5) * 0.5, {id: i}));
       }
-      const out = sliceFullTile(buildFullTileIndex(features), {z: 0, x: 0, y: 0}, {geomType: 'polygons'});
+      const out = sliceFullTile(
+        buildFullTileIndex(features),
+        {z: 0, x: 0, y: 0},
+        {geomType: 'polygons'}
+      );
       expect(out.length).toEqual(cap);
+    });
+  });
+
+  describe('lines slicing', () => {
+    test('drops sub-pixel lines, keeps long ones', () => {
+      // at z0 ~1px ≈ 0.70deg (bbox diagonal threshold for lines).
+      const index = buildFullTileIndex([
+        line(
+          [
+            [0, 0],
+            [10, 10],
+          ],
+          {id: 'long'}
+        ), // diagonal ~14deg
+        line(
+          [
+            [0, 0],
+            [0.0005, 0.0005],
+          ],
+          {id: 'tiny'}
+        ), // diagonal ~7e-4deg
+      ]);
+      const out = sliceFullTile(index, {z: 0, x: 0, y: 0}, {geomType: 'lines'});
+      expect(out.map((f) => f.properties?.id)).toEqual(['long']);
+    });
+  });
+
+  describe('buildFullTileIndex', () => {
+    test('skips null/collection geometry and spans all Multi* coordinates', () => {
+      const index = buildFullTileIndex([
+        {type: 'Feature', properties: {}, geometry: null} as unknown as Feature,
+        {
+          type: 'Feature',
+          properties: {},
+          geometry: {type: 'GeometryCollection', geometries: []},
+        } as unknown as Feature,
+        {
+          type: 'Feature',
+          properties: {id: 'multi'},
+          geometry: {
+            type: 'MultiPoint',
+            coordinates: [
+              [0, 0],
+              [10, 8],
+            ],
+          },
+        } as Feature,
+      ]);
+      // null + GeometryCollection are skipped; only the MultiPoint is indexed.
+      expect(index.features).toHaveLength(1);
+      const m = index.features[0];
+      expect([m.minX, m.minY, m.maxX, m.maxY]).toEqual([0, 0, 10, 8]);
     });
   });
 });

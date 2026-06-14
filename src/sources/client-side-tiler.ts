@@ -20,6 +20,11 @@ export type SliceableGeomType = 'points' | 'lines' | 'polygons';
 
 const EARTH_RADIUS_METERS = 6378137;
 const EARTH_CIRCUMFERENCE_METERS = 2 * Math.PI * EARTH_RADIUS_METERS; // 40075016.6856
+// These three mirror maps-api *settings*, not constants: MAPS_API_V3_DYNAMIC_TILES_
+// POINTS_AGGREGATION_LEVEL, _MAX_POLYGON_FEATURES, _MAX_LINES_FEATURES. The values
+// below are the server defaults. If a deployment overrides those env vars the
+// server tiler and this client slicer drift apart (locally-sliced tiles stop
+// matching per-tile requests); keep them in sync if the server defaults change.
 const DYNAMIC_TILES_POINTS_AGGREGATION_LEVEL = 8;
 const DYNAMIC_TILES_MAX_POLYGON_FEATURES = 5000;
 const DYNAMIC_TILES_MAX_LINES_FEATURES = 10000;
@@ -57,11 +62,13 @@ export function tileToBBox(
   return [west, tileLat(y + 1), east, tileLat(y)];
 }
 
-/** Simplification tolerance for a zoom (server parity). Degrees by default. */
+/** Simplification tolerance for a zoom (server parity). Meters by default. */
 export function getToleranceForSimplify(
   tileResolution: TileResolution,
   zoomLevel: number,
-  units: 'meters' | 'degrees' = 'degrees'
+  // Default mirrors the maps-api twin ('meters'); callers slicing lon/lat
+  // geojson pass 'degrees' explicitly.
+  units: 'meters' | 'degrees' = 'meters'
 ): number {
   const circumference = units === 'meters' ? EARTH_CIRCUMFERENCE_METERS : 360;
   const tileWidth = circumference / 2 ** zoomLevel;
@@ -99,7 +106,10 @@ export function getMaxFeaturesByResolution(
  * it opted in via `fullTiles` on the source.)
  */
 export function isFullSourceTilejson(tilejson: TilejsonResult): boolean {
-  return tilejson.maxzoom === 0 && Boolean(tilejson.tiles?.[0]?.includes('full=true'));
+  return (
+    tilejson.maxzoom === 0 &&
+    Boolean(tilejson.tiles?.[0]?.includes('full=true'))
+  );
 }
 
 interface IndexedFeature {
@@ -142,12 +152,15 @@ export function buildFullTileIndex(features: Feature[]): FullTileIndex {
     let minY = Infinity;
     let maxX = -Infinity;
     let maxY = -Infinity;
-    eachPosition((feature.geometry as {coordinates: unknown}).coordinates, ([lng, lat]) => {
-      if (lng < minX) minX = lng;
-      if (lat < minY) minY = lat;
-      if (lng > maxX) maxX = lng;
-      if (lat > maxY) maxY = lat;
-    });
+    eachPosition(
+      (feature.geometry as {coordinates: unknown}).coordinates,
+      ([lng, lat]) => {
+        if (lng < minX) minX = lng;
+        if (lat < minY) minY = lat;
+        if (lng > maxX) maxX = lng;
+        if (lat > maxY) maxY = lat;
+      }
+    );
     if (!Number.isFinite(minX)) continue;
     const isPolygon = feature.geometry.type.includes('Polygon');
     const w = maxX - minX;
@@ -186,7 +199,8 @@ export function sliceFullTile(
   const [west, south, east, north] = tileToBBox(tile.z, tile.x, tile.y);
   // bbox cull — only features intersecting this tile.
   const inTile = index.features.filter(
-    (f) => f.maxX >= west && f.minX <= east && f.maxY >= south && f.minY <= north
+    (f) =>
+      f.maxX >= west && f.minX <= east && f.maxY >= south && f.minY <= north
   );
 
   if (geomType === 'points') {
@@ -194,7 +208,7 @@ export function sliceFullTile(
   }
 
   // lines / polygons: drop sub-pixel features, then biggest-first cap.
-  const pixel = getToleranceForSimplify(tileResolution, tile.z) * 2; // ~1 px in degrees
+  const pixel = getToleranceForSimplify(tileResolution, tile.z, 'degrees') * 2; // ~1 px in degrees
   const minSize = geomType === 'lines' ? pixel : pixel * pixel;
   const survivors = inTile.filter((f) => f.size >= minSize || f.size === 0);
   survivors.sort((a, b) => b.size - a.size);
@@ -213,7 +227,8 @@ function aggregatePoints(
     // Web-Mercator pixel cell, identical math to the server points tiler.
     const qx = Math.floor(
       cells *
-        (Math.round(lng * 111319.49079327357) / EARTH_CIRCUMFERENCE_METERS + 0.5)
+        (Math.round(lng * 111319.49079327357) / EARTH_CIRCUMFERENCE_METERS +
+          0.5)
     );
     const qy = Math.floor(
       cells *

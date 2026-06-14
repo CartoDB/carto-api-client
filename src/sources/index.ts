@@ -24,10 +24,6 @@ export {
   isFullSourceTilejson,
   buildFullTileIndex,
   sliceFullTile,
-  tileToBBox,
-  getToleranceForSimplify,
-  getPointsAggregationLevel,
-  getMaxFeaturesByResolution,
 } from './client-side-tiler.js';
 export type {
   FullTileIndex,
