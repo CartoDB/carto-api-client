@@ -116,6 +116,37 @@ describe('vectorTableSource', () => {
     expect(tilejson.accessToken).toBe('<token>');
   });
 
+  test('inlineTilejson — does not mutate the cached embedded document', async () => {
+    // Build the embedded document as a standalone literal (not spread from the
+    // shared MOCK_TILESET_RESPONSE, which other tests mutate via the fetch path)
+    // so its `accessToken` is definitively absent before the call.
+    const inlinedTilejson: Record<string, unknown> = {
+      tilejson: '2.2.0',
+      tiles: ['https://xyz.com/{z}/{x}/{y}?formatTiles=binary&cache=abc123'],
+      tilestats: {layers: []},
+      schema: [],
+    };
+    stubGlobalFetchForSource({
+      tilejson: {
+        url: ['https://xyz.com?format=tilejson&cache=abc123'],
+        data: inlinedTilejson,
+      },
+    });
+
+    const result = await vectorTableSource({
+      connectionName: 'carto_dw',
+      accessToken: '<token>',
+      tableName: 'a.b.vector_table',
+    });
+
+    // The returned source carries the token, but the embedded document — which
+    // rides inside the (cacheable) instantiation response — must be left
+    // untouched so a reused response isn't corrupted (the accessToken rewrite
+    // happens on a copy, not the original).
+    expect(result.accessToken).toBe('<token>');
+    expect(inlinedTilejson.accessToken).toBeUndefined();
+  });
+
   test('widgetSource', async () => {
     stubGlobalFetchForSource();
 

@@ -100,7 +100,12 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
   // from the URL (older servers, or endpoints that don't inline).
   let json: TilejsonResult;
   if (tilejson.data) {
-    json = tilejson.data;
+    // Shallow-copy before the sessionMode/accessToken/schema rewrites below:
+    // tilejson.data is embedded in the (cacheable) instantiation response, so
+    // mutating it in place would corrupt the cached object for later calls
+    // (e.g. double-rewriting tile URLs in sessionMode). The downstream mutations
+    // are all top-level property reassignments, so a shallow copy is enough.
+    json = {...tilejson.data};
   } else {
     errorContext.requestType = 'Map data';
     json = await requestWithParameters<TilejsonResult>({
