@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- feat(sources): opt into `inlineTilejson` on map instantiation and use the embedded tilejson document when present, skipping the follow-up tilejson request — one round trip less per source. Falls back to fetching the URL on servers that don't support it (maps-api sc-556572). (#300)
 - feat(widgetSources): support `featureIds` / `geometryType` request options to filter widget aggregations by a feature selection without relying on the synthetic `_carto_feature_id` column (#294)
 
 ### 0.5.29
