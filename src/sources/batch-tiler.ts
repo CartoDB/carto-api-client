@@ -40,6 +40,9 @@ export function buildBatchTilesRequest(
   if (!tilejson.tiles_batch) {
     throw new Error('tilejson has no batch endpoint (tiles_batch)');
   }
+  if (tiles.length === 0) {
+    throw new Error('Cannot build a batch request with zero tiles');
+  }
   const list = [...tiles]
     .sort((a, b) => a.z - b.z || a.x - b.x || a.y - b.y)
     .map((t) => `${t.z}/${t.x}/${t.y}`)
@@ -81,7 +84,17 @@ export function splitBatchTilesResponse(
   const tileCount = view.getUint32(offset, true);
   offset += 4;
   const tiles = new Map<string, ArrayBuffer>();
+  // Each tile header is 13 bytes (u8 z + u32 x + u32 y + u32 len). Bounds-check
+  // before every read and before slicing the payload so a truncated or
+  // malformed container throws a clear error instead of a generic DataView
+  // RangeError or a silently truncated payload.
+  const TILE_HEADER_BYTES = 13;
   for (let i = 0; i < tileCount; i++) {
+    if (offset + TILE_HEADER_BYTES > data.byteLength) {
+      throw new Error(
+        'Malformed CDTB batch container: unexpected end of metadata'
+      );
+    }
     const z = view.getUint8(offset);
     offset += 1;
     const x = view.getUint32(offset, true);
@@ -90,6 +103,11 @@ export function splitBatchTilesResponse(
     offset += 4;
     const length = view.getUint32(offset, true);
     offset += 4;
+    if (offset + length > data.byteLength) {
+      throw new Error(
+        'Malformed CDTB batch container: unexpected end of payload'
+      );
+    }
     tiles.set(`${z}/${x}/${y}`, data.slice(offset, offset + length));
     offset += length;
   }
