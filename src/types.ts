@@ -133,7 +133,14 @@ export type SpatialFilter = GeometrySpatialFilter | SpatialIndexFilter;
 export function isSpatialIndexFilter(
   spatialFilter: SpatialFilter
 ): spatialFilter is SpatialIndexFilter {
-  return Array.isArray((spatialFilter as SpatialIndexFilter).indexes);
+  const filter = spatialFilter as
+    | Partial<SpatialIndexFilter>
+    | null
+    | undefined;
+  return (
+    Array.isArray(filter?.indexes) &&
+    ['h3', 'h3int', 'quadbin'].includes(filter?.type as string)
+  );
 }
 
 /** @privateRemarks Source: @deck.gl/carto */
