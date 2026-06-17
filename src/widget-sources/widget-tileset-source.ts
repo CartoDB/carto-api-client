@@ -18,7 +18,7 @@ import type {
   TimeSeriesRequestOptions,
   TimeSeriesResponse,
 } from './types.js';
-import type {SpatialFilter, Tile} from '../types.js';
+import type {GeometrySpatialFilter, Tile} from '../types.js';
 import type {TileFeatureExtractOptions} from '../filters/index.js';
 import type {BBox, FeatureCollection} from 'geojson';
 import {WidgetSource, type WidgetSourceProps} from './widget-source.js';
@@ -257,7 +257,7 @@ export class WidgetTilesetSource<
     spatialFilter,
   }: {
     geojson: FeatureCollection;
-    spatialFilter: SpatialFilter;
+    spatialFilter: GeometrySpatialFilter;
   }) {
     if (!this._workerEnabled) {
       return this._localImpl!.loadGeoJSON({geojson, spatialFilter});

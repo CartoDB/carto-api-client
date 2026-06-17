@@ -1,5 +1,5 @@
 import {cellToTile, getResolution, tileToCell} from 'quadbin';
-import type {RasterTile, SpatialFilter, Tile} from '../types.js';
+import type {RasterTile, GeometrySpatialFilter, Tile} from '../types.js';
 import type {FeatureData} from '../types-internal.js';
 import type {
   RasterMetadata,
@@ -10,7 +10,7 @@ import {intersectTileRaster} from './tileIntersection.js';
 
 export type TileFeaturesRasterOptions = {
   tiles: RasterTile[];
-  spatialFilter?: SpatialFilter;
+  spatialFilter?: GeometrySpatialFilter;
   spatialDataColumn: string;
   spatialDataType: SpatialDataType;
   rasterMetadata: RasterMetadata;
