@@ -20,6 +20,13 @@ import {vectorTilesetSource} from './vector-tileset-source.js';
 
 export {SOURCE_DEFAULTS} from './base-source.js';
 export {RasterBandColorinterp} from './constants.js';
+export {
+  isBatchTilesTilejson,
+  buildBatchTilesRequest,
+  splitBatchTilesResponse,
+  batchTileKey,
+} from './batch-tiler.js';
+export type {BatchTileIndex} from './batch-tiler.js';
 export type {
   SourceOptions,
   SourceRequiredOptions,

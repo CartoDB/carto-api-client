@@ -253,6 +253,18 @@ export interface Tilejson {
   tileResolution?: TileResolution;
 
   /**
+   * Batched-tiles fast path. When present, a consumer may coalesce a viewport's
+   * tiles into one request to this URL by appending `&tiles=z/x/y,z/x/y,…`
+   * (sorted), up to `tiles_batch_max` tiles. Absent ⇒ use the per-tile `tiles`
+   * template. Served for PostgreSQL/BigQuery sources in binary/geojson.
+   *
+   * @internal
+   */
+  tiles_batch?: string;
+  /** Max tiles accepted in a single `tiles_batch` request. @internal */
+  tiles_batch_max?: number;
+
+  /**
    * Resolution of data in spatial-index dataset (e.g. H3, Quadbin).
    *
    * @internal
