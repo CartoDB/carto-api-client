@@ -574,22 +574,24 @@ function createChannelProps(
   {
     // A line is always stroked; a polygon border only when `stroked`. Points are excluded.
     const strokeVisible = isLine || (isPolygon && Boolean(visConfig.stroked));
-    if (
-      isVectorTile &&
-      strokeVisible &&
-      visConfig.lineStyle &&
-      visConfig.lineStyle !== 'solid'
-    ) {
-      if (visConfig.lineStyle === 'dotted') {
-        result.lineCapRounded = true;
-      }
-      result.lineStyle = visConfig.lineStyle;
-      if (visConfig.dashArray) {
-        result.dashArray = visConfig.dashArray;
-      }
-
+    if (isVectorTile && strokeVisible) {
       const {lineStyleField, lineStyleScale} = visualChannels;
       const {lineStyleRange} = visConfig;
+
+      // Fixed preset (used when no column drives the style).
+      if (visConfig.lineStyle && visConfig.lineStyle !== 'solid') {
+        if (visConfig.lineStyle === 'dotted') {
+          result.lineCapRounded = true;
+        }
+        result.lineStyle = visConfig.lineStyle;
+        if (visConfig.dashArray) {
+          result.dashArray = visConfig.dashArray;
+          result.getDashArray = visConfig.dashArray;
+        }
+      }
+
+      // Data-driven — mirrors getLineColor/getFillColor: computed whenever the field/scale/range
+      // are set, independent of the fixed `lineStyle`. Overrides the constant accessor above.
       if (lineStyleField && lineStyleScale && lineStyleRange) {
         const {accessor, ...scaleProps} = getLineStyleAccessor(
           lineStyleField,
@@ -597,13 +599,19 @@ function createChannelProps(
           data
         );
         result.getDashArray = accessor;
-        scales.lineStyle = {
+        scales.lineStyle = updateTriggers.getDashArray = {
           field: lineStyleField,
           type: lineStyleScale,
           ...scaleProps,
         };
-      } else if (visConfig.dashArray) {
-        result.getDashArray = visConfig.dashArray;
+        // Round caps so per-category dotted values ([0, gap]) render as dots, not squares.
+        const dashArrays = [
+          ...lineStyleRange.dashArrayMap.map(({dashArray}) => dashArray),
+          ...(lineStyleRange.othersDashArray ? [lineStyleRange.othersDashArray] : []),
+        ];
+        if (dashArrays.some(([dash]) => dash === 0)) {
+          result.lineCapRounded = true;
+        }
       }
     }
   }
