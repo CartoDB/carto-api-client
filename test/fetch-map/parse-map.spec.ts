@@ -1371,7 +1371,9 @@ describe('parseMap', () => {
         }
       );
       expect(typeof props.getDashArray).toBe('function');
-      expect(props.getDashArray({properties: {road_type: 'b'}})).toEqual([0, 3]);
+      expect(props.getDashArray({properties: {road_type: 'b'}})).toEqual([
+        0, 3,
+      ]);
       expect(props.lineStyle).toBeUndefined(); // fixed preset stays solid → no flat prop
       expect(props.lineCapRounded).toBe(true); // a [0, gap] value ⇒ round dots
       expect(scales.lineStyle).toMatchObject({

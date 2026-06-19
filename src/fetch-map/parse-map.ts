@@ -607,7 +607,9 @@ function createChannelProps(
         // Round caps so per-category dotted values ([0, gap]) render as dots, not squares.
         const dashArrays = [
           ...lineStyleRange.dashArrayMap.map(({dashArray}) => dashArray),
-          ...(lineStyleRange.othersDashArray ? [lineStyleRange.othersDashArray] : []),
+          ...(lineStyleRange.othersDashArray
+            ? [lineStyleRange.othersDashArray]
+            : []),
         ];
         if (dashArrays.some(([dash]) => dash === 0)) {
           result.lineCapRounded = true;
