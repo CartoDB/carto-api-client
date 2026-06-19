@@ -1353,6 +1353,33 @@ describe('parseMap', () => {
       });
     });
 
+    test('by-column mode renders even when the fixed lineStyle is solid (round caps for dotted values)', () => {
+      const {props, scales} = parse(
+        'LineString',
+        {
+          lineStyle: 'solid',
+          lineStyleRange: {
+            dashArrayMap: [
+              {value: 'a', dashArray: [4, 2]},
+              {value: 'b', dashArray: [0, 3]},
+            ],
+          },
+        },
+        {
+          lineStyleField: {name: 'road_type', type: 'string'},
+          lineStyleScale: 'ordinal',
+        }
+      );
+      expect(typeof props.getDashArray).toBe('function');
+      expect(props.getDashArray({properties: {road_type: 'b'}})).toEqual([0, 3]);
+      expect(props.lineStyle).toBeUndefined(); // fixed preset stays solid → no flat prop
+      expect(props.lineCapRounded).toBe(true); // a [0, gap] value ⇒ round dots
+      expect(scales.lineStyle).toMatchObject({
+        field: {name: 'road_type', type: 'string'},
+        type: 'ordinal',
+      });
+    });
+
     test('non-vector-tile layer type receives no dashes', () => {
       const {props} = parse(
         'LineString',
