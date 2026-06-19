@@ -3,6 +3,13 @@
 // Copyright (c) vis.gl contributors
 
 export {
+  buildAuthHeaders,
+  getAuthCredentials,
+  rewriteUrlForSessionMode,
+  type AuthMode,
+  type AuthOptions,
+} from './auth.js';
+export {
   CartoAPIError,
   type APIErrorContext,
   type APIRequestType,

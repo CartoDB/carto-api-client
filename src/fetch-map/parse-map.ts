@@ -796,7 +796,13 @@ function createChannelProps(
   };
 }
 
-function createLoadOptions(accessToken: string) {
+function createLoadOptions(accessToken?: string) {
+  // No token (e.g. a source created with authMode: 'session', where tile URLs
+  // are same-origin and authenticated by a session cookie): attach no
+  // Authorization header rather than a literal 'Bearer undefined'.
+  if (!accessToken) {
+    return {loadOptions: {fetch: {credentials: 'same-origin'}}};
+  }
   return {
     loadOptions: {fetch: {headers: {Authorization: `Bearer ${accessToken}`}}},
   };
