@@ -37,13 +37,14 @@ export function _getHexagonResolution(
 const DYNAMIC_TILES_POINTS_AGGREGATION_LEVEL = 8;
 
 // Per-tileResolution correction, identical to the maps-api dynamic tiler.
-const AGG_LEVEL_CORRECTION_BY_TILE_RESOLUTION: Record<TileResolution, number> = {
-  0.25: -1,
-  0.5: 0,
-  1: 1,
-  2: 2,
-  4: 3,
-};
+const AGG_LEVEL_CORRECTION_BY_TILE_RESOLUTION: Record<TileResolution, number> =
+  {
+    0.25: -1,
+    0.5: 0,
+    1: 1,
+    2: 2,
+    4: 3,
+  };
 
 /**
  * Quadbin level at which the maps-api dynamic tiler implicitly aggregates a
