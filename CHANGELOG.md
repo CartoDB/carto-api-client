@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- feat(sources): rename `featureBbox` source option to `prepareLabels` (Maps API `featureBbox` param unchanged)
 - feat(sources): expose `_getPointsAggregationLevel` for maps-api dynamic point-tile aggregation parity (#304)
 - feat(widgetSources): support `featureIds` / `geometryType` request options to filter widget aggregations by a feature selection without relying on the synthetic `_carto_feature_id` column (#294)
 - feat(widgetSources): support `SpatialIndexFilter` (H3/Quadbin cell selection) on `spatialFilter` (#296)

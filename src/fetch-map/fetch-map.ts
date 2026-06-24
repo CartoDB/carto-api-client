@@ -320,7 +320,7 @@ export async function fetchMap({
       datasetsWithLabels.has(dataset.id) &&
       (dataset.type === 'table' || dataset.type === 'query')
     ) {
-      dataset.featureBbox = true;
+      dataset.prepareLabels = true;
     }
   });
 
