@@ -4,10 +4,10 @@ import union from '@turf/union';
 import {getType} from '@turf/invariant';
 import {polygon, multiPolygon, feature, featureCollection} from '@turf/helpers';
 import type {BBox, Geometry, MultiPolygon, Polygon, Position} from 'geojson';
-import type {SpatialFilter} from './types.js';
+import type {GeometrySpatialFilter} from './types.js';
 
 /**
- * Returns a {@link SpatialFilter} for a given viewport, typically obtained
+ * Returns a {@link GeometrySpatialFilter} for a given viewport, typically obtained
  * from deck.gl's `viewport.getBounds()` method ([west, south, east, north]).
  * If the viewport covers the entire world (to some margin of error in Web
  * Mercator space), `undefined` is returned instead.
@@ -17,7 +17,7 @@ import type {SpatialFilter} from './types.js';
  */
 export function createViewportSpatialFilter(
   viewport: BBox
-): SpatialFilter | undefined {
+): GeometrySpatialFilter | undefined {
   if (_isGlobalViewport(viewport)) {
     return;
   }
@@ -25,14 +25,14 @@ export function createViewportSpatialFilter(
 }
 
 /**
- * Returns a {@link SpatialFilter} for a given {@link Polygon} or
+ * Returns a {@link GeometrySpatialFilter} for a given {@link Polygon} or
  * {@link MultiPolygon}. If the polygon(s) extend outside longitude
  * range [-180, +180], the result may be reformatted for compatibility
  * with CARTO APIs.
  */
 export function createPolygonSpatialFilter(
   spatialFilter: Polygon | MultiPolygon
-): SpatialFilter | undefined {
+): GeometrySpatialFilter | undefined {
   return (spatialFilter && _normalizeGeometry(spatialFilter)) || undefined;
 }
 

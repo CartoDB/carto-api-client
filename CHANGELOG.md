@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(geo): narrow `createViewportSpatialFilter` / `createPolygonSpatialFilter` return type to `GeometrySpatialFilter` (#309)
+
 ### 0.5.30
 
 - feat(sources): expose `_getPointsAggregationLevel` for maps-api dynamic point-tile aggregation parity (#304)
