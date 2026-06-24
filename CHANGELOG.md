@@ -2,9 +2,12 @@
 
 ## Unreleased
 
+### 0.5.30
+
 - feat(sources): expose `_getPointsAggregationLevel` for maps-api dynamic point-tile aggregation parity (#304)
 - feat(widgetSources): support `featureIds` / `geometryType` request options to filter widget aggregations by a feature selection without relying on the synthetic `_carto_feature_id` column (#294)
 - feat(widgetSources): support `SpatialIndexFilter` (H3/Quadbin cell selection) on `spatialFilter` (#296)
+- feat(auth): session auth mode for same-origin proxy deployments (#298)
 
 ### 0.5.29
 
