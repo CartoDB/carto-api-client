@@ -55,21 +55,21 @@ describe('vectorQuerySource', () => {
     expect(initURL).not.toContain('aggregationExp');
   });
 
-  test('featureBbox', async () => {
+  test('prepareLabels sends featureBbox param', async () => {
     stubGlobalFetchForSource();
 
     await vectorQuerySource({
       connectionName: 'carto_dw',
       accessToken: '<token>',
       sqlQuery: 'SELECT * FROM a.b.vector_table',
-      featureBbox: true,
+      prepareLabels: true,
     });
 
     const [[initURL]] = vi.mocked(fetch).mock.calls;
     expect(initURL).toMatch(/featureBbox=true/);
   });
 
-  test('featureBbox not set by default', async () => {
+  test('featureBbox param not set by default', async () => {
     stubGlobalFetchForSource();
 
     await vectorQuerySource({

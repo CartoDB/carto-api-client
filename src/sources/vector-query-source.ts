@@ -30,7 +30,7 @@ export type VectorQuerySourceOptions = SourceOptions &
      * a `"west,south,east,north"` string in WGS84. Used by clients to compute
      * stable label positions for polygons that span multiple tiles.
      */
-    featureBbox?: boolean;
+    prepareLabels?: boolean;
   };
 
 type UrlParameters = {
@@ -59,7 +59,7 @@ export const vectorQuerySource = async function (
     tileResolution = DEFAULT_TILE_RESOLUTION,
     queryParameters,
     aggregationExp,
-    featureBbox,
+    prepareLabels,
   } = options;
 
   const spatialDataType = 'geo';
@@ -83,7 +83,7 @@ export const vectorQuerySource = async function (
   if (aggregationExp) {
     urlParameters.aggregationExp = aggregationExp;
   }
-  if (featureBbox) {
+  if (prepareLabels) {
     urlParameters.featureBbox = true;
   }
 

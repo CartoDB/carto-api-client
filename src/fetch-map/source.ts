@@ -106,13 +106,13 @@ export function configureSource({
     tileResolution,
     ...(queryParameters && {queryParameters}),
   } as QuerySourceOptions;
-  const {featureBbox} = dataset;
+  const {prepareLabels} = dataset;
   const vectorOptions = {
     spatialDataColumn,
     ...(columns && {columns}),
     ...(filters && {filters}),
     ...(aggregationExp && {aggregationExp}),
-    ...(featureBbox && {featureBbox}),
+    ...(prepareLabels && {prepareLabels}),
   } as VectorTableSourceOptions;
 
   if (type === 'raster') {
