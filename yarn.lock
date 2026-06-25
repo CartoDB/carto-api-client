@@ -216,6 +216,7 @@ __metadata:
     h3-js: "npm:^4.1.0"
     jsep: "npm:^1.4.0"
     quadbin: "npm:^0.4.1-alpha.0"
+    rollup: "npm:4.59.0"
   languageName: node
   linkType: soft
 
