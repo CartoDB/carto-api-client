@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+### 0.5.31
+
 - feat(sources): rename `featureBbox` source option to `prepareLabels` (Maps API `featureBbox` param unchanged)
 - fix(geo): narrow `createViewportSpatialFilter` / `createPolygonSpatialFilter` return type to `GeometrySpatialFilter` (#309)
 
