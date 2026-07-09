@@ -11,6 +11,7 @@ import {
   opacityToAlpha,
   getIconUrlAccessor,
   getLineStyleAccessor,
+  getFillPatternAccessor,
   negateAccessor,
   getMaxMarkerSize,
   type LayerType,
@@ -33,6 +34,7 @@ import type {
   VisualChannelField,
 } from './types.js';
 import {isRemoteCalculationSupported} from './utils.js';
+import {PATTERN_ATLAS_URL, PATTERN_ATLAS_MAPPING} from './pattern-atlas.js';
 import {
   getRasterTileLayerStylePropsRgb,
   getRasterTileLayerStylePropsScaledBand,
@@ -60,7 +62,8 @@ export type ScaleKey =
   | 'lineWidth'
   | 'elevation'
   | 'weight'
-  | 'lineStyle';
+  | 'lineStyle'
+  | 'fillPattern';
 
 export type Scales = Partial<Record<ScaleKey, Scale>>;
 
@@ -615,6 +618,49 @@ function createChannelProps(
           result.lineCapRounded = true;
         }
       }
+    }
+  }
+
+  // fill pattern — Phase 2. The pattern is a stencil tinted by the existing fillColor
+  // (mask:true) — no separate pattern-color channel. The consumer attaches
+  // FillStyleExtension unconditionally and reads `fillPatternEnabled` as the on/off
+  // switch, mirroring how MaskExtension is gated by `maskId`. Data only — no extension
+  // instantiation here. Applies to any filled polygon layer (mvt/tileset + H3/Quadbin);
+  // the stroke-dash block above is the VectorTile-only one (per OQ 10).
+  {
+    result.fillPatternEnabled = Boolean(visConfig.fillPatternEnabled);
+
+    if (visConfig.filled && visConfig.fillPatternEnabled) {
+      result.fillPatternAtlas = PATTERN_ATLAS_URL;
+      result.fillPatternMapping = PATTERN_ATLAS_MAPPING;
+      result.fillPatternMask = true;
+      result.getFillPatternScale = visConfig.fillPatternSize ?? 1;
+      // Flat prop for legend consumers (fallback when there is no by-column scale).
+      result.fillPattern = visConfig.fillPattern;
+
+      const {fillPatternField, fillPatternScale} = visualChannels;
+      const {fillPatternRange, fillPatternDensity} = visConfig;
+
+      if (fillPatternField && fillPatternScale && fillPatternRange) {
+        const {accessor, ...scaleProps} = getFillPatternAccessor(
+          fillPatternField,
+          fillPatternRange,
+          fillPatternDensity,
+          data
+        );
+        result.getFillPattern = accessor;
+        scales.fillPattern = updateTriggers.getFillPattern = {
+          field: fillPatternField,
+          type: fillPatternScale,
+          ...scaleProps,
+        };
+      } else {
+        // Single mode: one real pattern (never solid/none) for every feature.
+        const key = `${visConfig.fillPattern}-${fillPatternDensity ?? 'medium'}`;
+        result.getFillPattern = () => key;
+      }
+      // getFillColor is left exactly as the fillColor channel set it; under
+      // fillPatternMask:true that IS the pattern tint.
     }
   }
 

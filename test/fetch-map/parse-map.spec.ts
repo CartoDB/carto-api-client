@@ -1392,4 +1392,178 @@ describe('parseMap', () => {
       expect(props.getDashArray).toBeUndefined();
     });
   });
+
+  describe('fill pattern', () => {
+    const buildDataset = (geometry: string) => ({
+      id: 'FILL_DS',
+      data: {
+        tiles: ['https://example.com/tiles/{z}/{x}/{y}'],
+        tilestats: {
+          layers: [
+            {
+              attributes: [
+                {
+                  attribute: 'zone',
+                  categories: [{category: 'a'}, {category: 'b'}],
+                },
+              ],
+              geometry,
+            },
+          ],
+        },
+      },
+      type: 'tileset',
+    });
+
+    const buildLayerConfig = (
+      visConfigOverrides: Record<string, any> = {},
+      visualChannels: Record<string, any> = {},
+      type = 'tileset'
+    ) => ({
+      version: 'v1',
+      config: {
+        mapState: {},
+        mapStyle: {},
+        visState: {
+          layers: [
+            {
+              id: 'layer1',
+              type,
+              config: {
+                dataId: 'FILL_DS',
+                label: 'Test Layer',
+                textLabel: [{field: null, size: 12}],
+                visConfig: {
+                  filled: true,
+                  opacity: 1,
+                  colorRange: {
+                    category: 'sequential',
+                    colors: ['#f0f0f0', '#333333'],
+                    colorMap: undefined,
+                    name: 'custom',
+                    type: 'custom',
+                  },
+                  radius: 5,
+                  ...visConfigOverrides,
+                },
+              },
+              visualChannels,
+            },
+          ],
+          layerBlending: 'normal',
+          interactionConfig: {tooltip: {enabled: false}},
+        },
+      },
+    });
+
+    const parse = (
+      geometry: string,
+      ...args: Parameters<typeof buildLayerConfig>
+    ) =>
+      parseMap({
+        ...METADATA,
+        datasets: [buildDataset(geometry)],
+        keplerMapConfig: buildLayerConfig(...args),
+      }).layers[0];
+
+    test('disabled: emits fillPatternEnabled:false and no pattern props', () => {
+      const {props, scales} = parse('Polygon', {});
+      expect(props.fillPatternEnabled).toBe(false);
+      expect(props.getFillPattern).toBeUndefined();
+      expect(props.fillPatternAtlas).toBeUndefined();
+      expect(scales.fillPattern).toBeUndefined();
+    });
+
+    test('single mode: constant getFillPattern + atlas/mask props, no scale', () => {
+      const {props, scales} = parse('Polygon', {
+        fillPatternEnabled: true,
+        fillPattern: 'hlines',
+        fillPatternDensity: 'small',
+        fillPatternSize: 2,
+      });
+      expect(props.fillPatternEnabled).toBe(true);
+      expect(typeof props.getFillPattern).toBe('function');
+      expect(props.getFillPattern()).toBe('hlines-small');
+      expect(props.fillPatternAtlas).toContain('data:image/png;base64,');
+      expect(props.fillPatternMapping['hlines-small']).toMatchObject({
+        x: 128,
+        y: 0,
+        mask: true,
+      });
+      expect(props.fillPatternMask).toBe(true);
+      expect(props.getFillPatternScale).toBe(2);
+      expect(props.fillPattern).toBe('hlines');
+      expect(scales.fillPattern).toBeUndefined();
+    });
+
+    test('single mode defaults density to medium and scale to 1', () => {
+      const {props} = parse('Polygon', {
+        fillPatternEnabled: true,
+        fillPattern: 'dots',
+      });
+      expect(props.getFillPattern()).toBe('dots-medium');
+      expect(props.getFillPatternScale).toBe(1);
+    });
+
+    test('by-column mode builds a per-feature accessor and a fillPattern scale', () => {
+      const {props, scales} = parse(
+        'Polygon',
+        {
+          fillPatternEnabled: true,
+          fillPattern: 'hlines',
+          fillPatternDensity: 'medium',
+          fillPatternRange: {
+            patternMap: [
+              {value: 'a', pattern: 'hlines'},
+              {value: 'b', pattern: 'cross-hatch'},
+            ],
+            othersPattern: 'none',
+          },
+        },
+        {
+          fillPatternField: {name: 'zone', type: 'string'},
+          fillPatternScale: 'ordinal',
+        }
+      );
+      expect(typeof props.getFillPattern).toBe('function');
+      expect(props.getFillPattern({properties: {zone: 'a'}})).toBe(
+        'hlines-medium'
+      );
+      expect(props.getFillPattern({properties: {zone: 'b'}})).toBe(
+        'cross-hatch-medium'
+      );
+      expect(props.getFillPattern({properties: {zone: 'z'}})).toBe('none');
+      expect(scales.fillPattern).toEqual({
+        field: {name: 'zone', type: 'string'},
+        type: 'ordinal',
+        domain: ['a', 'b'],
+        range: ['hlines', 'cross-hatch'],
+      });
+    });
+
+    test('applies to H3/Quadbin fills (not VectorTile-gated like strokes)', () => {
+      const {props} = parse(
+        'Polygon',
+        {
+          fillPatternEnabled: true,
+          fillPattern: 'dots',
+          fillPatternDensity: 'large',
+        },
+        {},
+        'h3'
+      );
+      expect(props.fillPatternEnabled).toBe(true);
+      expect(props.getFillPattern()).toBe('dots-large');
+    });
+
+    test('unfilled layer keeps the flag but emits no pattern accessor', () => {
+      const {props} = parse('Polygon', {
+        filled: false,
+        fillPatternEnabled: true,
+        fillPattern: 'hlines',
+      });
+      expect(props.fillPatternEnabled).toBe(true);
+      expect(props.getFillPattern).toBeUndefined();
+    });
+  });
 });

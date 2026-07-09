@@ -3,6 +3,7 @@
 ## Unreleased
 
 - feat(fetchMap): Support line & polygon stroke dash styles (#297)
+- feat(fetchMap): Support polygon fill patterns (inline sprite atlas, `getFillPattern`/`scales.fillPattern`, `fillPatternEnabled`)
 
 ### 0.5.31
 
