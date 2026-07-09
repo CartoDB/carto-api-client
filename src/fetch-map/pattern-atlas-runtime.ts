@@ -1,35 +1,65 @@
-// Runtime fill-pattern atlas (option B / PoC).
+// Runtime fill-pattern atlas — option B (the proposal).
 //
-// Instead of a single pre-baked sheet, ship each pattern as its own editable SVG asset
-// (src/fetch-map/patterns/*.svg), let tsup inline each as a data URL (`dataurl` loader),
-// and composite them into one sprite sheet on a canvas the first time a pattern is needed.
-// The result is memoized and handed to deck.gl's async `fillPatternAtlas` prop as a Promise.
+// The patterns live as individual, developer-editable assets (src/fetch-map/patterns/*.png,
+// one 64x64 space-filling tile per pattern+density) rather than a compiled base64 blob.
+// tsup inlines each via its `dataurl` loader, and we composite them into the 192x512 sheet
+// on a canvas the first time a pattern is needed. The result is memoized and handed to
+// deck.gl's async `fillPatternAtlas` prop as a Promise (so this stays internal — the
+// consumer just spreads descriptor.props). SVG-vs-PNG for the assets is a later experiment.
 
-import hlines from './patterns/hlines.svg';
-import vlines from './patterns/vlines.svg';
-import diagLeft from './patterns/diag-left.svg';
-import diagRight from './patterns/diag-right.svg';
-import crossHatch from './patterns/cross-hatch.svg';
-import dots from './patterns/dots.svg';
-import checker from './patterns/checker.svg';
-import solid from './patterns/solid.svg';
+import hlinesLarge from './patterns/hlines-large.png';
+import hlinesMedium from './patterns/hlines-medium.png';
+import hlinesSmall from './patterns/hlines-small.png';
+import vlinesLarge from './patterns/vlines-large.png';
+import vlinesMedium from './patterns/vlines-medium.png';
+import vlinesSmall from './patterns/vlines-small.png';
+import diagLeftLarge from './patterns/diag-left-large.png';
+import diagLeftMedium from './patterns/diag-left-medium.png';
+import diagLeftSmall from './patterns/diag-left-small.png';
+import diagRightLarge from './patterns/diag-right-large.png';
+import diagRightMedium from './patterns/diag-right-medium.png';
+import diagRightSmall from './patterns/diag-right-small.png';
+import crossHatchLarge from './patterns/cross-hatch-large.png';
+import crossHatchMedium from './patterns/cross-hatch-medium.png';
+import crossHatchSmall from './patterns/cross-hatch-small.png';
+import dotsLarge from './patterns/dots-large.png';
+import dotsMedium from './patterns/dots-medium.png';
+import dotsSmall from './patterns/dots-small.png';
+import checkerLarge from './patterns/checker-large.png';
+import checkerMedium from './patterns/checker-medium.png';
+import checkerSmall from './patterns/checker-small.png';
+import solid from './patterns/solid.png';
 
 import {
   ATLAS_W,
   ATLAS_H,
   CELL,
-  DENSITY_TILE,
   PATTERN_ATLAS_MAPPING,
 } from './pattern-atlas-baked.js';
 
-const PART_URLS: Record<string, string> = {
-  hlines,
-  vlines,
-  'diag-left': diagLeft,
-  'diag-right': diagRight,
-  'cross-hatch': crossHatch,
-  dots,
-  checker,
+// atlas key -> inlined data URL of its editable source tile
+const CELL_URLS: Record<string, string> = {
+  'hlines-large': hlinesLarge,
+  'hlines-medium': hlinesMedium,
+  'hlines-small': hlinesSmall,
+  'vlines-large': vlinesLarge,
+  'vlines-medium': vlinesMedium,
+  'vlines-small': vlinesSmall,
+  'diag-left-large': diagLeftLarge,
+  'diag-left-medium': diagLeftMedium,
+  'diag-left-small': diagLeftSmall,
+  'diag-right-large': diagRightLarge,
+  'diag-right-medium': diagRightMedium,
+  'diag-right-small': diagRightSmall,
+  'cross-hatch-large': crossHatchLarge,
+  'cross-hatch-medium': crossHatchMedium,
+  'cross-hatch-small': crossHatchSmall,
+  'dots-large': dotsLarge,
+  'dots-medium': dotsMedium,
+  'dots-small': dotsSmall,
+  'checker-large': checkerLarge,
+  'checker-medium': checkerMedium,
+  'checker-small': checkerSmall,
   solid,
 };
 
@@ -76,20 +106,9 @@ async function toDataURL(canvas: AnyCanvas): Promise<string> {
   return canvas.toDataURL('image/png');
 }
 
-function splitKey(key: string): {
-  pattern: string;
-  density: 'large' | 'medium' | 'small';
-} {
-  const i = key.lastIndexOf('-');
-  return {
-    pattern: key.slice(0, i),
-    density: key.slice(i + 1) as 'large' | 'medium' | 'small',
-  };
-}
-
 let atlasPromise: Promise<string> | undefined;
 
-/** Assemble the sprite sheet from the individual pattern assets. Memoized. */
+/** Assemble the sprite sheet from the individual editable pattern tiles. Memoized. */
 export function assemblePatternAtlas(): Promise<string> {
   if (!atlasPromise) atlasPromise = build();
   return atlasPromise;
@@ -105,33 +124,15 @@ async function build(): Promise<string> {
 
   const images: Record<string, CanvasImageSource> = {};
   await Promise.all(
-    Object.entries(PART_URLS).map(async ([name, url]) => {
-      images[name] = await loadImage(url);
+    Object.entries(CELL_URLS).map(async ([key, url]) => {
+      images[key] = await loadImage(url);
     })
   );
 
+  // Place each editable 64x64 tile at its slot; `none` is left transparent (no tile).
   for (const [key, frame] of Object.entries(PATTERN_ATLAS_MAPPING)) {
-    if (key === 'none') continue; // transparent cell — paint nothing
-    if (key === 'solid') {
-      ctx.drawImage(images.solid, frame.x, frame.y, CELL, CELL);
-      continue;
-    }
-    const {pattern, density} = splitKey(key);
-    const tile = DENSITY_TILE[density];
-    const img = images[pattern];
-    // Stamp the Meridian glyph across the 64px cell at the density's tile size, clipping
-    // to the cell so trailing-edge stamps don't bleed into neighbours. (Meridian ships one
-    // glyph per pattern with no density variants, so density here is a tiling scale.)
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(frame.x, frame.y, CELL, CELL);
-    ctx.clip();
-    for (let y = 0; y < CELL; y += tile) {
-      for (let x = 0; x < CELL; x += tile) {
-        ctx.drawImage(img, frame.x + x, frame.y + y, tile, tile);
-      }
-    }
-    ctx.restore();
+    const img = images[key];
+    if (img) ctx.drawImage(img, frame.x, frame.y, CELL, CELL);
   }
 
   return toDataURL(canvas);
