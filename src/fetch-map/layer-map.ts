@@ -32,6 +32,7 @@ import type {
   ColorRange,
   CustomMarkersRange,
   Dataset,
+  FillPatternRange,
   LineStyleRange,
   MapLayerConfig,
   VisConfig,
@@ -527,6 +528,33 @@ export function getLineStyleAccessor(
     accessor: normalizeAccessor(accessor, data),
     domain: range.dashArrayMap.map(({value}) => value),
     range: range.dashArrayMap.map(({dashArray}) => dashArray),
+  };
+}
+
+export function getFillPatternAccessor(
+  field: VisualChannelField,
+  range: FillPatternRange,
+  density: 'small' | 'medium' | 'large' | undefined,
+  data: any
+) {
+  const d = density ?? 'medium';
+  // `solid` / `none` are density-agnostic atlas cells; every other pattern resolves to
+  // `${pattern}-${density}`.
+  const toKey = (pattern: string) =>
+    pattern === 'solid' || pattern === 'none' ? pattern : `${pattern}-${d}`;
+  // Always resolve to a real key — an unmapped key would sample atlas bounds [0,0,0,0]
+  // (the wrong (0,0) sprite). `none` is a real transparent cell = "paints nothing".
+  const fallback = toKey(range.othersPattern ?? 'none');
+  const mapping: Record<string, string> = {};
+  for (const {value, pattern} of range.patternMap) {
+    mapping[value] = toKey(pattern);
+  }
+  const accessor = (properties: any) =>
+    mapping[properties[field.name]] ?? fallback;
+  return {
+    accessor: normalizeAccessor(accessor, data),
+    domain: range.patternMap.map(({value}) => value),
+    range: range.patternMap.map(({pattern}) => pattern),
   };
 }
 
