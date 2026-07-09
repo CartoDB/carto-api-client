@@ -34,7 +34,7 @@ import type {
   VisualChannelField,
 } from './types.js';
 import {isRemoteCalculationSupported} from './utils.js';
-import {PATTERN_ATLAS_URL, PATTERN_ATLAS_MAPPING} from './pattern-atlas.js';
+import {getPatternAtlas, PATTERN_ATLAS_MAPPING} from './pattern-atlas.js';
 import {
   getRasterTileLayerStylePropsRgb,
   getRasterTileLayerStylePropsScaledBand,
@@ -631,7 +631,7 @@ function createChannelProps(
     result.fillPatternEnabled = Boolean(visConfig.fillPatternEnabled);
 
     if (visConfig.filled && visConfig.fillPatternEnabled) {
-      result.fillPatternAtlas = PATTERN_ATLAS_URL;
+      result.fillPatternAtlas = getPatternAtlas();
       result.fillPatternMapping = PATTERN_ATLAS_MAPPING;
       result.fillPatternMask = true;
       result.getFillPatternScale = visConfig.fillPatternSize ?? 1;

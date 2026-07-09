@@ -7,6 +7,9 @@ const commonConfig: Options = {
   clean: true,
   sourcemap: true,
   splitting: false,
+  // Inline SVG pattern assets as data URLs so they ship in the bundle with no asset
+  // file (see src/fetch-map/pattern-atlas-runtime.ts).
+  loader: {'.svg': 'dataurl'},
 };
 
 // Web Workers rely on ES Modules, and are not supported in our CJS builds.
