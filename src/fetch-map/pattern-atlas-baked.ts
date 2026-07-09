@@ -50,26 +50,7 @@ export const PATTERN_ATLAS_MAPPING: Record<string, PatternAtlasFrame> = {
   none: {x: 0, y: 448, width: 64, height: 64, mask: true},
 };
 
-// Atlas geometry shared by both the baked sheet above and the runtime assembler.
+// Atlas geometry shared by the baked sheet above and the runtime assembler.
 export const CELL = 64;
 export const ATLAS_W = CELL * 3; // 192 — columns: [large, medium, small]
 export const ATLAS_H = CELL * 8; // 512 — 7 pattern rows + 1 solid/none row
-
-// Tile size (px) the runtime assembler stamps the 16px motif at, per density.
-// Larger tile = coarser pattern. Chosen to visually match the baked sheet.
-export const DENSITY_TILE: Record<'large' | 'medium' | 'small', number> = {
-  large: 32,
-  medium: 24,
-  small: 16,
-};
-
-// The 7 tileable patterns (+ solid/none handled specially by the assembler).
-export const PATTERN_NAMES = [
-  'hlines',
-  'vlines',
-  'diag-left',
-  'diag-right',
-  'cross-hatch',
-  'dots',
-  'checker',
-] as const;
