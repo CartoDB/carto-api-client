@@ -23,7 +23,8 @@ updates:
     ignore:
       - dependency-name: "@types/react"
         update-types: ["version-update:semver-major"]
-      # TS 7 (native Go rewrite) breaks the build toolchain (tsup + rollup-plugin-dts).
-      # Block 7.x+ only; 6.x is still the JS-based compiler. Remove when the toolchain supports TS 7.
+      # Pin to TS 5.x. TS 7 is the native (Go) rewrite whose API breaks the build
+      # toolchain (tsup + rollup-plugin-dts); TS 6.0 turns the toolchain's baseUrl into a
+      # hard error (TS5101). Unpin once the repo is migrated for TS 6/7.
       - dependency-name: "typescript"
-        versions: [">= 7.0.0"]
+        versions: [">= 6.0.0"]
