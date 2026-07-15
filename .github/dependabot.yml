@@ -10,6 +10,10 @@ updates:
         patterns:
           - '@deck.gl/*'
           - '@luma.gl/*'
+      # loaders.gl packages are version-locked, so they must upgrade together in one PR.
+      loaders-gl:
+        patterns:
+          - '@loaders.gl/*'
       turf:
         patterns:
           - '@turf/*'
@@ -19,6 +23,7 @@ updates:
         exclude-patterns:
           - '@deck.gl/*'
           - '@luma.gl/*'
+          - '@loaders.gl/*'
           - '@turf/*'
     ignore:
       - dependency-name: "@types/react"
