@@ -5,17 +5,25 @@ updates:
     schedule:
       interval: 'monthly'
     groups:
-      deck-gl:
+      # deck.gl and luma.gl are version-locked, so they must upgrade together in one PR.
+      deck-luma-gl:
         patterns:
           - '@deck.gl/*'
-      luma-gl:
-        patterns:
           - '@luma.gl/*'
       turf:
         patterns:
           - '@turf/*'
       dev-dependencies:
         dependency-type: 'development'
+        # These are devDependencies; excluded so they stay in their dedicated groups above.
+        exclude-patterns:
+          - '@deck.gl/*'
+          - '@luma.gl/*'
+          - '@turf/*'
     ignore:
       - dependency-name: "@types/react"
         update-types: ["version-update:semver-major"]
+      # TS 7 (native Go rewrite) breaks the build toolchain (tsup + rollup-plugin-dts).
+      # Block 7.x+ only; 6.x is still the JS-based compiler. Remove when the toolchain supports TS 7.
+      - dependency-name: "typescript"
+        versions: [">= 7.0.0"]
