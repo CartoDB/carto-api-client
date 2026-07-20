@@ -56,7 +56,7 @@ export function tileFeaturesSpatialIndex({
 
     tile.data.forEach((d: Feature) => {
       // @ts-expect-error Mixed types for cell indices.
-      if (intersection === true || intersection.has(d.id as bigint | string)) {
+      if (intersection === true || intersection.has(d.id)) {
         map.set(d.id, {...d.properties, [spatialIndexIDName]: d.id});
       }
     });

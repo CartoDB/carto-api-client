@@ -37,5 +37,5 @@ export const h3TilesetSource = async function (
         spatialDataBounds: result.bounds,
       }),
     })
-  ) as Promise<H3TilesetSourceResponse>;
+  );
 };

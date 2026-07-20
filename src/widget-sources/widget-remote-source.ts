@@ -145,7 +145,7 @@ export abstract class WidgetRemoteSource<
 
     const normalizedRows = normalizeObjectKeys(result.rows || []);
     if (rawResult) {
-      return result as unknown as CategoryResponse;
+      return result;
     }
 
     if (!othersThreshold) {

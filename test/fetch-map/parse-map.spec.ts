@@ -1178,7 +1178,7 @@ describe('parseMap', () => {
     test('Polygon tileset without a textLabel field does not set autoLabels', () => {
       const keplerMapConfig = buildLayerConfig();
       keplerMapConfig.config.visState.layers[0].config.textLabel = [
-        {field: null, size: 12} as any,
+        {field: null, size: 12},
       ];
       const map = parseMap({
         ...METADATA,

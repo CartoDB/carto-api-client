@@ -47,5 +47,5 @@ export const rasterSource = async function (
         rasterMetadata: result.raster_metadata!,
       }),
     })
-  ) as Promise<RasterSourceResponse>;
+  );
 };

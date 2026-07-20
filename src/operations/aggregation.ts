@@ -65,7 +65,7 @@ const applyAggregationFunction = (
   const normalizedKeys = normalizeKeys(keys);
   const elements =
     (normalizedKeys?.length || 0) <= 1
-      ? filterFalsyElements(values as unknown[], normalizedKeys || [])
+      ? filterFalsyElements(values, normalizedKeys || [])
       : values;
   return aggFn(elements, keys, operation);
 };

@@ -58,8 +58,8 @@ export function removeFilter(
 
   if (owner) {
     for (const type of FILTER_TYPES) {
-      if (owner === filter[type as FilterType]?.owner) {
-        delete filter[type as FilterType];
+      if (owner === filter[type]?.owner) {
+        delete filter[type];
       }
     }
   }
@@ -102,7 +102,7 @@ export function hasFilter(
   }
 
   for (const type of FILTER_TYPES) {
-    if (owner === filter[type as FilterType]?.owner) {
+    if (owner === filter[type]?.owner) {
       return true;
     }
   }

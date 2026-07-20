@@ -35,12 +35,7 @@ export const GOOGLE_BASEMAPS: Record<string, GoogleBasemapProps> = {
 };
 
 type StyleLayerGroupSlug =
-  | 'label'
-  | 'road'
-  | 'border'
-  | 'building'
-  | 'water'
-  | 'land';
+  'label' | 'road' | 'border' | 'building' | 'water' | 'land';
 type StyleLayerGroup = {
   slug: StyleLayerGroupSlug;
   filter: (layer: any) => boolean;

@@ -145,7 +145,8 @@ function objectToURLSearchParams(object: Record<string, unknown>) {
     } else if (object[key] === null) {
       params.append(key, 'null');
     } else if (object[key] !== undefined) {
-      params.append(key, String(object[key] as unknown));
+      const value = object[key] as string | number | boolean;
+      params.append(key, String(value));
     }
   }
   return params;

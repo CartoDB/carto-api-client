@@ -92,7 +92,7 @@ export async function makeCall({
   } catch (error) {
     if ((error as Error).name === 'AbortError') throw error;
 
-    throw new Error(`Failed request: ${error as Error}`);
+    throw new Error(`Failed request: ${error as Error}`, {cause: error});
   }
 
   if (!response.ok) {
