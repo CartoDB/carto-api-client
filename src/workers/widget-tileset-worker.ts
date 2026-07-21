@@ -1,7 +1,7 @@
 import {WidgetTilesetSourceImpl} from '../widget-sources/widget-tileset-source-impl.js';
 import {type WidgetTilesetSourceProps} from '../widget-sources/widget-tileset-source.js';
 import {Method} from './constants.js';
-import type {WorkerRequest, WorkerResponse} from './types.js';
+import type {WorkerRequest} from './types.js';
 
 /*
  * Web Worker, compiled as a separate `@carto/api-client/worker` entrypoint.
@@ -25,16 +25,16 @@ addEventListener('message', (e) => {
 
   if (!source) {
     const error = `Cannot execute "${method}" on uninitialized source.`;
-    postMessage({ok: false, error, requestId} as WorkerResponse);
+    postMessage({ok: false, error, requestId});
     return;
   }
 
   // @ts-expect-error No type-checking dynamic method name.
   Promise.resolve(source[method](...params))
     .then((result) => {
-      postMessage({ok: true, result, requestId} as WorkerResponse);
+      postMessage({ok: true, result, requestId});
     })
     .catch((error) => {
-      postMessage({ok: false, error, requestId} as WorkerResponse);
+      postMessage({ok: false, error, requestId});
     });
 });

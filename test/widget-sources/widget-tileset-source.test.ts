@@ -324,8 +324,7 @@ describe('getAggregations', () => {
     // Tilesets do not support string-based aggregations because they require SQL
     await expect(async () => {
       await source.getAggregations({
-        aggregations:
-          'sum(revenue) as total_revenue, avg(size_m2) as avg_size' as any,
+        aggregations: 'sum(revenue) as total_revenue, avg(size_m2) as avg_size',
         spatialFilter: MOCK_SPATIAL_FILTER,
       });
     }).rejects.toThrow(/sql/i);

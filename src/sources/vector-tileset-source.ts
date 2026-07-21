@@ -38,5 +38,5 @@ export const vectorTilesetSource = async function (
         spatialDataBounds: result.bounds,
       }),
     })
-  ) as Promise<VectorTilesetSourceResponse>;
+  );
 };

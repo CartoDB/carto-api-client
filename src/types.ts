@@ -101,12 +101,7 @@ export type Raster = {
  * @privateRemarks Converted from enum to type union, for improved declarative API.
  */
 export type AggregationType =
-  | 'count'
-  | 'avg'
-  | 'min'
-  | 'max'
-  | 'sum'
-  | 'custom';
+  'count' | 'avg' | 'min' | 'max' | 'sum' | 'custom';
 
 /******************************************************************************
  * FILTERS
@@ -134,9 +129,7 @@ export function isSpatialIndexFilter(
   spatialFilter: SpatialFilter
 ): spatialFilter is SpatialIndexFilter {
   const filter = spatialFilter as
-    | Partial<SpatialIndexFilter>
-    | null
-    | undefined;
+    Partial<SpatialIndexFilter> | null | undefined;
   return (
     Array.isArray(filter?.indexes) &&
     ['h3', 'h3int', 'quadbin'].includes(filter?.type as string)
@@ -192,13 +185,7 @@ export type StringSearchOptions = {
  * @privateRemarks Source: @carto/react-core
  */
 export type GroupDateType =
-  | 'year'
-  | 'month'
-  | 'week'
-  | 'day'
-  | 'hour'
-  | 'minute'
-  | 'second';
+  'year' | 'month' | 'week' | 'day' | 'hour' | 'minute' | 'second';
 
 /******************************************************************************
  * SORTING
@@ -213,11 +200,7 @@ export type SortColumnType = 'number' | 'string' | 'date';
 
 /** @privateRemarks Source: @deck.gl/carto */
 export type QueryParameterValue =
-  | string
-  | number
-  | boolean
-  | Array<QueryParameterValue>
-  | object;
+  string | number | boolean | Array<QueryParameterValue> | object;
 
 /** @privateRemarks Source: @deck.gl/carto */
 export type NamedQueryParameter = Record<string, QueryParameterValue>;

@@ -137,16 +137,14 @@ export function intersectTileH3(
 
   const cellsWest = h3PolygonToCells(
     bboxClip(spatialFilterFeature, BBOX_WEST).geometry.coordinates as
-      | number[][]
-      | number[][][],
+      number[][] | number[][][],
     cellResolution,
     true
   );
 
   const cellsEast = h3PolygonToCells(
     bboxClip(spatialFilterFeature, BBOX_EAST).geometry.coordinates as
-      | number[][]
-      | number[][][],
+      number[][] | number[][][],
     cellResolution,
     true
   );

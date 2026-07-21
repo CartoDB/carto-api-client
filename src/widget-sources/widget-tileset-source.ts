@@ -23,7 +23,7 @@ import type {TileFeatureExtractOptions} from '../filters/index.js';
 import type {BBox, FeatureCollection} from 'geojson';
 import {WidgetSource, type WidgetSourceProps} from './widget-source.js';
 import {Method} from '../workers/constants.js';
-import type {WorkerRequest, WorkerResponse} from '../workers/types.js';
+import type {WorkerResponse} from '../workers/types.js';
 import type {SpatialDataType, TilesetSourceOptions} from '../sources/types.js';
 import {TileFormat} from '../constants.js';
 import {WidgetTilesetSourceImpl} from './widget-tileset-source-impl.js';
@@ -129,7 +129,7 @@ export class WidgetTilesetSource<
     this._workerImpl.postMessage({
       method: Method.INIT,
       params: [this.props],
-    } as WorkerRequest);
+    });
 
     return this._workerImpl;
   }
@@ -183,7 +183,7 @@ export class WidgetTilesetSource<
         requestId,
         method,
         params,
-      } as WorkerRequest);
+      });
     });
 
     // Whether the task completes, fails, or aborts: clean up afterward.
@@ -230,7 +230,7 @@ export class WidgetTilesetSource<
     worker.postMessage({
       method: Method.LOAD_TILES,
       params: [tiles],
-    } as WorkerRequest);
+    });
   }
 
   /** Configures options used to extract features from tiles. */
@@ -268,7 +268,7 @@ export class WidgetTilesetSource<
     worker.postMessage({
       method: Method.LOAD_GEOJSON,
       params: [{geojson, spatialFilter}],
-    } as WorkerRequest);
+    });
   }
 
   /////////////////////////////////////////////////////////////////////////////

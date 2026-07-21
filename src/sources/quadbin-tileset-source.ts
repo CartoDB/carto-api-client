@@ -37,5 +37,5 @@ export const quadbinTilesetSource = async function (
         spatialDataBounds: result.bounds,
       }),
     })
-  ) as Promise<QuadbinTilesetSourceResponse>;
+  );
 };

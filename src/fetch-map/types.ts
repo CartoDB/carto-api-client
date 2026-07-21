@@ -304,6 +304,4 @@ export type AttributeStatsString = AttributeStatsBase & {
  * Result of getAttributeStats request to backend.
  */
 export type AttributeStats =
-  | AttributeStatsString
-  | AttributeStatsNumber
-  | AttributeStatsTimestamp;
+  AttributeStatsString | AttributeStatsNumber | AttributeStatsTimestamp;
