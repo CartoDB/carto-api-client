@@ -186,7 +186,6 @@ __metadata:
   dependencies:
     "@loaders.gl/schema": "npm:^4.3.3"
     "@types/geojson": "npm:^7946.0.16"
-    brace-expansion: "npm:2.1.2"
     d3-format: "npm:^3.1.2"
     d3-scale: "npm:^4.0.2"
     h3-js: "npm:^4.1.0"
@@ -3022,7 +3021,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"brace-expansion@npm:2.1.2, brace-expansion@npm:^2.0.1":
+"brace-expansion@npm:^2.0.1":
   version: 2.1.2
   resolution: "brace-expansion@npm:2.1.2"
   dependencies:
