@@ -266,17 +266,19 @@ export async function fetchMap({
   // will not update when a map is published.
   let stopAutoRefresh: (() => void) | undefined;
   if (autoRefresh) {
-    const intervalId = setInterval(async () => {
-      const changed = await fillInMapDatasets(map, {
-        ...context,
-        headers: {
-          ...headers,
-          'If-Modified-Since': new Date().toUTCString(),
-        },
-      });
-      if (onNewData && changed.some((v) => v === true)) {
-        onNewData(parseMap(map));
-      }
+    const intervalId = setInterval(() => {
+      void (async () => {
+        const changed = await fillInMapDatasets(map, {
+          ...context,
+          headers: {
+            ...headers,
+            'If-Modified-Since': new Date().toUTCString(),
+          },
+        });
+        if (onNewData && changed.some((v) => v === true)) {
+          onNewData(parseMap(map));
+        }
+      })();
     }, autoRefresh * 1000);
     stopAutoRefresh = () => {
       clearInterval(intervalId);
