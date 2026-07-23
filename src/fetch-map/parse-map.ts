@@ -10,6 +10,7 @@ import {
   getTextAccessor,
   opacityToAlpha,
   getIconUrlAccessor,
+  getLineStyleAccessor,
   negateAccessor,
   getMaxMarkerSize,
   type LayerType,
@@ -48,7 +49,8 @@ export type Scale = {
 
   /** Domain of the user to construct d3 scale */
   scaleDomain?: string[] | number[];
-  range?: string[] | number[];
+  // `number[][]` carries per-category `[dash, gap]` tuples for the `lineStyle` scale.
+  range?: string[] | number[] | number[][];
 };
 
 export type ScaleKey =
@@ -57,7 +59,8 @@ export type ScaleKey =
   | 'lineColor'
   | 'lineWidth'
   | 'elevation'
-  | 'weight';
+  | 'weight'
+  | 'lineStyle';
 
 export type Scales = Partial<Record<ScaleKey, Scale>>;
 
@@ -377,6 +380,14 @@ function createChannelProps(
 
   const scales: Record<string, Scale> = {};
 
+  const isVectorTile = layerType === 'mvt' || layerType === 'tileset';
+  const geometry = data.tilestats?.layers?.[0]?.geometry;
+  const isLine =
+    geometry === 'Line' ||
+    geometry === 'LineString' ||
+    geometry === 'MultiLineString';
+  const isPolygon = geometry === 'Polygon' || geometry === 'MultiPolygon';
+
   // fill color
   {
     const {colorField, colorScale} = visualChannels;
@@ -559,6 +570,54 @@ function createChannelProps(
     }
   }
 
+  // stroke dash style — only VectorTileLayer (mvt/tileset) carries dashes; H3/Quadbin excluded.
+  {
+    // A line is always stroked; a polygon border only when `stroked`. Points are excluded.
+    const strokeVisible = isLine || (isPolygon && Boolean(visConfig.stroked));
+    if (isVectorTile && strokeVisible) {
+      const {lineStyleField, lineStyleScale} = visualChannels;
+      const {lineStyleRange} = visConfig;
+
+      // Fixed preset (used when no column drives the style).
+      if (visConfig.lineStyle && visConfig.lineStyle !== 'solid') {
+        if (visConfig.lineStyle === 'dotted') {
+          result.lineCapRounded = true;
+        }
+        result.lineStyle = visConfig.lineStyle;
+        if (visConfig.dashArray) {
+          result.dashArray = visConfig.dashArray;
+          result.getDashArray = visConfig.dashArray;
+        }
+      }
+
+      // Data-driven — mirrors getLineColor/getFillColor: computed whenever the field/scale/range
+      // are set, independent of the fixed `lineStyle`. Overrides the constant accessor above.
+      if (lineStyleField && lineStyleScale && lineStyleRange) {
+        const {accessor, ...scaleProps} = getLineStyleAccessor(
+          lineStyleField,
+          lineStyleRange,
+          data
+        );
+        result.getDashArray = accessor;
+        scales.lineStyle = updateTriggers.getDashArray = {
+          field: lineStyleField,
+          type: lineStyleScale,
+          ...scaleProps,
+        };
+        // Round caps so per-category dotted values ([0, gap]) render as dots, not squares.
+        const dashArrays = [
+          ...lineStyleRange.dashArrayMap.map(({dashArray}) => dashArray),
+          ...(lineStyleRange.othersDashArray
+            ? [lineStyleRange.othersDashArray]
+            : []),
+        ];
+        if (dashArrays.some(([dash]) => dash === 0)) {
+          result.lineCapRounded = true;
+        }
+      }
+    }
+  }
+
   // height / elevation
   {
     const {heightField, heightScale} = visualChannels;
@@ -704,14 +763,7 @@ function createChannelProps(
     // point labels at line midpoints / polygon centroids via `autoLabels`. The
     // optional `uniqueIdProperty` dedupes features that span multiple tiles so
     // each feature gets one label instead of one-per-tile.
-    const geometry = data.tilestats?.layers?.[0]?.geometry;
-    const isLineOrPolygon =
-      geometry === 'Polygon' ||
-      geometry === 'MultiPolygon' ||
-      geometry === 'Line' ||
-      geometry === 'LineString' ||
-      geometry === 'MultiLineString';
-    if (isLineOrPolygon && (layerType === 'tileset' || layerType === 'mvt')) {
+    if ((isLine || isPolygon) && isVectorTile) {
       const uniqueIdProperty = visConfig.textLabelUniqueIdField;
       result.autoLabels = uniqueIdProperty ? {uniqueIdProperty} : true;
       result.pointType = 'text';
