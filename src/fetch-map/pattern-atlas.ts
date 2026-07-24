@@ -42,6 +42,8 @@ import checkerSmall from './patterns/checker-small.png';
 import solid from './patterns/solid.png';
 
 const DEFAULT_CELL_SIZE = 128;
+// px of the authored pattern art; also the reference for on-screen pattern size.
+const SOURCE_TILE_SIZE = 64;
 
 type PatternDebugGlobals = {
   __CARTO_PATTERN_CELL_SIZE__?: number;
@@ -110,6 +112,16 @@ export function getPatternTextureParameters():
   | undefined {
   const params = debugGlobals().__CARTO_PATTERN_TEXTURE_PARAMS__;
   return params && typeof params === 'object' ? params : undefined;
+}
+
+// deck's fill-pattern shader sizes the on-screen repeat proportionally to the mapping
+// frame's texel size (scale = FILL_UV_SCALE * getFillPatternScale * frame.wh), so a
+// bigger cell magnifies the art instead of sharpening it. This factor compensates:
+// getFillPatternScale must be multiplied by it so cell size only changes resolution.
+export function getPatternScaleAdjustment(
+  cell: number = getPatternCellSize()
+): number {
+  return SOURCE_TILE_SIZE / cell;
 }
 
 export function getPatternAtlasMapping(
