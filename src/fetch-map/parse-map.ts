@@ -634,12 +634,14 @@ function createChannelProps(
       result.fillPatternAtlas = getPatternAtlas();
       result.fillPatternMapping = PATTERN_ATLAS_MAPPING;
       result.fillPatternMask = true;
-      // Nearest sampling: the tiles are pixel art at Nyquist frequency (checker-small
-      // is a 2-texel checker), so linear filtering moirés near 1:1 and blurs magnified.
+      // The tiles are pixel art at Nyquist frequency (checker-small is a 2-texel
+      // checker): nearest magnification keeps them crisp when zoomed in, but
+      // minification must stay linear — nearest picks one arbitrary texel per pixel
+      // and dissolves the pattern into per-frame noise when zoomed out.
       // Merged into the atlas texture's sampler by deck's image-prop transform.
       result.textureParameters = {
         magFilter: 'nearest',
-        minFilter: 'nearest',
+        minFilter: 'linear',
       };
       result.getFillPatternScale = visConfig.fillPatternSize ?? 1;
       // Flat prop for legend consumers (fallback when there is no by-column scale).
