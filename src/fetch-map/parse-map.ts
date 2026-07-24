@@ -37,6 +37,7 @@ import {isRemoteCalculationSupported} from './utils.js';
 import {
   getPatternAtlas,
   getPatternAtlasMapping,
+  getPatternScaleAdjustment,
   getPatternTextureParameters,
 } from './pattern-atlas.js';
 import {
@@ -643,7 +644,9 @@ function createChannelProps(
         // Merged into the atlas texture's sampler by deck's image-prop transform.
         result.textureParameters = textureParameters;
       }
-      result.getFillPatternScale = visConfig.fillPatternSize ?? 1;
+      // Scale compensated for the atlas cell size — see getPatternScaleAdjustment.
+      result.getFillPatternScale =
+        (visConfig.fillPatternSize ?? 1) * getPatternScaleAdjustment();
       // Flat prop for legend consumers (fallback when there is no by-column scale).
       result.fillPattern = visConfig.fillPattern;
 
