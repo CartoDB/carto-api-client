@@ -1,12 +1,13 @@
 // Fill-pattern atlas — internal to carto-api-client.
 //
 // The patterns live as individual, developer-editable tiles (src/fetch-map/patterns/
-// *.png — any resolution; ideally anti-aliased exports from the Design vector master),
-// inlined by tsup's `dataurl` loader and composited into a sprite sheet on a canvas the
-// first time a pattern is needed. Each cell is surrounded by a gutter filled with the
-// tile's own wrapped content, so linear sampling stays seamless at repeat boundaries
-// and never bleeds a neighboring cell. High-res sources are smoothly downscaled;
-// lower-res (pixel-art) sources are upscaled nearest-neighbor.
+// *.png — anti-aliased exports from the Design vector master), inlined by tsup's
+// `dataurl` loader and composited into a sprite sheet on a canvas the first time a
+// pattern is needed. Each atlas cell is filled with side-by-side native-resolution
+// copies of its tile (never resampled), and is surrounded by a gutter holding the
+// tile's own wrapped content — so linear sampling stays seamless at repeat boundaries
+// and never bleeds a neighboring cell. Cell size should be a multiple of the source
+// tile size.
 //
 // parse-map sets `result.fillPatternAtlas = getPatternAtlas()`. deck.gl's
 // `fillPatternAtlas` prop is async — but the Promise must resolve to a decoded image,
@@ -115,14 +116,22 @@ export function getPatternTextureParameters():
   return params && typeof params === 'object' ? params : undefined;
 }
 
+// Copies of the source tile laid side by side inside one atlas cell, per axis. The
+// tile draws at native resolution (no resampling) and the UV wrap — where sampling
+// seams live — happens 1/reps as often.
+function getPatternRepeats(cell: number): number {
+  return Math.max(1, Math.floor(cell / SOURCE_TILE_SIZE));
+}
+
 // deck's fill-pattern shader sizes the on-screen repeat proportionally to the mapping
-// frame's texel size (scale = FILL_UV_SCALE * getFillPatternScale * frame.wh), so a
-// bigger cell magnifies the art instead of sharpening it. This factor compensates:
-// getFillPatternScale must be multiplied by it so cell size only changes resolution.
+// frame's texel size (scale = FILL_UV_SCALE * getFillPatternScale * frame.wh). This
+// factor compensates for both the cell size and the repeats inside it, so the design
+// tile keeps a constant on-screen size; it is exactly 1 when cell is a multiple of
+// the source tile size.
 export function getPatternScaleAdjustment(
   cell: number = getPatternCellSize()
 ): number {
-  return SOURCE_TILE_SIZE / cell;
+  return (SOURCE_TILE_SIZE * getPatternRepeats(cell)) / cell;
 }
 
 // Gutter width around each cell; sized so a few mip levels stay bleed-free.
@@ -223,23 +232,21 @@ async function build(cell: number): Promise<AssembledAtlas> {
     })
   );
 
-  // `none` is left transparent (no tile). Every other tile is drawn 3x3 clipped to its
-  // padded rect, so the gutter holds the tile's own wrapped content.
+  // `none` is left transparent (no tile). Every other cell is filled with reps x reps
+  // native-resolution copies of its tile — never upscaled — with one extra ring
+  // clipped into the gutter, so the padding holds the tile's own wrapped content.
+  const reps = getPatternRepeats(cell);
+  const step = cell / reps;
   for (const [key, frame] of Object.entries(mapping)) {
     const img = images[key];
     if (!img) continue;
-    // Two art classes: diagonal tiles rely on baked anti-aliasing, which nearest
-    // scaling turns into hard blocks — scale them smoothly. Axis-aligned tiles have
-    // exact hard edges on texel boundaries — nearest is lossless, smoothing blurs.
-    ctx.imageSmoothingEnabled = /^(diag-|cross-hatch)/.test(key);
-    if ('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality = 'high';
     ctx.save();
     ctx.beginPath();
     ctx.rect(frame.x - pad, frame.y - pad, cell + 2 * pad, cell + 2 * pad);
     ctx.clip();
-    for (const dx of [-cell, 0, cell]) {
-      for (const dy of [-cell, 0, cell]) {
-        ctx.drawImage(img, frame.x + dx, frame.y + dy, cell, cell);
+    for (let i = -1; i <= reps; i++) {
+      for (let j = -1; j <= reps; j++) {
+        ctx.drawImage(img, frame.x + i * step, frame.y + j * step, step, step);
       }
     }
     ctx.restore();

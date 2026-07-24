@@ -1606,8 +1606,7 @@ describe('parseMap', () => {
         mask: true,
       });
       expect(props.fillPatternMask).toBe(true);
-      // fillPatternSize 2 x the cell-size adjustment (64 / default 128 cell)
-      expect(props.getFillPatternScale).toBe(1);
+      expect(props.getFillPatternScale).toBe(2);
       expect(props.fillPattern).toBe('hlines');
       expect(scales.fillPattern).toBeUndefined();
     });
@@ -1618,7 +1617,7 @@ describe('parseMap', () => {
         fillPattern: 'dots',
       });
       expect(props.getFillPattern()).toBe('dots-medium');
-      expect(props.getFillPatternScale).toBe(0.5);
+      expect(props.getFillPatternScale).toBe(1);
     });
 
     test('by-column mode builds a per-feature accessor and a fillPattern scale', () => {
