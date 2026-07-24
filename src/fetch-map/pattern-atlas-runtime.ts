@@ -4,8 +4,8 @@
 // one 64x64 space-filling tile per pattern+density) rather than a compiled base64 blob.
 // tsup inlines each via its `dataurl` loader, and we composite them into the 192x512 sheet
 // on a canvas the first time a pattern is needed. The result is memoized and handed to
-// deck.gl's async `fillPatternAtlas` prop as a Promise (so this stays internal — the
-// consumer just spreads descriptor.props). SVG-vs-PNG for the assets is a later experiment.
+// deck.gl's async `fillPatternAtlas` prop as a Promise of a decoded image (so this stays
+// internal — the consumer just spreads descriptor.props). SVG-vs-PNG is a later experiment.
 
 import hlinesLarge from './patterns/hlines-large.png';
 import hlinesMedium from './patterns/hlines-medium.png';
@@ -94,27 +94,20 @@ async function loadImage(dataUrl: string): Promise<CanvasImageSource> {
   });
 }
 
-async function toDataURL(canvas: AnyCanvas): Promise<string> {
-  if ('convertToBlob' in canvas) {
-    const blob = await canvas.convertToBlob({type: 'image/png'});
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.readAsDataURL(blob);
-    });
-  }
-  return canvas.toDataURL('image/png');
-}
+export type AssembledAtlas = ImageBitmap | HTMLCanvasElement;
 
-let atlasPromise: Promise<string> | undefined;
+let atlasPromise: Promise<AssembledAtlas> | undefined;
 
 /** Assemble the sprite sheet from the individual editable pattern tiles. Memoized. */
-export function assemblePatternAtlas(): Promise<string> {
+export function assemblePatternAtlas(): Promise<AssembledAtlas> {
   if (!atlasPromise) atlasPromise = build();
   return atlasPromise;
 }
 
-async function build(): Promise<string> {
+// Must resolve to a decoded image, never a data-URL string: deck.gl only URL-loads
+// string prop *values* — a string resolved from a Promise goes straight to texture
+// creation, where luma.gl rejects it (1x1 texture, "ArrayBufferView not big enough").
+async function build(): Promise<AssembledAtlas> {
   const canvas = createCanvas(ATLAS_W, ATLAS_H);
   const ctx = canvas.getContext('2d');
   if (!ctx)
@@ -135,5 +128,7 @@ async function build(): Promise<string> {
     if (img) ctx.drawImage(img, frame.x, frame.y, CELL, CELL);
   }
 
-  return toDataURL(canvas);
+  if (typeof createImageBitmap !== 'undefined')
+    return createImageBitmap(canvas);
+  return canvas as HTMLCanvasElement;
 }
