@@ -228,9 +228,10 @@ async function build(cell: number): Promise<AssembledAtlas> {
   for (const [key, frame] of Object.entries(mapping)) {
     const img = images[key];
     if (!img) continue;
-    // Smooth downscale for high-res art; nearest upscale for pixel-art sources.
-    const srcWidth = (img as ImageBitmap | HTMLImageElement).width;
-    ctx.imageSmoothingEnabled = srcWidth > cell;
+    // Two art classes: diagonal tiles rely on baked anti-aliasing, which nearest
+    // scaling turns into hard blocks — scale them smoothly. Axis-aligned tiles have
+    // exact hard edges on texel boundaries — nearest is lossless, smoothing blurs.
+    ctx.imageSmoothingEnabled = /^(diag-|cross-hatch)/.test(key);
     if ('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality = 'high';
     ctx.save();
     ctx.beginPath();
