@@ -1484,10 +1484,12 @@ describe('parseMap', () => {
       expect(props.fillPatternEnabled).toBe(true);
       expect(typeof props.getFillPattern).toBe('function');
       expect(props.getFillPattern()).toBe('hlines-small');
-      expect(props.fillPatternAtlas).toContain('data:image/png;base64,');
+      expect(props.fillPatternAtlas).toBeInstanceOf(Promise);
       expect(props.fillPatternMapping['hlines-small']).toMatchObject({
-        x: 128,
+        x: 256,
         y: 0,
+        width: 128,
+        height: 128,
         mask: true,
       });
       expect(props.fillPatternMask).toBe(true);

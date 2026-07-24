@@ -34,7 +34,11 @@ import type {
   VisualChannelField,
 } from './types.js';
 import {isRemoteCalculationSupported} from './utils.js';
-import {getPatternAtlas, PATTERN_ATLAS_MAPPING} from './pattern-atlas.js';
+import {
+  getPatternAtlas,
+  getPatternAtlasMapping,
+  getPatternTextureParameters,
+} from './pattern-atlas.js';
 import {
   getRasterTileLayerStylePropsRgb,
   getRasterTileLayerStylePropsScaledBand,
@@ -632,17 +636,13 @@ function createChannelProps(
 
     if (visConfig.filled && visConfig.fillPatternEnabled) {
       result.fillPatternAtlas = getPatternAtlas();
-      result.fillPatternMapping = PATTERN_ATLAS_MAPPING;
+      result.fillPatternMapping = getPatternAtlasMapping();
       result.fillPatternMask = true;
-      // The tiles are pixel art at Nyquist frequency (checker-small is a 2-texel
-      // checker): nearest magnification keeps them crisp when zoomed in, but
-      // minification must stay linear — nearest picks one arbitrary texel per pixel
-      // and dissolves the pattern into per-frame noise when zoomed out.
-      // Merged into the atlas texture's sampler by deck's image-prop transform.
-      result.textureParameters = {
-        magFilter: 'nearest',
-        minFilter: 'linear',
-      };
+      const textureParameters = getPatternTextureParameters();
+      if (textureParameters) {
+        // Merged into the atlas texture's sampler by deck's image-prop transform.
+        result.textureParameters = textureParameters;
+      }
       result.getFillPatternScale = visConfig.fillPatternSize ?? 1;
       // Flat prop for legend consumers (fallback when there is no by-column scale).
       result.fillPattern = visConfig.fillPattern;
