@@ -31,6 +31,9 @@ export type VisualChannels = {
   lineStyleField?: VisualChannelField;
   lineStyleScale?: ScaleType;
 
+  fillPatternField?: VisualChannelField;
+  fillPatternScale?: ScaleType;
+
   heightField?: VisualChannelField;
   heightScale?: ScaleType;
 
@@ -63,6 +66,18 @@ export type LineStyleRange = {
     dashArray: [number, number];
   }[];
   othersDashArray?: [number, number];
+};
+
+// Per-category mapping for by-column fill patterns. `pattern` is the base pattern name
+// (e.g. 'hlines') or the density-agnostic 'solid' / 'none'; density is applied uniformly
+// from `visConfig.fillPatternDensity`, so the resolved atlas key is `${pattern}-${density}`
+// (or the bare 'solid' / 'none').
+export type FillPatternRange = {
+  patternMap: {
+    value: string;
+    pattern: string;
+  }[];
+  othersPattern?: string;
 };
 
 export type ColorBand = 'red' | 'green' | 'blue' | 'alpha';
@@ -114,6 +129,16 @@ export type VisConfig = {
   lineStyle?: 'solid' | 'dashed' | 'dotted';
   dashArray?: [number, number];
   lineStyleRange?: LineStyleRange | null;
+
+  // Fill pattern (Phase 2). `fillPatternEnabled` is the Solid|Pattern master toggle the
+  // (always-attached) FillStyleExtension reads. The pattern is tinted by the existing
+  // `fillColor` — there is no separate pattern-color field. `fillPatternSize` maps to
+  // deck.gl's getFillPatternScale (1 = 100%).
+  fillPatternEnabled?: boolean;
+  fillPattern?: string;
+  fillPatternDensity?: 'small' | 'medium' | 'large';
+  fillPatternSize?: number;
+  fillPatternRange?: FillPatternRange | null;
 
   heightRange?: number[];
   heightAggregation?: string;

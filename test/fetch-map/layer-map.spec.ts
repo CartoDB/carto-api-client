@@ -4,6 +4,7 @@ import {
   getSizeAccessor,
   getTextAccessor,
   getLineStyleAccessor,
+  getFillPatternAccessor,
   getLayerProps,
   _domainFromValues,
 } from '@carto/api-client';
@@ -491,6 +492,58 @@ describe('layer-map', () => {
         data
       );
       expect(accessor({properties: {road_type: 'unknown'}})).toEqual([0, 0]);
+    });
+  });
+
+  describe('getFillPatternAccessor', () => {
+    const field = {name: 'zone', type: 'string'};
+    const data = {
+      tilestats: {
+        layers: [{attributes: [{attribute: 'zone', categories: []}]}],
+      },
+    };
+
+    test('maps categories to density-qualified keys; solid/none stay density-agnostic', () => {
+      const {accessor, domain, range} = getFillPatternAccessor(
+        field,
+        {
+          patternMap: [
+            {value: 'a', pattern: 'hlines'},
+            {value: 'b', pattern: 'solid'},
+            {value: 'c', pattern: 'none'},
+          ],
+          othersPattern: 'checker',
+        },
+        'small',
+        data
+      );
+      expect(accessor({properties: {zone: 'a'}})).toBe('hlines-small');
+      expect(accessor({properties: {zone: 'b'}})).toBe('solid');
+      expect(accessor({properties: {zone: 'c'}})).toBe('none');
+      expect(accessor({properties: {zone: 'z'}})).toBe('checker-small');
+      expect(domain).toEqual(['a', 'b', 'c']);
+      expect(range).toEqual(['hlines', 'solid', 'none']);
+    });
+
+    test('falls back to transparent none when othersPattern is absent', () => {
+      const {accessor} = getFillPatternAccessor(
+        field,
+        {patternMap: [{value: 'a', pattern: 'dots'}]},
+        'large',
+        data
+      );
+      expect(accessor({properties: {zone: 'a'}})).toBe('dots-large');
+      expect(accessor({properties: {zone: 'unknown'}})).toBe('none');
+    });
+
+    test('defaults density to medium when unset', () => {
+      const {accessor} = getFillPatternAccessor(
+        field,
+        {patternMap: [{value: 'a', pattern: 'vlines'}]},
+        undefined,
+        data
+      );
+      expect(accessor({properties: {zone: 'a'}})).toBe('vlines-medium');
     });
   });
 

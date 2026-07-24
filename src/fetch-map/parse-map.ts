@@ -11,6 +11,7 @@ import {
   opacityToAlpha,
   getIconUrlAccessor,
   getLineStyleAccessor,
+  getFillPatternAccessor,
   negateAccessor,
   getMaxMarkerSize,
   type LayerType,
@@ -33,6 +34,12 @@ import type {
   VisualChannelField,
 } from './types.js';
 import {isRemoteCalculationSupported} from './utils.js';
+import {
+  getPatternAtlas,
+  getPatternAtlasMapping,
+  getPatternScaleAdjustment,
+  getPatternTextureParameters,
+} from './pattern-atlas.js';
 import {
   getRasterTileLayerStylePropsRgb,
   getRasterTileLayerStylePropsScaledBand,
@@ -60,7 +67,8 @@ export type ScaleKey =
   | 'lineWidth'
   | 'elevation'
   | 'weight'
-  | 'lineStyle';
+  | 'lineStyle'
+  | 'fillPattern';
 
 export type Scales = Partial<Record<ScaleKey, Scale>>;
 
@@ -615,6 +623,69 @@ function createChannelProps(
           result.lineCapRounded = true;
         }
       }
+    }
+  }
+
+  // fill pattern — Phase 2. The pattern is a stencil tinted by the existing fillColor
+  // (mask:true) — no separate pattern-color channel. The consumer attaches
+  // FillStyleExtension unconditionally and reads `fillPatternEnabled` as the on/off
+  // switch, mirroring how MaskExtension is gated by `maskId`. Data only — no extension
+  // instantiation here. Applies to any filled polygon layer (mvt/tileset + H3/Quadbin);
+  // the stroke-dash block above is the VectorTile-only one (per OQ 10).
+  {
+    const fillPatternEnabled = Boolean(
+      visConfig.filled && visConfig.fillPatternEnabled
+    );
+    result.fillPatternEnabled = fillPatternEnabled;
+
+    // Pattern props are emitted for every filled layer, even with the pattern off:
+    // removing them on a live layer transitions the async `fillPatternAtlas` prop to
+    // null, which crashes deck's layer matching (null image transform) and blanks the
+    // layer. A disabled layer samples the opaque `solid` cell instead — under
+    // fillPatternMask the mask multiplies by 1, i.e. a plain fill.
+    if (visConfig.filled) {
+      result.fillPatternAtlas = getPatternAtlas();
+      result.fillPatternMapping = getPatternAtlasMapping();
+      result.fillPatternMask = true;
+      const textureParameters = getPatternTextureParameters();
+      if (textureParameters) {
+        // Merged into the atlas texture's sampler by deck's image-prop transform.
+        result.textureParameters = textureParameters;
+      }
+      // Scale compensated for the atlas cell size — see getPatternScaleAdjustment.
+      result.getFillPatternScale =
+        (visConfig.fillPatternSize ?? 1) * getPatternScaleAdjustment();
+
+      const {fillPatternField, fillPatternScale} = visualChannels;
+      const {fillPatternRange, fillPatternDensity} = visConfig;
+
+      if (!fillPatternEnabled) {
+        result.getFillPattern = () => 'solid';
+        updateTriggers.getFillPattern = 'solid';
+      } else if (fillPatternField && fillPatternScale && fillPatternRange) {
+        // Flat prop for legend consumers (fallback when there is no by-column scale).
+        result.fillPattern = visConfig.fillPattern;
+        const {accessor, ...scaleProps} = getFillPatternAccessor(
+          fillPatternField,
+          fillPatternRange,
+          fillPatternDensity,
+          data
+        );
+        result.getFillPattern = accessor;
+        scales.fillPattern = updateTriggers.getFillPattern = {
+          field: fillPatternField,
+          type: fillPatternScale,
+          ...scaleProps,
+        };
+      } else {
+        // Single mode: one real pattern (never solid/none) for every feature.
+        result.fillPattern = visConfig.fillPattern;
+        const key = `${visConfig.fillPattern}-${fillPatternDensity ?? 'medium'}`;
+        result.getFillPattern = () => key;
+        updateTriggers.getFillPattern = key;
+      }
+      // getFillColor is left exactly as the fillColor channel set it; under
+      // fillPatternMask:true that IS the pattern tint.
     }
   }
 
