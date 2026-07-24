@@ -1,11 +1,12 @@
 // Fill-pattern atlas — internal to carto-api-client.
 //
-// The patterns live as individual, developer-editable 64x64 pixel-art tiles
-// (src/fetch-map/patterns/*.png), inlined by tsup's `dataurl` loader and composited into
-// a sprite sheet on a canvas the first time a pattern is needed. Tiles are upscaled to
-// the atlas cell size with nearest-neighbor (smoothing off), so each art pixel spans
-// several texels and deck.gl's default linear sampling keeps edges crisp while line
-// spacing stays even at fractional zoom ratios.
+// The patterns live as individual, developer-editable tiles (src/fetch-map/patterns/
+// *.png — any resolution; ideally anti-aliased exports from the Design vector master),
+// inlined by tsup's `dataurl` loader and composited into a sprite sheet on a canvas the
+// first time a pattern is needed. Each cell is surrounded by a gutter filled with the
+// tile's own wrapped content, so linear sampling stays seamless at repeat boundaries
+// and never bleeds a neighboring cell. High-res sources are smoothly downscaled;
+// lower-res (pixel-art) sources are upscaled nearest-neighbor.
 //
 // parse-map sets `result.fillPatternAtlas = getPatternAtlas()`. deck.gl's
 // `fillPatternAtlas` prop is async — but the Promise must resolve to a decoded image,
@@ -124,13 +125,20 @@ export function getPatternScaleAdjustment(
   return SOURCE_TILE_SIZE / cell;
 }
 
+// Gutter width around each cell; sized so a few mip levels stay bleed-free.
+function getPatternCellPadding(cell: number): number {
+  return Math.max(2, Math.round(cell / 16));
+}
+
 export function getPatternAtlasMapping(
   cell: number = getPatternCellSize()
 ): Record<string, PatternAtlasFrame> {
+  const pad = getPatternCellPadding(cell);
+  const pitch = cell + 2 * pad;
   const mapping: Record<string, PatternAtlasFrame> = {};
   const frame = (col: number, row: number): PatternAtlasFrame => ({
-    x: col * cell,
-    y: row * cell,
+    x: pad + col * pitch,
+    y: pad + row * pitch,
     width: cell,
     height: cell,
     mask: true,
@@ -199,7 +207,9 @@ export function getPatternAtlas(
 
 async function build(cell: number): Promise<AssembledAtlas> {
   const mapping = getPatternAtlasMapping(cell);
-  const canvas = createCanvas(cell * 3, cell * (PATTERN_ROWS.length + 1));
+  const pad = getPatternCellPadding(cell);
+  const pitch = cell + 2 * pad;
+  const canvas = createCanvas(pitch * 3, pitch * (PATTERN_ROWS.length + 1));
   const ctx = canvas.getContext('2d');
   if (!ctx)
     throw new Error(
@@ -213,12 +223,25 @@ async function build(cell: number): Promise<AssembledAtlas> {
     })
   );
 
-  // Nearest-neighbor upscale of each pixel-art tile to its cell; `none` is left
-  // transparent (no tile).
-  ctx.imageSmoothingEnabled = false;
+  // `none` is left transparent (no tile). Every other tile is drawn 3x3 clipped to its
+  // padded rect, so the gutter holds the tile's own wrapped content.
   for (const [key, frame] of Object.entries(mapping)) {
     const img = images[key];
-    if (img) ctx.drawImage(img, frame.x, frame.y, cell, cell);
+    if (!img) continue;
+    // Smooth downscale for high-res art; nearest upscale for pixel-art sources.
+    const srcWidth = (img as ImageBitmap | HTMLImageElement).width;
+    ctx.imageSmoothingEnabled = srcWidth > cell;
+    if ('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality = 'high';
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(frame.x - pad, frame.y - pad, cell + 2 * pad, cell + 2 * pad);
+    ctx.clip();
+    for (const dx of [-cell, 0, cell]) {
+      for (const dy of [-cell, 0, cell]) {
+        ctx.drawImage(img, frame.x + dx, frame.y + dy, cell, cell);
+      }
+    }
+    ctx.restore();
   }
 
   if (typeof createImageBitmap !== 'undefined')
