@@ -633,9 +633,17 @@ function createChannelProps(
   // instantiation here. Applies to any filled polygon layer (mvt/tileset + H3/Quadbin);
   // the stroke-dash block above is the VectorTile-only one (per OQ 10).
   {
-    result.fillPatternEnabled = Boolean(visConfig.fillPatternEnabled);
+    const fillPatternEnabled = Boolean(
+      visConfig.filled && visConfig.fillPatternEnabled
+    );
+    result.fillPatternEnabled = fillPatternEnabled;
 
-    if (visConfig.filled && visConfig.fillPatternEnabled) {
+    // Pattern props are emitted for every filled layer, even with the pattern off:
+    // removing them on a live layer transitions the async `fillPatternAtlas` prop to
+    // null, which crashes deck's layer matching (null image transform) and blanks the
+    // layer. A disabled layer samples the opaque `solid` cell instead — under
+    // fillPatternMask the mask multiplies by 1, i.e. a plain fill.
+    if (visConfig.filled) {
       result.fillPatternAtlas = getPatternAtlas();
       result.fillPatternMapping = getPatternAtlasMapping();
       result.fillPatternMask = true;
@@ -647,13 +655,16 @@ function createChannelProps(
       // Scale compensated for the atlas cell size — see getPatternScaleAdjustment.
       result.getFillPatternScale =
         (visConfig.fillPatternSize ?? 1) * getPatternScaleAdjustment();
-      // Flat prop for legend consumers (fallback when there is no by-column scale).
-      result.fillPattern = visConfig.fillPattern;
 
       const {fillPatternField, fillPatternScale} = visualChannels;
       const {fillPatternRange, fillPatternDensity} = visConfig;
 
-      if (fillPatternField && fillPatternScale && fillPatternRange) {
+      if (!fillPatternEnabled) {
+        result.getFillPattern = () => 'solid';
+        updateTriggers.getFillPattern = 'solid';
+      } else if (fillPatternField && fillPatternScale && fillPatternRange) {
+        // Flat prop for legend consumers (fallback when there is no by-column scale).
+        result.fillPattern = visConfig.fillPattern;
         const {accessor, ...scaleProps} = getFillPatternAccessor(
           fillPatternField,
           fillPatternRange,
@@ -668,8 +679,10 @@ function createChannelProps(
         };
       } else {
         // Single mode: one real pattern (never solid/none) for every feature.
+        result.fillPattern = visConfig.fillPattern;
         const key = `${visConfig.fillPattern}-${fillPatternDensity ?? 'medium'}`;
         result.getFillPattern = () => key;
+        updateTriggers.getFillPattern = key;
       }
       // getFillColor is left exactly as the fillColor channel set it; under
       // fillPatternMask:true that IS the pattern tint.

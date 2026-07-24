@@ -1466,11 +1466,14 @@ describe('parseMap', () => {
         keplerMapConfig: buildLayerConfig(...args),
       }).layers[0];
 
-    test('disabled: emits fillPatternEnabled:false and no pattern props', () => {
+    test('disabled: keeps atlas props stable and samples the solid cell', () => {
       const {props, scales} = parse('Polygon', {});
       expect(props.fillPatternEnabled).toBe(false);
-      expect(props.getFillPattern).toBeUndefined();
-      expect(props.fillPatternAtlas).toBeUndefined();
+      // Atlas props stay so the async prop never transitions to null on toggle
+      // (that crashes deck's layer matching); solid cell renders as plain fill.
+      expect(props.fillPatternAtlas).toBeInstanceOf(Promise);
+      expect(props.getFillPattern()).toBe('solid');
+      expect(props.fillPattern).toBeUndefined();
       expect(scales.fillPattern).toBeUndefined();
     });
 
@@ -1559,14 +1562,15 @@ describe('parseMap', () => {
       expect(props.getFillPattern()).toBe('dots-large');
     });
 
-    test('unfilled layer keeps the flag but emits no pattern accessor', () => {
+    test('unfilled layer emits no pattern props and reports the flag off', () => {
       const {props} = parse('Polygon', {
         filled: false,
         fillPatternEnabled: true,
         fillPattern: 'hlines',
       });
-      expect(props.fillPatternEnabled).toBe(true);
+      expect(props.fillPatternEnabled).toBe(false);
       expect(props.getFillPattern).toBeUndefined();
+      expect(props.fillPatternAtlas).toBeUndefined();
     });
   });
 });
