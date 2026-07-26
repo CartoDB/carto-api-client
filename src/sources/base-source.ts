@@ -58,9 +58,11 @@ export async function baseSource<UrlParameters extends Record<string, unknown>>(
   // response (maps-api sc-556572) so the follow-up GET below can be skipped.
   // Safe against servers that don't support it: the unknown query param is
   // ignored and `tilejson.data` is simply absent, falling back to the fetch.
+  // On by default, but overridable (`inlineTilejson: false`) so consumers keep
+  // a kill switch that doesn't require downgrading the client.
   const parameters = {
     client: clientId,
-    inlineTilejson: true,
+    inlineTilejson: options.inlineTilejson ?? true,
     ...options.tags,
     ...urlParameters,
   };

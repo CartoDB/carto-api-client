@@ -13,6 +13,13 @@ export type SourceRequiredOptions = AuthOptions & {
 
 export type SourceOptionalOptions = {
   /**
+   * Ask the server to embed the tilejson document in the instantiation
+   * response, skipping the follow-up request (default: `true`). Set `false`
+   * to force the classic two-request flow.
+   */
+  inlineTilejson?: boolean;
+
+  /**
    * Base URL of the CARTO Maps API.
    *
    * Example for account located in EU-west region: `https://gcp-eu-west1.api.carto.com`

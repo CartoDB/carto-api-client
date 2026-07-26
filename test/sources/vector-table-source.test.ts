@@ -92,6 +92,20 @@ describe('vectorTableSource', () => {
     expect(initURL).toMatch(/inlineTilejson=true/);
   });
 
+  test('inlineTilejson: false forces the classic two-request flow', async () => {
+    stubGlobalFetchForSource();
+
+    await vectorTableSource({
+      connectionName: 'carto_dw',
+      accessToken: '<token>',
+      tableName: 'a.b.vector_table',
+      inlineTilejson: false,
+    });
+
+    const [[initURL]] = vi.mocked(fetch).mock.calls;
+    expect(initURL).toMatch(/inlineTilejson=false/);
+  });
+
   test('inlineTilejson — uses embedded document and skips the follow-up request', async () => {
     const inlinedTilejson = {
       ...MOCK_TILESET_RESPONSE,
