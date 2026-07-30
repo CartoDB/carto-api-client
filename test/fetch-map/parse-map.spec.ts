@@ -409,6 +409,118 @@ describe('parseMap', () => {
       expect(layerDesc.scales.lineWidth?.field?.accessorKey).toBeUndefined();
     });
 
+    // Builder synthesizes the channel field before rendering, so maps persisted by
+    // other writers can reach parseMap with the styling only in visConfig.
+    test('custom color aggregation renders with a null colorField', () => {
+      const keplerMapConfig = {
+        version: 'v1',
+        config: {
+          mapState: {},
+          mapStyle: {},
+          visState: {
+            layers: [
+              {
+                id: 'layer1',
+                type: 'h3',
+                config: {
+                  dataId: 'CUSTOM_AGG_DS',
+                  label: 'Test Layer',
+                  textLabel: [{field: null, size: 12}],
+                  visConfig: {
+                    filled: true,
+                    opacity: 1,
+                    colorAggregation: 'custom',
+                    colorAggregationExp: 'SUM(x)/SUM(y)',
+                    colorAggregationDomain: [0, 100],
+                    colorRange: {
+                      category: 'sequential',
+                      colors: ['#f0f0f0', '#333333'],
+                      colorMap: undefined,
+                      name: 'custom',
+                      type: 'custom',
+                    },
+                  },
+                },
+                visualChannels: {
+                  colorField: null,
+                  colorScale: 'quantize',
+                },
+              },
+            ],
+            layerBlending: 'normal',
+            interactionConfig: {tooltip: {enabled: false}},
+          },
+        },
+      };
+      const map = parseMap({
+        ...METADATA,
+        datasets: [CUSTOM_AGG_DATASET],
+        keplerMapConfig,
+      });
+      const layerDesc = map.layers[0];
+
+      expect(layerDesc.scales.fillColor?.field?.accessorKey).toBe(
+        'custom_agg_cc6f64ff'
+      );
+      expect(layerDesc.scales.fillColor?.type).toBe('quantize');
+      expect(layerDesc.props.getFillColor).toBeTypeOf('function');
+
+      // The graduated ramp is what regresses to a flat fill when the channel is dropped.
+      const colorAt = (value: number) =>
+        layerDesc.props.getFillColor({
+          properties: {custom_agg_cc6f64ff: value},
+        });
+      expect(colorAt(0)).not.toEqual(colorAt(100));
+    });
+
+    test('custom color aggregation with a null colorField and no expression is dropped', () => {
+      const keplerMapConfig = {
+        version: 'v1',
+        config: {
+          mapState: {},
+          mapStyle: {},
+          visState: {
+            layers: [
+              {
+                id: 'layer1',
+                type: 'h3',
+                config: {
+                  dataId: 'CUSTOM_AGG_DS',
+                  label: 'Test Layer',
+                  textLabel: [{field: null, size: 12}],
+                  visConfig: {
+                    filled: true,
+                    opacity: 1,
+                    colorAggregation: 'custom',
+                    colorAggregationExp: '   ',
+                    colorRange: {
+                      category: 'sequential',
+                      colors: ['#f0f0f0', '#333333'],
+                      colorMap: undefined,
+                      name: 'custom',
+                      type: 'custom',
+                    },
+                  },
+                },
+                visualChannels: {
+                  colorField: null,
+                  colorScale: 'quantize',
+                },
+              },
+            ],
+            layerBlending: 'normal',
+            interactionConfig: {tooltip: {enabled: false}},
+          },
+        },
+      };
+      const map = parseMap({
+        ...METADATA,
+        datasets: [CUSTOM_AGG_DATASET],
+        keplerMapConfig,
+      });
+      expect(map.layers[0].scales.fillColor?.field).toBeUndefined();
+    });
+
     test('colorAggregationDomain overrides auto-computed scale domain', () => {
       const keplerMapConfig = {
         version: 'v1',
