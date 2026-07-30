@@ -15,15 +15,19 @@
 // never a data-URL string: deck URL-loads string prop values, while a promise-resolved
 // string goes straight to texture creation, where luma.gl rejects it.
 //
-// Debug knobs (set in the browser console, then reload the map):
-//   globalThis.__CARTO_PATTERN_CELL_SIZE__ = 64|128|256   // atlas cell px, default 128
-//   globalThis.__CARTO_PATTERN_TEXTURE_PARAMS__ = {magFilter: 'nearest', ...}
-//     // merged into the atlas texture's sampler via deck's `textureParameters`;
-//     // unset -> deck defaults (linear).
-//   globalThis.__CARTO_PATTERN_ASSET_SOURCE__ = 'png' | 'svg' | 'procedural'
+// Debug knobs — set via `localStorage` (persists across reloads, settable from devtools
+// with no source access) or `globalThis`, then reload the map. localStorage values are
+// read as JSON, or as a raw string when not valid JSON (so `svg` and `"svg"` both work):
+//   __CARTO_PATTERN_CELL_SIZE__ = 64|128|256   // atlas cell px, default 128
+//   __CARTO_PATTERN_TEXTURE_PARAMS__ = {"lodMaxClamp": 3, ...}
+//     // merged into the atlas texture's sampler via deck's `textureParameters`, spread
+//     // over the prop default `{lodMaxClamp: 0}` — so set `lodMaxClamp` > 0 to let the
+//     // (always-generated) mip chain kick in; unset -> deck defaults.
+//   __CARTO_PATTERN_ASSET_SOURCE__ = 'png' | 'svg' | 'procedural'
 //     // 'png' (default): Design's original 64px raster masks, tiled at native
 //     //   resolution. 'svg': in-repo vector tiles rasterized at atlas-build time
 //     //   (2x texel density per repeat). 'procedural': canvas painters, no assets.
+//   e.g. localStorage.__CARTO_PATTERN_TEXTURE_PARAMS__ = '{"lodMaxClamp": 3}'
 
 import hlinesLarge from './patterns/hlines-large.png';
 import hlinesMedium from './patterns/hlines-medium.png';
@@ -160,17 +164,33 @@ const CELL_SVG_URLS: Record<string, string> = {
   solid: solidSvg,
 };
 
-function debugGlobals(): PatternDebugGlobals {
-  return globalThis as PatternDebugGlobals;
+// localStorage wins over globalThis; its string value is parsed as JSON, falling back to
+// the raw string when it isn't valid JSON. Reads are defensive — `localStorage` access can
+// throw (sandboxed iframe) or be absent (SSR/tests).
+function readKnob(key: keyof PatternDebugGlobals): unknown {
+  let raw: string | null = null;
+  try {
+    if (typeof localStorage !== 'undefined') raw = localStorage.getItem(key);
+  } catch {
+    raw = null;
+  }
+  if (raw !== null) {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return raw;
+    }
+  }
+  return (globalThis as PatternDebugGlobals)[key];
 }
 
 export function getPatternCellSize(): number {
-  const cell = debugGlobals().__CARTO_PATTERN_CELL_SIZE__;
+  const cell = readKnob('__CARTO_PATTERN_CELL_SIZE__');
   return typeof cell === 'number' && cell > 0 ? cell : DEFAULT_CELL_SIZE;
 }
 
 export function getPatternAssetSource(): PatternAssetSource {
-  const source = debugGlobals().__CARTO_PATTERN_ASSET_SOURCE__;
+  const source = readKnob('__CARTO_PATTERN_ASSET_SOURCE__');
   return source === 'svg' || source === 'procedural' ? source : 'png';
 }
 
@@ -178,8 +198,10 @@ export function getPatternAssetSource(): PatternAssetSource {
 export function getPatternTextureParameters():
   | Record<string, unknown>
   | undefined {
-  const params = debugGlobals().__CARTO_PATTERN_TEXTURE_PARAMS__;
-  return params && typeof params === 'object' ? params : undefined;
+  const params = readKnob('__CARTO_PATTERN_TEXTURE_PARAMS__');
+  return params && typeof params === 'object'
+    ? (params as Record<string, unknown>)
+    : undefined;
 }
 
 // Copies of the source tile laid side by side inside one atlas cell, per axis. Raster
