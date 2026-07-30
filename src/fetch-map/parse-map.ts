@@ -306,12 +306,16 @@ function resolveCustomAggregation({
   if (aggregation !== 'custom') {
     return {field, aggregation, domainOverride: undefined};
   }
-  if (!field || !expression?.trim()) {
+  if (!expression?.trim()) {
     return {field, aggregation: undefined, domainOverride: undefined};
   }
   const alias = compileCustomAggregation(expression, {provider: providerId});
   return {
-    field: {...field, accessorKey: alias},
+    // The alias alone identifies the column, so a saved map that carries no field
+    // for the channel still renders instead of falling back to its fixed color.
+    field: field
+      ? {...field, accessorKey: alias}
+      : {name: alias, type: 'integer', accessorKey: alias},
     aggregation: undefined,
     domainOverride: domain,
   };
