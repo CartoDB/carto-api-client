@@ -37,6 +37,7 @@ import {isRemoteCalculationSupported} from './utils.js';
 import {
   getPatternAtlas,
   getPatternAtlasMapping,
+  getPatternMipLevels,
   getPatternScaleAdjustment,
   getPatternTextureParameters,
 } from './pattern-atlas.js';
@@ -651,11 +652,14 @@ function createChannelProps(
       result.fillPatternAtlas = getPatternAtlas();
       result.fillPatternMapping = getPatternAtlasMapping();
       result.fillPatternMask = true;
-      const textureParameters = getPatternTextureParameters();
-      if (textureParameters) {
-        // Merged into the atlas texture's sampler by deck's image-prop transform.
-        result.textureParameters = textureParameters;
-      }
+      // Enable mipmap minification by default (kills the zoomed-out Moiré), capped at the
+      // margin's bleed-free level count so the atlas never samples across cells. deck's
+      // image-prop transform spreads this over the prop default `{lodMaxClamp: 0}`; the
+      // debug knob (getPatternTextureParameters) spreads last and wins.
+      result.textureParameters = {
+        lodMaxClamp: getPatternMipLevels(),
+        ...getPatternTextureParameters(),
+      };
       // Scale compensated for the atlas cell size — see getPatternScaleAdjustment.
       result.getFillPatternScale =
         (visConfig.fillPatternSize ?? 1) * getPatternScaleAdjustment();

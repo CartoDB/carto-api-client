@@ -1600,10 +1600,10 @@ describe('parseMap', () => {
       expect(typeof props.getFillPattern).toBe('function');
       expect(props.getFillPattern()).toBe('hlines-small');
       expect(props.fillPatternAtlas).toBeInstanceOf(Promise);
-      // Default 128 cell with an 8px wrapped-content gutter: pitch 144, col 2, row 0.
+      // Default 128 cell with a 16px wrapped-content margin (2^4 levels): pitch 160, col 2, row 0.
       expect(props.fillPatternMapping['hlines-small']).toMatchObject({
-        x: 296,
-        y: 8,
+        x: 336,
+        y: 16,
         width: 128,
         height: 128,
         mask: true,

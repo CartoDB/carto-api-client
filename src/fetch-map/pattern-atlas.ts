@@ -19,10 +19,12 @@
 // with no source access) or `globalThis`, then reload the map. localStorage values are
 // read as JSON, or as a raw string when not valid JSON (so `svg` and `"svg"` both work):
 //   __CARTO_PATTERN_CELL_SIZE__ = 64|128|256   // atlas cell px, default 128
+//   __CARTO_PATTERN_MIP_LEVELS__ = 4            // margin bleed-free level count, default 4;
+//     // also the default `lodMaxClamp` parse-map emits, so mipmaps are on out of the box.
 //   __CARTO_PATTERN_TEXTURE_PARAMS__ = {"lodMaxClamp": 3, ...}
 //     // merged into the atlas texture's sampler via deck's `textureParameters`, spread
-//     // over the prop default `{lodMaxClamp: 0}` — so set `lodMaxClamp` > 0 to let the
-//     // (always-generated) mip chain kick in; unset -> deck defaults.
+//     // over parse-map's default `{lodMaxClamp: N}` (which itself overrides deck's
+//     // `{lodMaxClamp: 0}`) — the winning override, e.g. `{"lodMaxClamp": 0}` to disable.
 //   __CARTO_PATTERN_ASSET_SOURCE__ = 'png' | 'svg' | 'procedural'
 //     // 'png' (default): Design's original 64px raster masks, tiled at native
 //     //   resolution. 'svg': in-repo vector tiles rasterized at atlas-build time
@@ -82,11 +84,17 @@ const SOURCE_TILE_SIZE = 64;
 // Vector sources (svg/procedural) rasterize each repeat at up to this many px,
 // doubling texel density per repeat vs the 64px masks.
 const VECTOR_RENDER_SIZE = 128;
+// How many mip levels the margin (bleeding buffer) is sized to keep bleed-free. Each
+// level doubles the sampling footprint, so a level-L texel near a cell edge reaches 2^L
+// atlas texels into the neighbour; a margin of 2^N texels keeps levels 0..N clean. Set
+// the sampler's `lodMaxClamp` to this to get mipmap minification with no cross-cell bleed.
+const DEFAULT_MIP_LEVELS = 4;
 
 export type PatternAssetSource = 'png' | 'svg' | 'procedural';
 
 type PatternDebugGlobals = {
   __CARTO_PATTERN_CELL_SIZE__?: number;
+  __CARTO_PATTERN_MIP_LEVELS__?: number;
   __CARTO_PATTERN_TEXTURE_PARAMS__?: Record<string, unknown>;
   __CARTO_PATTERN_ASSET_SOURCE__?: PatternAssetSource;
 };
@@ -189,6 +197,15 @@ export function getPatternCellSize(): number {
   return typeof cell === 'number' && cell > 0 ? cell : DEFAULT_CELL_SIZE;
 }
 
+// Mip levels the atlas margin is built to keep bleed-free; also the `lodMaxClamp` the
+// consumer should cap the sampler at to enable mipmaps without cross-cell bleed.
+export function getPatternMipLevels(): number {
+  const levels = readKnob('__CARTO_PATTERN_MIP_LEVELS__');
+  return typeof levels === 'number' && levels >= 0
+    ? Math.floor(levels)
+    : DEFAULT_MIP_LEVELS;
+}
+
 export function getPatternAssetSource(): PatternAssetSource {
   const source = readKnob('__CARTO_PATTERN_ASSET_SOURCE__');
   return source === 'svg' || source === 'procedural' ? source : 'png';
@@ -227,9 +244,12 @@ export function getPatternScaleAdjustment(
   return (SOURCE_TILE_SIZE * getPatternRepeats(cell)) / cell;
 }
 
-// Gutter width around each cell; sized so a few mip levels stay bleed-free.
+// Margin (bleeding buffer) width around each cell, filled with the cell's own wrapped
+// pattern by composeAtlas. Sized as 2^N atlas texels to keep N mip levels bleed-free,
+// capped at cell/4 so the atlas doesn't balloon for small cells.
 function getPatternCellPadding(cell: number): number {
-  return Math.max(2, Math.round(cell / 16));
+  const forLevels = 1 << getPatternMipLevels();
+  return Math.max(2, Math.min(forLevels, Math.round(cell / 4)));
 }
 
 export function getPatternAtlasMapping(
@@ -406,8 +426,11 @@ async function composeAtlas(
     ctx.beginPath();
     ctx.rect(frame.x - pad, frame.y - pad, cell + 2 * pad, cell + 2 * pad);
     ctx.clip();
-    for (let i = -1; i <= reps; i++) {
-      for (let j = -1; j <= reps; j++) {
+    // Enough extra repeat rings to fill the whole margin on every side (`pad` may span
+    // more than one repeat), so the padding always holds the pattern's wrapped content.
+    const ext = Math.ceil(pad / step);
+    for (let i = -ext; i < reps + ext; i++) {
+      for (let j = -ext; j < reps + ext; j++) {
         ctx.drawImage(img, frame.x + i * step, frame.y + j * step, step, step);
       }
     }
