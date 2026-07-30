@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### 0.5.32
+
+- fix(parseMap): custom-aggregated channels no longer render a flat fixed color when the saved map has a null visual-channel field; the field is synthesized from the compiled aggregation alias, which also restores the channel's scale for legends (#328)
+- chore(deps): bump the turf group to 7.3.5 (#317). Turf is bundled, so this inlines `@turf/distance`, `@turf/geojson-rbush`, `@turf/line-segment`, `@turf/line-split`, `@turf/nearest-point-on-line`, `@turf/truncate` and `rbush`, adding ~32 KB to `api-client.js` and ~130 KB to `worker-compat.js`. Affects the geometry used by the spatial filters (`tileFeatures`, `tileIntersection`).
+- chore(deps): bump h3-js to 4.5.0 (#319) and the @loaders.gl group (#324) — lockfile only, the published `dependencies` ranges are unchanged
+- chore(deps): bump dev dependencies (eslint 10, vite 8, vitest 4, and others) and pin TypeScript to 5.x (#315, #321)
+
 ### 0.5.31
 
 - feat(sources): rename `featureBbox` source option to `prepareLabels` (Maps API `featureBbox` param unchanged)
