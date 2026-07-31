@@ -19,4 +19,11 @@ export type {
 export * from './basemap.js';
 export * from './layer-map.js';
 export * from './parse-map.js';
+export {buildPatternAtlas as _buildPatternAtlas} from './pattern-atlas.js';
+export type {
+  PatternAtlasOptions as _PatternAtlasOptions,
+  PatternAtlasBuild as _PatternAtlasBuild,
+  PatternAtlasFrame as _PatternAtlasFrame,
+  AssembledAtlas as _AssembledAtlas,
+} from './pattern-atlas.js';
 export {getLog10ScaleSteps as _getLog10ScaleSteps} from './utils.js';

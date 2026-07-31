@@ -34,13 +34,7 @@ import type {
   VisualChannelField,
 } from './types.js';
 import {isRemoteCalculationSupported} from './utils.js';
-import {
-  getPatternAtlas,
-  getPatternAtlasMapping,
-  getPatternMipLevels,
-  getPatternScaleAdjustment,
-  getPatternTextureParameters,
-} from './pattern-atlas.js';
+import {buildPatternAtlas} from './pattern-atlas.js';
 import {
   getRasterTileLayerStylePropsRgb,
   getRasterTileLayerStylePropsScaledBand,
@@ -649,20 +643,18 @@ function createChannelProps(
     // layer. A disabled layer samples the opaque `solid` cell instead — under
     // fillPatternMask the mask multiplies by 1, i.e. a plain fill.
     if (visConfig.filled) {
-      result.fillPatternAtlas = getPatternAtlas();
-      result.fillPatternMapping = getPatternAtlasMapping();
+      const patternAtlas = buildPatternAtlas();
+      result.fillPatternAtlas = patternAtlas.atlas;
+      result.fillPatternMapping = patternAtlas.mapping;
       result.fillPatternMask = true;
-      // Enable mipmap minification by default (kills the zoomed-out Moiré), capped at the
-      // margin's bleed-free level count so the atlas never samples across cells. deck's
-      // image-prop transform spreads this over the prop default `{lodMaxClamp: 0}`; the
-      // debug knob (getPatternTextureParameters) spreads last and wins.
-      result.textureParameters = {
-        lodMaxClamp: getPatternMipLevels(),
-        ...getPatternTextureParameters(),
-      };
-      // Scale compensated for the atlas cell size — see getPatternScaleAdjustment.
+      // Sampler defaults from the atlas build: mips on to kill zoomed-out Moiré
+      // (lodMaxClamp = the atlas mip depth) plus anisotropy for tilted views. deck's
+      // image-prop transform spreads this over the prop default `{lodMaxClamp: 0}`.
+      result.textureParameters = patternAtlas.textureParameters;
+      // Plain, world-anchored scale — no zoom adaptation here; consumers that want
+      // constant on-screen size multiply this by their own zoom factor.
       result.getFillPatternScale =
-        (visConfig.fillPatternSize ?? 1) * getPatternScaleAdjustment();
+        (visConfig.fillPatternSize ?? 1) * patternAtlas.scaleAdjustment;
 
       const {fillPatternField, fillPatternScale} = visualChannels;
       const {fillPatternRange, fillPatternDensity} = visConfig;

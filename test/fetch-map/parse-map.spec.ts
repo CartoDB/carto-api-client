@@ -1600,26 +1600,29 @@ describe('parseMap', () => {
       expect(typeof props.getFillPattern).toBe('function');
       expect(props.getFillPattern()).toBe('hlines-small');
       expect(props.fillPatternAtlas).toBeInstanceOf(Promise);
-      // Default 128 cell with a 16px wrapped-content margin (2^4 levels): pitch 160, col 2, row 0.
+      // Default 128 cell with a 4px wrapped-content margin (2^2 levels): pitch 136, col 2, row 0.
       expect(props.fillPatternMapping['hlines-small']).toMatchObject({
-        x: 336,
-        y: 16,
+        x: 276,
+        y: 4,
         width: 128,
         height: 128,
         mask: true,
       });
       expect(props.fillPatternMask).toBe(true);
+      // scaleAdjustment for the default atlas (cell 128, 2×2 packing) is (64×2)/128 = 1,
+      // so the emitted scale is fillPatternSize (2) × 1.
       expect(props.getFillPatternScale).toBe(2);
       expect(props.fillPattern).toBe('hlines');
       expect(scales.fillPattern).toBeUndefined();
     });
 
-    test('single mode defaults density to medium and scale to 1', () => {
+    test('single mode defaults density to medium and scale to the atlas adjustment', () => {
       const {props} = parse('Polygon', {
         fillPatternEnabled: true,
         fillPattern: 'dots',
       });
       expect(props.getFillPattern()).toBe('dots-medium');
+      // fillPatternSize defaults to 1; scaleAdjustment for the default atlas is 1.
       expect(props.getFillPatternScale).toBe(1);
     });
 

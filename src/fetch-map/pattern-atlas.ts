@@ -1,58 +1,19 @@
 // Fill-pattern atlas — internal to carto-api-client.
 //
-// The patterns live as individual, developer-editable tiles (src/fetch-map/patterns/):
-// Design's original 64px raster masks (*.png) plus vector twins (*.svg), both inlined
-// by tsup's `dataurl` loader, with procedural canvas painters as a third, asset-free
-// source — selectable via a debug knob while the final asset strategy is evaluated.
-// Tiles are composited into a sprite sheet on a canvas the first time a pattern is
-// needed. Each atlas cell is filled with side-by-side copies of its tile (raster art
-// never resampled), and is surrounded by a gutter holding the tile's own wrapped
-// content — so linear sampling stays seamless at repeat boundaries and never bleeds a
-// neighboring cell.
+// Pattern tiles live as individual, developer-editable assets under
+// src/fetch-map/patterns/ — the Figma vector export (*.svg), inlined as data URLs by
+// tsup's `dataurl` loader. Tiles are composited into a sprite sheet on a canvas the first
+// time an atlas is requested; each cell packs floor(cell/64) native-size copies of its
+// tile, surrounded by a gutter carrying the tile's own wrapped content so linear sampling
+// stays seamless at repeat boundaries and never bleeds a neighbouring cell.
 //
-// parse-map sets `result.fillPatternAtlas = getPatternAtlas()`. deck.gl's
-// `fillPatternAtlas` prop is async — but the Promise must resolve to a decoded image,
-// never a data-URL string: deck URL-loads string prop values, while a promise-resolved
-// string goes straight to texture creation, where luma.gl rejects it.
+// The atlas is a pure function of `buildPatternAtlas`'s options — no ambient config.
+// Callers own scale/zoom behaviour: this module never adapts the pattern to zoom, and
+// knows nothing about the shader extensions (seam/fp64) Builder layers on top.
 //
-// Debug knobs — set via `localStorage` (persists across reloads, settable from devtools
-// with no source access) or `globalThis`, then reload the map. localStorage values are
-// read as JSON, or as a raw string when not valid JSON (so `svg` and `"svg"` both work):
-//   __CARTO_PATTERN_CELL_SIZE__ = 64|128|256   // atlas cell px, default 128
-//   __CARTO_PATTERN_MIP_LEVELS__ = 4            // margin bleed-free level count, default 4;
-//     // also the default `lodMaxClamp` parse-map emits, so mipmaps are on out of the box.
-//   __CARTO_PATTERN_TEXTURE_PARAMS__ = {"lodMaxClamp": 3, ...}
-//     // merged into the atlas texture's sampler via deck's `textureParameters`, spread
-//     // over parse-map's default `{lodMaxClamp: N}` (which itself overrides deck's
-//     // `{lodMaxClamp: 0}`) — the winning override, e.g. `{"lodMaxClamp": 0}` to disable.
-//   __CARTO_PATTERN_ASSET_SOURCE__ = 'png' | 'svg' | 'procedural'
-//     // 'png' (default): Design's original 64px raster masks, tiled at native
-//     //   resolution. 'svg': in-repo vector tiles rasterized at atlas-build time
-//     //   (2x texel density per repeat). 'procedural': canvas painters, no assets.
-//   e.g. localStorage.__CARTO_PATTERN_TEXTURE_PARAMS__ = '{"lodMaxClamp": 3}'
-
-import hlinesLarge from './patterns/hlines-large.png';
-import hlinesMedium from './patterns/hlines-medium.png';
-import hlinesSmall from './patterns/hlines-small.png';
-import vlinesLarge from './patterns/vlines-large.png';
-import vlinesMedium from './patterns/vlines-medium.png';
-import vlinesSmall from './patterns/vlines-small.png';
-import diagLeftLarge from './patterns/diag-left-large.png';
-import diagLeftMedium from './patterns/diag-left-medium.png';
-import diagLeftSmall from './patterns/diag-left-small.png';
-import diagRightLarge from './patterns/diag-right-large.png';
-import diagRightMedium from './patterns/diag-right-medium.png';
-import diagRightSmall from './patterns/diag-right-small.png';
-import crossHatchLarge from './patterns/cross-hatch-large.png';
-import crossHatchMedium from './patterns/cross-hatch-medium.png';
-import crossHatchSmall from './patterns/cross-hatch-small.png';
-import dotsLarge from './patterns/dots-large.png';
-import dotsMedium from './patterns/dots-medium.png';
-import dotsSmall from './patterns/dots-small.png';
-import checkerLarge from './patterns/checker-large.png';
-import checkerMedium from './patterns/checker-medium.png';
-import checkerSmall from './patterns/checker-small.png';
-import solid from './patterns/solid.png';
+// deck.gl's `fillPatternAtlas` prop is async — but the Promise must resolve to a decoded
+// image, never a data-URL string: deck URL-loads string prop values, while a
+// promise-resolved string goes straight to texture creation, where luma.gl rejects it.
 
 import hlinesLargeSvg from './patterns/hlines-large.svg';
 import hlinesMediumSvg from './patterns/hlines-medium.svg';
@@ -77,27 +38,26 @@ import checkerMediumSvg from './patterns/checker-medium.svg';
 import checkerSmallSvg from './patterns/checker-small.svg';
 import solidSvg from './patterns/solid.svg';
 
-const DEFAULT_CELL_SIZE = 128;
-// px of the original raster masks; also the design grid the on-screen size is
-// defined against — one tile spans 64 design units whatever the asset source.
+// Native period of every tile — the figma svg viewBox spans 64 units. The atlas packs
+// `floor(cell/64)` copies per cell (see composeAtlas), so a larger cell holds more tiles at
+// native density rather than one upscaled tile — the proven playground layout.
 const SOURCE_TILE_SIZE = 64;
-// Vector sources (svg/procedural) rasterize each repeat at up to this many px,
-// doubling texel density per repeat vs the 64px masks.
-const VECTOR_RENDER_SIZE = 128;
-// How many mip levels the margin (bleeding buffer) is sized to keep bleed-free. Each
-// level doubles the sampling footprint, so a level-L texel near a cell edge reaches 2^L
-// atlas texels into the neighbour; a margin of 2^N texels keeps levels 0..N clean. Set
-// the sampler's `lodMaxClamp` to this to get mipmap minification with no cross-cell bleed.
-const DEFAULT_MIP_LEVELS = 4;
+// CSS/logical cell size — the on-screen reference. Drives on-screen pattern size.
+const DEFAULT_SIZE = 64;
+// Texel-density multiplier: actual atlas cell = size × resolution, which packs
+// `resolution` more tile copies per cell (higher texel budget, same on-screen density).
+const DEFAULT_RESOLUTION = 2;
+// Mip depth for the atlas. Zoomed-out moiré is texture minification aliasing, so mipmaps
+// stay on: the emitted `lodMaxClamp` equals this, and the cell gutter (bleeding buffer) is
+// sized to 2^mipLevels texels so a level-L average near a cell edge never reaches into the
+// neighbour. 2 is the crispness/moiré sweet spot — deeper levels over-blur and anisotropy
+// covers the rest. Raise it to sample deeper; the gutter and `lodMaxClamp` grow with it.
+const DEFAULT_MIP_LEVELS = 2;
 
-export type PatternAssetSource = 'png' | 'svg' | 'procedural';
-
-type PatternDebugGlobals = {
-  __CARTO_PATTERN_CELL_SIZE__?: number;
-  __CARTO_PATTERN_MIP_LEVELS__?: number;
-  __CARTO_PATTERN_TEXTURE_PARAMS__?: Record<string, unknown>;
-  __CARTO_PATTERN_ASSET_SOURCE__?: PatternAssetSource;
-};
+// Anisotropic taps for the atlas sampler — oriented multi-tap that suppresses minification
+// moiré on tilted views with far less crispness loss than a deeper mip. Only costs when the
+// footprint is elongated (grazing angle), ~free flat; 4 is the sweet spot.
+const DEFAULT_MAX_ANISOTROPY = 4;
 
 export type PatternAtlasFrame = {
   x: number;
@@ -120,34 +80,8 @@ const PATTERN_ROWS = [
 ] as const;
 const DENSITY_COLUMNS = ['large', 'medium', 'small'] as const;
 
-// atlas key -> inlined data URL of its editable source tile
+// atlas key -> inlined data URL of its editable source tile (Figma vector export)
 const CELL_URLS: Record<string, string> = {
-  'hlines-large': hlinesLarge,
-  'hlines-medium': hlinesMedium,
-  'hlines-small': hlinesSmall,
-  'vlines-large': vlinesLarge,
-  'vlines-medium': vlinesMedium,
-  'vlines-small': vlinesSmall,
-  'diag-left-large': diagLeftLarge,
-  'diag-left-medium': diagLeftMedium,
-  'diag-left-small': diagLeftSmall,
-  'diag-right-large': diagRightLarge,
-  'diag-right-medium': diagRightMedium,
-  'diag-right-small': diagRightSmall,
-  'cross-hatch-large': crossHatchLarge,
-  'cross-hatch-medium': crossHatchMedium,
-  'cross-hatch-small': crossHatchSmall,
-  'dots-large': dotsLarge,
-  'dots-medium': dotsMedium,
-  'dots-small': dotsSmall,
-  'checker-large': checkerLarge,
-  'checker-medium': checkerMedium,
-  'checker-small': checkerSmall,
-  solid,
-};
-
-// atlas key -> inlined data URL of its vector source tile
-const CELL_SVG_URLS: Record<string, string> = {
   'hlines-large': hlinesLargeSvg,
   'hlines-medium': hlinesMediumSvg,
   'hlines-small': hlinesSmallSvg,
@@ -172,90 +106,70 @@ const CELL_SVG_URLS: Record<string, string> = {
   solid: solidSvg,
 };
 
-// localStorage wins over globalThis; its string value is parsed as JSON, falling back to
-// the raw string when it isn't valid JSON. Reads are defensive — `localStorage` access can
-// throw (sandboxed iframe) or be absent (SSR/tests).
-function readKnob(key: keyof PatternDebugGlobals): unknown {
-  let raw: string | null = null;
-  try {
-    if (typeof localStorage !== 'undefined') raw = localStorage.getItem(key);
-  } catch {
-    raw = null;
-  }
-  if (raw !== null) {
-    try {
-      return JSON.parse(raw);
-    } catch {
-      return raw;
-    }
-  }
-  return (globalThis as PatternDebugGlobals)[key];
+export type PatternAtlasOptions = {
+  /** CSS/logical cell size — the on-screen reference. Default 64. */
+  size?: number;
+  /** Texel-density multiplier; actual atlas cell = size × resolution, packing `resolution`
+   *  more native-size tile copies per cell. Default 2. */
+  resolution?: number;
+  /** Mip levels the margin is sized to keep bleed-free; also the `lodMaxClamp` to cap the
+   *  sampler at. Default 2. */
+  mipLevels?: number;
+};
+
+type ResolvedOptions = {
+  size: number;
+  resolution: number;
+  mipLevels: number;
+  /** Actual atlas cell in texels: size × resolution. */
+  cell: number;
+};
+
+function resolveOptions(options: PatternAtlasOptions = {}): ResolvedOptions {
+  const size =
+    typeof options.size === 'number' && options.size > 0
+      ? Math.round(options.size)
+      : DEFAULT_SIZE;
+  const resolution =
+    typeof options.resolution === 'number' && options.resolution > 0
+      ? options.resolution
+      : DEFAULT_RESOLUTION;
+  const mipLevels =
+    typeof options.mipLevels === 'number' && options.mipLevels >= 0
+      ? Math.floor(options.mipLevels)
+      : DEFAULT_MIP_LEVELS;
+  return {
+    size,
+    resolution,
+    mipLevels,
+    cell: Math.round(size * resolution),
+  };
 }
 
-export function getPatternCellSize(): number {
-  const cell = readKnob('__CARTO_PATTERN_CELL_SIZE__');
-  return typeof cell === 'number' && cell > 0 ? cell : DEFAULT_CELL_SIZE;
+// Copies of the native tile packed per axis inside one cell.
+function repeatsFor(cell: number): number {
+  return Math.max(1, Math.floor(cell / SOURCE_TILE_SIZE));
 }
 
-// Mip levels the atlas margin is built to keep bleed-free; also the `lodMaxClamp` the
-// consumer should cap the sampler at to enable mipmaps without cross-cell bleed.
-export function getPatternMipLevels(): number {
-  const levels = readKnob('__CARTO_PATTERN_MIP_LEVELS__');
-  return typeof levels === 'number' && levels >= 0
-    ? Math.floor(levels)
-    : DEFAULT_MIP_LEVELS;
-}
-
-export function getPatternAssetSource(): PatternAssetSource {
-  const source = readKnob('__CARTO_PATTERN_ASSET_SOURCE__');
-  return source === 'svg' || source === 'procedural' ? source : 'png';
-}
-
-/** Sampler overrides for the atlas texture; undefined keeps deck's defaults (linear). */
-export function getPatternTextureParameters():
-  | Record<string, unknown>
-  | undefined {
-  const params = readKnob('__CARTO_PATTERN_TEXTURE_PARAMS__');
-  return params && typeof params === 'object'
-    ? (params as Record<string, unknown>)
-    : undefined;
-}
-
-// Copies of the source tile laid side by side inside one atlas cell, per axis. Raster
-// tiles draw at native resolution (no resampling); vector sources rasterize each
-// repeat at up to VECTOR_RENDER_SIZE px. The UV wrap — where sampling seams live —
-// happens 1/reps as often.
-function getPatternRepeats(
-  cell: number,
-  source: PatternAssetSource = getPatternAssetSource()
-): number {
-  const repeatSize = source === 'png' ? SOURCE_TILE_SIZE : VECTOR_RENDER_SIZE;
-  return Math.max(1, Math.floor(cell / repeatSize));
-}
-
-// deck's fill-pattern shader sizes the on-screen repeat proportionally to the mapping
-// frame's texel size (scale = FILL_UV_SCALE * getFillPatternScale * frame.wh). This
-// factor compensates for the cell size and the repeats inside it, normalized to the
-// 64px design grid, so the pattern keeps a constant on-screen size across cell sizes
-// and asset sources.
-export function getPatternScaleAdjustment(
-  cell: number = getPatternCellSize()
-): number {
-  return (SOURCE_TILE_SIZE * getPatternRepeats(cell)) / cell;
+// deck sizes the on-screen repeat as FILL_UV_SCALE × getFillPatternScale × frame.wh (the
+// whole cell). With `reps` tiles packed in the cell, this factor keeps each tile at a
+// constant SOURCE_TILE_SIZE on-screen footprint independent of cell size / resolution.
+function scaleAdjustmentFor({cell}: ResolvedOptions): number {
+  return (SOURCE_TILE_SIZE * repeatsFor(cell)) / cell;
 }
 
 // Margin (bleeding buffer) width around each cell, filled with the cell's own wrapped
 // pattern by composeAtlas. Sized as 2^N atlas texels to keep N mip levels bleed-free,
 // capped at cell/4 so the atlas doesn't balloon for small cells.
-function getPatternCellPadding(cell: number): number {
-  const forLevels = 1 << getPatternMipLevels();
-  return Math.max(2, Math.min(forLevels, Math.round(cell / 4)));
+function cellPadding(cell: number, mipLevels: number): number {
+  return Math.max(2, Math.min(1 << mipLevels, Math.round(cell / 4)));
 }
 
-export function getPatternAtlasMapping(
-  cell: number = getPatternCellSize()
-): Record<string, PatternAtlasFrame> {
-  const pad = getPatternCellPadding(cell);
+function getAtlasMapping({
+  cell,
+  mipLevels,
+}: ResolvedOptions): Record<string, PatternAtlasFrame> {
+  const pad = cellPadding(cell, mipLevels);
   const pitch = cell + 2 * pad;
   const mapping: Record<string, PatternAtlasFrame> = {};
   const frame = (col: number, row: number): PatternAtlasFrame => ({
@@ -294,131 +208,47 @@ function createCanvas(w: number, h: number): AnyCanvas {
   );
 }
 
-async function loadImage(dataUrl: string): Promise<CanvasImageSource> {
-  if (
-    typeof createImageBitmap !== 'undefined' &&
-    typeof fetch !== 'undefined'
-  ) {
-    const blob = await (await fetch(dataUrl)).blob();
-    return createImageBitmap(blob);
-  }
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = dataUrl;
-  });
-}
-
 // SVG images always go through an Image element: createImageBitmap on SVG blobs is
 // inconsistent across engines, and drawImage from an SVG image rasterizes from the
 // vector at the destination size in modern browsers.
-function loadSvgImage(dataUrl: string): Promise<CanvasImageSource> {
+function loadSvg(dataUrl: string): Promise<CanvasImageSource> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve(img);
     img.onerror = reject;
     img.src = dataUrl;
   });
-}
-
-// Procedural painters — the same measured design-grid geometry as the assets, drawn
-// in 64-unit design coordinates onto a pre-scaled context (canvas AA does the rest).
-const DENSITY_STEP: Record<string, number> = {small: 1, medium: 2, large: 4};
-
-function paintDesignTile(
-  ctx: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D,
-  key: string
-): void {
-  const [, name, density] =
-    key.match(/^(.*?)(?:-(small|medium|large))?$/) ?? [];
-  const step = DENSITY_STEP[density ?? ''] ?? 1;
-  const linePeriod = 4 * step;
-  const diagPeriod = 16 * step;
-  const square = 2 * step;
-  ctx.fillStyle = '#000';
-  ctx.strokeStyle = '#000';
-  const diag = (dir: 1 | -1) => {
-    // dir 1: "\" lines (x - y = k*p); dir -1: "/" lines (x + y = k*p)
-    ctx.lineWidth = Math.SQRT2; // 2px horizontal width at 45 degrees
-    ctx.beginPath();
-    for (
-      let k = -Math.ceil(64 / diagPeriod);
-      k <= 2 * Math.ceil(64 / diagPeriod);
-      k++
-    ) {
-      ctx.moveTo(k * diagPeriod - 8 * dir, -8);
-      ctx.lineTo(k * diagPeriod + 72 * dir, 72);
-    }
-    ctx.stroke();
-  };
-  switch (name) {
-    case 'solid':
-      ctx.fillRect(0, 0, 64, 64);
-      break;
-    case 'hlines':
-      for (let y = 0; y < 64; y += linePeriod) ctx.fillRect(0, y, 64, 2);
-      break;
-    case 'vlines':
-      for (let x = 0; x < 64; x += linePeriod) ctx.fillRect(x, 0, 2, 64);
-      break;
-    case 'dots':
-      for (let y = 0; y < 64; y += linePeriod)
-        for (let x = 0; x < 64; x += linePeriod) ctx.fillRect(x, y, 2, 2);
-      break;
-    case 'checker':
-      for (let j = 0; j * square < 64; j++)
-        for (let i = 0; i * square < 64; i++)
-          if ((i + j) % 2 === 0)
-            ctx.fillRect(i * square, j * square, square, square);
-      break;
-    case 'diag-left':
-      diag(1);
-      break;
-    case 'diag-right':
-      diag(-1);
-      break;
-    case 'cross-hatch':
-      diag(1);
-      diag(-1);
-      break;
-  }
-}
-
-function paintTileCanvas(key: string, size: number): CanvasImageSource {
-  const canvas = createCanvas(size, size);
-  const ctx = canvas.getContext('2d');
-  if (!ctx)
-    throw new Error(
-      'carto-api-client: 2D context unavailable for pattern tile'
-    );
-  ctx.scale(size / 64, size / 64);
-  paintDesignTile(ctx, key);
-  return canvas;
 }
 
 type TileImages = Record<string, CanvasImageSource>;
 
-// Shared compositor: lay out the per-key tile images on the atlas grid. `none` is
-// left transparent (no tile). Every other cell is filled with reps x reps copies of
-// its tile, with one extra ring clipped into the gutter, so the padding holds the
-// tile's own wrapped content.
+// Composite the tiles onto the atlas grid. `none` is left transparent (no tile). Every
+// other cell is filled with reps×reps native-size copies of its tile, plus enough extra
+// rings clipped into the gutter that the padding always holds the tile's own wrapped
+// content — so linear sampling stays seamless at repeat boundaries.
 async function composeAtlas(
-  cell: number,
-  reps: number,
+  opts: ResolvedOptions,
   images: TileImages
 ): Promise<AssembledAtlas> {
-  const mapping = getPatternAtlasMapping(cell);
-  const pad = getPatternCellPadding(cell);
+  const {cell, mipLevels} = opts;
+  const mapping = getAtlasMapping(opts);
+  const pad = cellPadding(cell, mipLevels);
   const pitch = cell + 2 * pad;
+  const reps = repeatsFor(cell);
   const step = cell / reps;
   const canvas = createCanvas(pitch * 3, pitch * (PATTERN_ROWS.length + 1));
-  const ctx = canvas.getContext('2d');
+  // Narrowing cast: getContext('2d') on the HTMLCanvasElement | OffscreenCanvas union
+  // otherwise widens the DOM branch to the generic RenderingContext in the dts build.
+  // The 2D drawing API used below is shared by both canvas kinds.
+  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | null;
   if (!ctx)
     throw new Error(
       'carto-api-client: 2D context unavailable for pattern atlas'
     );
 
+  // `pad` may span more than one tile step, so draw enough extra rings on every side to
+  // fill the whole margin with the pattern's wrapped content.
+  const ext = Math.ceil(pad / step);
   for (const [key, frame] of Object.entries(mapping)) {
     const img = images[key];
     if (!img) continue;
@@ -426,9 +256,6 @@ async function composeAtlas(
     ctx.beginPath();
     ctx.rect(frame.x - pad, frame.y - pad, cell + 2 * pad, cell + 2 * pad);
     ctx.clip();
-    // Enough extra repeat rings to fill the whole margin on every side (`pad` may span
-    // more than one repeat), so the padding always holds the pattern's wrapped content.
-    const ext = Math.ceil(pad / step);
     for (let i = -ext; i < reps + ext; i++) {
       for (let j = -ext; j < reps + ext; j++) {
         ctx.drawImage(img, frame.x + i * step, frame.y + j * step, step, step);
@@ -442,65 +269,78 @@ async function composeAtlas(
   return canvas as HTMLCanvasElement;
 }
 
-// One builder per asset source, all funneling into composeAtlas.
-
-// Design's original 64px raster masks, tiled at native resolution (never resampled).
-async function buildPngAtlas(cell: number): Promise<AssembledAtlas> {
+async function assembleAtlas(opts: ResolvedOptions): Promise<AssembledAtlas> {
   const images: TileImages = {};
   await Promise.all(
     Object.entries(CELL_URLS).map(async ([key, url]) => {
-      images[key] = await loadImage(url);
+      images[key] = await loadSvg(url);
     })
   );
-  return composeAtlas(cell, getPatternRepeats(cell, 'png'), images);
+  return composeAtlas(opts, images);
 }
 
-// In-repo vector tiles, rasterized from the vector at the repeat size.
-async function buildSvgAtlas(cell: number): Promise<AssembledAtlas> {
-  const images: TileImages = {};
-  await Promise.all(
-    Object.entries(CELL_SVG_URLS).map(async ([key, url]) => {
-      images[key] = await loadSvgImage(url);
-    })
-  );
-  return composeAtlas(cell, getPatternRepeats(cell, 'svg'), images);
-}
-
-// Asset-free canvas painters drawing the measured design-grid geometry.
-async function buildProceduralAtlas(cell: number): Promise<AssembledAtlas> {
-  const reps = getPatternRepeats(cell, 'procedural');
-  const step = cell / reps;
-  const images: TileImages = {};
-  for (const key of Object.keys(CELL_URLS)) {
-    images[key] = paintTileCanvas(key, step);
-  }
-  return composeAtlas(cell, reps, images);
-}
-
-const ATLAS_BUILDERS: Record<
-  PatternAssetSource,
-  (cell: number) => Promise<AssembledAtlas>
-> = {
-  png: buildPngAtlas,
-  svg: buildSvgAtlas,
-  procedural: buildProceduralAtlas,
+export type PatternAtlasBuild = {
+  /** Decoded sprite sheet — memoized, safe to pass repeatedly as deck's async
+   *  `fillPatternAtlas` prop. */
+  atlas: Promise<AssembledAtlas>;
+  /** Per-key atlas frames for deck's `fillPatternMapping`. */
+  mapping: Record<string, PatternAtlasFrame>;
+  /** Multiply into `getFillPatternScale` to keep on-screen size resolution-invariant. */
+  scaleAdjustment: number;
+  /** Resolved actual cell size in texels (size × resolution). */
+  cell: number;
+  /** Resolved mip depth: the gutter is sized for it and the emitted `lodMaxClamp` matches. */
+  mipLevels: number;
+  /** Sampler params for deck's `textureParameters`: mips on (`lodMaxClamp` = `mipLevels`)
+   *  plus anisotropy for tilted views. */
+  textureParameters: {lodMaxClamp: number; maxAnisotropy: number};
 };
 
-const atlasPromises = new Map<string, Promise<AssembledAtlas>>();
+// The sprite sheet and its mapping depend only on (cell, mipLevels), so memoize them by
+// that key — deck matches layers by prop reference, and a fresh atlas
+// Promise each parse would re-trigger the texture load and blank the layer. Not keyed by
+// `size`: two size×resolution pairs can resolve to the same cell (e.g. 64@4 and 128@2)
+// with an identical atlas but a different scaleAdjustment, so scale is computed per call.
+type AtlasCore = {
+  atlas: Promise<AssembledAtlas>;
+  mapping: Record<string, PatternAtlasFrame>;
+};
+const coreCache = new Map<string, AtlasCore>();
 
-/** Assemble the sprite sheet for the active asset source and cell size. Memoized. */
-export function getPatternAtlas(
-  cell: number = getPatternCellSize()
-): Promise<AssembledAtlas> {
-  const source = getPatternAssetSource();
-  const memoKey = `${source}:${cell}`;
-  let promise = atlasPromises.get(memoKey);
-  if (!promise) {
-    promise = ATLAS_BUILDERS[source](cell);
-    // Keep a rejection observed even if no consumer attaches a handler (e.g. Node,
-    // where there is no canvas) — the returned promise still rejects for real callers.
-    promise.catch(() => {});
-    atlasPromises.set(memoKey, promise);
+function getAtlasCore(opts: ResolvedOptions): AtlasCore {
+  const key = `${opts.cell}:${opts.mipLevels}`;
+  let core = coreCache.get(key);
+  if (!core) {
+    const atlas = assembleAtlas(opts);
+    // Keep a rejection observed even if no consumer attaches a handler (e.g. Node, where
+    // there is no canvas) — the returned promise still rejects for real callers.
+    atlas.catch(() => {});
+    core = {atlas, mapping: getAtlasMapping(opts)};
+    coreCache.set(key, core);
   }
-  return promise;
+  return core;
+}
+
+/**
+ * Assemble the fill-pattern sprite sheet for the given options. The decoded atlas and its
+ * mapping are memoized by resolved atlas identity; `scaleAdjustment` reflects the caller's
+ * `size`. Pure atlas production — applies no zoom/scale adaptation and knows nothing about
+ * the shader extensions the caller may attach.
+ */
+export function buildPatternAtlas(
+  options?: PatternAtlasOptions
+): PatternAtlasBuild {
+  const opts = resolveOptions(options);
+  const {atlas, mapping} = getAtlasCore(opts);
+  return {
+    atlas,
+    mapping,
+    scaleAdjustment: scaleAdjustmentFor(opts),
+    cell: opts.cell,
+    mipLevels: opts.mipLevels,
+    textureParameters: {
+      lodMaxClamp: opts.mipLevels,
+      maxAnisotropy: DEFAULT_MAX_ANISOTROPY,
+    },
+  };
 }

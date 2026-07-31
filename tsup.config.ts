@@ -10,7 +10,7 @@ const commonConfig: Options = {
   // Inline the individual pattern assets as data URLs so the editable per-pattern files
   // ship in the bundle with no separate asset file (see pattern-atlas-runtime.ts).
   // PNG for now; SVG kept enabled for the deferred svg-vs-png experiment.
-  loader: {'.png': 'dataurl', '.svg': 'dataurl'},
+  loader: {'.svg': 'dataurl'},
 };
 
 // Web Workers rely on ES Modules, and are not supported in our CJS builds.
