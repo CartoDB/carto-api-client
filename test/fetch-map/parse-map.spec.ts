@@ -1626,6 +1626,15 @@ describe('parseMap', () => {
       expect(props.getFillPatternScale).toBe(0.25);
     });
 
+    test('floors fillPatternSize at 0.1 — a stored 0 must not emit a zero scale', () => {
+      const {props} = parse('Polygon', {
+        fillPatternEnabled: true,
+        fillPattern: 'dots',
+        fillPatternSize: 0,
+      });
+      expect(props.getFillPatternScale).toBeCloseTo(0.1 * 0.25);
+    });
+
     test('by-column mode builds a per-feature accessor and a fillPattern scale', () => {
       const {props, scales} = parse(
         'Polygon',

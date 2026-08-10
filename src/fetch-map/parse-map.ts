@@ -652,9 +652,11 @@ function createChannelProps(
       // image-prop transform spreads this over the prop default `{lodMaxClamp: 0}`.
       result.textureParameters = patternAtlas.textureParameters;
       // Plain, world-anchored scale — no zoom adaptation here; consumers that want
-      // constant on-screen size multiply this by their own zoom factor.
+      // constant on-screen size multiply this by their own zoom factor. Floored at
+      // 0.1 (the Builder slider minimum): 0 would NaN the shader's texture coords.
       result.getFillPatternScale =
-        (visConfig.fillPatternSize ?? 1) * patternAtlas.scaleAdjustment;
+        Math.max(visConfig.fillPatternSize ?? 1, 0.1) *
+        patternAtlas.scaleAdjustment;
 
       const {fillPatternField, fillPatternScale} = visualChannels;
       const {fillPatternRange, fillPatternDensity} = visConfig;
