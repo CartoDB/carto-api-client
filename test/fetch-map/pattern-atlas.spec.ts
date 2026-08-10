@@ -6,11 +6,11 @@ import {buildPatternAtlas} from '../../src/fetch-map/pattern-atlas.js';
 // is swallowed by buildPatternAtlas.
 
 describe('buildPatternAtlas defaults', () => {
-  it('defaults to 64 @ 2 (cell 128, 2×2 packing) with mip depth 2', () => {
+  it('defaults to 64 @ 2 (cell 128, one 128px-dense tile) with mip depth 2', () => {
     const build = buildPatternAtlas();
     expect(build.cell).toBe(128); // size 64 × resolution 2
     expect(build.mipLevels).toBe(2);
-    expect(build.scaleAdjustment).toBe(1); // (SOURCE_TILE_SIZE 64 × reps 2) / cell 128
+    expect(build.scaleAdjustment).toBe(0.5); // (SOURCE_TILE_SIZE 64 × reps 1) / cell 128
   });
 
   it('floors mipLevels and ignores a negative value', () => {
@@ -36,30 +36,39 @@ describe('buildPatternAtlas defaults', () => {
   });
 });
 
-describe('resolution packs more native-size tiles', () => {
-  // The atlas packs floor(cell/64) copies per cell. Each packed tile keeps a constant
-  // on-screen footprint of SOURCE_TILE_SIZE (64): scaleAdjustment × cell / reps === 64.
-  // Resolution raises the atlas texel budget (more copies), not per-tile density.
-  it('grows cell and reps with resolution, per-tile footprint constant', () => {
+describe('resolution raises per-tile texel density', () => {
+  // reps = floor(size/64) — resolution never adds copies; every copy is rasterized at
+  // cell/reps = 64 × resolution texels. Each tile keeps a constant on-screen footprint
+  // of SOURCE_TILE_SIZE (64): scaleAdjustment × cell / reps === 64.
+  it('keeps reps pinned to size while texels per tile grow with resolution', () => {
     for (const [resolution, cell, reps] of [
       [1, 64, 1],
-      [2, 128, 2],
-      [4, 256, 4],
+      [2, 128, 1],
+      [4, 256, 1],
     ] as const) {
       const b = buildPatternAtlas({size: 64, resolution});
       expect(b.cell).toBe(cell);
-      expect((b.scaleAdjustment * b.cell) / reps).toBe(64);
+      expect(b.cell / reps).toBe(64 * resolution); // texels per tile
+      expect((b.scaleAdjustment * b.cell) / reps).toBe(64); // on-screen footprint
     }
   });
 
-  it('sets scaleAdjustment to (64 × reps) / cell', () => {
-    expect(buildPatternAtlas({size: 64, resolution: 2}).scaleAdjustment).toBe(
-      1
-    );
-    // cell 256, reps 4 -> (64 × 4) / 256 = 1
-    expect(buildPatternAtlas({size: 128, resolution: 2}).scaleAdjustment).toBe(
-      1
-    );
+  it('packs copies from size, each still resolution-dense', () => {
+    const b = buildPatternAtlas({size: 128, resolution: 2}); // cell 256, reps 2
+    expect(b.cell).toBe(256);
+    expect(b.scaleAdjustment).toBe(0.5); // (64 × 2) / 256
+    expect((b.scaleAdjustment * b.cell) / 2).toBe(64);
+  });
+
+  it('gives 64@2 and 128@1 the same cell but different atlases', () => {
+    // Same 128px cell; one holds a single 128px-dense tile, the other 2×2 native copies.
+    // A shared cache entry would silently serve one build's pixels to the other.
+    const dense = buildPatternAtlas({size: 64, resolution: 2});
+    const packed = buildPatternAtlas({size: 128, resolution: 1});
+    expect(dense.cell).toBe(packed.cell);
+    expect(dense.atlas).not.toBe(packed.atlas);
+    expect(dense.scaleAdjustment).toBe(0.5);
+    expect(packed.scaleAdjustment).toBe(1);
   });
 });
 

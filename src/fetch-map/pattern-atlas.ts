@@ -3,9 +3,10 @@
 // Pattern tiles live as individual, developer-editable assets under
 // src/fetch-map/patterns/ — the Figma vector export (*.svg), inlined as data URLs by
 // tsup's `dataurl` loader. Tiles are composited into a sprite sheet on a canvas the first
-// time an atlas is requested; each cell packs floor(cell/64) native-size copies of its
-// tile, surrounded by a gutter carrying the tile's own wrapped content so linear sampling
-// stays seamless at repeat boundaries and never bleeds a neighbouring cell.
+// time an atlas is requested; each cell packs floor(size/64) copies of its tile, every
+// copy rasterized at 64 × resolution texels, surrounded by a gutter carrying the tile's
+// own wrapped content so linear sampling stays seamless at repeat boundaries and never
+// bleeds a neighbouring cell.
 //
 // The atlas is a pure function of `buildPatternAtlas`'s options — no ambient config.
 // Callers own scale/zoom behaviour: this module never adapts the pattern to zoom, and
@@ -39,13 +40,13 @@ import checkerSmallSvg from './patterns/checker-small.svg';
 import solidSvg from './patterns/solid.svg';
 
 // Native period of every tile — the figma svg viewBox spans 64 units. The atlas packs
-// `floor(cell/64)` copies per cell (see composeAtlas), so a larger cell holds more tiles at
-// native density rather than one upscaled tile — the proven playground layout.
+// `floor(size/64)` copies per cell (see composeAtlas); the texel budget from `resolution`
+// goes into rasterizing each copy denser, never into more copies.
 const SOURCE_TILE_SIZE = 64;
 // CSS/logical cell size — the on-screen reference. Drives on-screen pattern size.
 const DEFAULT_SIZE = 64;
-// Texel-density multiplier: actual atlas cell = size × resolution, which packs
-// `resolution` more tile copies per cell (higher texel budget, same on-screen density).
+// Texel-density multiplier: actual atlas cell = size × resolution, and every tile copy is
+// rasterized from its svg at `resolution` × its native 64 px (sharper, same on-screen size).
 const DEFAULT_RESOLUTION = 2;
 // Mip depth for the atlas. Zoomed-out moiré is texture minification aliasing, so mipmaps
 // stay on: the emitted `lodMaxClamp` equals this, and the cell gutter (bleeding buffer) is
@@ -109,8 +110,8 @@ const CELL_URLS: Record<string, string> = {
 export type PatternAtlasOptions = {
   /** CSS/logical cell size — the on-screen reference. Default 64. */
   size?: number;
-  /** Texel-density multiplier; actual atlas cell = size × resolution, packing `resolution`
-   *  more native-size tile copies per cell. Default 2. */
+  /** Texel-density multiplier; actual atlas cell = size × resolution, each tile copy
+   *  rasterized at `resolution` × its native 64 px. Default 2. */
   resolution?: number;
   /** Mip levels the margin is sized to keep bleed-free; also the `lodMaxClamp` to cap the
    *  sampler at. Default 2. */
@@ -146,16 +147,19 @@ function resolveOptions(options: PatternAtlasOptions = {}): ResolvedOptions {
   };
 }
 
-// Copies of the native tile packed per axis inside one cell.
-function repeatsFor(cell: number): number {
-  return Math.max(1, Math.floor(cell / SOURCE_TILE_SIZE));
+// Copies of the native tile packed per axis inside one cell. Derived from the logical
+// `size`, NOT the texel cell: deriving from the cell would convert the whole resolution
+// budget into extra 1×-density copies (each drawn at cell/reps = 64 px), silently
+// cancelling `resolution` — each copy must instead rasterize at 64 × resolution texels.
+function repeatsFor({size}: ResolvedOptions): number {
+  return Math.max(1, Math.floor(size / SOURCE_TILE_SIZE));
 }
 
 // deck sizes the on-screen repeat as FILL_UV_SCALE × getFillPatternScale × frame.wh (the
 // whole cell). With `reps` tiles packed in the cell, this factor keeps each tile at a
 // constant SOURCE_TILE_SIZE on-screen footprint independent of cell size / resolution.
-function scaleAdjustmentFor({cell}: ResolvedOptions): number {
-  return (SOURCE_TILE_SIZE * repeatsFor(cell)) / cell;
+function scaleAdjustmentFor(opts: ResolvedOptions): number {
+  return (SOURCE_TILE_SIZE * repeatsFor(opts)) / opts.cell;
 }
 
 // Margin (bleeding buffer) width around each cell, filled with the cell's own wrapped
@@ -234,7 +238,9 @@ async function composeAtlas(
   const mapping = getAtlasMapping(opts);
   const pad = cellPadding(cell, mipLevels);
   const pitch = cell + 2 * pad;
-  const reps = repeatsFor(cell);
+  const reps = repeatsFor(opts);
+  // Each copy draws at 64 × resolution texels — SVG rasterizes at the destination size,
+  // so this is where the resolution budget becomes real pixel density.
   const step = cell / reps;
   const canvas = createCanvas(pitch * 3, pitch * (PATTERN_ROWS.length + 1));
   // Narrowing cast: getContext('2d') on the HTMLCanvasElement | OffscreenCanvas union
@@ -296,11 +302,11 @@ export type PatternAtlasBuild = {
   textureParameters: {lodMaxClamp: number; maxAnisotropy: number};
 };
 
-// The sprite sheet and its mapping depend only on (cell, mipLevels), so memoize them by
-// that key — deck matches layers by prop reference, and a fresh atlas
-// Promise each parse would re-trigger the texture load and blank the layer. Not keyed by
-// `size`: two size×resolution pairs can resolve to the same cell (e.g. 64@4 and 128@2)
-// with an identical atlas but a different scaleAdjustment, so scale is computed per call.
+// The sprite sheet and its mapping depend on (cell, reps, mipLevels), so memoize them by
+// that key — deck matches layers by prop reference, and a fresh atlas Promise each parse
+// would re-trigger the texture load and blank the layer. `reps` must be in the key: two
+// pairs can share a cell with different content (64@2 is one 128px-dense tile, 128@1 is
+// 2×2 native copies). scaleAdjustment is cheap and computed per call.
 type AtlasCore = {
   atlas: Promise<AssembledAtlas>;
   mapping: Record<string, PatternAtlasFrame>;
@@ -308,7 +314,7 @@ type AtlasCore = {
 const coreCache = new Map<string, AtlasCore>();
 
 function getAtlasCore(opts: ResolvedOptions): AtlasCore {
-  const key = `${opts.cell}:${opts.mipLevels}`;
+  const key = `${opts.cell}:${repeatsFor(opts)}:${opts.mipLevels}`;
   let core = coreCache.get(key);
   if (!core) {
     const atlas = assembleAtlas(opts);

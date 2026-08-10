@@ -1609,9 +1609,9 @@ describe('parseMap', () => {
         mask: true,
       });
       expect(props.fillPatternMask).toBe(true);
-      // scaleAdjustment for the default atlas (cell 128, 2×2 packing) is (64×2)/128 = 1,
-      // so the emitted scale is fillPatternSize (2) × 1.
-      expect(props.getFillPatternScale).toBe(2);
+      // scaleAdjustment for the default atlas (one 128px-dense tile) is (64×1)/128 = 0.5,
+      // so the emitted scale is fillPatternSize (2) × 0.5.
+      expect(props.getFillPatternScale).toBe(1);
       expect(props.fillPattern).toBe('hlines');
       expect(scales.fillPattern).toBeUndefined();
     });
@@ -1622,8 +1622,8 @@ describe('parseMap', () => {
         fillPattern: 'dots',
       });
       expect(props.getFillPattern()).toBe('dots-medium');
-      // fillPatternSize defaults to 1; scaleAdjustment for the default atlas is 1.
-      expect(props.getFillPatternScale).toBe(1);
+      // fillPatternSize defaults to 1; scaleAdjustment for the default atlas is 0.5.
+      expect(props.getFillPatternScale).toBe(0.5);
     });
 
     test('by-column mode builds a per-feature accessor and a fillPattern scale', () => {
