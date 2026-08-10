@@ -6,11 +6,11 @@ import {buildPatternAtlas} from '../../src/fetch-map/pattern-atlas.js';
 // is swallowed by buildPatternAtlas.
 
 describe('buildPatternAtlas defaults', () => {
-  it('defaults to 64 @ 2 (cell 128, one 128px-dense tile) with mip depth 2', () => {
+  it('defaults to 64 @ 4 (cell 256, one 256px-dense tile) with mip depth 2', () => {
     const build = buildPatternAtlas();
-    expect(build.cell).toBe(128); // size 64 × resolution 2
+    expect(build.cell).toBe(256); // size 64 × resolution 4
     expect(build.mipLevels).toBe(2);
-    expect(build.scaleAdjustment).toBe(0.5); // (SOURCE_TILE_SIZE 64 × reps 1) / cell 128
+    expect(build.scaleAdjustment).toBe(0.25); // (SOURCE_TILE_SIZE 64 × reps 1) / cell 256
   });
 
   it('floors mipLevels and ignores a negative value', () => {
@@ -78,7 +78,7 @@ describe('atlas mapping margin', () => {
     const cell = 128;
     const pad = 16; // mipLevels 4 -> min(2^4, 128/4) = min(16, 32)
     const pitch = cell + 2 * pad; // 160
-    const {mapping} = buildPatternAtlas({mipLevels: 4}); // svg 64 @ 2 -> cell 128
+    const {mapping} = buildPatternAtlas({resolution: 2, mipLevels: 4}); // svg 64 @ 2 -> cell 128
 
     expect(mapping['hlines-large']).toMatchObject({
       x: pad,
@@ -92,7 +92,7 @@ describe('atlas mapping margin', () => {
 
   it('shrinks the margin when fewer mip levels are requested', () => {
     const pad = 2; // min(2^1, 32)
-    const {mapping} = buildPatternAtlas({mipLevels: 1}); // cell 128
+    const {mapping} = buildPatternAtlas({resolution: 2, mipLevels: 1}); // cell 128
     expect(mapping['hlines-large']).toMatchObject({x: pad, y: pad});
   });
 

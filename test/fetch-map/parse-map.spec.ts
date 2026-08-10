@@ -1600,18 +1600,18 @@ describe('parseMap', () => {
       expect(typeof props.getFillPattern).toBe('function');
       expect(props.getFillPattern()).toBe('hlines-small');
       expect(props.fillPatternAtlas).toBeInstanceOf(Promise);
-      // Default 128 cell with a 4px wrapped-content margin (2^2 levels): pitch 136, col 2, row 0.
+      // Default 256 cell with a 4px wrapped-content margin (2^2 levels): pitch 264, col 2, row 0.
       expect(props.fillPatternMapping['hlines-small']).toMatchObject({
-        x: 276,
+        x: 532,
         y: 4,
-        width: 128,
-        height: 128,
+        width: 256,
+        height: 256,
         mask: true,
       });
       expect(props.fillPatternMask).toBe(true);
-      // scaleAdjustment for the default atlas (one 128px-dense tile) is (64×1)/128 = 0.5,
-      // so the emitted scale is fillPatternSize (2) × 0.5.
-      expect(props.getFillPatternScale).toBe(1);
+      // scaleAdjustment for the default atlas (one 256px-dense tile) is (64×1)/256 = 0.25,
+      // so the emitted scale is fillPatternSize (2) × 0.25.
+      expect(props.getFillPatternScale).toBe(0.5);
       expect(props.fillPattern).toBe('hlines');
       expect(scales.fillPattern).toBeUndefined();
     });
@@ -1622,8 +1622,8 @@ describe('parseMap', () => {
         fillPattern: 'dots',
       });
       expect(props.getFillPattern()).toBe('dots-medium');
-      // fillPatternSize defaults to 1; scaleAdjustment for the default atlas is 0.5.
-      expect(props.getFillPatternScale).toBe(0.5);
+      // fillPatternSize defaults to 1; scaleAdjustment for the default atlas is 0.25.
+      expect(props.getFillPatternScale).toBe(0.25);
     });
 
     test('by-column mode builds a per-feature accessor and a fillPattern scale', () => {

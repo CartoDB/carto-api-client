@@ -47,7 +47,7 @@ const SOURCE_TILE_SIZE = 64;
 const DEFAULT_SIZE = 64;
 // Texel-density multiplier: actual atlas cell = size × resolution, and every tile copy is
 // rasterized from its svg at `resolution` × its native 64 px (sharper, same on-screen size).
-const DEFAULT_RESOLUTION = 2;
+const DEFAULT_RESOLUTION = 4;
 // Mip depth for the atlas. Zoomed-out moiré is texture minification aliasing, so mipmaps
 // stay on: the emitted `lodMaxClamp` equals this, and the cell gutter (bleeding buffer) is
 // sized to 2^mipLevels texels so a level-L average near a cell edge never reaches into the
@@ -111,7 +111,7 @@ export type PatternAtlasOptions = {
   /** CSS/logical cell size — the on-screen reference. Default 64. */
   size?: number;
   /** Texel-density multiplier; actual atlas cell = size × resolution, each tile copy
-   *  rasterized at `resolution` × its native 64 px. Default 2. */
+   *  rasterized at `resolution` × its native 64 px. Default 4. */
   resolution?: number;
   /** Mip levels the margin is sized to keep bleed-free; also the `lodMaxClamp` to cap the
    *  sampler at. Default 2. */
