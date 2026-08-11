@@ -262,6 +262,15 @@ async function composeAtlas(
     ctx.beginPath();
     ctx.rect(frame.x - pad, frame.y - pad, cell + 2 * pad, cell + 2 * pad);
     ctx.clip();
+    // Workaround for deck.gl FillStyleExtension sampling the atlas vertically
+    // mirrored (common-space y grows up-screen, texture v grows down-image, and the
+    // shader never flips — https://github.com/visgl/deck.gl/issues/10548): compose
+    // each frame flipped so the rendered fill matches the source SVG. Only the
+    // direction-sensitive sprites (the diagonals) can tell. The ring region is
+    // symmetric about the frame midline, so the reflection maps it onto itself and
+    // the wrapped padding stays seamless. Drop this if deck fixes the orientation.
+    ctx.translate(0, 2 * frame.y + cell);
+    ctx.scale(1, -1);
     for (let i = -ext; i < reps + ext; i++) {
       for (let j = -ext; j < reps + ext; j++) {
         ctx.drawImage(img, frame.x + i * step, frame.y + j * step, step, step);
