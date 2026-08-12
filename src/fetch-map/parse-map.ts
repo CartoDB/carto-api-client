@@ -680,9 +680,13 @@ function createChannelProps(
           ...scaleProps,
         };
       } else {
-        // Single mode: one real pattern (never solid/none) for every feature.
+        // Single mode: one pattern for every feature.
         result.fillPattern = visConfig.fillPattern;
-        const key = `${visConfig.fillPattern}-${fillPatternDensity ?? 'medium'}`;
+        const pattern = visConfig.fillPattern ?? 'solid';
+        const key =
+          pattern === 'solid' || pattern === 'none'
+            ? pattern
+            : `${pattern}-${fillPatternDensity ?? 'medium'}`;
         result.getFillPattern = () => key;
         updateTriggers.getFillPattern = key;
       }

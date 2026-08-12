@@ -1626,6 +1626,23 @@ describe('parseMap', () => {
       expect(props.getFillPatternScale).toBe(0.25);
     });
 
+    test('single mode: solid/none/missing patterns resolve without a density suffix', () => {
+      const enabled = {fillPatternEnabled: true};
+      expect(
+        parse('Polygon', {
+          ...enabled,
+          fillPattern: 'solid',
+        }).props.getFillPattern()
+      ).toBe('solid');
+      expect(
+        parse('Polygon', {
+          ...enabled,
+          fillPattern: 'none',
+        }).props.getFillPattern()
+      ).toBe('none');
+      expect(parse('Polygon', enabled).props.getFillPattern()).toBe('solid');
+    });
+
     test('floors fillPatternSize at 0.1 — a stored 0 must not emit a zero scale', () => {
       const {props} = parse('Polygon', {
         fillPatternEnabled: true,
