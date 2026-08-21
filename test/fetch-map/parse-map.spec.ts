@@ -1504,4 +1504,214 @@ describe('parseMap', () => {
       expect(props.getDashArray).toBeUndefined();
     });
   });
+
+  describe('fill pattern', () => {
+    const buildDataset = (geometry: string) => ({
+      id: 'FILL_DS',
+      data: {
+        tiles: ['https://example.com/tiles/{z}/{x}/{y}'],
+        tilestats: {
+          layers: [
+            {
+              attributes: [
+                {
+                  attribute: 'zone',
+                  categories: [{category: 'a'}, {category: 'b'}],
+                },
+              ],
+              geometry,
+            },
+          ],
+        },
+      },
+      type: 'tileset',
+    });
+
+    const buildLayerConfig = (
+      visConfigOverrides: Record<string, any> = {},
+      visualChannels: Record<string, any> = {},
+      type = 'tileset'
+    ) => ({
+      version: 'v1',
+      config: {
+        mapState: {},
+        mapStyle: {},
+        visState: {
+          layers: [
+            {
+              id: 'layer1',
+              type,
+              config: {
+                dataId: 'FILL_DS',
+                label: 'Test Layer',
+                textLabel: [{field: null, size: 12}],
+                visConfig: {
+                  filled: true,
+                  opacity: 1,
+                  colorRange: {
+                    category: 'sequential',
+                    colors: ['#f0f0f0', '#333333'],
+                    colorMap: undefined,
+                    name: 'custom',
+                    type: 'custom',
+                  },
+                  radius: 5,
+                  ...visConfigOverrides,
+                },
+              },
+              visualChannels,
+            },
+          ],
+          layerBlending: 'normal',
+          interactionConfig: {tooltip: {enabled: false}},
+        },
+      },
+    });
+
+    const parse = (
+      geometry: string,
+      ...args: Parameters<typeof buildLayerConfig>
+    ) =>
+      parseMap({
+        ...METADATA,
+        datasets: [buildDataset(geometry)],
+        keplerMapConfig: buildLayerConfig(...args),
+      }).layers[0];
+
+    test('disabled: keeps atlas props stable and samples the solid cell', () => {
+      const {props, scales} = parse('Polygon', {});
+      expect(props.fillPatternEnabled).toBe(false);
+      // Atlas props stay so the async prop never transitions to null on toggle
+      // (that crashes deck's layer matching); solid cell renders as plain fill.
+      expect(props.fillPatternAtlas).toBeInstanceOf(Promise);
+      expect(props.getFillPattern()).toBe('solid');
+      expect(props.fillPattern).toBeUndefined();
+      expect(scales.fillPattern).toBeUndefined();
+    });
+
+    test('single mode: constant getFillPattern + atlas/mask props, no scale', () => {
+      const {props, scales} = parse('Polygon', {
+        fillPatternEnabled: true,
+        fillPattern: 'hlines',
+        fillPatternDensity: 'small',
+        fillPatternSize: 2,
+      });
+      expect(props.fillPatternEnabled).toBe(true);
+      expect(typeof props.getFillPattern).toBe('function');
+      expect(props.getFillPattern()).toBe('hlines-small');
+      expect(props.fillPatternAtlas).toBeInstanceOf(Promise);
+      // Default 256 cell with a 4px wrapped-content margin (2^2 levels): pitch 264, col 2, row 0.
+      expect(props.fillPatternMapping['hlines-small']).toMatchObject({
+        x: 532,
+        y: 4,
+        width: 256,
+        height: 256,
+        mask: true,
+      });
+      expect(props.fillPatternMask).toBe(true);
+      // scaleAdjustment for the default atlas (one 256px-dense tile) is (64×1)/256 = 0.25,
+      // so the emitted scale is fillPatternSize (2) × 0.25.
+      expect(props.getFillPatternScale).toBe(0.5);
+      expect(props.fillPattern).toBe('hlines');
+      expect(scales.fillPattern).toBeUndefined();
+    });
+
+    test('single mode defaults density to medium and scale to the atlas adjustment', () => {
+      const {props} = parse('Polygon', {
+        fillPatternEnabled: true,
+        fillPattern: 'dots',
+      });
+      expect(props.getFillPattern()).toBe('dots-medium');
+      // fillPatternSize defaults to 1; scaleAdjustment for the default atlas is 0.25.
+      expect(props.getFillPatternScale).toBe(0.25);
+    });
+
+    test('single mode: solid/none/missing patterns resolve without a density suffix', () => {
+      const enabled = {fillPatternEnabled: true};
+      expect(
+        parse('Polygon', {
+          ...enabled,
+          fillPattern: 'solid',
+        }).props.getFillPattern()
+      ).toBe('solid');
+      expect(
+        parse('Polygon', {
+          ...enabled,
+          fillPattern: 'none',
+        }).props.getFillPattern()
+      ).toBe('none');
+      expect(parse('Polygon', enabled).props.getFillPattern()).toBe('solid');
+    });
+
+    test('floors fillPatternSize at 0.1 — a stored 0 must not emit a zero scale', () => {
+      const {props} = parse('Polygon', {
+        fillPatternEnabled: true,
+        fillPattern: 'dots',
+        fillPatternSize: 0,
+      });
+      expect(props.getFillPatternScale).toBeCloseTo(0.1 * 0.25);
+    });
+
+    test('by-column mode builds a per-feature accessor and a fillPattern scale', () => {
+      const {props, scales} = parse(
+        'Polygon',
+        {
+          fillPatternEnabled: true,
+          fillPattern: 'hlines',
+          fillPatternDensity: 'medium',
+          fillPatternRange: {
+            patternMap: [
+              {value: 'a', pattern: 'hlines'},
+              {value: 'b', pattern: 'cross-hatch'},
+            ],
+            othersPattern: 'none',
+          },
+        },
+        {
+          fillPatternField: {name: 'zone', type: 'string'},
+          fillPatternScale: 'ordinal',
+        }
+      );
+      expect(typeof props.getFillPattern).toBe('function');
+      expect(props.getFillPattern({properties: {zone: 'a'}})).toBe(
+        'hlines-medium'
+      );
+      expect(props.getFillPattern({properties: {zone: 'b'}})).toBe(
+        'cross-hatch-medium'
+      );
+      expect(props.getFillPattern({properties: {zone: 'z'}})).toBe('none');
+      expect(scales.fillPattern).toEqual({
+        field: {name: 'zone', type: 'string'},
+        type: 'ordinal',
+        domain: ['a', 'b'],
+        range: ['hlines', 'cross-hatch'],
+      });
+    });
+
+    test('applies to H3/Quadbin fills (not VectorTile-gated like strokes)', () => {
+      const {props} = parse(
+        'Polygon',
+        {
+          fillPatternEnabled: true,
+          fillPattern: 'dots',
+          fillPatternDensity: 'large',
+        },
+        {},
+        'h3'
+      );
+      expect(props.fillPatternEnabled).toBe(true);
+      expect(props.getFillPattern()).toBe('dots-large');
+    });
+
+    test('unfilled layer emits no pattern props and reports the flag off', () => {
+      const {props} = parse('Polygon', {
+        filled: false,
+        fillPatternEnabled: true,
+        fillPattern: 'hlines',
+      });
+      expect(props.fillPatternEnabled).toBe(false);
+      expect(props.getFillPattern).toBeUndefined();
+      expect(props.fillPatternAtlas).toBeUndefined();
+    });
+  });
 });

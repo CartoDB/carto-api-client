@@ -11,6 +11,7 @@ import {
   opacityToAlpha,
   getIconUrlAccessor,
   getLineStyleAccessor,
+  getFillPatternAccessor,
   negateAccessor,
   getMaxMarkerSize,
   type LayerType,
@@ -33,6 +34,7 @@ import type {
   VisualChannelField,
 } from './types.js';
 import {isRemoteCalculationSupported} from './utils.js';
+import {buildPatternAtlas} from './pattern-atlas.js';
 import {
   getRasterTileLayerStylePropsRgb,
   getRasterTileLayerStylePropsScaledBand,
@@ -60,7 +62,8 @@ export type ScaleKey =
   | 'lineWidth'
   | 'elevation'
   | 'weight'
-  | 'lineStyle';
+  | 'lineStyle'
+  | 'fillPattern';
 
 export type Scales = Partial<Record<ScaleKey, Scale>>;
 
@@ -619,6 +622,76 @@ function createChannelProps(
           result.lineCapRounded = true;
         }
       }
+    }
+  }
+
+  // fill pattern — Phase 2. The pattern is a stencil tinted by the existing fillColor
+  // (mask:true) — no separate pattern-color channel. The consumer attaches
+  // FillStyleExtension unconditionally and reads `fillPatternEnabled` as the on/off
+  // switch, mirroring how MaskExtension is gated by `maskId`. Data only — no extension
+  // instantiation here. Applies to any filled polygon layer (mvt/tileset + H3/Quadbin);
+  // the stroke-dash block above is the VectorTile-only one (per OQ 10).
+  {
+    const fillPatternEnabled = Boolean(
+      visConfig.filled && visConfig.fillPatternEnabled
+    );
+    result.fillPatternEnabled = fillPatternEnabled;
+
+    // Pattern props are emitted for every filled layer, even with the pattern off:
+    // removing them on a live layer transitions the async `fillPatternAtlas` prop to
+    // null, which crashes deck's layer matching (null image transform) and blanks the
+    // layer. A disabled layer samples the opaque `solid` cell instead — under
+    // fillPatternMask the mask multiplies by 1, i.e. a plain fill.
+    if (visConfig.filled) {
+      const patternAtlas = buildPatternAtlas();
+      result.fillPatternAtlas = patternAtlas.atlas;
+      result.fillPatternMapping = patternAtlas.mapping;
+      result.fillPatternMask = true;
+      // Sampler defaults from the atlas build: mips on to kill zoomed-out Moiré
+      // (lodMaxClamp = the atlas mip depth) plus anisotropy for tilted views. deck's
+      // image-prop transform spreads this over the prop default `{lodMaxClamp: 0}`.
+      result.textureParameters = patternAtlas.textureParameters;
+      // Plain, world-anchored scale — no zoom adaptation here; consumers that want
+      // constant on-screen size multiply this by their own zoom factor. Floored at
+      // 0.1 (the Builder slider minimum): 0 would NaN the shader's texture coords.
+      result.getFillPatternScale =
+        Math.max(visConfig.fillPatternSize ?? 1, 0.1) *
+        patternAtlas.scaleAdjustment;
+
+      const {fillPatternField, fillPatternScale} = visualChannels;
+      const {fillPatternRange, fillPatternDensity} = visConfig;
+
+      if (!fillPatternEnabled) {
+        result.getFillPattern = () => 'solid';
+        updateTriggers.getFillPattern = 'solid';
+      } else if (fillPatternField && fillPatternScale && fillPatternRange) {
+        // Flat prop for legend consumers (fallback when there is no by-column scale).
+        result.fillPattern = visConfig.fillPattern;
+        const {accessor, ...scaleProps} = getFillPatternAccessor(
+          fillPatternField,
+          fillPatternRange,
+          fillPatternDensity,
+          data
+        );
+        result.getFillPattern = accessor;
+        scales.fillPattern = updateTriggers.getFillPattern = {
+          field: fillPatternField,
+          type: fillPatternScale,
+          ...scaleProps,
+        };
+      } else {
+        // Single mode: one pattern for every feature.
+        result.fillPattern = visConfig.fillPattern;
+        const pattern = visConfig.fillPattern ?? 'solid';
+        const key =
+          pattern === 'solid' || pattern === 'none'
+            ? pattern
+            : `${pattern}-${fillPatternDensity ?? 'medium'}`;
+        result.getFillPattern = () => key;
+        updateTriggers.getFillPattern = key;
+      }
+      // getFillColor is left exactly as the fillColor channel set it; under
+      // fillPatternMask:true that IS the pattern tint.
     }
   }
 
