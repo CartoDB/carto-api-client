@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- feat(fetchMap): Support line & polygon stroke dash styles (#297)
+
 ### 0.5.32
 
 - fix(parseMap): custom-aggregated channels no longer render a flat fixed color when the saved map has a null visual-channel field; the field is synthesized from the compiled aggregation alias, which also restores the channel's scale for legends (#328)
