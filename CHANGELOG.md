@@ -2,8 +2,10 @@
 
 ## Unreleased
 
+### 0.5.33
+
 - feat(fetchMap): Support line & polygon stroke dash styles (#297)
-- feat(fetchMap): Support polygon fill patterns (runtime-assembled sprite atlas, `getFillPattern`/`scales.fillPattern`, `fillPatternEnabled`)
+- feat(fetchMap): Support polygon fill patterns (runtime-assembled sprite atlas, `getFillPattern`/`scales.fillPattern`, `fillPatternEnabled`) (#313)
 - feat(fetchMap): expose `_buildPatternAtlas({size, resolution, mipLevels})` — options-driven fill-pattern atlas builder (Figma svg tiles, 64 @ 2, mip depth 2); returns the decoded atlas, mapping, scale adjustment, resolved cell/mip, and sampler `textureParameters` (mips-on `lodMaxClamp` = mip depth + `maxAnisotropy` 4 to suppress zoomed-out moiré) for consumers to drive scale themselves
 
 ### 0.5.32
