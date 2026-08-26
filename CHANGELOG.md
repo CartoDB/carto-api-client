@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(fetchMap): stop crashing on a map whose config has no `filters` — the shape of every map created programmatically and never saved by Builder. `filters` and `popupSettings` are now optional on `KeplerMapConfig`. [sc-569943]
+
 ### 0.5.33
 
 - feat(fetchMap): Support line & polygon stroke dash styles (#297)
