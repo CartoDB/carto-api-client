@@ -193,15 +193,17 @@ export interface CustomStyle {
 }
 
 // TODO replace with more complete type from Builder
+// Optional fields are the ones Builder adds when it first saves a map; a config
+// written programmatically carries only mapState, mapStyle and visState.
 export type KeplerMapConfig = {
-  filters: any;
+  filters?: any;
   mapState: any;
   mapStyle: {
     styleType: string;
     visibleLayerGroups: Record<string, boolean>;
   };
   legendSettings?: any;
-  popupSettings: any;
+  popupSettings?: any;
   visState: {
     layers: MapConfigLayer[];
     layerBlending: any;

@@ -110,7 +110,9 @@ export async function fillInMapDatasets(
   {datasets, keplerMapConfig}: {datasets: Dataset[]; keplerMapConfig: any},
   context: _FetchMapContext
 ) {
-  const {filters} = keplerMapConfig.config as KeplerMapConfig;
+  // Builder is not the only producer of map configs: a programmatically created
+  // map carries a minimal config and may have no `filters` key at all.
+  const {filters = {}} = keplerMapConfig.config as KeplerMapConfig;
   const promises = datasets.map((dataset) =>
     _fetchMapDataset(dataset, filters[dataset.id], context)
   );
