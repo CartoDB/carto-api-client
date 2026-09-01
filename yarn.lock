@@ -1031,15 +1031,15 @@ __metadata:
   linkType: hard
 
 "@loaders.gl/core@npm:^4.2.0, @loaders.gl/core@npm:^4.3.3":
-  version: 4.4.3
-  resolution: "@loaders.gl/core@npm:4.4.3"
+  version: 4.4.5
+  resolution: "@loaders.gl/core@npm:4.4.5"
   dependencies:
-    "@loaders.gl/loader-utils": "npm:4.4.3"
-    "@loaders.gl/schema": "npm:4.4.3"
-    "@loaders.gl/schema-utils": "npm:4.4.3"
-    "@loaders.gl/worker-utils": "npm:4.4.3"
+    "@loaders.gl/loader-utils": "npm:4.4.5"
+    "@loaders.gl/schema": "npm:4.4.5"
+    "@loaders.gl/schema-utils": "npm:4.4.5"
+    "@loaders.gl/worker-utils": "npm:4.4.5"
     "@probe.gl/log": "npm:^4.1.1"
-  checksum: 10c0/dcb412017844bc453918e2c2cf59910c5f1a2fec505cbc346db35a147dd562bde913604050a641f1891557c23ea936ad28102d3f1a3d01ba4146788ba805067b
+  checksum: 10c0/7aab2edbbf79771b8dced03a6936e5cb2a8d18cc8507f34c51e8470a70e2c5ecea0e8fad33759c099b9591f5caedd36a20c6b7ca0318f2d80f3f70f2791e0ccc
   languageName: node
   linkType: hard
 
@@ -1139,15 +1139,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@loaders.gl/loader-utils@npm:4.4.3":
-  version: 4.4.3
-  resolution: "@loaders.gl/loader-utils@npm:4.4.3"
+"@loaders.gl/loader-utils@npm:4.4.5":
+  version: 4.4.5
+  resolution: "@loaders.gl/loader-utils@npm:4.4.5"
   dependencies:
-    "@loaders.gl/schema": "npm:4.4.3"
-    "@loaders.gl/worker-utils": "npm:4.4.3"
+    "@loaders.gl/schema": "npm:4.4.5"
+    "@loaders.gl/worker-utils": "npm:4.4.5"
     "@probe.gl/log": "npm:^4.1.1"
     "@probe.gl/stats": "npm:^4.1.1"
-  checksum: 10c0/82fd3a3d7b130d9d3794ec11f64cd6210e347732d732022b60f12f8560754043e1eae16126c689342436a84fdf7cfeeb828d8a9c76a1c3c84728f4bb304cc71a
+  checksum: 10c0/824ae9fbf6bb11c81920f972114f48bad6e42b4292ce1a76c25d7903f5a5ef18b4ee2454d4709f22b61720388dda8a81391c0fd86880b1e10a88d3309586ead3
   languageName: node
   linkType: hard
 
@@ -1180,16 +1180,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@loaders.gl/schema-utils@npm:4.4.3":
-  version: 4.4.3
-  resolution: "@loaders.gl/schema-utils@npm:4.4.3"
+"@loaders.gl/schema-utils@npm:4.4.5":
+  version: 4.4.5
+  resolution: "@loaders.gl/schema-utils@npm:4.4.5"
   dependencies:
-    "@loaders.gl/schema": "npm:4.4.3"
+    "@loaders.gl/schema": "npm:4.4.5"
+    "@math.gl/types": "npm:^4.1.0"
     "@types/geojson": "npm:^7946.0.7"
     apache-arrow: "npm:>= 17.0.0"
   peerDependencies:
     "@loaders.gl/core": ~4.4.0
-  checksum: 10c0/bf03c6725ba85fba55bc74282d6660a914b7f33e9e69bbed5918a5793302b87e1c956dabe4e24a10f57c490aa1eb78441cbeb05f3f76ca88026c64162c120734
+  checksum: 10c0/f7d7870824b71e00912203738c345d9adf7de54b1bfee306e17a0e315fc3a5cccfdd54f057985564fd1aad347c06b0ccf8298eee866243df906b97aa8f12ba2c
   languageName: node
   linkType: hard
 
@@ -1215,13 +1216,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@loaders.gl/schema@npm:4.4.3, @loaders.gl/schema@npm:^4.2.0, @loaders.gl/schema@npm:^4.3.3":
-  version: 4.4.3
-  resolution: "@loaders.gl/schema@npm:4.4.3"
+"@loaders.gl/schema@npm:4.4.5, @loaders.gl/schema@npm:^4.2.0, @loaders.gl/schema@npm:^4.3.3":
+  version: 4.4.5
+  resolution: "@loaders.gl/schema@npm:4.4.5"
   dependencies:
     "@types/geojson": "npm:^7946.0.7"
     apache-arrow: "npm:>= 17.0.0"
-  checksum: 10c0/59a9fd6047398a3eebb67fdd11fb2418feb91767955911573656d486718af06643e3b4e5ccd860612356031081f826197c876e61a3f0426fb20e6137a7498d4a
+  checksum: 10c0/d7f4aeaba855a5a6daca7fb5c851aa7775a3a9548ffaf095c3e3982a4b822dfd446d38e400e3ac4fc0c8b22c35cf90ea1d3afad6a578cb0ad9a938f08d5986b0
   languageName: node
   linkType: hard
 
@@ -1307,12 +1308,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@loaders.gl/worker-utils@npm:4.4.3":
-  version: 4.4.3
-  resolution: "@loaders.gl/worker-utils@npm:4.4.3"
+"@loaders.gl/worker-utils@npm:4.4.5":
+  version: 4.4.5
+  resolution: "@loaders.gl/worker-utils@npm:4.4.5"
   peerDependencies:
     "@loaders.gl/core": ~4.4.0
-  checksum: 10c0/b82093c822725c6a076dba9a133df5cbb31b646ec523ea3b2a5bda6443e0919d65a6b97e774482b3976621ea1b1d257139a6319acdfa6d5163f8408d0c78334a
+  checksum: 10c0/c07eec6c256e00de973d3f1da881ce2b0695134fda10d850cf44e32c607f3d06eabc0822de575daad8005626b643b264cc8b3bda484c63479fe2e6c50ce6a4b7
   languageName: node
   linkType: hard
 
