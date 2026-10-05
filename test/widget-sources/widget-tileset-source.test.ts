@@ -1,4 +1,4 @@
-import {describe, it, expect, beforeEach} from 'vitest';
+import {describe, it, expect, beforeEach, vi} from 'vitest';
 import {
   TileFormat,
   WidgetTilesetSource,
@@ -328,5 +328,50 @@ describe('getAggregations', () => {
         spatialFilter: MOCK_SPATIAL_FILTER,
       });
     }).rejects.toThrow(/sql/i);
+  });
+});
+
+describe('worker requests', () => {
+  // A Worker that never answers: the request stays pending until aborted.
+  class SilentWorker extends EventTarget {
+    postMessage() {}
+    terminate() {}
+  }
+
+  // test/setup.ts unstubs globals after each test
+  beforeEach(() => {
+    vi.stubGlobal('Worker', SilentWorker);
+  });
+
+  it('an aborted request rejects once, with no unhandled rejection', async () => {
+    const unhandled: unknown[] = [];
+    const onUnhandled = (reason: unknown) => unhandled.push(reason);
+    process.on('unhandledRejection', onUnhandled);
+
+    const workerSource = new WidgetTilesetSource({
+      connectionName: 'test-connection',
+      tableName: 'test-table',
+      accessToken: '••••',
+      tileFormat: TileFormat.BINARY,
+      spatialDataType: 'geo',
+      spatialDataBounds: MOCK_BOUNDS,
+      widgetWorker: true,
+    });
+    const controller = new AbortController();
+    const request = workerSource.getFormula({
+      column: 'revenue',
+      operation: 'sum',
+      spatialFilter: MOCK_SPATIAL_FILTER,
+      signal: controller.signal,
+    });
+    controller.abort();
+
+    await expect(request).rejects.toThrow(/abort/i);
+    // the derived `.finally()` promise settles a tick after `request` does
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    process.off('unhandledRejection', onUnhandled);
+
+    expect(unhandled).toEqual([]);
+    workerSource.destroy();
   });
 });

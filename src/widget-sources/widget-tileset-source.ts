@@ -186,11 +186,15 @@ export class WidgetTilesetSource<
       });
     });
 
-    // Whether the task completes, fails, or aborts: clean up afterward.
-    void promise.finally(() => {
-      worker.removeEventListener('message', onMessage);
-      signal?.removeEventListener('abort', onAbort);
-    });
+    // Whether the task completes, fails, or aborts: clean up afterward. The
+    // promise `.finally()` returns adopts the rejection; the caller already
+    // gets it through `promise`, so this copy only has to not be unhandled.
+    promise
+      .finally(() => {
+        worker.removeEventListener('message', onMessage);
+        signal?.removeEventListener('abort', onAbort);
+      })
+      .catch(() => undefined);
 
     return promise;
   }
